@@ -2007,7 +2007,7 @@ async function loadFromCloud() {
     showToast('Syncing your data…', 1500);
 
     // Load all data in parallel
-    const [settings, goals, progress, workout, prs, foodlib, steps, sleep, photos] = await Promise.all([
+    const [settings, goals, progress, workout, prs, foodlib, steps, sleep, photos, macros] = await Promise.all([
       cloudGet('/user/settings'),
       cloudGet('/user/goals'),
       cloudGet('/progress'),
@@ -2017,6 +2017,7 @@ async function loadFromCloud() {
       cloudGet('/steps'),
       cloudGet('/sleep'),
       cloudGet('/photos'),
+      cloudGet('/macros'),
     ]);
 
     // Apply settings
@@ -2069,6 +2070,9 @@ async function loadFromCloud() {
         if(ws.program) {
           workoutState = { ...workoutState, ...ws };
           save(WORKOUT_KEY, workoutState);
+          // Restore active program and day index into runtime variables
+          selectedProgram = ws.program;
+          if(ws.dayIdx != null) workoutDayIdx = ws.dayIdx;
         }
       } catch(e) {}
     }
@@ -2101,6 +2105,39 @@ async function loadFromCloud() {
         date: p.log_date, ts: new Date(p.created_at).getTime()
       }));
       save(PROGRESS_PHOTOS_KEY, mapped);
+    }
+
+    // Apply macros/food log data
+    if(macros && macros.length > 0) {
+      const storedMacros = load(MACRO_KEY) || {};
+      macros.forEach(entry => {
+        const idx = entry.day_index;
+        if(idx == null) return;
+        if(!storedMacros[idx]) storedMacros[idx] = { meals: { breakfast: { items: [] }, lunch: { items: [] }, dinner: { items: [] } }, burned: 0, notes: '' };
+        // Restore burned calories and notes if present
+        if(entry.burned != null) storedMacros[idx].burned = entry.burned;
+        if(entry.notes)          storedMacros[idx].notes  = entry.notes;
+        const meal = entry.meal;
+        if(!meal) return;
+        if(!storedMacros[idx].meals) storedMacros[idx].meals = { breakfast: { items: [] }, lunch: { items: [] }, dinner: { items: [] } };
+        if(!storedMacros[idx].meals[meal]) storedMacros[idx].meals[meal] = { items: [] };
+        // Avoid duplicates
+        const exists = storedMacros[idx].meals[meal].items.some(i =>
+          i.name === entry.food_name && i.cal === entry.calories
+        );
+        if(!exists) {
+          storedMacros[idx].meals[meal].items.push({
+            name: entry.food_name,
+            cal: entry.calories,
+            protein: entry.protein,
+            carbs: entry.carbs,
+            fat: entry.fat,
+            _synced: true
+          });
+        }
+      });
+      save(MACRO_KEY, storedMacros);
+      macroData = storedMacros;
     }
 
     // Re-render everything with cloud data
@@ -2226,7 +2263,10 @@ function saveDay(){
 function onActivityInput(){
   macroData[cur].burned=parseFloat(document.getElementById('f-burned').value)||0;
   macroData[cur].notes=document.getElementById('f-notes').value||'';
-  save(MACRO_KEY,macroData);renderHero();renderMacroStats();renderWeekBars();renderWeekTotals();renderLine();updateActivityStats();
+  save(MACRO_KEY,macroData);
+  // Sync burned calories to cloud
+  cloudPost('/macros/burned', { day_index: cur, date: new Date().toISOString().split('T')[0], burned: macroData[cur].burned, notes: macroData[cur].notes });
+  renderHero();renderMacroStats();renderWeekBars();renderWeekTotals();renderLine();updateActivityStats();
   const s=document.getElementById('actSaveStatus'),t=document.getElementById('actSaveText');
   s.classList.add('saved');t.textContent='saved';clearTimeout(window._aT);
   window._aT=setTimeout(()=>{s.classList.remove('saved');t.textContent='updates automatically';},1800);
@@ -4165,6 +4205,8 @@ function startProgram(){
   workoutState.weekOffset=0;
   workoutWeek=0;
   save(WORKOUT_KEY,workoutState);
+  // Sync program selection to cloud immediately
+  cloudPost('/workout', { program: workoutState.program, state: workoutState });
   // Always start on the first real training day (Day 1), not today's weekday index
   const prog = getProgram(selectedProgram);
   if(prog) {
@@ -7854,10 +7896,13 @@ try {
   updateProfilePicDisplay();
   // Load cloud data if logged in
   if(isLoggedIn()) loadFromCloud();
-  // Show onboarding on first ever load
-  if(obShouldShow()) {
+  // Show onboarding only for first-time users who are NOT already logged in
+  if(obShouldShow() && !isLoggedIn()) {
     // Wait for splash to finish (2.5s) then show onboarding
     setTimeout(() => obOpen(), 2600);
+  } else if(obShouldShow() && isLoggedIn()) {
+    // Logged in user — mark onboarding done, their data will load from cloud
+    localStorage.setItem(ONBOARDING_KEY, '1');
   }
 } catch(e) {
   console.error('Init error:', e);
