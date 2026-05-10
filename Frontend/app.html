@@ -3313,50 +3313,61 @@ const PROGRAMS = {
     days:[
       {name:'Glutes A',exercises:[
         {name:'Barbell Hip Thrust',sets:4,reps:'8-12'},
+        {name:'Dumbbell Shoulder Press',sets:3,reps:'12-15'},
         {name:'Romanian Deadlift',sets:3,reps:'10-12'},
+        {name:'Lat Pulldown',sets:3,reps:'12-15'},
         {name:'Sumo Squat',sets:3,reps:'12-15'},
+        {name:'Lateral Raises',sets:3,reps:'15-20'},
         {name:'Cable Kickback',sets:3,reps:'15-20'},
+        {name:'Tricep Pushdowns',sets:3,reps:'15-20'},
         {name:'Donkey Kicks',sets:3,reps:'15-20'},
+        {name:'Dumbbell Curl',sets:3,reps:'12-15'},
         {name:'Glute Bridge Hold',sets:3,reps:'30s'}
       ]},
-      {name:'Upper Tone',exercises:[
-        {name:'Dumbbell Shoulder Press',sets:3,reps:'12-15'},
-        {name:'Lat Pulldown',sets:3,reps:'12-15'},
+      {name:'Upper + Lower Tone',exercises:[
         {name:'Seated Cable Row',sets:3,reps:'12-15'},
-        {name:'Lateral Raises',sets:3,reps:'15-20'},
-        {name:'Tricep Pushdowns',sets:3,reps:'15-20'},
-        {name:'Dumbbell Curl',sets:3,reps:'12-15'}
-      ]},
-      {name:'Legs & Glutes',exercises:[
-        {name:'Squat',sets:4,reps:'10-12'},
         {name:'Walking Lunges',sets:3,reps:'12 each'},
-        {name:'Leg Press',sets:3,reps:'12-15'},
-        {name:'Leg Curl',sets:3,reps:'12-15'},
-        {name:'Fire Hydrants',sets:3,reps:'20 each'},
-        {name:'Calf Raises',sets:4,reps:'15-20'}
-      ]},
-      {name:'Glutes B',exercises:[
-        {name:'Single Leg Hip Thrust',sets:4,reps:'10-12 each'},
-        {name:'Deadlift',sets:3,reps:'8-10'},
-        {name:'Curtsy Lunge',sets:3,reps:'12 each'},
-        {name:'Cable Pull-Through',sets:3,reps:'15-20'},
-        {name:'Banded Glute Bridge',sets:3,reps:'20'},
-        {name:'Reverse Hyperextension',sets:3,reps:'15-20'}
-      ]},
-      {name:'Upper Tone B',exercises:[
-        {name:'Incline Dumbbell Press',sets:3,reps:'12-15'},
         {name:'Dumbbell Row',sets:3,reps:'12-15'},
+        {name:'Leg Curl',sets:3,reps:'12-15'},
         {name:'Face Pulls',sets:3,reps:'15-20'},
+        {name:'Fire Hydrants',sets:3,reps:'20 each'},
         {name:'Rear Delt Fly',sets:3,reps:'15-20'},
+        {name:'Calf Raises',sets:4,reps:'15-20'},
         {name:'Overhead Tricep Extension',sets:3,reps:'12-15'},
         {name:'Hammer Curl',sets:3,reps:'12-15'}
       ]},
-      {name:'Booty Burn',exercises:[
-        {name:'Hip Thrust',sets:5,reps:'15-20'},
-        {name:'Sumo Deadlift',sets:3,reps:'10-12'},
-        {name:'Leg Press (High Foot)',sets:3,reps:'15-20'},
-        {name:'Donkey Kicks',sets:4,reps:'20 each'},
+      {name:'Legs & Glutes B',exercises:[
+        {name:'Squat',sets:4,reps:'10-12'},
+        {name:'Incline Dumbbell Press',sets:3,reps:'12-15'},
+        {name:'Single Leg Hip Thrust',sets:4,reps:'10-12 each'},
+        {name:'Dumbbell Shoulder Press',sets:3,reps:'12-15'},
+        {name:'Leg Press',sets:3,reps:'12-15'},
+        {name:'Lat Pulldown',sets:3,reps:'12-15'},
+        {name:'Curtsy Lunge',sets:3,reps:'12 each'},
+        {name:'Lateral Raises',sets:3,reps:'15-20'},
+        {name:'Cable Pull-Through',sets:3,reps:'15-20'}
+      ]},
+      {name:'Glutes & Upper B',exercises:[
+        {name:'Deadlift',sets:3,reps:'8-10'},
+        {name:'Push-Ups',sets:3,reps:'15-20'},
+        {name:'Banded Glute Bridge',sets:3,reps:'20'},
+        {name:'Seated Cable Row',sets:3,reps:'12-15'},
+        {name:'Reverse Hyperextension',sets:3,reps:'15-20'},
+        {name:'Face Pulls',sets:3,reps:'15-20'},
         {name:'Side-Lying Clam',sets:3,reps:'20 each'},
+        {name:'Tricep Pushdowns',sets:3,reps:'15-20'},
+        {name:'Cable Kickback',sets:3,reps:'15-20'},
+        {name:'Hammer Curl',sets:3,reps:'12-15'}
+      ]},
+      {name:'Booty Burn & Upper',exercises:[
+        {name:'Hip Thrust',sets:5,reps:'15-20'},
+        {name:'Dumbbell Row',sets:3,reps:'12-15'},
+        {name:'Sumo Deadlift',sets:3,reps:'10-12'},
+        {name:'Overhead Tricep Extension',sets:3,reps:'12-15'},
+        {name:'Leg Press (High Foot)',sets:3,reps:'15-20'},
+        {name:'Rear Delt Fly',sets:3,reps:'15-20'},
+        {name:'Donkey Kicks',sets:4,reps:'20 each'},
+        {name:'Dumbbell Curl',sets:3,reps:'12-15'},
         {name:'Glute Kickback Machine',sets:3,reps:'15-20'}
       ]},
       {name:'Rest',exercises:[]}
@@ -3369,41 +3380,37 @@ const PROGRAMS = {
     desc:'4-day program to build curves — grow the glutes, slim the waist, tone the upper body',
     daysPerWeek:'4 days/week',
     days:[
-      {name:'Lower Body',exercises:[
+      {name:'Lower + Upper A',exercises:[
         {name:'Barbell Hip Thrust',sets:4,reps:'10-12'},
-        {name:'Romanian Deadlift',sets:3,reps:'10-12'},
-        {name:'Sumo Squat',sets:3,reps:'12-15'},
-        {name:'Leg Curl',sets:3,reps:'12-15'},
-        {name:'Cable Kickback',sets:3,reps:'15-20'},
-        {name:'Standing Calf Raises',sets:3,reps:'15-20'}
-      ]},
-      {name:'Upper + Core',exercises:[
         {name:'Dumbbell Shoulder Press',sets:3,reps:'12-15'},
+        {name:'Romanian Deadlift',sets:3,reps:'10-12'},
         {name:'Lat Pulldown',sets:3,reps:'12-15'},
+        {name:'Sumo Squat',sets:3,reps:'12-15'},
         {name:'Cable Fly',sets:3,reps:'15-20'},
+        {name:'Leg Curl',sets:3,reps:'12-15'},
         {name:'Lateral Raises',sets:3,reps:'15-20'},
+        {name:'Cable Kickback',sets:3,reps:'15-20'},
         {name:'Plank',sets:3,reps:'45s'},
-        {name:'Russian Twist',sets:3,reps:'20'},
-        {name:'Bicycle Crunches',sets:3,reps:'20 each'}
+        {name:'Standing Calf Raises',sets:3,reps:'15-20'},
+        {name:'Russian Twist',sets:3,reps:'20'}
       ]},
       {name:'Rest',exercises:[]},
-      {name:'Glutes & Hamstrings',exercises:[
+      {name:'Lower + Upper B',exercises:[
         {name:'Single Leg Hip Thrust',sets:4,reps:'12 each'},
-        {name:'Deadlift',sets:3,reps:'8-10'},
-        {name:'Walking Lunges',sets:3,reps:'12 each'},
-        {name:'Leg Press (High Foot)',sets:3,reps:'15'},
-        {name:'Donkey Kicks',sets:3,reps:'20 each'},
-        {name:'Reverse Hyperextension',sets:3,reps:'15-20'}
-      ]},
-      {name:'Upper + Abs',exercises:[
         {name:'Incline Dumbbell Press',sets:3,reps:'12-15'},
+        {name:'Deadlift',sets:3,reps:'8-10'},
         {name:'Seated Cable Row',sets:3,reps:'12-15'},
+        {name:'Walking Lunges',sets:3,reps:'12 each'},
         {name:'Face Pulls',sets:3,reps:'15-20'},
+        {name:'Leg Press (High Foot)',sets:3,reps:'15'},
         {name:'Tricep Pushdowns',sets:3,reps:'15-20'},
+        {name:'Donkey Kicks',sets:3,reps:'20 each'},
         {name:'Dumbbell Curl',sets:3,reps:'12-15'},
-        {name:'Hanging Knee Raise',sets:3,reps:'15'},
-        {name:'Dead Bug',sets:3,reps:'10 each'}
+        {name:'Reverse Hyperextension',sets:3,reps:'15-20'},
+        {name:'Hanging Knee Raise',sets:3,reps:'15'}
       ]},
+      {name:'Rest',exercises:[]},
+      {name:'Rest',exercises:[]},
       {name:'Rest',exercises:[]},
       {name:'Rest',exercises:[]}
     ]
@@ -3699,37 +3706,48 @@ const PROGRAMS_MALE = {
     desc:'4-day push/pull/legs with cardio finishers to maximize fat burn',
     daysPerWeek:'4 days · 12 weeks',
     days:[
-      {name:'Day 1 — Push',exercises:[
+      {name:'Day 1 — Push + Lower',exercises:[
         {name:'Bench Press',sets:3,reps:'12-15',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
+        {name:'Squat',sets:3,reps:'12-15',p2:{sets:4,reps:'8-10'},p3:{sets:5,reps:'5-6'}},
         {name:'Overhead Press',sets:3,reps:'12-15',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
+        {name:'Romanian Deadlift',sets:3,reps:'12-15',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
         {name:'Incline Dumbbell Press',sets:3,reps:'12-15',p2:{sets:3,reps:'10-12'},p3:{sets:4,reps:'8-10'}},
+        {name:'Leg Press',sets:3,reps:'15-20',p2:{sets:4,reps:'10-12'},p3:{sets:4,reps:'8-10'}},
         {name:'Lateral Raises',sets:3,reps:'15-20',p2:{sets:4,reps:'12-15'},p3:{sets:4,reps:'10-12'}},
-        {name:'Tricep Pushdowns',sets:3,reps:'15-20',p2:{sets:3,reps:'12-15'},p3:{sets:4,reps:'10-12'}},
-        {name:'Diamond Push-Ups',sets:3,reps:'15-20',p2:{sets:3,reps:'12-15'},p3:{sets:4,reps:'10-12'}}
+        {name:'Calf Raises',sets:3,reps:'20',p2:{sets:4,reps:'15'},p3:{sets:4,reps:'12'}},
+        {name:'Tricep Pushdowns',sets:3,reps:'15-20',p2:{sets:3,reps:'12-15'},p3:{sets:4,reps:'10-12'}}
       ]},
-      {name:'Day 2 — Pull',exercises:[
+      {name:'Day 2 — Pull + Lower',exercises:[
         {name:'Barbell Row',sets:3,reps:'12-15',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
+        {name:'Leg Curl',sets:3,reps:'12-15',p2:{sets:3,reps:'10-12'},p3:{sets:4,reps:'8-10'}},
         {name:'Lat Pulldown',sets:3,reps:'12-15',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
+        {name:'Walking Lunges',sets:3,reps:'15 each',p2:{sets:3,reps:'12 each'},p3:{sets:4,reps:'10 each'}},
         {name:'Seated Cable Row',sets:3,reps:'12-15',p2:{sets:3,reps:'10-12'},p3:{sets:4,reps:'8-10'}},
+        {name:'Hip Thrust',sets:3,reps:'15',p2:{sets:4,reps:'10-12'},p3:{sets:4,reps:'8-10'}},
         {name:'Face Pulls',sets:3,reps:'15-20',p2:{sets:3,reps:'12-15'},p3:{sets:4,reps:'10-12'}},
         {name:'Barbell Curl',sets:3,reps:'12-15',p2:{sets:3,reps:'10-12'},p3:{sets:4,reps:'8-10'}},
         {name:'Hammer Curls',sets:3,reps:'12-15',p2:{sets:3,reps:'10-12'},p3:{sets:4,reps:'8-10'}}
       ]},
-      {name:'Day 3 — Legs',exercises:[
-        {name:'Squat',sets:3,reps:'12-15',p2:{sets:4,reps:'8-10'},p3:{sets:5,reps:'5-6'}},
+      {name:'Day 3 — Lower + Core',exercises:[
+        {name:'Deadlift',sets:3,reps:'8-10',p2:{sets:4,reps:'5-6'},p3:{sets:5,reps:'3'}},
+        {name:'Plank',sets:3,reps:'45s',p2:{reps:'60s'},p3:{reps:'90s'}},
         {name:'Romanian Deadlift',sets:3,reps:'12-15',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
+        {name:'Pull-Ups',sets:3,reps:'10-12',p2:{sets:4,reps:'6-8'},p3:{sets:4,reps:'5-6'}},
+        {name:'Squat',sets:3,reps:'12-15',p2:{sets:4,reps:'8-10'},p3:{sets:5,reps:'5-6'}},
+        {name:'Dumbbell Shoulder Press',sets:3,reps:'12',p2:{sets:3,reps:'10'},p3:{sets:4,reps:'8'}},
         {name:'Leg Press',sets:3,reps:'15-20',p2:{sets:4,reps:'10-12'},p3:{sets:4,reps:'8-10'}},
-        {name:'Leg Curl',sets:3,reps:'12-15',p2:{sets:3,reps:'10-12'},p3:{sets:4,reps:'8-10'}},
-        {name:'Walking Lunges',sets:3,reps:'15 each',p2:{sets:3,reps:'12 each'},p3:{sets:4,reps:'10 each'}},
-        {name:'Calf Raises',sets:3,reps:'20',p2:{sets:4,reps:'15'},p3:{sets:4,reps:'12'}}
+        {name:'Incline Bench Press',sets:3,reps:'12',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
+        {name:'Leg Curl',sets:3,reps:'12-15',p2:{sets:3,reps:'10-12'},p3:{sets:4,reps:'8-10'}}
       ]},
       {name:'Day 4 — Full Body',exercises:[
-        {name:'Deadlift',sets:3,reps:'8-10',p2:{sets:4,reps:'5-6'},p3:{sets:5,reps:'3'}},
-        {name:'Incline Bench Press',sets:3,reps:'12',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
-        {name:'Pull-Ups',sets:3,reps:'10-12',p2:{sets:4,reps:'6-8'},p3:{sets:4,reps:'5-6'}},
         {name:'Hip Thrust',sets:3,reps:'15',p2:{sets:4,reps:'10-12'},p3:{sets:4,reps:'8-10'}},
-        {name:'Dumbbell Shoulder Press',sets:3,reps:'12',p2:{sets:3,reps:'10'},p3:{sets:4,reps:'8'}},
-        {name:'Plank',sets:3,reps:'45s',p2:{reps:'60s'},p3:{reps:'90s'}}
+        {name:'Bench Press',sets:3,reps:'12-15',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
+        {name:'Walking Lunges',sets:3,reps:'15 each',p2:{sets:3,reps:'12 each'},p3:{sets:4,reps:'10 each'}},
+        {name:'Barbell Row',sets:3,reps:'12-15',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
+        {name:'Calf Raises',sets:3,reps:'20',p2:{sets:4,reps:'15'},p3:{sets:4,reps:'12'}},
+        {name:'Overhead Press',sets:3,reps:'12-15',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
+        {name:'Leg Curl',sets:3,reps:'12-15',p2:{sets:3,reps:'10-12'},p3:{sets:4,reps:'8-10'}},
+        {name:'Face Pulls',sets:3,reps:'15-20',p2:{sets:3,reps:'12-15'},p3:{sets:4,reps:'10-12'}}
       ]}
     ]
   },
@@ -3740,37 +3758,51 @@ const PROGRAMS_MALE = {
     desc:'4-day upper/lower split — proven for intermediate lifters to build serious muscle',
     daysPerWeek:'4 days · 12 weeks',
     days:[
-      {name:'Day 1 — Upper A',exercises:[
+      {name:'Day 1 — Upper A + Lower',exercises:[
         {name:'Bench Press',sets:3,reps:'10-12',p2:{sets:4,reps:'6-8'},p3:{sets:5,reps:'4-6'}},
+        {name:'Squat',sets:3,reps:'10-12',p2:{sets:4,reps:'6-8'},p3:{sets:5,reps:'4-6'}},
         {name:'Barbell Row',sets:3,reps:'10-12',p2:{sets:4,reps:'6-8'},p3:{sets:4,reps:'5-6'}},
+        {name:'Romanian Deadlift',sets:3,reps:'10-12',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
         {name:'Overhead Press',sets:3,reps:'10-12',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
+        {name:'Leg Press',sets:3,reps:'12-15',p2:{sets:4,reps:'10-12'},p3:{sets:4,reps:'8-10'}},
         {name:'Lat Pulldown',sets:3,reps:'12-15',p2:{sets:3,reps:'10-12'},p3:{sets:4,reps:'8-10'}},
+        {name:'Calf Raises',sets:3,reps:'15-20',p2:{sets:4,reps:'12-15'},p3:{sets:4,reps:'10-12'}},
         {name:'Tricep Pushdowns',sets:3,reps:'12-15',p2:{sets:3,reps:'10-12'},p3:{sets:4,reps:'8-10'}},
         {name:'Barbell Curl',sets:3,reps:'12-15',p2:{sets:3,reps:'10-12'},p3:{sets:4,reps:'8-10'}}
       ]},
-      {name:'Day 2 — Lower A',exercises:[
-        {name:'Squat',sets:3,reps:'10-12',p2:{sets:4,reps:'6-8'},p3:{sets:5,reps:'4-6'}},
-        {name:'Romanian Deadlift',sets:3,reps:'10-12',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
-        {name:'Leg Press',sets:3,reps:'12-15',p2:{sets:4,reps:'10-12'},p3:{sets:4,reps:'8-10'}},
-        {name:'Leg Curl',sets:3,reps:'12-15',p2:{sets:3,reps:'10-12'},p3:{sets:4,reps:'8-10'}},
-        {name:'Hip Thrust',sets:3,reps:'12-15',p2:{sets:4,reps:'10-12'},p3:{sets:4,reps:'8-10'}},
-        {name:'Calf Raises',sets:3,reps:'15-20',p2:{sets:4,reps:'12-15'},p3:{sets:4,reps:'10-12'}}
-      ]},
-      {name:'Day 3 — Upper B',exercises:[
+      {name:'Day 2 — Lower A + Upper',exercises:[
+        {name:'Deadlift',sets:3,reps:'8-10',p2:{sets:4,reps:'5-6'},p3:{sets:5,reps:'3-5'}},
         {name:'Incline Bench Press',sets:3,reps:'10-12',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
+        {name:'Front Squat',sets:3,reps:'10-12',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
         {name:'Chest-Supported Row',sets:3,reps:'10-12',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
+        {name:'Hip Thrust',sets:3,reps:'12-15',p2:{sets:4,reps:'10-12'},p3:{sets:4,reps:'8-10'}},
         {name:'Dumbbell Shoulder Press',sets:3,reps:'10-12',p2:{sets:3,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
+        {name:'Leg Curl',sets:3,reps:'12-15',p2:{sets:3,reps:'10-12'},p3:{sets:4,reps:'8-10'}},
+        {name:'Pull-Ups',sets:3,reps:'8-12',p2:{sets:4,reps:'6-8'},p3:{sets:4,reps:'5-6'}}
+      ]},
+      {name:'Day 3 — Upper B + Lower',exercises:[
+        {name:'Incline Bench Press',sets:3,reps:'10-12',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
+        {name:'Bulgarian Split Squat',sets:3,reps:'10-12 each',p2:{sets:3,reps:'8-10 each'},p3:{sets:4,reps:'6-8 each'}},
+        {name:'Chest-Supported Row',sets:3,reps:'10-12',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
+        {name:'Nordic Curl',sets:3,reps:'6-8',p2:{sets:3,reps:'8'},p3:{sets:4,reps:'8'}},
+        {name:'Dumbbell Shoulder Press',sets:3,reps:'10-12',p2:{sets:3,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
+        {name:'Leg Extension',sets:3,reps:'12-15',p2:{sets:3,reps:'10-12'},p3:{sets:4,reps:'8-10'}},
         {name:'Pull-Ups',sets:3,reps:'8-12',p2:{sets:4,reps:'6-8'},p3:{sets:4,reps:'5-6'}},
+        {name:'Standing Calf Raises',sets:3,reps:'15-20',p2:{sets:4,reps:'12-15'},p3:{sets:4,reps:'10-12'}},
         {name:'Skull Crushers',sets:3,reps:'10-12',p2:{sets:3,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
         {name:'Hammer Curls',sets:3,reps:'12-15',p2:{sets:3,reps:'10-12'},p3:{sets:4,reps:'8-10'}}
       ]},
-      {name:'Day 4 — Lower B',exercises:[
-        {name:'Deadlift',sets:3,reps:'8-10',p2:{sets:4,reps:'5-6'},p3:{sets:5,reps:'3-5'}},
-        {name:'Front Squat',sets:3,reps:'10-12',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
-        {name:'Bulgarian Split Squat',sets:3,reps:'10-12 each',p2:{sets:3,reps:'8-10 each'},p3:{sets:4,reps:'6-8 each'}},
-        {name:'Nordic Curl',sets:3,reps:'6-8',p2:{sets:3,reps:'8'},p3:{sets:4,reps:'8'}},
-        {name:'Leg Extension',sets:3,reps:'12-15',p2:{sets:3,reps:'10-12'},p3:{sets:4,reps:'8-10'}},
-        {name:'Standing Calf Raises',sets:3,reps:'15-20',p2:{sets:4,reps:'12-15'},p3:{sets:4,reps:'10-12'}}
+      {name:'Day 4 — Lower B + Upper',exercises:[
+        {name:'Squat',sets:3,reps:'10-12',p2:{sets:4,reps:'6-8'},p3:{sets:5,reps:'4-6'}},
+        {name:'Barbell Row',sets:3,reps:'10-12',p2:{sets:4,reps:'6-8'},p3:{sets:4,reps:'5-6'}},
+        {name:'Romanian Deadlift',sets:3,reps:'10-12',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
+        {name:'Overhead Press',sets:3,reps:'10-12',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
+        {name:'Leg Press',sets:3,reps:'12-15',p2:{sets:4,reps:'10-12'},p3:{sets:4,reps:'8-10'}},
+        {name:'Lat Pulldown',sets:3,reps:'12-15',p2:{sets:3,reps:'10-12'},p3:{sets:4,reps:'8-10'}},
+        {name:'Leg Curl',sets:3,reps:'12-15',p2:{sets:3,reps:'10-12'},p3:{sets:4,reps:'8-10'}},
+        {name:'Tricep Pushdowns',sets:3,reps:'12-15',p2:{sets:3,reps:'10-12'},p3:{sets:4,reps:'8-10'}},
+        {name:'Hip Thrust',sets:3,reps:'12-15',p2:{sets:4,reps:'10-12'},p3:{sets:4,reps:'8-10'}},
+        {name:'Barbell Curl',sets:3,reps:'12-15',p2:{sets:3,reps:'10-12'},p3:{sets:4,reps:'8-10'}}
       ]}
     ]
   },
@@ -3781,31 +3813,42 @@ const PROGRAMS_MALE = {
     desc:"Wendler's legendary strength program — add weight to the bar every month",
     daysPerWeek:'4 days · 12 weeks',
     days:[
-      {name:'Day 1 — Press Day',exercises:[
+      {name:'Day 1 — Press + Lower',exercises:[
         {name:'Overhead Press',sets:3,reps:'5/3/1+',p2:{reps:'3/3/3+'},p3:{reps:'5/3/1+'}},
+        {name:'Squat',sets:3,reps:'10-12',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
         {name:'Bench Press',sets:5,reps:'10 (BBB)',p2:{reps:'8 (BBB)'},p3:{reps:'5 (BBB)'}},
+        {name:'Leg Press',sets:3,reps:'10-12',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
         {name:'Chin-Ups',sets:3,reps:'10-12',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
+        {name:'Leg Curl',sets:3,reps:'10-12',p2:{sets:3,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
         {name:'Dips',sets:3,reps:'10-12',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
         {name:'Face Pulls',sets:3,reps:'15',p2:{sets:3,reps:'12'},p3:{sets:4,reps:'10'}}
       ]},
-      {name:'Day 2 — Deadlift Day',exercises:[
+      {name:'Day 2 — Deadlift + Upper',exercises:[
         {name:'Deadlift',sets:3,reps:'5/3/1+',p2:{reps:'3/3/3+'},p3:{reps:'5/3/1+'}},
+        {name:'Barbell Row',sets:3,reps:'10-12',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
         {name:'Squat',sets:5,reps:'10 (BBB)',p2:{reps:'8 (BBB)'},p3:{reps:'5 (BBB)'}},
-        {name:'Leg Press',sets:3,reps:'10-12',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
-        {name:'Leg Curl',sets:3,reps:'10-12',p2:{sets:3,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
+        {name:'Chin-Ups',sets:3,reps:'10-12',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
+        {name:'Romanian Deadlift',sets:3,reps:'10-12',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
+        {name:'Face Pulls',sets:3,reps:'15',p2:{sets:3,reps:'12'},p3:{sets:4,reps:'10'}},
         {name:'Plank',sets:3,reps:'60s',p2:{reps:'75s'},p3:{reps:'90s'}}
       ]},
-      {name:'Day 3 — Bench Day',exercises:[
+      {name:'Day 3 — Bench + Lower',exercises:[
         {name:'Bench Press',sets:3,reps:'5/3/1+',p2:{reps:'3/3/3+'},p3:{reps:'5/3/1+'}},
+        {name:'Romanian Deadlift',sets:3,reps:'10-12',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
         {name:'Overhead Press',sets:5,reps:'10 (BBB)',p2:{reps:'8 (BBB)'},p3:{reps:'5 (BBB)'}},
+        {name:'Leg Press',sets:3,reps:'10-12',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
         {name:'Barbell Row',sets:3,reps:'10-12',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
+        {name:'Calf Raises',sets:4,reps:'15-20',p2:{sets:4,reps:'12-15'},p3:{sets:4,reps:'10-12'}},
         {name:'Tricep Pushdowns',sets:3,reps:'12-15',p2:{sets:3,reps:'10-12'},p3:{sets:4,reps:'8-10'}},
         {name:'Barbell Curl',sets:3,reps:'12-15',p2:{sets:3,reps:'10-12'},p3:{sets:4,reps:'8-10'}}
       ]},
-      {name:'Day 4 — Squat Day',exercises:[
+      {name:'Day 4 — Squat + Upper',exercises:[
         {name:'Squat',sets:3,reps:'5/3/1+',p2:{reps:'3/3/3+'},p3:{reps:'5/3/1+'}},
+        {name:'Overhead Press',sets:3,reps:'10-12',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
         {name:'Deadlift',sets:5,reps:'10 (BBB)',p2:{reps:'8 (BBB)'},p3:{reps:'5 (BBB)'}},
+        {name:'Barbell Row',sets:3,reps:'10-12',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
         {name:'Romanian Deadlift',sets:3,reps:'10-12',p2:{sets:4,reps:'8-10'},p3:{sets:4,reps:'6-8'}},
+        {name:'Tricep Pushdowns',sets:3,reps:'12-15',p2:{sets:3,reps:'10-12'},p3:{sets:4,reps:'8-10'}},
         {name:'Calf Raises',sets:4,reps:'15-20',p2:{sets:4,reps:'12-15'},p3:{sets:4,reps:'10-12'}},
         {name:'Ab Wheel',sets:3,reps:'10-15',p2:{sets:3,reps:'12'},p3:{sets:4,reps:'10'}}
       ]}
