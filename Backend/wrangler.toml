@@ -1,0 +1,8 @@
+name = "logmeal-proxy"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "trident-fitness-db"
+database_id = "858b4019-df8a-4d89-ac57-1d20cd6e94fe"
