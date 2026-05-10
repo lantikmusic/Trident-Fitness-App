@@ -2949,6 +2949,12 @@ function addFoodItem(name, protein, carbs, fat, save2=true, skipLib=false) {
   const now = new Date();
   const time = now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});
   meal.items.push({name, protein, carbs, fat, cal, time});
+  // Sync to cloud immediately
+  cloudPost('/macros', {
+    date: new Date().toISOString().split('T')[0],
+    day_index: cur, meal: curMeal,
+    food_name: name, calories: cal, protein, carbs, fat
+  });
   // Update aggregated meal totals
   meal.protein = Math.round(meal.items.reduce((s,it)=>s+(it.protein||0),0)*10)/10;
   meal.carbs   = Math.round(meal.items.reduce((s,it)=>s+(it.carbs||0),0)*10)/10;
