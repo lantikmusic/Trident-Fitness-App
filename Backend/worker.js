@@ -92,6 +92,8 @@ export default {
     if (path === '/macros'        && request.method === 'GET')  return getMacros(request, env.DB);
     if (path === '/macros'        && request.method === 'POST') return saveMacros(request, env.DB);
     if (path === '/macros/burned' && request.method === 'POST') return saveBurned(request, env.DB);
+    if (path === '/macros/delete' && request.method === 'POST') return deleteMacro(request, env.DB);
+    if (path === '/macros/clear'  && request.method === 'POST') return clearMacros(request, env.DB);
 
     // ── Progress Routes ──
     if (path === '/progress'      && request.method === 'GET')  return getProgress(request, env.DB);
@@ -469,6 +471,44 @@ async function saveBurned(request, DB) {
   await DB.prepare(`INSERT INTO user_blobs (user_id, blob_key, data_json, updated_at) VALUES (?, ?, ?, datetime('now'))
     ON CONFLICT(user_id, blob_key) DO UPDATE SET data_json = excluded.data_json, updated_at = excluded.updated_at`)
     .bind(session.user_id, 'burned_calories', JSON.stringify(burned)).run();
+
+  return json({ success: true });
+}
+
+async function deleteMacro(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+
+  const data = await request.json();
+  // Delete a single matching macro entry by day_index, meal, food_name, and calories
+  await DB.prepare(
+    'DELETE FROM macro_logs WHERE user_id = ? AND day_index = ? AND meal = ? AND food_name = ? AND calories = ?'
+  ).bind(
+    session.user_id,
+    data.day_index,
+    data.meal,
+    data.food_name,
+    data.calories || 0
+  ).run();
+
+  return json({ success: true });
+}
+
+async function clearMacros(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+
+  const data = await request.json();
+  // Clear all macros for a specific day_index + meal, or whole day if no meal specified
+  if (data.meal) {
+    await DB.prepare(
+      'DELETE FROM macro_logs WHERE user_id = ? AND day_index = ? AND meal = ?'
+    ).bind(session.user_id, data.day_index, data.meal).run();
+  } else {
+    await DB.prepare(
+      'DELETE FROM macro_logs WHERE user_id = ? AND day_index = ?'
+    ).bind(session.user_id, data.day_index).run();
+  }
 
   return json({ success: true });
 }

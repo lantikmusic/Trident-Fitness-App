@@ -2982,6 +2982,16 @@ function addFoodItem(name, protein, carbs, fat, save2=true, skipLib=false) {
 
 function deleteFoodItem(idx) {
   const meal = macroData[cur].meals[curMeal];
+  const removed = meal.items[idx];
+  // Remove from cloud
+  if(removed) {
+    cloudPost('/macros/delete', {
+      day_index: cur,
+      meal: curMeal,
+      food_name: removed.name,
+      calories: removed.cal || 0
+    });
+  }
   meal.items.splice(idx, 1);
   // Recalculate totals
   meal.protein = Math.round(meal.items.reduce((s,it)=>s+(it.protein||0),0)*10)/10;
@@ -3000,6 +3010,8 @@ function clearFoodLog() {
   meal.items = [];
   meal.protein = 0; meal.carbs = 0; meal.fat = 0;
   save(MACRO_KEY,macroData);
+  // Clear from cloud
+  cloudPost('/macros/clear', { day_index: cur, meal: curMeal });
   loadMealInputs();
   renderFoodLog();
   renderMealTabCals();
