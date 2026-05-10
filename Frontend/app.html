@@ -2660,6 +2660,7 @@ async function lookupBarcode(barcode) {
     console.log('LogMeal barcode data:', data);
 
     const foodName = data.product_name || data.name || data.food_name || '';
+    const brand = data.brand || data.brand_name || data.manufacturer || '';
     if(!foodName) {
       await lookupBarcodeOFF(barcode);
       return;
@@ -2709,7 +2710,7 @@ async function lookupBarcode(barcode) {
       return;
     }
 
-    displayScanResult(foodName, '', calories, protein, carbs, fat);
+    displayScanResult(foodName, brand, calories, protein, carbs, fat);
 
   } catch(err) {
     console.error('Barcode error:', err);
@@ -2751,7 +2752,12 @@ async function lookupBarcodeOFF(barcode) {
 }
 
 function displayScanResult(foodName, brand, calories, protein, carbs, fat, servingG) {
-  scannedFoodData = { name: foodName, protein, carbs, fat, calories };
+  // Prepend brand to food name if not already included
+  const displayName = (brand && !foodName.toLowerCase().includes(brand.toLowerCase()))
+    ? `${brand} ${foodName}`
+    : foodName;
+  scannedFoodData = { name: displayName, protein, carbs, fat, calories };
+  foodName = displayName;
   baseScanMacros  = { protein, carbs, fat, calories };
 
   document.getElementById('scanServings').value = 1;
