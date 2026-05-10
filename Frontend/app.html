@@ -2116,11 +2116,11 @@ async function loadFromCloud() {
       macroItems.forEach(entry => {
         const idx = entry.day_index;
         if(idx == null) return;
-        if(!storedMacros[idx]) storedMacros[idx] = { meals: { breakfast: { items: [] }, lunch: { items: [] }, dinner: { items: [] } }, burned: 0, notes: '' };
+        if(!storedMacros[idx]) storedMacros[idx] = { meals: { breakfast: { items: [], protein: 0, carbs: 0, fat: 0 }, lunch: { items: [], protein: 0, carbs: 0, fat: 0 }, dinner: { items: [], protein: 0, carbs: 0, fat: 0 } }, burned: 0, notes: '' };
         const meal = entry.meal;
         if(!meal) return;
         if(!storedMacros[idx].meals) storedMacros[idx].meals = { breakfast: { items: [] }, lunch: { items: [] }, dinner: { items: [] } };
-        if(!storedMacros[idx].meals[meal]) storedMacros[idx].meals[meal] = { items: [] };
+        if(!storedMacros[idx].meals[meal]) storedMacros[idx].meals[meal] = { items: [], protein: 0, carbs: 0, fat: 0 };
         const exists = storedMacros[idx].meals[meal].items.some(i =>
           i.name === entry.food_name && i.cal === entry.calories
         );
@@ -2137,9 +2137,20 @@ async function loadFromCloud() {
       });
       // Restore burned calories and notes per day
       Object.entries(macrosBurned).forEach(([idx, val]) => {
-        if(!storedMacros[idx]) storedMacros[idx] = { meals: { breakfast: { items: [] }, lunch: { items: [] }, dinner: { items: [] } }, burned: 0, notes: '' };
+        if(!storedMacros[idx]) storedMacros[idx] = { meals: { breakfast: { items: [], protein: 0, carbs: 0, fat: 0 }, lunch: { items: [], protein: 0, carbs: 0, fat: 0 }, dinner: { items: [], protein: 0, carbs: 0, fat: 0 } }, burned: 0, notes: '' };
         if(val.burned != null) storedMacros[idx].burned = val.burned;
         if(val.notes)          storedMacros[idx].notes  = val.notes;
+      });
+      // Recalculate aggregated meal totals from items so dashboard hero shows correct values
+      Object.values(storedMacros).forEach(day => {
+        if(!day || !day.meals) return;
+        ['breakfast','lunch','dinner'].forEach(m => {
+          if(!day.meals[m]) return;
+          const items = day.meals[m].items || [];
+          day.meals[m].protein = Math.round(items.reduce((s,it)=>s+(it.protein||0),0)*10)/10;
+          day.meals[m].carbs   = Math.round(items.reduce((s,it)=>s+(it.carbs||0),0)*10)/10;
+          day.meals[m].fat     = Math.round(items.reduce((s,it)=>s+(it.fat||0),0)*10)/10;
+        });
       });
       save(MACRO_KEY, storedMacros);
       macroData = storedMacros;

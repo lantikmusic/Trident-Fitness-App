@@ -91,6 +91,7 @@ export default {
     // ── Macro Log Routes ──
     if (path === '/macros'        && request.method === 'GET')  return getMacros(request, env.DB);
     if (path === '/macros'        && request.method === 'POST') return saveMacros(request, env.DB);
+    if (path === '/macros/burned' && request.method === 'POST') return saveBurned(request, env.DB);
 
     // ── Progress Routes ──
     if (path === '/progress'      && request.method === 'GET')  return getProgress(request, env.DB);
@@ -293,7 +294,15 @@ async function getSettings(request, DB) {
     'SELECT * FROM user_settings WHERE user_id = ?'
   ).bind(session.user_id).first();
 
-  return json(settings || {});
+  // Fetch profile pic from blobs
+  const picRow = await DB.prepare(
+    'SELECT data_json FROM user_blobs WHERE user_id = ? AND blob_key = ?'
+  ).bind(session.user_id, 'profile_pic').first();
+
+  const result = settings || {};
+  if (picRow) result.profile_pic = JSON.parse(picRow.data_json);
+
+  return json(result);
 }
 
 async function saveSettings(request, DB) {
@@ -301,6 +310,13 @@ async function saveSettings(request, DB) {
   if (!session) return error('Unauthorized', 401);
 
   const data = await request.json();
+
+  // Save profile pic separately as a blob if provided (too large for settings table)
+  if (data.profile_pic) {
+    await DB.prepare(`INSERT INTO user_blobs (user_id, blob_key, data_json, updated_at) VALUES (?, ?, ?, datetime('now'))
+      ON CONFLICT(user_id, blob_key) DO UPDATE SET data_json = excluded.data_json, updated_at = excluded.updated_at`)
+      .bind(session.user_id, 'profile_pic', JSON.stringify(data.profile_pic)).run();
+  }
 
   await DB.prepare(`
     INSERT INTO user_settings (user_id, gender, age, height_ft, height_in, weight, goal_weight, activity_level, name, updated_at)
@@ -384,13 +400,30 @@ async function getMacros(request, DB) {
   if (!session) return error('Unauthorized', 401);
 
   const url = new URL(request.url);
-  const date = url.searchParams.get('date') || new Date().toISOString().split('T')[0];
+  const date = url.searchParams.get('date');
 
-  const logs = await DB.prepare(
-    'SELECT * FROM macro_logs WHERE user_id = ? AND log_date = ? ORDER BY created_at ASC'
-  ).bind(session.user_id, date).all();
+  // If date specified fetch just that day, otherwise fetch all logs for the past 30 days
+  let logs;
+  if (date) {
+    logs = await DB.prepare(
+      'SELECT * FROM macro_logs WHERE user_id = ? AND log_date = ? ORDER BY created_at ASC'
+    ).bind(session.user_id, date).all();
+  } else {
+    logs = await DB.prepare(
+      'SELECT * FROM macro_logs WHERE user_id = ? ORDER BY log_date DESC, created_at ASC LIMIT 500'
+    ).bind(session.user_id).all();
+  }
 
-  return json(logs.results || []);
+  // Also fetch burned calories blob
+  const burnedRow = await DB.prepare(
+    'SELECT data_json FROM user_blobs WHERE user_id = ? AND blob_key = ?'
+  ).bind(session.user_id, 'burned_calories').first();
+  const burned = burnedRow ? JSON.parse(burnedRow.data_json) : {};
+
+  const results = logs.results || [];
+
+  // Attach burned/notes to response as special entries
+  return json({ items: results, burned });
 }
 
 async function saveMacros(request, DB) {
@@ -418,6 +451,26 @@ async function saveMacros(request, DB) {
   ).run();
 
   return json({ success: true, id });
+}
+
+async function saveBurned(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+
+  const data = await request.json();
+  // Store burned calories as a blob keyed by day_index
+  const burnedRow = await DB.prepare(
+    'SELECT data_json FROM user_blobs WHERE user_id = ? AND blob_key = ?'
+  ).bind(session.user_id, 'burned_calories').first();
+
+  const burned = burnedRow ? JSON.parse(burnedRow.data_json) : {};
+  burned[data.day_index] = { burned: data.burned || 0, notes: data.notes || '', date: data.date };
+
+  await DB.prepare(`INSERT INTO user_blobs (user_id, blob_key, data_json, updated_at) VALUES (?, ?, ?, datetime('now'))
+    ON CONFLICT(user_id, blob_key) DO UPDATE SET data_json = excluded.data_json, updated_at = excluded.updated_at`)
+    .bind(session.user_id, 'burned_calories', JSON.stringify(burned)).run();
+
+  return json({ success: true });
 }
 
 async function getProgress(request, DB) {
