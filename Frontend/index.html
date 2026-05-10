@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TridentFit">
+<meta name="theme-color" content="#000000">
+<link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIyNiIgZmlsbD0iIzAwMDAwMCIvPjxjaXJjbGUgY3g9IjYwIiBjeT0iNjAiIHI9IjM2IiBmaWxsPSJub25lIiBzdHJva2U9IiMxYTFhMWEiIHN0cm9rZS13aWR0aD0iMTAiLz48Y2lyY2xlIGN4PSI2MCIgY3k9IjYwIiByPSIzNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMzJGQ0ZEIiBzdHJva2Utd2lkdGg9IjEwIiBzdHJva2UtZGFzaGFycmF5PSIyMjYuMiIgc3Ryb2tlLWRhc2hvZmZzZXQ9IjU2LjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgdHJhbnNmb3JtPSJyb3RhdGUoLTkwIDYwIDYwKSIvPjx0ZXh0IHg9IjYwIiB5PSI2NiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9Ii1hcHBsZS1zeXN0ZW0sc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZmZmZiIgbGV0dGVyLXNwYWNpbmc9Ii0xIj5URjwvdGV4dD48L3N2Zz4=">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<title>Trident Fitness</title>
+<style>
+:root {
+  --pink: #32FCFD;
+  --pink-dim: rgba(50,252,253,0.10);
+  --pink-glow: rgba(50,252,253,0.22);
+  --pink-border: rgba(50,252,253,0.22);
+  --bg: #000;
+  --bg2: #0a0a0a;
+  --bg3: #111;
+  --bg4: #1a1a1a;
+  --bg5: #222;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.14);
+  --text: #fff;
+  --text2: rgba(255,255,255,0.55);
+  --text3: rgba(255,255,255,0.28);
+  --red: #FF453A;
+  --green: #30D158;
+  --radius: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 22px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+  overflow-x: hidden;
+}
+
+/* ── Screens ── */
+.screen { display: none; min-height: 100vh; min-height: -webkit-fill-available; }
+.screen.active { display: flex; flex-direction: column; }
+
+/* ── Background mesh ── */
+.bg-mesh {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 10%, rgba(50,252,253,0.07) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 50% at 80% 80%, rgba(50,252,253,0.05) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 30% at 50% 50%, rgba(50,252,253,0.04) 0%, transparent 70%);
+}
+
+/* ── Welcome / Splash Screen ── */
+#screen-welcome {
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(env(safe-area-inset-top) + 60px) 28px calc(env(safe-area-inset-bottom) + 48px);
+  position: relative;
+}
+
+.welcome-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  justify-content: center;
+  gap: 0;
+}
+
+.welcome-logo {
+  width: 80px;
+  height: 80px;
+  border-radius: 22px;
+  background: var(--bg3);
+  border: 0.5px solid var(--border2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 28px;
+  box-shadow: 0 0 40px rgba(50,252,253,0.15);
+}
+
+.welcome-title {
+  font-size: 42px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  text-align: center;
+  margin-bottom: 14px;
+}
+
+.welcome-title span { color: var(--pink); }
+
+.welcome-sub {
+  font-size: 16px;
+  color: var(--text3);
+  text-align: center;
+  line-height: 1.5;
+  max-width: 280px;
+}
+
+.welcome-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 32px;
+}
+
+.welcome-pill {
+  background: var(--bg3);
+  border: 0.5px solid var(--border2);
+  border-radius: 99px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text2);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.welcome-actions { width: 100%; display: flex; flex-direction: column; gap: 12px; margin-top: 48px; }
+
+/* ── Auth card ── */
+#screen-login, #screen-signup {
+  align-items: stretch;
+  justify-content: flex-start;
+  padding: calc(env(safe-area-inset-top) + 20px) 0 calc(env(safe-area-inset-bottom) + 20px);
+  overflow-y: auto;
+}
+
+.auth-scroll {
+  flex: 1;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-back {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--bg3);
+  border: 0.5px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  margin-bottom: 28px;
+  flex-shrink: 0;
+}
+
+.auth-header { margin-bottom: 32px; }
+.auth-eyebrow {
+  font-size: 11px; font-weight: 600; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--pink); margin-bottom: 8px;
+}
+.auth-title { font-size: 32px; font-weight: 700; letter-spacing: -0.03em; line-height: 1; }
+.auth-sub { font-size: 14px; color: var(--text3); margin-top: 6px; }
+
+.auth-form { display: flex; flex-direction: column; gap: 14px; flex: 1; }
+
+.field label {
+  display: block; font-size: 12px; font-weight: 500;
+  color: var(--text3); margin-bottom: 6px;
+}
+.iw {
+  display: flex; align-items: center;
+  background: var(--bg3);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: border-color .15s;
+  width: 100%;
+}
+.iw:focus-within { border-color: var(--pink); }
+.iw input {
+  flex: 1; background: transparent; border: none;
+  padding: 14px 16px; font-size: 16px; font-weight: 400;
+  font-family: inherit; color: var(--text); outline: none;
+}
+.iw input::placeholder { color: var(--text3); }
+.iw-icon {
+  padding: 0 14px 0 0; color: var(--text3);
+  display: flex; align-items: center;
+}
+
+/* Password toggle */
+.pw-toggle {
+  padding: 0 14px; cursor: pointer;
+  color: var(--text3); background: none;
+  border: none; display: flex; align-items: center;
+}
+
+/* Error message */
+.field-error {
+  font-size: 12px; color: var(--red);
+  margin-top: 4px; display: none;
+}
+.field-error.show { display: block; }
+
+/* Auth buttons */
+.pink-btn {
+  display: block; width: 100%; padding: 15px;
+  border-radius: var(--radius-lg); border: none;
+  background: var(--pink); font-family: inherit;
+  font-size: 16px; font-weight: 700; color: #000;
+  cursor: pointer; transition: all .18s; text-align: center;
+  letter-spacing: -0.01em;
+}
+.pink-btn:active { transform: scale(.998); filter: brightness(0.95); }
+.pink-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.ghost-btn {
+  display: block; width: 100%; padding: 14px;
+  border-radius: var(--radius-lg); border: 0.5px solid var(--border2);
+  background: transparent; font-family: inherit;
+  font-size: 15px; font-weight: 500; color: var(--text2);
+  cursor: pointer; transition: all .18s; text-align: center;
+}
+.ghost-btn:active { border-color: var(--pink); color: var(--pink); }
+
+/* Divider */
+.divider {
+  display: flex; align-items: center; gap: 12px;
+  color: var(--text3); font-size: 12px;
+}
+.divider::before, .divider::after {
+  content: ''; flex: 1;
+  height: 0.5px; background: var(--border2);
+}
+
+/* Google button */
+.google-btn {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%; padding: 14px;
+  border-radius: var(--radius-lg); border: 0.5px solid var(--border2);
+  background: var(--bg3); font-family: inherit;
+  font-size: 15px; font-weight: 500; color: var(--text);
+  cursor: pointer; transition: all .18s;
+}
+.google-btn:active { border-color: var(--border2); background: var(--bg4); }
+
+/* Switch link */
+.auth-switch {
+  text-align: center; font-size: 14px; color: var(--text3);
+  margin-top: 20px;
+}
+.auth-switch a {
+  color: var(--pink); font-weight: 600;
+  text-decoration: none; cursor: pointer;
+}
+
+/* Forgot password */
+.forgot-link {
+  text-align: right; font-size: 12px;
+  color: var(--text3); cursor: pointer;
+  margin-top: -6px;
+}
+.forgot-link:active { color: var(--pink); }
+
+/* ── Toast ── */
+.toast {
+  position: fixed; bottom: calc(env(safe-area-inset-bottom) + 24px);
+  left: 50%; transform: translateX(-50%) translateY(80px);
+  background: var(--bg4); border: 0.5px solid var(--border2);
+  border-radius: 99px; padding: 10px 20px;
+  font-size: 14px; font-weight: 500; color: var(--text);
+  z-index: 9999; transition: transform .3s cubic-bezier(.34,1.56,.64,1);
+  white-space: nowrap; pointer-events: none;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ── Loading spinner ── */
+.spinner {
+  width: 20px; height: 20px;
+  border: 2px solid rgba(0,0,0,0.3);
+  border-top-color: #000;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Onboarding ── */
+#screen-onboarding {
+  align-items: stretch;
+  justify-content: flex-start;
+  overflow-y: auto;
+  padding: calc(env(safe-area-inset-top) + 20px) 0 calc(env(safe-area-inset-bottom) + 20px);
+}
+
+.ob-scroll { flex: 1; padding: 20px 24px; display: flex; flex-direction: column; }
+
+.ob-progress {
+  display: flex; gap: 6px; margin-bottom: 32px;
+}
+.ob-progress-dot {
+  flex: 1; height: 3px; border-radius: 99px;
+  background: var(--bg5); transition: background .3s;
+}
+.ob-progress-dot.active { background: var(--pink); }
+.ob-progress-dot.done { background: rgba(50,252,253,0.4); }
+
+.ob-step { display: none; flex-direction: column; flex: 1; }
+.ob-step.active { display: flex; }
+
+.ob-step-eyebrow {
+  font-size: 11px; font-weight: 600; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--pink); margin-bottom: 8px;
+}
+.ob-step-title {
+  font-size: 28px; font-weight: 700; letter-spacing: -0.03em;
+  line-height: 1.1; margin-bottom: 8px;
+}
+.ob-step-sub {
+  font-size: 14px; color: var(--text3); line-height: 1.5;
+  margin-bottom: 28px;
+}
+
+/* Focus cards */
+.focus-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
+.focus-card {
+  background: var(--bg3); border: 0.5px solid var(--border);
+  border-radius: var(--radius-lg); padding: 16px 14px;
+  cursor: pointer; transition: all .18s; text-align: left;
+}
+.focus-card.selected {
+  border-color: var(--pink);
+  background: var(--pink-dim);
+  box-shadow: 0 0 20px rgba(50,252,253,0.08);
+}
+.focus-icon { font-size: 24px; margin-bottom: 8px; }
+.focus-label { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+.focus-desc { font-size: 11px; color: var(--text3); line-height: 1.4; }
+.focus-card.selected .focus-desc { color: rgba(50,252,253,0.7); }
+
+/* Activity cards */
+.activity-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
+.activity-card {
+  background: var(--bg3); border: 0.5px solid var(--border);
+  border-radius: var(--radius); padding: 14px 16px;
+  cursor: pointer; transition: all .18s;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.activity-card.selected { border-color: var(--pink); background: var(--pink-dim); }
+.activity-left { display: flex; flex-direction: column; gap: 2px; }
+.activity-name { font-size: 14px; font-weight: 600; }
+.activity-detail { font-size: 12px; color: var(--text3); }
+.activity-card.selected .activity-detail { color: rgba(50,252,253,0.7); }
+.activity-check {
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 1.5px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  transition: all .18s;
+}
+.activity-card.selected .activity-check {
+  background: var(--pink); border-color: var(--pink);
+}
+
+.ob-fields { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; }
+.ob-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.ob-footer { margin-top: auto; display: flex; flex-direction: column; gap: 10px; }
+.ob-skip { text-align: center; font-size: 13px; color: var(--text3); cursor: pointer; padding: 8px; }
+.ob-skip:active { color: var(--pink); }
+
+/* ── Animations ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.screen.active { animation: fadeUp .35s ease; }
+</style>
+</head>
+<body>
+
+<div class="bg-mesh"></div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- WELCOME SCREEN                         -->
+<!-- ══════════════════════════════════════ -->
+<div class="screen active" id="screen-welcome">
+  <div class="welcome-top">
+    <!-- Logo -->
+    <div class="welcome-logo">
+      <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="22" cy="22" r="18" stroke="#32FCFD" stroke-width="2.5" stroke-dasharray="113.1" stroke-dashoffset="28.3" stroke-linecap="round" transform="rotate(-90 22 22)"/>
+        <text x="22" y="27" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="13" font-weight="800" fill="#fff" letter-spacing="-0.5">TF</text>
+      </svg>
+    </div>
+
+    <div class="welcome-title">Trident<br><span>Fitness</span></div>
+    <div class="welcome-sub">Your personal fitness & nutrition companion built for results</div>
+
+    <div class="welcome-pills">
+      <div class="welcome-pill">🔥 Macro Tracking</div>
+      <div class="welcome-pill">💪 Workouts</div>
+      <div class="welcome-pill">📊 Progress</div>
+      <div class="welcome-pill">🎯 Goals</div>
+    </div>
+  </div>
+
+  <div class="welcome-actions">
+    <button class="pink-btn" onclick="showScreen('screen-signup')">Create Account</button>
+    <button class="ghost-btn" onclick="showScreen('screen-login')">I Already Have an Account</button>
+    <div style="text-align:center;font-size:11px;color:var(--text3);margin-top:4px;line-height:1.6;">
+      By continuing you agree to our Terms of Service<br>and Privacy Policy
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- LOGIN SCREEN                           -->
+<!-- ══════════════════════════════════════ -->
+<div class="screen" id="screen-login">
+  <div class="auth-scroll">
+    <button class="auth-back" onclick="showScreen('screen-welcome')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+    </button>
+
+    <div class="auth-header">
+      <div class="auth-eyebrow">Welcome Back</div>
+      <div class="auth-title">Log in to<br>Trident Fitness</div>
+      <div class="auth-sub">Continue your fitness journey</div>
+    </div>
+
+    <div class="auth-form">
+      <div class="field">
+        <label>Email Address</label>
+        <div class="iw">
+          <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email" inputmode="email">
+        </div>
+        <div class="field-error" id="login-email-error">Please enter a valid email address</div>
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <div class="iw">
+          <input type="password" id="login-password" placeholder="Your password" autocomplete="current-password">
+          <button class="pw-toggle" onclick="togglePassword('login-password', this)" type="button">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+        <div class="field-error" id="login-password-error">Password must be at least 8 characters</div>
+      </div>
+
+      <div class="forgot-link" onclick="showForgotPassword()">Forgot password?</div>
+
+      <div style="flex:1; min-height: 12px;"></div>
+
+      <button class="pink-btn" id="login-btn" onclick="handleLogin()">Log In</button>
+
+      <div class="divider">or continue with</div>
+
+      <button class="google-btn" onclick="handleGoogleAuth()">
+        <svg width="20" height="20" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        Continue with Google
+      </button>
+      <div id="google-btn-container" style="display:flex;justify-content:center;"></div>
+
+      <div class="auth-switch">
+        Don't have an account? <a onclick="showScreen('screen-signup')">Sign up</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- SIGNUP SCREEN                          -->
+<!-- ══════════════════════════════════════ -->
+<div class="screen" id="screen-signup">
+  <div class="auth-scroll">
+    <button class="auth-back" onclick="showScreen('screen-welcome')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+    </button>
+
+    <div class="auth-header">
+      <div class="auth-eyebrow">Get Started</div>
+      <div class="auth-title">Create your<br>Trident account</div>
+      <div class="auth-sub">Start your fitness journey today</div>
+    </div>
+
+    <div class="auth-form">
+      <div class="field">
+        <label>Full Name</label>
+        <div class="iw">
+          <input type="text" id="signup-name" placeholder="Your name" autocomplete="name">
+        </div>
+        <div class="field-error" id="signup-name-error">Please enter your name</div>
+      </div>
+
+      <div class="field">
+        <label>Email Address</label>
+        <div class="iw">
+          <input type="email" id="signup-email" placeholder="you@example.com" autocomplete="email" inputmode="email">
+        </div>
+        <div class="field-error" id="signup-email-error">Please enter a valid email address</div>
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <div class="iw">
+          <input type="password" id="signup-password" placeholder="Min. 8 characters" autocomplete="new-password">
+          <button class="pw-toggle" onclick="togglePassword('signup-password', this)" type="button">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+        <div class="field-error" id="signup-password-error">Password must be at least 8 characters</div>
+      </div>
+
+      <div class="field">
+        <label>Confirm Password</label>
+        <div class="iw">
+          <input type="password" id="signup-confirm" placeholder="Repeat password" autocomplete="new-password">
+          <button class="pw-toggle" onclick="togglePassword('signup-confirm', this)" type="button">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+        <div class="field-error" id="signup-confirm-error">Passwords don't match</div>
+      </div>
+
+      <div style="flex:1; min-height: 12px;"></div>
+
+      <button class="pink-btn" id="signup-btn" onclick="handleSignup()">Create Account</button>
+
+      <div class="divider">or continue with</div>
+
+      <button class="google-btn" onclick="handleGoogleAuth()">
+        <svg width="20" height="20" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        Continue with Google
+      </button>
+
+      <div class="auth-switch">
+        Already have an account? <a onclick="showScreen('screen-login')">Log in</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- ONBOARDING SCREEN                      -->
+<!-- ══════════════════════════════════════ -->
+<div class="screen" id="screen-onboarding">
+  <div class="ob-scroll">
+    <!-- Progress dots -->
+    <div class="ob-progress">
+      <div class="ob-progress-dot active" id="dot-0"></div>
+      <div class="ob-progress-dot" id="dot-1"></div>
+      <div class="ob-progress-dot" id="dot-2"></div>
+      <div class="ob-progress-dot" id="dot-3"></div>
+    </div>
+
+    <!-- Step 0: Goal Focus -->
+    <div class="ob-step active" id="ob-step-0">
+      <div class="ob-step-eyebrow">Step 1 of 4</div>
+      <div class="ob-step-title">What's your main goal?</div>
+      <div class="ob-step-sub">We'll personalise your calorie and macro targets around this.</div>
+
+      <div class="focus-grid">
+        <div class="focus-card" id="focus-fat_loss" onclick="selectFocus('fat_loss')">
+          <div class="focus-icon">🔥</div>
+          <div class="focus-label">Lose Fat</div>
+          <div class="focus-desc">Calorie deficit, preserve muscle</div>
+        </div>
+        <div class="focus-card" id="focus-muscle_gain" onclick="selectFocus('muscle_gain')">
+          <div class="focus-icon">💪</div>
+          <div class="focus-label">Build Muscle</div>
+          <div class="focus-desc">Calorie surplus, strength gains</div>
+        </div>
+        <div class="focus-card" id="focus-recomp" onclick="selectFocus('recomp')">
+          <div class="focus-icon">⚡</div>
+          <div class="focus-label">Body Recomp</div>
+          <div class="focus-desc">Lose fat, gain muscle together</div>
+        </div>
+        <div class="focus-card" id="focus-maintain" onclick="selectFocus('maintain')">
+          <div class="focus-icon">🎯</div>
+          <div class="focus-label">Maintain</div>
+          <div class="focus-desc">Stay at current weight and fitness</div>
+        </div>
+      </div>
+
+      <div class="ob-footer">
+        <button class="pink-btn" onclick="obNext()" id="ob-next-0">Continue</button>
+      </div>
+    </div>
+
+    <!-- Step 1: Personal Stats -->
+    <div class="ob-step" id="ob-step-1">
+      <div class="ob-step-eyebrow">Step 2 of 4</div>
+      <div class="ob-step-title">Your stats</div>
+      <div class="ob-step-sub">Used to calculate your personal calorie and macro targets.</div>
+
+      <div class="ob-fields">
+        <div class="ob-two-col">
+          <div class="field">
+            <label>Age</label>
+            <div class="iw">
+              <input type="number" id="ob-age" placeholder="25" min="13" max="100" inputmode="numeric">
+              <span class="unit" style="font-size:12px;font-weight:500;color:var(--text3);padding-right:12px;">yrs</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>Gender</label>
+            <div class="iw">
+              <select id="ob-gender" style="flex:1;background:transparent;border:none;padding:14px 12px;font-size:16px;font-family:inherit;color:var(--text);outline:none;">
+                <option value="female">Female</option>
+                <option value="male">Male</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Height</label>
+          <div class="ob-two-col">
+            <div class="iw">
+              <input type="number" id="ob-height-ft" placeholder="5" min="3" max="8" inputmode="numeric">
+              <span class="unit" style="font-size:12px;font-weight:500;color:var(--text3);padding-right:12px;">ft</span>
+            </div>
+            <div class="iw">
+              <input type="number" id="ob-height-in" placeholder="7" min="0" max="11" inputmode="numeric">
+              <span class="unit" style="font-size:12px;font-weight:500;color:var(--text3);padding-right:12px;">in</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ob-two-col">
+          <div class="field">
+            <label>Current Weight</label>
+            <div class="iw">
+              <input type="number" id="ob-weight" placeholder="150" step="0.1" inputmode="decimal">
+              <span class="unit" style="font-size:12px;font-weight:500;color:var(--text3);padding-right:12px;">lbs</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>Goal Weight</label>
+            <div class="iw">
+              <input type="number" id="ob-goal-weight" placeholder="140" step="0.1" inputmode="decimal">
+              <span class="unit" style="font-size:12px;font-weight:500;color:var(--text3);padding-right:12px;">lbs</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ob-footer">
+        <button class="pink-btn" onclick="obNext()">Continue</button>
+        <div class="ob-skip" onclick="obNext()">Skip for now</div>
+      </div>
+    </div>
+
+    <!-- Step 2: Activity Level -->
+    <div class="ob-step" id="ob-step-2">
+      <div class="ob-step-eyebrow">Step 3 of 4</div>
+      <div class="ob-step-title">How active are you?</div>
+      <div class="ob-step-sub">Be honest — this affects your daily calorie target.</div>
+
+      <div class="activity-list">
+        <div class="activity-card" onclick="selectActivity(1.2, this)">
+          <div class="activity-left">
+            <div class="activity-name">🛋️ Sedentary</div>
+            <div class="activity-detail">Little or no exercise, desk job</div>
+          </div>
+          <div class="activity-check">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+        </div>
+        <div class="activity-card" onclick="selectActivity(1.375, this)">
+          <div class="activity-left">
+            <div class="activity-name">🚶 Lightly Active</div>
+            <div class="activity-detail">Light exercise 1-3 days/week</div>
+          </div>
+          <div class="activity-check">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+        </div>
+        <div class="activity-card selected" onclick="selectActivity(1.55, this)">
+          <div class="activity-left">
+            <div class="activity-name">🏃 Moderately Active</div>
+            <div class="activity-detail">Moderate exercise 3-5 days/week</div>
+          </div>
+          <div class="activity-check">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+        </div>
+        <div class="activity-card" onclick="selectActivity(1.725, this)">
+          <div class="activity-left">
+            <div class="activity-name">🏋️ Very Active</div>
+            <div class="activity-detail">Hard exercise 6-7 days/week</div>
+          </div>
+          <div class="activity-check">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+        </div>
+        <div class="activity-card" onclick="selectActivity(1.9, this)">
+          <div class="activity-left">
+            <div class="activity-name">🔱 Extremely Active</div>
+            <div class="activity-detail">Very hard exercise, physical job</div>
+          </div>
+          <div class="activity-check">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="ob-footer">
+        <button class="pink-btn" onclick="obNext()">Continue</button>
+      </div>
+    </div>
+
+    <!-- Step 3: All Done -->
+    <div class="ob-step" id="ob-step-3">
+      <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:20px; padding: 20px 0;">
+        <div style="width:80px;height:80px;border-radius:50%;background:var(--pink-dim);border:0.5px solid var(--pink-border);display:flex;align-items:center;justify-content:center;font-size:36px;box-shadow:0 0 40px rgba(50,252,253,0.15);">🎉</div>
+        <div>
+          <div class="ob-step-title" style="text-align:center;" id="ob-done-title">You're all set!</div>
+          <div class="ob-step-sub" style="text-align:center;margin-bottom:0;">Your personalised plan is ready. Let's start crushing your goals.</div>
+        </div>
+        <div id="ob-summary" style="background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:16px;width:100%;text-align:left;display:flex;flex-direction:column;gap:10px;"></div>
+      </div>
+
+      <div class="ob-footer">
+        <button class="pink-btn" onclick="finishOnboarding()">Let's Go 🚀</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── State ──
+let currentUser = null;
+let obData = {
+  focus: null,
+  activity: 1.55,
+  age: null,
+  gender: 'female',
+  heightFt: null,
+  heightIn: null,
+  weight: null,
+  goalWeight: null,
+  name: ''
+};
+let obStep = 0;
+const OB_STEPS = 4;
+
+// ══════════════════════════════════════
+// CLOUDFLARE WORKER URL
+// ══════════════════════════════════════
+const WORKER_URL = 'https://logmeal-proxy.tridentfitness.workers.dev';
+
+// ── Session token storage ──
+function saveToken(token) { localStorage.setItem('trident_session_token', token); }
+function getToken() { return localStorage.getItem('trident_session_token'); }
+function clearToken() { localStorage.removeItem('trident_session_token'); }
+
+// ── API helper ──
+async function api(path, method = 'GET', body = null) {
+  const opts = {
+    method,
+    headers: { 'Content-Type': 'application/json' }
+  };
+  const token = getToken();
+  if (token) opts.headers['Authorization'] = `Bearer ${token}`;
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(`${WORKER_URL}${path}`, opts);
+  return { ok: res.ok, status: res.status, data: await res.json() };
+}
+
+// ── Check if already logged in ──
+// If a token exists, redirect straight to app without showing the login page.
+// The token validity is verified in the background; if it's invalid, app.html
+// will handle the logout and send the user back here.
+function checkExistingSession() {
+  const token = getToken();
+  if (token) {
+    // Already authenticated — go directly to app, no login flash
+    redirectToApp();
+  }
+}
+
+// Run session check on load
+checkExistingSession();
+
+// ── Screen Navigation ──
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ── Toast ──
+function showToast(msg, duration = 2500) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), duration);
+}
+
+// ── Password toggle ──
+function togglePassword(inputId, btn) {
+  const input = document.getElementById(inputId);
+  const isText = input.type === 'text';
+  input.type = isText ? 'password' : 'text';
+  btn.style.opacity = isText ? '1' : '0.5';
+}
+
+// ── Field validation ──
+function showError(id, show) {
+  const el = document.getElementById(id);
+  if(el) el.classList.toggle('show', show);
+}
+
+function validateEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+// ══════════════════════════════════════
+// AUTH HANDLERS
+// ══════════════════════════════════════
+
+async function handleLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+
+  let valid = true;
+  if(!validateEmail(email)) { showError('login-email-error', true); valid = false; }
+  else showError('login-email-error', false);
+  if(password.length < 8) { showError('login-password-error', true); valid = false; }
+  else showError('login-password-error', false);
+  if(!valid) return;
+
+  const btn = document.getElementById('login-btn');
+  btn.innerHTML = '<div class="spinner"></div>';
+  btn.disabled = true;
+
+  try {
+    const { ok, status, data } = await api('/auth/login', 'POST', { email, password });
+
+    if(!ok) {
+      showToast(data.error || 'Login failed — please try again');
+      return;
+    }
+
+    saveToken(data.token);
+    currentUser = data.user;
+    showToast('✓ Welcome back, ' + (data.user.name || data.user.email) + '!');
+    setTimeout(() => redirectToApp(), 800);
+
+  } catch(e) {
+    showToast('Connection error — please try again');
+  } finally {
+    btn.innerHTML = 'Log In';
+    btn.disabled = false;
+  }
+}
+
+async function handleSignup() {
+  const name = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const password = document.getElementById('signup-password').value;
+  const confirm = document.getElementById('signup-confirm').value;
+
+  let valid = true;
+  if(!name) { showError('signup-name-error', true); valid = false; }
+  else showError('signup-name-error', false);
+  if(!validateEmail(email)) { showError('signup-email-error', true); valid = false; }
+  else showError('signup-email-error', false);
+  if(password.length < 8) { showError('signup-password-error', true); valid = false; }
+  else showError('signup-password-error', false);
+  if(password !== confirm) { showError('signup-confirm-error', true); valid = false; }
+  else showError('signup-confirm-error', false);
+  if(!valid) return;
+
+  const btn = document.getElementById('signup-btn');
+  btn.innerHTML = '<div class="spinner"></div>';
+  btn.disabled = true;
+
+  try {
+    const { ok, data } = await api('/auth/signup', 'POST', { email, password, name });
+
+    if(!ok) {
+      showToast(data.error || 'Signup failed — please try again');
+      return;
+    }
+
+    saveToken(data.token);
+    currentUser = data.user;
+    obData.name = name;
+    showToast('✓ Account created! Let\'s set up your profile.');
+    setTimeout(() => showScreen('screen-onboarding'), 600);
+
+  } catch(e) {
+    showToast('Connection error — please try again');
+  } finally {
+    btn.innerHTML = 'Create Account';
+    btn.disabled = false;
+  }
+}
+
+const GOOGLE_CLIENT_ID = '341176626662-7cf89bets0asup40ht1kl3m7engnik5a.apps.googleusercontent.com';
+
+function handleGoogleAuth() {
+  google.accounts.id.initialize({
+    client_id: GOOGLE_CLIENT_ID,
+    callback: handleGoogleCredential,
+    auto_select: false,
+    cancel_on_tap_outside: true,
+  });
+  google.accounts.id.prompt((notification) => {
+    if(notification.isNotDisplayed() || notification.isSkippedMoment()) {
+      // Fallback: show popup
+      google.accounts.id.renderButton(
+        document.getElementById('google-btn-container'),
+        { theme: 'filled_black', size: 'large', width: 320, text: 'continue_with' }
+      );
+    }
+  });
+}
+
+async function handleGoogleCredential(response) {
+  const btn = document.querySelector('.google-btn');
+  if(btn) { btn.innerHTML = '<div class="spinner" style="border-color:rgba(0,0,0,0.3);border-top-color:#000;"></div>'; btn.disabled = true; }
+
+  try {
+    // Send Google ID token to our Worker to verify + create/login user
+    const res = await fetch(`${WORKER_URL}/auth/google`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ credential: response.credential })
+    });
+
+    const data = await res.json();
+
+    if(!res.ok) {
+      showToast(data.error || 'Google sign-in failed');
+      return;
+    }
+
+    saveToken(data.token);
+    currentUser = data.user;
+
+    if(data.isNewUser) {
+      obData.name = data.user.name;
+      showToast(`✓ Welcome, ${data.user.name.split(' ')[0]}!`);
+      setTimeout(() => showScreen('screen-onboarding'), 600);
+    } else {
+      showToast(`✓ Welcome back, ${data.user.name.split(' ')[0]}!`);
+      setTimeout(() => redirectToApp(), 800);
+    }
+
+  } catch(e) {
+    showToast('Connection error — please try again');
+  } finally {
+    if(btn) { btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg> Continue with Google'; btn.disabled = false; }
+  }
+}
+
+function showForgotPassword() {
+  showToast('Password reset coming soon!');
+}
+
+// ══════════════════════════════════════
+// ONBOARDING
+// ══════════════════════════════════════
+function selectFocus(focus) {
+  obData.focus = focus;
+  document.querySelectorAll('.focus-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById(`focus-${focus}`).classList.add('selected');
+}
+
+function selectActivity(value, card) {
+  obData.activity = value;
+  document.querySelectorAll('.activity-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+}
+
+function obNext() {
+  if(obStep === 0 && !obData.focus) {
+    showToast('Please select a goal to continue');
+    return;
+  }
+
+  if(obStep === 1) {
+    obData.age        = parseFloat(document.getElementById('ob-age').value) || null;
+    obData.gender     = document.getElementById('ob-gender').value;
+    obData.heightFt   = parseFloat(document.getElementById('ob-height-ft').value) || null;
+    obData.heightIn   = parseFloat(document.getElementById('ob-height-in').value) || 0;
+    obData.weight     = parseFloat(document.getElementById('ob-weight').value) || null;
+    obData.goalWeight = parseFloat(document.getElementById('ob-goal-weight').value) || null;
+  }
+
+  document.getElementById(`ob-step-${obStep}`).classList.remove('active');
+  document.getElementById(`dot-${obStep}`).classList.remove('active');
+  document.getElementById(`dot-${obStep}`).classList.add('done');
+  obStep++;
+
+  if(obStep < OB_STEPS) {
+    document.getElementById(`ob-step-${obStep}`).classList.add('active');
+    document.getElementById(`dot-${obStep}`).classList.add('active');
+  }
+
+  if(obStep === 3) buildSummary();
+}
+
+function buildSummary() {
+  const focusLabels = {
+    fat_loss: '🔥 Lose Fat',
+    muscle_gain: '💪 Build Muscle',
+    recomp: '⚡ Body Recomp',
+    maintain: '🎯 Maintain'
+  };
+  const activityLabels = {
+    1.2: 'Sedentary', 1.375: 'Lightly Active',
+    1.55: 'Moderately Active', 1.725: 'Very Active', 1.9: 'Extremely Active'
+  };
+
+  const rows = [
+    ['Goal', focusLabels[obData.focus] || 'Not set'],
+    ['Activity', activityLabels[obData.activity] || 'Moderate'],
+    obData.weight     ? ['Current Weight', `${obData.weight} lbs`]  : null,
+    obData.goalWeight ? ['Goal Weight',    `${obData.goalWeight} lbs`] : null,
+  ].filter(Boolean);
+
+  document.getElementById('ob-summary').innerHTML = rows.map(([label, value]) => `
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:13px;color:var(--text3);">${label}</span>
+      <span style="font-size:13px;font-weight:600;color:var(--text);">${value}</span>
+    </div>
+  `).join('');
+
+  if(currentUser?.name) {
+    document.getElementById('ob-done-title').textContent = `You're all set, ${currentUser.name.split(' ')[0]}!`;
+  }
+}
+
+async function finishOnboarding() {
+  // Save settings to Worker/D1
+  try {
+    await api('/user/settings', 'POST', {
+      name:           currentUser?.name || obData.name,
+      gender:         obData.gender,
+      age:            obData.age,
+      height_ft:      obData.heightFt,
+      height_in:      obData.heightIn,
+      weight:         obData.weight,
+      goal_weight:    obData.goalWeight,
+      activity_level: obData.activity
+    });
+
+    if(obData.focus) {
+      await api('/user/goals', 'POST', {
+        focus:          obData.focus,
+        current_weight: obData.weight,
+        goal_weight:    obData.goalWeight
+      });
+    }
+  } catch(e) {
+    console.warn('Could not save onboarding data:', e);
+  }
+
+  // Also save to localStorage as fallback for the main app
+  localStorage.setItem('trident_goals_v1', JSON.stringify({
+    focus:         obData.focus,
+    name:          currentUser?.name || '',
+    currentWeight: obData.weight,
+    goalWeight:    obData.goalWeight,
+    age:           obData.age,
+    gender:        obData.gender,
+    heightFt:      obData.heightFt,
+    heightIn:      obData.heightIn,
+    activity:      obData.activity
+  }));
+
+  const settings = JSON.parse(localStorage.getItem('trident_settings_v1') || '{}');
+  settings.gender = obData.gender;
+  settings.name   = currentUser?.name || '';
+  localStorage.setItem('trident_settings_v1', JSON.stringify(settings));
+
+  redirectToApp();
+}
+
+function redirectToApp() {
+  window.location.href = 'app.html';
+}
+</script>
+</body>
+</html>
