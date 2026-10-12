@@ -3284,16 +3284,7 @@ function setGender(gender) {
   s.gender = gender;
   save('trident_settings_v1', s);
   appSettings.gender = gender;
-  updateGenderButtons(gender);
-  // Reset program selection since programs changed
-  workoutState.program = null;
-  save('trident_workout_v1', workoutState);
-  selectedProgram = null;
-  renderWorkout();
-  showToast('Gender updated — programs refreshed');
-}
-
-function updateGenderButtons(gender) {
+  // Update button styles
   const fg = document.getElementById('genderFemale');
   const fm = document.getElementById('genderMale');
   if(fg && fm) {
@@ -3304,6 +3295,12 @@ function updateGenderButtons(gender) {
     fm.style.color = gender==='male' ? '#000' : 'var(--text2)';
     fm.style.borderColor = gender==='male' ? 'var(--pink)' : 'var(--border2)';
   }
+  // Reset program selection since programs changed
+  workoutState.program = null;
+  save('trident_workout_v1', workoutState);
+  selectedProgram = null;
+  renderWorkout();
+  showToast('Gender updated — programs refreshed');
 }
 
 const PROGRAMS = {
@@ -3598,57 +3595,6 @@ const PROGRAMS = {
       {name:'Recovery',type:'recovery',exercises:[]},
       {name:'Recovery',type:'recovery',exercises:[]}
     ]
-  },
-  lantikHybrid: {
-    name:'LANTIK Hybrid Training - Football/Muay Thai',
-    short:'Hybrid',
-    icon:'bolt',
-    calendarAligned:true,
-    desc:'Weekly hybrid plan for flag football + Muay Thai — the heaviest training sits mid-week (furthest from game day), with built-in recovery the day after and the day before your Sunday game',
-    daysPerWeek:'4 training days + 2 recovery · 12 weeks',
-    days:[
-      {name:'Monday — Active Recovery (Post-Game)',type:'recovery',exercises:[]},
-      {name:'Tuesday — Heavy Lower Power (Gym)',exercises:[
-        {name:'Trap Bar Deadlift',sets:3,reps:'6',p2:{sets:4,reps:'4'},p3:{sets:5,reps:'2'}},
-        {name:'Back Squat',sets:3,reps:'8',p2:{sets:4,reps:'5'},p3:{sets:5,reps:'3'}},
-        {name:'Bulgarian Split Squat',sets:3,reps:'10 each',p2:{sets:4,reps:'8 each'},p3:{sets:4,reps:'6 each'}},
-        {name:'Broad Jumps',sets:3,reps:'5',p2:{sets:4,reps:'5'},p3:{sets:5,reps:'5'},type:'explosive'},
-        {name:'Nordic Curl',sets:3,reps:'6',p2:{sets:3,reps:'8'},p3:{sets:4,reps:'8'}},
-        {name:'Standing Calf Raises',sets:3,reps:'15',p2:{sets:4,reps:'15'},p3:{sets:4,reps:'12'}}
-      ]},
-      {name:'Wednesday — Muay Thai Power & Rotational Core (Bag/Gym)',exercises:[
-        {name:'Landmine Press',sets:3,reps:'10 each',p2:{sets:4,reps:'8 each'},p3:{sets:4,reps:'6 each'}},
-        {name:'Cable Woodchop (High-to-Low)',sets:3,reps:'12 each',p2:{sets:4,reps:'10 each'},p3:{sets:4,reps:'8 each'}},
-        {name:'Med Ball Rotational Throw',sets:3,reps:'8 each',p2:{sets:4,reps:'6 each'},p3:{sets:4,reps:'5 each'},type:'explosive'},
-        {name:'Heavy Bag Combinations',sets:6,reps:'2 min rounds',p2:{sets:6,reps:'3 min rounds'},p3:{sets:8,reps:'3 min rounds'},type:'conditioning'},
-        {name:'Hanging Knee Raise',sets:3,reps:'15',p2:{sets:3,reps:'20'},p3:{sets:4,reps:'20'}},
-        {name:'Farmer Carry',sets:3,reps:'40m',p2:{sets:3,reps:'50m'},p3:{sets:4,reps:'50m'},type:'conditioning'}
-      ]},
-      {name:'Thursday — Upper Strength & Explosive Push/Pull (Gym)',exercises:[
-        {name:'Bench Press',sets:3,reps:'8',p2:{sets:4,reps:'5'},p3:{sets:5,reps:'3'}},
-        {name:'Explosive Pull-Ups',sets:3,reps:'6',p2:{sets:4,reps:'6'},p3:{sets:4,reps:'5'}},
-        {name:'Push Press',sets:3,reps:'8',p2:{sets:4,reps:'5'},p3:{sets:5,reps:'3'}},
-        {name:'Plyo Push-Ups',sets:3,reps:'10',p2:{sets:4,reps:'8'},p3:{sets:4,reps:'10'}},
-        {name:'Band Pull-Aparts',sets:3,reps:'20',p2:{sets:4,reps:'15'},p3:{sets:4,reps:'15'}},
-        {name:'Battle Ropes',sets:3,reps:'30s',p2:{sets:4,reps:'30s'},p3:{sets:5,reps:'30s'},type:'conditioning'}
-      ]},
-      {name:'Friday — Speed, Agility & Footwork (Field)',type:'field',exercises:[
-        {name:'5-10-5 Shuttle',sets:4,reps:'1 rep',p2:{sets:5,reps:'1 rep'},p3:{sets:6,reps:'1 rep'},type:'agility'},
-        {name:'Ladder Drills',sets:3,reps:'2 min',p2:{sets:4,reps:'2 min'},p3:{sets:4,reps:'2 min'},type:'agility'},
-        {name:'Mirror Reaction Drills',sets:4,reps:'30s',p2:{sets:4,reps:'30s'},p3:{sets:5,reps:'30s'},type:'agility'},
-        {name:'Lateral Bounds',sets:3,reps:'8 each',p2:{sets:4,reps:'6 each'},p3:{sets:4,reps:'6 each'},type:'explosive'},
-        {name:'Sprint Starts (10-20yd)',sets:6,reps:'1 sprint',p2:{sets:8,reps:'1 sprint'},p3:{sets:8,reps:'1 sprint'},type:'speed'},
-        {name:'Shadow Boxing w/ Footwork',sets:4,reps:'2 min',p2:{sets:5,reps:'2 min'},p3:{sets:6,reps:'2 min'},type:'conditioning'}
-      ]},
-      {name:'Saturday — Active Recovery (Game Eve)',type:'recovery',exercises:[]},
-      {name:'Sunday — GAME DAY 🏈 Pre-Game Activation',exercises:[
-        {name:'Leg Swings (Dynamic)',sets:2,reps:'10 each',type:'mobility'},
-        {name:'High Knees',sets:2,reps:'20m',type:'agility'},
-        {name:'A-Skips',sets:2,reps:'20m',type:'agility'},
-        {name:'Build-Up Sprints (50%-75%-90%)',sets:3,reps:'20m',type:'speed'},
-        {name:'Band Lateral Walks',sets:2,reps:'10 each',type:'mobility'}
-      ]}
-    ]
   }
 };
 
@@ -3751,57 +3697,6 @@ const PROGRAMS_MALE = {
       ]},
       {name:'Recovery',type:'recovery',exercises:[]},
       {name:'Recovery',type:'recovery',exercises:[]}
-    ]
-  },
-  lantikHybrid: {
-    name:'LANTIK Hybrid Training - Football/Muay Thai',
-    short:'Hybrid',
-    icon:'bolt',
-    calendarAligned:true,
-    desc:'Weekly hybrid plan for flag football + Muay Thai — the heaviest training sits mid-week (furthest from game day), with built-in recovery the day after and the day before your Sunday game',
-    daysPerWeek:'4 training days + 2 recovery · 12 weeks',
-    days:[
-      {name:'Monday — Active Recovery (Post-Game)',type:'recovery',exercises:[]},
-      {name:'Tuesday — Heavy Lower Power (Gym)',exercises:[
-        {name:'Trap Bar Deadlift',sets:3,reps:'6',p2:{sets:4,reps:'4'},p3:{sets:5,reps:'2'}},
-        {name:'Back Squat',sets:3,reps:'8',p2:{sets:4,reps:'5'},p3:{sets:5,reps:'3'}},
-        {name:'Bulgarian Split Squat',sets:3,reps:'10 each',p2:{sets:4,reps:'8 each'},p3:{sets:4,reps:'6 each'}},
-        {name:'Broad Jumps',sets:3,reps:'5',p2:{sets:4,reps:'5'},p3:{sets:5,reps:'5'},type:'explosive'},
-        {name:'Nordic Curl',sets:3,reps:'6',p2:{sets:3,reps:'8'},p3:{sets:4,reps:'8'}},
-        {name:'Standing Calf Raises',sets:3,reps:'15',p2:{sets:4,reps:'15'},p3:{sets:4,reps:'12'}}
-      ]},
-      {name:'Wednesday — Muay Thai Power & Rotational Core (Bag/Gym)',exercises:[
-        {name:'Landmine Press',sets:3,reps:'10 each',p2:{sets:4,reps:'8 each'},p3:{sets:4,reps:'6 each'}},
-        {name:'Cable Woodchop (High-to-Low)',sets:3,reps:'12 each',p2:{sets:4,reps:'10 each'},p3:{sets:4,reps:'8 each'}},
-        {name:'Med Ball Rotational Throw',sets:3,reps:'8 each',p2:{sets:4,reps:'6 each'},p3:{sets:4,reps:'5 each'},type:'explosive'},
-        {name:'Heavy Bag Combinations',sets:6,reps:'2 min rounds',p2:{sets:6,reps:'3 min rounds'},p3:{sets:8,reps:'3 min rounds'},type:'conditioning'},
-        {name:'Hanging Knee Raise',sets:3,reps:'15',p2:{sets:3,reps:'20'},p3:{sets:4,reps:'20'}},
-        {name:'Farmer Carry',sets:3,reps:'40m',p2:{sets:3,reps:'50m'},p3:{sets:4,reps:'50m'},type:'conditioning'}
-      ]},
-      {name:'Thursday — Upper Strength & Explosive Push/Pull (Gym)',exercises:[
-        {name:'Bench Press',sets:3,reps:'8',p2:{sets:4,reps:'5'},p3:{sets:5,reps:'3'}},
-        {name:'Explosive Pull-Ups',sets:3,reps:'6',p2:{sets:4,reps:'6'},p3:{sets:4,reps:'5'}},
-        {name:'Push Press',sets:3,reps:'8',p2:{sets:4,reps:'5'},p3:{sets:5,reps:'3'}},
-        {name:'Plyo Push-Ups',sets:3,reps:'10',p2:{sets:4,reps:'8'},p3:{sets:4,reps:'10'}},
-        {name:'Band Pull-Aparts',sets:3,reps:'20',p2:{sets:4,reps:'15'},p3:{sets:4,reps:'15'}},
-        {name:'Battle Ropes',sets:3,reps:'30s',p2:{sets:4,reps:'30s'},p3:{sets:5,reps:'30s'},type:'conditioning'}
-      ]},
-      {name:'Friday — Speed, Agility & Footwork (Field)',type:'field',exercises:[
-        {name:'5-10-5 Shuttle',sets:4,reps:'1 rep',p2:{sets:5,reps:'1 rep'},p3:{sets:6,reps:'1 rep'},type:'agility'},
-        {name:'Ladder Drills',sets:3,reps:'2 min',p2:{sets:4,reps:'2 min'},p3:{sets:4,reps:'2 min'},type:'agility'},
-        {name:'Mirror Reaction Drills',sets:4,reps:'30s',p2:{sets:4,reps:'30s'},p3:{sets:5,reps:'30s'},type:'agility'},
-        {name:'Lateral Bounds',sets:3,reps:'8 each',p2:{sets:4,reps:'6 each'},p3:{sets:4,reps:'6 each'},type:'explosive'},
-        {name:'Sprint Starts (10-20yd)',sets:6,reps:'1 sprint',p2:{sets:8,reps:'1 sprint'},p3:{sets:8,reps:'1 sprint'},type:'speed'},
-        {name:'Shadow Boxing w/ Footwork',sets:4,reps:'2 min',p2:{sets:5,reps:'2 min'},p3:{sets:6,reps:'2 min'},type:'conditioning'}
-      ]},
-      {name:'Saturday — Active Recovery (Game Eve)',type:'recovery',exercises:[]},
-      {name:'Sunday — GAME DAY 🏈 Pre-Game Activation',exercises:[
-        {name:'Leg Swings (Dynamic)',sets:2,reps:'10 each',type:'mobility'},
-        {name:'High Knees',sets:2,reps:'20m',type:'agility'},
-        {name:'A-Skips',sets:2,reps:'20m',type:'agility'},
-        {name:'Build-Up Sprints (50%-75%-90%)',sets:3,reps:'20m',type:'speed'},
-        {name:'Band Lateral Walks',sets:2,reps:'10 each',type:'mobility'}
-      ]}
     ]
   },
   fatLoss_ppl: {
@@ -4204,34 +4099,16 @@ if(workoutState.program && !getProgram(workoutState.program)){
 }
 let selectedProgram = workoutState.program;
 let workoutWeek = workoutState.weekOffset || 0;
-// Restore saved day index — never derive from weekday (getTodayIdx) which causes rest day mismatches,
-// EXCEPT for calendar-aligned programs (e.g. LANTIK Hybrid) whose days are literal Mon-Sun slots.
+// Restore saved day index — never derive from weekday (getTodayIdx) which causes rest day mismatches
 let workoutDayIdx = (workoutState.dayIdx != null) ? workoutState.dayIdx : (() => {
   if(!workoutState.program) return 0;
   const prog = getProgram(workoutState.program);
   if(!prog) return 0;
-  if(prog.calendarAligned) return getTodayIdx();
   const first = prog.days.findIndex(d =>
     d.name !== 'Rest' && d.name !== 'Recovery' &&
     d.type !== 'recovery' && d.exercises && d.exercises.length > 0
   );
   return first >= 0 ? first : 0;
-})();
-
-// Calendar-aligned programs: auto-resync to today's weekday once per real calendar day,
-// without overriding a same-day manual day-tab selection (tracked via workoutState.lastSyncDate).
-(() => {
-  if(!workoutState.program) return;
-  const prog = getProgram(workoutState.program);
-  if(!prog || !prog.calendarAligned) return;
-  const todayStr = new Date().toDateString();
-  if(workoutState.lastSyncDate !== todayStr) {
-    workoutDayIdx = getTodayIdx();
-    workoutState.dayIdx = workoutDayIdx;
-    workoutState.lastSyncDate = todayStr;
-    // A storage failure here (e.g. quota full) must never abort startup — the rest of the app loads below.
-    try { save(WORKOUT_KEY, workoutState); } catch(e) { console.warn('Workout day sync not saved:', e); }
-  }
 })();
 
 function renderWorkout(){
@@ -4407,12 +4284,9 @@ function startProgram(){
   save(WORKOUT_KEY,workoutState);
   // Sync program selection to cloud immediately
   cloudPost('/workout', { program: workoutState.program, state: workoutState });
-  // Calendar-aligned programs (e.g. LANTIK Hybrid) start on today's actual weekday.
-  // All other programs start on the first real training day (Day 1), not today's weekday index.
+  // Always start on the first real training day (Day 1), not today's weekday index
   const prog = getProgram(selectedProgram);
-  if(prog && prog.calendarAligned) {
-    workoutDayIdx = getTodayIdx();
-  } else if(prog) {
+  if(prog) {
     const firstTrainingDay = prog.days.findIndex(d =>
       d.name !== 'Rest' && d.name !== 'Recovery' &&
       d.type !== 'recovery' && d.exercises && d.exercises.length > 0
@@ -4422,7 +4296,6 @@ function startProgram(){
     workoutDayIdx = 0;
   }
   workoutState.dayIdx = workoutDayIdx;
-  workoutState.lastSyncDate = new Date().toDateString();
   save(WORKOUT_KEY, workoutState);
   activeExerciseIdx = 0;
   _workoutScreen = 'preview';
@@ -6858,8 +6731,9 @@ function closeSettings() {
 }
 
 function loadSettingsInputs() {
-  // Restore gender buttons (display only — opening Settings must not change gender or reset the program)
-  updateGenderButtons(appSettings.gender || 'female');
+  // Restore gender buttons
+  const gender = appSettings.gender || 'female';
+  setGender(gender);
   // Restore USDA key
   const savedKey = localStorage.getItem(USDA_KEY_STORAGE) || '';
   const keyEl = document.getElementById('usdaKeyInput');
