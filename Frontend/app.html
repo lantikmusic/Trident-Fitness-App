@@ -897,6 +897,55 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .splash-bar-fill{height:100%;background:var(--pink);border-radius:99px;animation:splashLoad 2.2s ease-in-out forwards;}
 @keyframes splashLoad{from{width:0%;}to{width:100%;}}
 
+/* ── Progress / Goals switch ── */
+.seg-toggle{display:flex;gap:4px;background:var(--bg3);border:0.5px solid var(--border);border-radius:99px;padding:4px;margin-top:14px;max-width:260px;}
+.seg-btn{flex:1;padding:8px 0;border:none;border-radius:99px;background:transparent;color:var(--text2);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;}
+.seg-btn.active{background:var(--pink);color:#000;}
+/* ── Community ── */
+.cm-compose-btn{display:block;width:100%;padding:13px 14px;border-radius:var(--radius-lg);border:0.5px solid var(--border2);background:var(--bg3);color:var(--text2);font-family:inherit;font-size:14px;text-align:left;cursor:pointer;margin-bottom:14px;}
+.cm-post{background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:14px;margin-bottom:12px;overflow:hidden;}
+.cm-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.cm-avatar{width:36px;height:36px;border-radius:50%;background:var(--bg5);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--text2);overflow:hidden;}
+.cm-avatar img{width:100%;height:100%;object-fit:cover;display:block;}
+.cm-avatar.sm{width:28px;height:28px;font-size:12px;}
+.cm-name{font-size:14px;font-weight:600;line-height:1.2;word-break:break-word;}
+.cm-time{font-size:11px;color:var(--text3);margin-top:2px;}
+.cm-del{margin-left:auto;flex-shrink:0;background:none;border:none;color:var(--text3);font-family:inherit;font-size:12px;cursor:pointer;padding:6px;}
+.cm-body{font-size:14px;line-height:1.5;white-space:pre-wrap;word-break:break-word;margin-bottom:10px;}
+.cm-photo{display:block;width:100%;max-height:460px;object-fit:cover;border-radius:var(--radius);margin-bottom:10px;background:var(--bg4);}
+.cm-attach{background:var(--bg4);border:0.5px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:10px;}
+.cm-attach-tag{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--pink);margin-bottom:4px;}
+.cm-attach-title{font-size:15px;font-weight:700;margin-bottom:4px;word-break:break-word;}
+.cm-attach-row{display:flex;justify-content:space-between;gap:12px;font-size:12px;color:var(--text2);padding:3px 0;}
+.cm-attach-row span:first-child{min-width:0;word-break:break-word;}
+.cm-attach-row span:last-child{color:var(--text);font-weight:600;text-align:right;flex-shrink:0;max-width:55%;}
+.cm-pr-weight{font-size:28px;font-weight:700;letter-spacing:-0.03em;color:var(--pink);line-height:1.1;}
+.cm-actions{display:flex;gap:6px;border-top:0.5px solid var(--border);padding-top:8px;}
+.cm-act{display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--text2);font-family:inherit;font-size:13px;font-weight:500;padding:6px 10px;border-radius:99px;cursor:pointer;}
+.cm-act svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.cm-act.liked{color:var(--pink);}
+.cm-act.liked svg{fill:var(--pink);stroke:var(--pink);}
+.cm-comments{margin-top:8px;border-top:0.5px solid var(--border);padding-top:10px;}
+.cm-comment{display:flex;gap:8px;margin-bottom:10px;}
+.cm-comment-bubble{flex:1;min-width:0;background:var(--bg4);border-radius:12px;padding:8px 10px;}
+.cm-comment-name{font-size:12px;font-weight:600;word-break:break-word;}
+.cm-comment-text{font-size:13px;line-height:1.45;white-space:pre-wrap;word-break:break-word;}
+.cm-comment-meta{font-size:10px;color:var(--text3);margin-top:3px;}
+.cm-link{background:none;border:none;padding:0;color:inherit;font:inherit;text-decoration:underline;cursor:pointer;}
+.cm-comment-form{display:flex;gap:8px;align-items:center;}
+.cm-input{flex:1;min-width:0;background:var(--bg4);border:0.5px solid var(--border);border-radius:99px;padding:9px 14px;color:var(--text);font-family:inherit;font-size:16px;outline:none;}
+.cm-send{flex-shrink:0;background:var(--pink);color:#000;border:none;border-radius:99px;padding:10px 14px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;}
+.cm-empty{text-align:center;padding:36px 16px;color:var(--text3);font-size:13px;line-height:1.6;}
+.cm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:400;display:none;align-items:flex-end;justify-content:center;}
+.cm-sheet{width:100%;max-width:680px;max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--bg3);border-radius:24px 24px 0 0;border-top:0.5px solid var(--border2);padding:18px 16px calc(20px + env(safe-area-inset-bottom));}
+.cm-sheet-title{font-size:18px;font-weight:700;margin-bottom:12px;}
+.cm-textarea{display:block;width:100%;min-height:96px;background:var(--bg4);border:0.5px solid var(--border);border-radius:var(--radius);padding:12px;color:var(--text);font-family:inherit;font-size:16px;line-height:1.45;outline:none;resize:vertical;}
+.cm-count{font-size:11px;color:var(--text3);text-align:right;margin-top:4px;}
+.cm-chips{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;}
+.cm-chip{background:var(--bg4);border:0.5px solid var(--border2);border-radius:99px;padding:8px 14px;color:var(--text2);font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;}
+.cm-chip.on{border-color:var(--pink);color:var(--pink);}
+.cm-pick{display:block;width:100%;text-align:left;background:var(--bg4);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 12px;color:var(--text);font-family:inherit;font-size:13px;line-height:1.4;margin-bottom:6px;cursor:pointer;}
+.cm-pick small{display:block;color:var(--text3);font-size:11px;}
 </style>
 </head>
 <body>
@@ -1511,6 +1560,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
     <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">Exercise Breakdown</div>
     <div id="summaryExList"></div>
     <button class="pink-btn" onclick="closeSummary()" style="margin-top:16px;">Done <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M18 3a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2v4a4 4 0 0 1-8 0V9a2 2 0 0 1 2-2h4V5a2 2 0 0 1 2-2h2z"/></svg></button>
+    <button class="ghost-btn" onclick="cmShareLastWorkout()" style="margin-top:8px;">Share to Community</button>
   </div>
 </div>
 
@@ -1537,6 +1587,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
   <div class="page-header compact">
     <div class="eyebrow">Body</div>
     <div class="page-title">Progress</div>
+    <div class="seg-toggle"><button class="seg-btn active" onclick="navTo('progress')">Progress</button><button class="seg-btn" onclick="navTo('goals')">Goals</button></div>
   </div>
   <div class="container">
     <div style="height:14px;"></div>
@@ -1579,6 +1630,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
   <div class="page-header compact">
     <div class="eyebrow">Targets</div>
     <div class="page-title">Goals</div>
+    <div class="seg-toggle"><button class="seg-btn" onclick="navTo('progress')">Progress</button><button class="seg-btn active" onclick="navTo('goals')">Goals</button></div>
   </div>
   <div class="container">
     <div style="height:14px;"></div>
@@ -1773,6 +1825,35 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
   </div>
 </div>
 
+<!-- COMMUNITY -->
+<div class="page" id="page-community">
+  <div class="page-header compact">
+    <div class="eyebrow">Together</div>
+    <div class="page-title">Community</div>
+  </div>
+  <div class="container">
+    <div style="height:14px;"></div>
+    <div id="cmRoot"></div>
+  </div>
+</div>
+<div class="cm-overlay" id="cmComposeOverlay" onclick="if(event.target===this)cmCloseCompose()">
+  <div class="cm-sheet">
+    <div class="cm-sheet-title">New post</div>
+    <textarea class="cm-textarea" id="cmText" maxlength="1000" placeholder="Share a win, a workout, or a question…" oninput="cmUpdateCount()"></textarea>
+    <div class="cm-count" id="cmCount">0 / 1000</div>
+    <div class="cm-chips">
+      <button class="cm-chip" id="cmChipPhoto" onclick="document.getElementById('cmPhotoInput').click()">Photo</button>
+      <button class="cm-chip" id="cmChipWorkout" onclick="cmPickAttachment('workout')">Workout</button>
+      <button class="cm-chip" id="cmChipPR" onclick="cmPickAttachment('pr')">PR</button>
+    </div>
+    <input type="file" id="cmPhotoInput" accept="image/*" style="display:none;" onchange="cmPhotoChosen(this)">
+    <div id="cmPicker"></div>
+    <div id="cmAttachPreview"></div>
+    <button class="pink-btn" id="cmPostBtn" onclick="cmSubmitPost()">Post</button>
+    <button class="ghost-btn" onclick="cmCloseCompose()" style="margin-top:8px;">Cancel</button>
+  </div>
+</div>
+
 <!-- Settings Gear Button (always visible) -->
 <button class="settings-btn" onclick="openSettings()" aria-label="Settings">
   <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1933,10 +2014,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
     <span class="nav-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
     <span class="nav-label">Progress</span>
   </button>
-  <!-- Goals: target / crosshair -->
-  <button class="nav-item" onclick="navTo('goals')" id="nav-goals">
-    <span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg></span>
-    <span class="nav-label">Goals</span>
+  <!-- Community: people (Goals now lives inside the Progress tab) -->
+  <button class="nav-item" onclick="navTo('community')" id="nav-community">
+    <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+    <span class="nav-label">Community</span>
   </button>
 </nav>
 
@@ -2239,13 +2320,15 @@ function navTo(page) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+page).classList.add('active');
-  document.getElementById('nav-'+page).classList.add('active');
+  // Goals has no tab of its own: it sits inside the Progress tab
+  document.getElementById('nav-'+(page==='goals'?'progress':page)).classList.add('active');
   currentPage = page;
   if(page==='dashboard') renderDashboard();
   if(page==='macros') renderMacros();
   if(page==='workout') renderWorkout();
   if(page==='progress') renderProgress();
   if(page==='goals') renderGoals();
+  if(page==='community') renderCommunity();
 }
 
 // ══════════════════════════════════════
@@ -8158,6 +8241,483 @@ function drawExProgressChart(sessions, bodyweight) {
       ctx.fillText(labels[i], x, H - 8);
     });
   }
+}
+
+// ══════════════════════════════════════
+// COMMUNITY (shared feed: posts, likes, comments)
+// ══════════════════════════════════════
+// Everything shown here was typed by other people: every string goes through cmEsc(),
+// every number through cmNum(), and every id through cmSafeId() before it reaches the page.
+const CM_PAGE_SIZE = 15;
+const CM_HEART = '<svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21.2l7.8-7.7 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
+const CM_BUBBLE = '<svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5z"/></svg>';
+let cmState = { posts: [], next: null, status: 'idle', loadedAt: 0, busy: false, comments: {}, open: {} };
+let cmDraft = { photo: null, attach: null, options: null, sending: false };
+
+function cmEsc(v) {
+  return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function cmNum(v) { const n = Number(v); return Number.isFinite(n) ? n : 0; }
+function cmSafeId(v) { const id = String(v == null ? '' : v); return /^[A-Za-z0-9-]{1,64}$/.test(id) ? id : ''; }
+function cmFindPost(id) { return cmState.posts.find(p => p.id === id) || null; }
+
+function cmTimeAgo(iso) {
+  const t = Date.parse(iso);
+  if(!Number.isFinite(t)) return '';
+  const secs = Math.max(0, Math.round((Date.now() - t) / 1000));
+  if(secs < 60) return 'Just now';
+  if(secs < 3600) return Math.floor(secs / 60) + 'm ago';
+  if(secs < 86400) return Math.floor(secs / 3600) + 'h ago';
+  if(secs < 604800) return Math.floor(secs / 86400) + 'd ago';
+  return new Date(t).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+
+// Like cloudGet/cloudPost, but also returns the status and the server's error message.
+async function cmApi(path, method, body) {
+  const token = getSessionToken();
+  if(!token) return { ok: false, status: 0, data: null };
+  try {
+    const res = await fetch(`${WORKER_URL}${path}`, {
+      method: method || 'GET',
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: body ? JSON.stringify(body) : undefined
+    });
+    if(res.status === 401) { handleSessionExpired(); return { ok: false, status: 401, data: null }; }
+    let data = null;
+    try { data = await res.json(); } catch(e) {}
+    return { ok: res.ok, status: res.status, data };
+  } catch(e) {
+    return { ok: false, status: 0, data: null };
+  }
+}
+
+function cmAvatarHTML(o, small) {
+  const uid = cmSafeId(o && o.user_id);
+  const initial = cmEsc((String((o && o.author_name) || 'M').trim().charAt(0) || 'M').toUpperCase());
+  const inner = (o && o.has_avatar && uid)
+    ? `<img src="${WORKER_URL}/community/avatar/${uid}" alt="" loading="lazy" data-i="${initial}" onerror="this.parentNode.textContent=this.dataset.i">`
+    : initial;
+  return `<div class="cm-avatar${small ? ' sm' : ''}">${inner}</div>`;
+}
+
+function cmSetsText(ex) {
+  const sets = Array.isArray(ex && ex.sets) ? ex.sets : [];
+  const parts = sets.slice(0, 4).map(st => {
+    const w = cmNum(st && st.w), r = cmNum(st && st.r);
+    return w ? `${w}×${r}` : `${r} reps`;
+  });
+  if(sets.length > 4) parts.push(`+${sets.length - 4}`);
+  return parts.join(', ');
+}
+
+function cmAttachHTML(type, payload) {
+  if(!payload || typeof payload !== 'object') return '';
+  if(type === 'workout') {
+    const exs = Array.isArray(payload.exercises) ? payload.exercises.slice(0, 12) : [];
+    const meta = [
+      payload.program ? cmEsc(payload.program) : '',
+      cmNum(payload.sets) ? `${cmNum(payload.sets)} sets` : '',
+      cmNum(payload.volume) ? `${cmNum(payload.volume).toLocaleString()} lbs lifted` : ''
+    ].filter(Boolean).join(' · ');
+    return `<div class="cm-attach">
+      <div class="cm-attach-tag">Workout</div>
+      <div class="cm-attach-title">${cmEsc(payload.day || 'Workout')}</div>
+      ${meta ? `<div class="cm-time" style="margin-bottom:8px;">${meta}</div>` : ''}
+      ${exs.map(ex => `<div class="cm-attach-row"><span>${cmEsc(ex && ex.name)}</span><span>${cmEsc(cmSetsText(ex))}</span></div>`).join('')}
+    </div>`;
+  }
+  if(type === 'pr') {
+    return `<div class="cm-attach">
+      <div class="cm-attach-tag">Personal record</div>
+      <div class="cm-attach-title">${cmEsc(payload.exercise || 'Lift')}</div>
+      <div class="cm-pr-weight">${cmNum(payload.weight)}<span style="font-size:13px;color:var(--text3);margin-left:4px;">lbs</span></div>
+      ${payload.date ? `<div class="cm-time" style="margin-top:6px;">${cmEsc(payload.date)}</div>` : ''}
+    </div>`;
+  }
+  return '';
+}
+
+function cmCommentsHTML(id) {
+  const list = cmState.comments[id];
+  let inner;
+  if(list === undefined) {
+    inner = `<div class="cm-time" style="margin-bottom:10px;">Loading comments…</div>`;
+  } else if(list === null) {
+    inner = `<div class="cm-time" style="margin-bottom:10px;">Comments could not be loaded. <button class="cm-link" onclick="cmLoadComments('${id}')">Try again</button></div>`;
+  } else {
+    inner = list.map(c => {
+      const cid = cmSafeId(c && c.id);
+      if(!cid) return '';
+      return `<div class="cm-comment">
+        ${cmAvatarHTML(c, true)}
+        <div class="cm-comment-bubble">
+          <div class="cm-comment-name">${cmEsc(c.author_name || 'Member')}</div>
+          <div class="cm-comment-text">${cmEsc(c.body)}</div>
+          <div class="cm-comment-meta">${cmEsc(cmTimeAgo(c.created_at))}${c.can_delete ? ` · <button class="cm-link" onclick="cmDeleteComment('${id}','${cid}')">Delete</button>` : ''}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  return `<div class="cm-comments">
+    ${inner}
+    <div class="cm-comment-form">
+      <input class="cm-input" id="cm-ci-${id}" maxlength="500" placeholder="Add a comment…" aria-label="Add a comment" onkeydown="if(event.key==='Enter'){event.preventDefault();cmSendComment('${id}');}">
+      <button class="cm-send" onclick="cmSendComment('${id}')">Send</button>
+    </div>
+  </div>`;
+}
+
+function cmPostHTML(p) {
+  const id = cmSafeId(p && p.id);
+  if(!id) return '';
+  const name = cmEsc(p.author_name || 'Member');
+  return `<div class="cm-post" id="cm-post-${id}">
+    <div class="cm-head">
+      ${cmAvatarHTML(p)}
+      <div style="min-width:0;"><div class="cm-name">${name}</div><div class="cm-time">${cmEsc(cmTimeAgo(p.created_at))}</div></div>
+      ${p.mine ? `<button class="cm-del" onclick="cmDeletePost('${id}')">Delete</button>` : ''}
+    </div>
+    ${p.body ? `<div class="cm-body">${cmEsc(p.body)}</div>` : ''}
+    ${cmAttachHTML(p.type, p.payload)}
+    ${p.has_photo ? `<img class="cm-photo" src="${WORKER_URL}/community/photo/${id}" alt="Photo shared by ${name}" loading="lazy">` : ''}
+    <div class="cm-actions">
+      <button class="cm-act${p.liked ? ' liked' : ''}" onclick="cmToggleLike('${id}')" aria-label="Like">${CM_HEART}<span>${cmNum(p.like_count)}</span></button>
+      <button class="cm-act" onclick="cmToggleComments('${id}')" aria-label="Comments">${CM_BUBBLE}<span>${cmNum(p.comment_count)}</span></button>
+    </div>
+    ${cmState.open[id] ? cmCommentsHTML(id) : ''}
+  </div>`;
+}
+
+function cmDraw() {
+  const root = document.getElementById('cmRoot');
+  if(!root) return;
+  let html = `<button class="cm-compose-btn" onclick="cmOpenCompose()">＋ Share a post, photo, workout or PR</button>`;
+  if(cmState.status === 'loading') {
+    html += `<div class="cm-empty">Loading the feed…</div>`;
+  } else if(cmState.status === 'error') {
+    html += `<div class="cm-empty">The community feed isn't available right now.<br><br><button class="cm-chip" onclick="cmLoadFeed(true)">Try again</button></div>`;
+  } else if(!cmState.posts.length) {
+    html += `<div class="cm-empty">No posts yet.<br>Be the first to share something.</div>`;
+  } else {
+    html += cmState.posts.map(cmPostHTML).join('');
+    if(cmState.next) html += `<button class="ghost-btn" onclick="cmLoadFeed(false)">Load more</button>`;
+  }
+  root.innerHTML = html;
+}
+
+// Redraws one post in place, keeping whatever is being typed in its comment box.
+function cmRedrawPost(id) {
+  const el = document.getElementById('cm-post-' + id);
+  const p = cmFindPost(id);
+  if(!el || !p) { cmDraw(); return; }
+  const input = document.getElementById('cm-ci-' + id);
+  const typed = input ? input.value : '';
+  const hadFocus = !!input && document.activeElement === input;
+  el.outerHTML = cmPostHTML(p);
+  const fresh = document.getElementById('cm-ci-' + id);
+  if(fresh && typed) fresh.value = typed;
+  if(fresh && hadFocus) fresh.focus();
+}
+
+function renderCommunity() {
+  const root = document.getElementById('cmRoot');
+  if(!root) return;
+  if(!isLoggedIn()) {
+    root.innerHTML = `<div class="cm-empty">Sign in to see and share posts with the community.</div>`;
+    return;
+  }
+  cmDraw();
+  if(cmState.status === 'idle' || cmState.status === 'error' || Date.now() - cmState.loadedAt > 30000) cmLoadFeed(true);
+}
+
+async function cmLoadFeed(reset) {
+  if(cmState.busy) return;
+  cmState.busy = true;
+  if(reset && !cmState.posts.length) { cmState.status = 'loading'; cmDraw(); }
+  const before = (!reset && cmState.next) ? `&before=${encodeURIComponent(cmState.next)}` : '';
+  const r = await cmApi(`/community/feed?limit=${CM_PAGE_SIZE}${before}`);
+  cmState.busy = false;
+  if(r.status === 401) return;
+  if(!r.ok || !r.data || !Array.isArray(r.data.posts)) {
+    if(cmState.posts.length) { cmState.status = 'ready'; showToast('Could not refresh the feed'); }
+    else cmState.status = 'error';
+    cmDraw();
+    return;
+  }
+  const fresh = r.data.posts.filter(p => p && cmSafeId(p.id));
+  cmState.posts = reset ? fresh : cmState.posts.concat(fresh.filter(p => !cmFindPost(p.id)));
+  cmState.next = r.data.next || null;
+  cmState.status = 'ready';
+  cmState.loadedAt = Date.now();
+  cmDraw();
+}
+
+async function cmToggleLike(id) {
+  const p = cmFindPost(id);
+  if(!p || p._liking) return;
+  p._liking = true;
+  const was = !!p.liked, wasCount = cmNum(p.like_count);
+  p.liked = !was;
+  p.like_count = Math.max(0, wasCount + (was ? -1 : 1));
+  cmRedrawPost(id);
+  const r = await cmApi('/community/like', 'POST', { post_id: id });
+  p._liking = false;
+  if(r.ok && r.data) { p.liked = !!r.data.liked; p.like_count = cmNum(r.data.like_count); }
+  else { p.liked = was; p.like_count = wasCount; if(r.status !== 401) showToast('Could not update like'); }
+  cmRedrawPost(id);
+}
+
+function cmToggleComments(id) {
+  cmState.open[id] = !cmState.open[id];
+  cmRedrawPost(id);
+  if(cmState.open[id]) cmLoadComments(id);
+}
+
+async function cmLoadComments(id) {
+  const r = await cmApi('/community/comments?post_id=' + encodeURIComponent(id));
+  if(r.status === 401) return;
+  const ok = r.ok && r.data && Array.isArray(r.data.comments);
+  cmState.comments[id] = ok ? r.data.comments : null;
+  const p = cmFindPost(id);
+  if(p && ok) p.comment_count = r.data.comments.length;
+  cmRedrawPost(id);
+}
+
+async function cmSendComment(id) {
+  const input = document.getElementById('cm-ci-' + id);
+  if(!input || input.disabled) return;
+  const body = input.value.trim();
+  if(!body) return;
+  input.disabled = true;
+  const r = await cmApi('/community/comments', 'POST', { post_id: id, body });
+  const current = document.getElementById('cm-ci-' + id);
+  if(current) current.disabled = false;
+  if(!r.ok || !r.data || !r.data.comment) {
+    if(r.status !== 401) showToast((r.data && r.data.error) || 'Could not post your comment');
+    return;
+  }
+  if(!Array.isArray(cmState.comments[id])) cmState.comments[id] = [];
+  cmState.comments[id].push(r.data.comment);
+  const p = cmFindPost(id);
+  if(p) p.comment_count = cmNum(r.data.comment_count);
+  if(current) current.value = '';
+  cmRedrawPost(id);
+}
+
+async function cmDeleteComment(postId, commentId) {
+  if(!confirm('Delete this comment?')) return;
+  const r = await cmApi('/community/comments/delete', 'POST', { id: commentId });
+  if(!r.ok) { if(r.status !== 401) showToast((r.data && r.data.error) || 'Could not delete that comment'); return; }
+  if(Array.isArray(cmState.comments[postId])) cmState.comments[postId] = cmState.comments[postId].filter(c => c.id !== commentId);
+  const p = cmFindPost(postId);
+  if(p && r.data) p.comment_count = cmNum(r.data.comment_count);
+  cmRedrawPost(postId);
+}
+
+async function cmDeletePost(id) {
+  if(!confirm('Delete this post? Its likes and comments go with it.')) return;
+  const r = await cmApi('/community/posts/delete', 'POST', { id });
+  if(!r.ok) { if(r.status !== 401) showToast((r.data && r.data.error) || 'Could not delete that post'); return; }
+  cmState.posts = cmState.posts.filter(p => p.id !== id);
+  delete cmState.comments[id];
+  delete cmState.open[id];
+  cmDraw();
+  showToast('Post deleted');
+}
+
+// ── Composing a post ──
+function cmOpenCompose(attach) {
+  if(!isLoggedIn()) { showToast('Sign in to post'); return; }
+  cmDraft = { photo: null, attach: attach || null, options: null, sending: false };
+  document.getElementById('cmText').value = '';
+  document.getElementById('cmPhotoInput').value = '';
+  document.getElementById('cmPicker').innerHTML = '';
+  const btn = document.getElementById('cmPostBtn');
+  btn.disabled = false; btn.textContent = 'Post';
+  cmUpdateCount();
+  cmDrawDraft();
+  document.getElementById('cmComposeOverlay').style.display = 'flex';
+}
+function cmCloseCompose() {
+  document.getElementById('cmComposeOverlay').style.display = 'none';
+}
+function cmUpdateCount() {
+  document.getElementById('cmCount').textContent = document.getElementById('cmText').value.length + ' / 1000';
+}
+function cmDrawDraft() {
+  const kind = cmDraft.attach ? cmDraft.attach.type : null;
+  document.getElementById('cmChipPhoto').classList.toggle('on', !!cmDraft.photo);
+  document.getElementById('cmChipWorkout').classList.toggle('on', kind === 'workout');
+  document.getElementById('cmChipPR').classList.toggle('on', kind === 'pr');
+  let html = '';
+  if(cmDraft.attach) {
+    html += cmAttachHTML(cmDraft.attach.type, cmDraft.attach.payload)
+      + `<button class="cm-chip" style="margin-bottom:10px;" onclick="cmClearAttach()">Remove ${kind === 'pr' ? 'PR' : 'workout'}</button>`;
+  }
+  if(cmDraft.photo) {
+    html += `<img class="cm-photo" src="${cmDraft.photo}" alt="Selected photo">`
+      + `<button class="cm-chip" style="margin-bottom:10px;" onclick="cmClearPhoto()">Remove photo</button>`;
+  }
+  document.getElementById('cmAttachPreview').innerHTML = html;
+}
+function cmClearAttach() { cmDraft.attach = null; cmDrawDraft(); }
+function cmClearPhoto() { cmDraft.photo = null; cmDrawDraft(); }
+
+// Shrinks a chosen photo to a JPEG small enough to store and quick to load on a phone.
+function cmCompressImage(file) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      try {
+        let out = '';
+        for(const [maxSide, quality] of [[1280, 0.78], [1080, 0.7], [900, 0.62], [720, 0.55]]) {
+          const scale = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight, 1));
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
+          canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
+          canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+          out = canvas.toDataURL('image/jpeg', quality);
+          if(out.length <= 600000) break;
+        }
+        URL.revokeObjectURL(url);
+        if(out.startsWith('data:image/jpeg;base64,') && out.length <= 850000) resolve(out);
+        else reject(new Error('Photo too large'));
+      } catch(e) { URL.revokeObjectURL(url); reject(e); }
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Photo unreadable')); };
+    img.src = url;
+  });
+}
+
+async function cmPhotoChosen(input) {
+  const file = input.files && input.files[0];
+  if(!file) return;
+  try {
+    cmDraft.photo = await cmCompressImage(file);
+  } catch(e) {
+    cmDraft.photo = null;
+    showToast('That photo could not be used — try another');
+  }
+  input.value = '';
+  cmDrawDraft();
+}
+
+function cmBuildWorkoutPayload(prog, day, week, log) {
+  let volume = 0, setCount = 0;
+  const exercises = [];
+  day.exercises.forEach((ex, ei) => {
+    const sets = Array.isArray(log && log[ei]) ? log[ei] : [];
+    const logged = sets
+      .map(st => ({ w: parseFloat(st && st.weight) || 0, r: parseFloat(st && st.reps) || 0 }))
+      .filter(st => st.w || st.r);
+    if(!logged.length) return;
+    logged.forEach(st => { volume += st.w * st.r; setCount++; });
+    exercises.push({ name: String(ex.name).slice(0, 60), sets: logged.slice(0, 8) });
+  });
+  if(!exercises.length) return null;
+  return {
+    program: String(prog.name).slice(0, 80),
+    day: String(day.name).slice(0, 80),
+    week: week + 1,
+    volume: Math.round(volume),
+    sets: setCount,
+    exercises: exercises.slice(0, 12)
+  };
+}
+
+function cmWorkoutOptions() {
+  const out = [];
+  const logs = (workoutState && workoutState.logs) || {};
+  Object.keys(logs).forEach(key => {
+    const m = /^(.+)_w(\d+)_d(\d+)$/.exec(key);
+    if(!m) return;
+    const prog = getProgram(m[1]);
+    const week = Number(m[2]), dayIdx = Number(m[3]);
+    const day = prog && prog.days[dayIdx];
+    if(!day || !Array.isArray(day.exercises)) return;
+    const payload = cmBuildWorkoutPayload(prog, day, week, logs[key]);
+    if(payload) out.push({ label: `${day.name}`, sub: `${prog.name} · Week ${week + 1}`, payload, sort: week * 100 + dayIdx });
+  });
+  return out.sort((a, b) => b.sort - a.sort).slice(0, 10);
+}
+
+function cmPROptions() {
+  const prs = load(PR_KEY) || {};
+  return Object.keys(prs).map(key => {
+    const v = prs[key] || {};
+    const weight = cmNum(v.weight);
+    if(!weight) return null;
+    const name = key.split('_').filter(Boolean).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') || 'Lift';
+    return {
+      label: `${name} — ${weight} lbs`,
+      sub: String(v.date || ''),
+      payload: { exercise: name.slice(0, 60), weight, date: String(v.date || '').slice(0, 30) },
+      sort: cmNum(v.ts)
+    };
+  }).filter(Boolean).sort((a, b) => b.sort - a.sort).slice(0, 15);
+}
+
+function cmPickAttachment(kind) {
+  const picker = document.getElementById('cmPicker');
+  if(cmDraft.options && cmDraft.options.kind === kind) { cmDraft.options = null; picker.innerHTML = ''; return; }
+  const list = kind === 'workout' ? cmWorkoutOptions() : cmPROptions();
+  if(!list.length) {
+    cmDraft.options = null; picker.innerHTML = '';
+    showToast(kind === 'workout' ? 'Log a workout first, then you can share it' : 'No PRs yet — they appear here once you set one');
+    return;
+  }
+  cmDraft.options = { kind, list };
+  picker.innerHTML = list.map((o, i) =>
+    `<button class="cm-pick" onclick="cmChooseAttachment(${i})">${cmEsc(o.label)}${o.sub ? `<small>${cmEsc(o.sub)}</small>` : ''}</button>`
+  ).join('');
+}
+
+function cmChooseAttachment(i) {
+  const opts = cmDraft.options;
+  const choice = opts && opts.list[i];
+  if(!choice) return;
+  cmDraft.attach = { type: opts.kind, payload: choice.payload };
+  cmDraft.options = null;
+  document.getElementById('cmPicker').innerHTML = '';
+  cmDrawDraft();
+}
+
+async function cmSubmitPost() {
+  if(cmDraft.sending) return;
+  const body = document.getElementById('cmText').value.trim();
+  if(!body && !cmDraft.photo && !cmDraft.attach) { showToast('Write something or attach a photo, workout or PR'); return; }
+  const btn = document.getElementById('cmPostBtn');
+  cmDraft.sending = true; btn.disabled = true; btn.textContent = 'Posting…';
+  const r = await cmApi('/community/posts', 'POST', {
+    type: cmDraft.attach ? cmDraft.attach.type : 'text',
+    body,
+    payload: cmDraft.attach ? cmDraft.attach.payload : null,
+    photo: cmDraft.photo
+  });
+  cmDraft.sending = false; btn.disabled = false; btn.textContent = 'Post';
+  if(!r.ok || !r.data || !r.data.post || !cmSafeId(r.data.post.id)) {
+    if(r.status !== 401) showToast((r.data && r.data.error) || 'Could not post — please try again');
+    return;
+  }
+  cmState.posts.unshift(r.data.post);
+  cmState.status = 'ready';
+  cmCloseCompose();
+  cmDraw();
+  showToast('Posted!');
+}
+
+// From the "Workout Complete" sheet: opens a new post with that workout attached.
+function cmShareLastWorkout() {
+  const prog = getProgram(selectedProgram);
+  const day = prog && prog.days[workoutDayIdx];
+  const payload = (day && Array.isArray(day.exercises))
+    ? cmBuildWorkoutPayload(prog, day, workoutWeek, workoutState.logs[getLogKey()])
+    : null;
+  if(!payload) { showToast('Nothing logged to share yet'); return; }
+  closeSummary();
+  navTo('community');
+  cmOpenCompose({ type: 'workout', payload });
 }
 
 // ── INIT ──
