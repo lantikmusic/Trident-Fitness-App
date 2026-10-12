@@ -3284,7 +3284,16 @@ function setGender(gender) {
   s.gender = gender;
   save('trident_settings_v1', s);
   appSettings.gender = gender;
-  // Update button styles
+  updateGenderButtons(gender);
+  // Reset program selection since programs changed
+  workoutState.program = null;
+  save('trident_workout_v1', workoutState);
+  selectedProgram = null;
+  renderWorkout();
+  showToast('Gender updated — programs refreshed');
+}
+
+function updateGenderButtons(gender) {
   const fg = document.getElementById('genderFemale');
   const fm = document.getElementById('genderMale');
   if(fg && fm) {
@@ -3295,12 +3304,6 @@ function setGender(gender) {
     fm.style.color = gender==='male' ? '#000' : 'var(--text2)';
     fm.style.borderColor = gender==='male' ? 'var(--pink)' : 'var(--border2)';
   }
-  // Reset program selection since programs changed
-  workoutState.program = null;
-  save('trident_workout_v1', workoutState);
-  selectedProgram = null;
-  renderWorkout();
-  showToast('Gender updated — programs refreshed');
 }
 
 const PROGRAMS = {
@@ -4226,7 +4229,8 @@ let workoutDayIdx = (workoutState.dayIdx != null) ? workoutState.dayIdx : (() =>
     workoutDayIdx = getTodayIdx();
     workoutState.dayIdx = workoutDayIdx;
     workoutState.lastSyncDate = todayStr;
-    save(WORKOUT_KEY, workoutState);
+    // A storage failure here (e.g. quota full) must never abort startup — the rest of the app loads below.
+    try { save(WORKOUT_KEY, workoutState); } catch(e) { console.warn('Workout day sync not saved:', e); }
   }
 })();
 
@@ -6854,9 +6858,8 @@ function closeSettings() {
 }
 
 function loadSettingsInputs() {
-  // Restore gender buttons
-  const gender = appSettings.gender || 'female';
-  setGender(gender);
+  // Restore gender buttons (display only — opening Settings must not change gender or reset the program)
+  updateGenderButtons(appSettings.gender || 'female');
   // Restore USDA key
   const savedKey = localStorage.getItem(USDA_KEY_STORAGE) || '';
   const keyEl = document.getElementById('usdaKeyInput');
