@@ -3595,6 +3595,56 @@ const PROGRAMS = {
       {name:'Recovery',type:'recovery',exercises:[]},
       {name:'Recovery',type:'recovery',exercises:[]}
     ]
+  },
+  lantikHybrid: {
+    name:'LANTIK Hybrid Training - Football/Muay Thai',
+    short:'Hybrid',
+    icon:'bolt',
+    desc:'Weekly hybrid plan for flag football + Muay Thai — the heaviest training sits mid-week (furthest from game day), with built-in recovery the day after and the day before your Sunday game',
+    daysPerWeek:'4 training days + 2 recovery · 12 weeks',
+    days:[
+      {name:'Monday — Active Recovery (Post-Game)',type:'recovery',exercises:[]},
+      {name:'Tuesday — Heavy Lower Power (Gym)',exercises:[
+        {name:'Trap Bar Deadlift',sets:3,reps:'6',p2:{sets:4,reps:'4'},p3:{sets:5,reps:'2'}},
+        {name:'Back Squat',sets:3,reps:'8',p2:{sets:4,reps:'5'},p3:{sets:5,reps:'3'}},
+        {name:'Bulgarian Split Squat',sets:3,reps:'10 each',p2:{sets:4,reps:'8 each'},p3:{sets:4,reps:'6 each'}},
+        {name:'Broad Jumps',sets:3,reps:'5',p2:{sets:4,reps:'5'},p3:{sets:5,reps:'5'},type:'explosive'},
+        {name:'Nordic Curl',sets:3,reps:'6',p2:{sets:3,reps:'8'},p3:{sets:4,reps:'8'}},
+        {name:'Standing Calf Raises',sets:3,reps:'15',p2:{sets:4,reps:'15'},p3:{sets:4,reps:'12'}}
+      ]},
+      {name:'Wednesday — Muay Thai Power & Rotational Core (Bag/Gym)',exercises:[
+        {name:'Landmine Press',sets:3,reps:'10 each',p2:{sets:4,reps:'8 each'},p3:{sets:4,reps:'6 each'}},
+        {name:'Cable Woodchop (High-to-Low)',sets:3,reps:'12 each',p2:{sets:4,reps:'10 each'},p3:{sets:4,reps:'8 each'}},
+        {name:'Med Ball Rotational Throw',sets:3,reps:'8 each',p2:{sets:4,reps:'6 each'},p3:{sets:4,reps:'5 each'},type:'explosive'},
+        {name:'Heavy Bag Combinations',sets:6,reps:'2 min rounds',p2:{sets:6,reps:'3 min rounds'},p3:{sets:8,reps:'3 min rounds'},type:'conditioning'},
+        {name:'Hanging Knee Raise',sets:3,reps:'15',p2:{sets:3,reps:'20'},p3:{sets:4,reps:'20'}},
+        {name:'Farmer Carry',sets:3,reps:'40m',p2:{sets:3,reps:'50m'},p3:{sets:4,reps:'50m'},type:'conditioning'}
+      ]},
+      {name:'Thursday — Upper Strength & Explosive Push/Pull (Gym)',exercises:[
+        {name:'Bench Press',sets:3,reps:'8',p2:{sets:4,reps:'5'},p3:{sets:5,reps:'3'}},
+        {name:'Explosive Pull-Ups',sets:3,reps:'6',p2:{sets:4,reps:'6'},p3:{sets:4,reps:'5'}},
+        {name:'Push Press',sets:3,reps:'8',p2:{sets:4,reps:'5'},p3:{sets:5,reps:'3'}},
+        {name:'Plyo Push-Ups',sets:3,reps:'10',p2:{sets:4,reps:'8'},p3:{sets:4,reps:'10'}},
+        {name:'Band Pull-Aparts',sets:3,reps:'20',p2:{sets:4,reps:'15'},p3:{sets:4,reps:'15'}},
+        {name:'Battle Ropes',sets:3,reps:'30s',p2:{sets:4,reps:'30s'},p3:{sets:5,reps:'30s'},type:'conditioning'}
+      ]},
+      {name:'Friday — Speed, Agility & Footwork (Field)',type:'field',exercises:[
+        {name:'5-10-5 Shuttle',sets:4,reps:'1 rep',p2:{sets:5,reps:'1 rep'},p3:{sets:6,reps:'1 rep'},type:'agility'},
+        {name:'Ladder Drills',sets:3,reps:'2 min',p2:{sets:4,reps:'2 min'},p3:{sets:4,reps:'2 min'},type:'agility'},
+        {name:'Mirror Reaction Drills',sets:4,reps:'30s',p2:{sets:4,reps:'30s'},p3:{sets:5,reps:'30s'},type:'agility'},
+        {name:'Lateral Bounds',sets:3,reps:'8 each',p2:{sets:4,reps:'6 each'},p3:{sets:4,reps:'6 each'},type:'explosive'},
+        {name:'Sprint Starts (10-20yd)',sets:6,reps:'1 sprint',p2:{sets:8,reps:'1 sprint'},p3:{sets:8,reps:'1 sprint'},type:'speed'},
+        {name:'Shadow Boxing w/ Footwork',sets:4,reps:'2 min',p2:{sets:5,reps:'2 min'},p3:{sets:6,reps:'2 min'},type:'conditioning'}
+      ]},
+      {name:'Saturday — Active Recovery (Game Eve)',type:'recovery',exercises:[]},
+      {name:'Sunday — GAME DAY 🏈 Pre-Game Activation',exercises:[
+        {name:'Leg Swings (Dynamic)',sets:2,reps:'10 each',type:'mobility'},
+        {name:'High Knees',sets:2,reps:'20m',type:'agility'},
+        {name:'A-Skips',sets:2,reps:'20m',type:'agility'},
+        {name:'Build-Up Sprints (50%-75%-90%)',sets:3,reps:'20m',type:'speed'},
+        {name:'Band Lateral Walks',sets:2,reps:'10 each',type:'mobility'}
+      ]}
+    ]
   }
 };
 
@@ -3697,6 +3747,56 @@ const PROGRAMS_MALE = {
       ]},
       {name:'Recovery',type:'recovery',exercises:[]},
       {name:'Recovery',type:'recovery',exercises:[]}
+    ]
+  },
+  lantikHybrid: {
+    name:'LANTIK Hybrid Training - Football/Muay Thai',
+    short:'Hybrid',
+    icon:'bolt',
+    desc:'Weekly hybrid plan for flag football + Muay Thai — the heaviest training sits mid-week (furthest from game day), with built-in recovery the day after and the day before your Sunday game',
+    daysPerWeek:'4 training days + 2 recovery · 12 weeks',
+    days:[
+      {name:'Monday — Active Recovery (Post-Game)',type:'recovery',exercises:[]},
+      {name:'Tuesday — Heavy Lower Power (Gym)',exercises:[
+        {name:'Trap Bar Deadlift',sets:3,reps:'6',p2:{sets:4,reps:'4'},p3:{sets:5,reps:'2'}},
+        {name:'Back Squat',sets:3,reps:'8',p2:{sets:4,reps:'5'},p3:{sets:5,reps:'3'}},
+        {name:'Bulgarian Split Squat',sets:3,reps:'10 each',p2:{sets:4,reps:'8 each'},p3:{sets:4,reps:'6 each'}},
+        {name:'Broad Jumps',sets:3,reps:'5',p2:{sets:4,reps:'5'},p3:{sets:5,reps:'5'},type:'explosive'},
+        {name:'Nordic Curl',sets:3,reps:'6',p2:{sets:3,reps:'8'},p3:{sets:4,reps:'8'}},
+        {name:'Standing Calf Raises',sets:3,reps:'15',p2:{sets:4,reps:'15'},p3:{sets:4,reps:'12'}}
+      ]},
+      {name:'Wednesday — Muay Thai Power & Rotational Core (Bag/Gym)',exercises:[
+        {name:'Landmine Press',sets:3,reps:'10 each',p2:{sets:4,reps:'8 each'},p3:{sets:4,reps:'6 each'}},
+        {name:'Cable Woodchop (High-to-Low)',sets:3,reps:'12 each',p2:{sets:4,reps:'10 each'},p3:{sets:4,reps:'8 each'}},
+        {name:'Med Ball Rotational Throw',sets:3,reps:'8 each',p2:{sets:4,reps:'6 each'},p3:{sets:4,reps:'5 each'},type:'explosive'},
+        {name:'Heavy Bag Combinations',sets:6,reps:'2 min rounds',p2:{sets:6,reps:'3 min rounds'},p3:{sets:8,reps:'3 min rounds'},type:'conditioning'},
+        {name:'Hanging Knee Raise',sets:3,reps:'15',p2:{sets:3,reps:'20'},p3:{sets:4,reps:'20'}},
+        {name:'Farmer Carry',sets:3,reps:'40m',p2:{sets:3,reps:'50m'},p3:{sets:4,reps:'50m'},type:'conditioning'}
+      ]},
+      {name:'Thursday — Upper Strength & Explosive Push/Pull (Gym)',exercises:[
+        {name:'Bench Press',sets:3,reps:'8',p2:{sets:4,reps:'5'},p3:{sets:5,reps:'3'}},
+        {name:'Explosive Pull-Ups',sets:3,reps:'6',p2:{sets:4,reps:'6'},p3:{sets:4,reps:'5'}},
+        {name:'Push Press',sets:3,reps:'8',p2:{sets:4,reps:'5'},p3:{sets:5,reps:'3'}},
+        {name:'Plyo Push-Ups',sets:3,reps:'10',p2:{sets:4,reps:'8'},p3:{sets:4,reps:'10'}},
+        {name:'Band Pull-Aparts',sets:3,reps:'20',p2:{sets:4,reps:'15'},p3:{sets:4,reps:'15'}},
+        {name:'Battle Ropes',sets:3,reps:'30s',p2:{sets:4,reps:'30s'},p3:{sets:5,reps:'30s'},type:'conditioning'}
+      ]},
+      {name:'Friday — Speed, Agility & Footwork (Field)',type:'field',exercises:[
+        {name:'5-10-5 Shuttle',sets:4,reps:'1 rep',p2:{sets:5,reps:'1 rep'},p3:{sets:6,reps:'1 rep'},type:'agility'},
+        {name:'Ladder Drills',sets:3,reps:'2 min',p2:{sets:4,reps:'2 min'},p3:{sets:4,reps:'2 min'},type:'agility'},
+        {name:'Mirror Reaction Drills',sets:4,reps:'30s',p2:{sets:4,reps:'30s'},p3:{sets:5,reps:'30s'},type:'agility'},
+        {name:'Lateral Bounds',sets:3,reps:'8 each',p2:{sets:4,reps:'6 each'},p3:{sets:4,reps:'6 each'},type:'explosive'},
+        {name:'Sprint Starts (10-20yd)',sets:6,reps:'1 sprint',p2:{sets:8,reps:'1 sprint'},p3:{sets:8,reps:'1 sprint'},type:'speed'},
+        {name:'Shadow Boxing w/ Footwork',sets:4,reps:'2 min',p2:{sets:5,reps:'2 min'},p3:{sets:6,reps:'2 min'},type:'conditioning'}
+      ]},
+      {name:'Saturday — Active Recovery (Game Eve)',type:'recovery',exercises:[]},
+      {name:'Sunday — GAME DAY 🏈 Pre-Game Activation',exercises:[
+        {name:'Leg Swings (Dynamic)',sets:2,reps:'10 each',type:'mobility'},
+        {name:'High Knees',sets:2,reps:'20m',type:'agility'},
+        {name:'A-Skips',sets:2,reps:'20m',type:'agility'},
+        {name:'Build-Up Sprints (50%-75%-90%)',sets:3,reps:'20m',type:'speed'},
+        {name:'Band Lateral Walks',sets:2,reps:'10 each',type:'mobility'}
+      ]}
     ]
   },
   fatLoss_ppl: {
