@@ -124,6 +124,17 @@ export default {
     if (path === '/photos'        && request.method === 'POST') return savePhoto(request, env.DB);
     if (path === '/photos/delete' && request.method === 'POST') return deletePhoto(request, env.DB);
 
+    // ── Community ──
+    if (path === '/community/feed'            && request.method === 'GET')  return community(communityFeed, request, env.DB);
+    if (path === '/community/posts'           && request.method === 'POST') return community(communityCreatePost, request, env.DB);
+    if (path === '/community/posts/delete'    && request.method === 'POST') return community(communityDeletePost, request, env.DB);
+    if (path === '/community/like'            && request.method === 'POST') return community(communityToggleLike, request, env.DB);
+    if (path === '/community/comments'        && request.method === 'GET')  return community(communityComments, request, env.DB);
+    if (path === '/community/comments'        && request.method === 'POST') return community(communityAddComment, request, env.DB);
+    if (path === '/community/comments/delete' && request.method === 'POST') return community(communityDeleteComment, request, env.DB);
+    if (path.startsWith('/community/photo/')  && request.method === 'GET')  return community(communityPhoto, path, env.DB);
+    if (path.startsWith('/community/avatar/') && request.method === 'GET')  return community(communityAvatar, path, env.DB);
+
     // ── LogMeal Proxy Routes ──
     if (path.startsWith('/v2/')) return handleLogMealProxy(request, path);
 
@@ -684,6 +695,294 @@ async function deletePhoto(request, DB) {
   const { id } = await request.json();
   await DB.prepare('DELETE FROM progress_photos WHERE id = ? AND user_id = ?').bind(id, session.user_id).run();
   return json({ success: true });
+}
+
+// ══════════════════════════════════════════════════════
+// COMMUNITY (shared feed: posts, likes, comments)
+// ══════════════════════════════════════════════════════
+const COMMUNITY_MAX_BODY = 1000;
+const COMMUNITY_MAX_COMMENT = 500;
+const COMMUNITY_MAX_PHOTO = 900000;   // characters of the data URL
+const COMMUNITY_MAX_PAYLOAD = 6000;   // characters of the JSON attachment
+const COMMUNITY_POSTS_PER_DAY = 30;
+const COMMUNITY_COMMENTS_PER_DAY = 200;
+const COMMUNITY_ID = /^[A-Za-z0-9-]{1,64}$/;
+
+// A failing community query (e.g. tables not created yet) must answer with JSON, not crash the worker.
+async function community(handler, ...args) {
+  try {
+    return await handler(...args);
+  } catch (e) {
+    return error('Community is unavailable right now', 500);
+  }
+}
+
+const COMMUNITY_AUTHOR = "COALESCE(NULLIF(s.name, ''), NULLIF(u.name, ''), 'Member')";
+
+const COMMUNITY_POST_SELECT = `
+  SELECT p.id, p.user_id, p.type, p.body, p.payload_json, p.created_at,
+    (p.photo_data IS NOT NULL) AS has_photo,
+    ${COMMUNITY_AUTHOR} AS author_name,
+    (SELECT COUNT(*) FROM community_likes l WHERE l.post_id = p.id) AS like_count,
+    (SELECT COUNT(*) FROM community_comments c WHERE c.post_id = p.id) AS comment_count,
+    EXISTS(SELECT 1 FROM community_likes l2 WHERE l2.post_id = p.id AND l2.user_id = ?1) AS liked,
+    EXISTS(SELECT 1 FROM user_blobs b WHERE b.user_id = p.user_id AND b.blob_key = 'profile_pic') AS has_avatar
+  FROM community_posts p
+  JOIN users u ON u.id = p.user_id
+  LEFT JOIN user_settings s ON s.user_id = p.user_id`;
+
+function communityPostOut(row, viewerId) {
+  let payload = null;
+  try { payload = row.payload_json ? JSON.parse(row.payload_json) : null; } catch (e) {}
+  return {
+    id: row.id,
+    user_id: row.user_id,
+    type: row.type,
+    body: row.body || '',
+    payload,
+    created_at: row.created_at,
+    has_photo: !!row.has_photo,
+    author_name: row.author_name,
+    like_count: row.like_count || 0,
+    comment_count: row.comment_count || 0,
+    liked: !!row.liked,
+    has_avatar: !!row.has_avatar,
+    mine: row.user_id === viewerId
+  };
+}
+
+function communityDayAgo() {
+  return new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+}
+
+async function communityFeed(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+
+  const url = new URL(request.url);
+  const limit = Math.min(Math.max(parseInt(url.searchParams.get('limit'), 10) || 15, 1), 30);
+  const before = url.searchParams.get('before') || null;
+
+  const rows = await DB.prepare(
+    `${COMMUNITY_POST_SELECT} WHERE (?2 IS NULL OR p.created_at < ?2) ORDER BY p.created_at DESC LIMIT ?3`
+  ).bind(session.user_id, before, limit + 1).all();
+
+  const list = rows.results || [];
+  const page = list.slice(0, limit);
+  return json({
+    posts: page.map(r => communityPostOut(r, session.user_id)),
+    next: list.length > limit ? page[page.length - 1].created_at : null
+  });
+}
+
+async function communityCreatePost(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+
+  let data;
+  try { data = await request.json(); } catch (e) { return error('Invalid request'); }
+  if (!data || typeof data !== 'object') return error('Invalid request');
+
+  const type = ['text', 'workout', 'pr'].includes(data.type) ? data.type : 'text';
+  const body = typeof data.body === 'string' ? data.body.trim() : '';
+  if (body.length > COMMUNITY_MAX_BODY) return error(`Posts are limited to ${COMMUNITY_MAX_BODY} characters`);
+
+  let photo = null;
+  if (data.photo != null) {
+    if (typeof data.photo !== 'string') return error('That photo could not be read');
+    if (data.photo.length > COMMUNITY_MAX_PHOTO) return error('That photo is too large', 413);
+    if (!/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/]+=*$/.test(data.photo)) return error('That photo could not be read');
+    photo = data.photo;
+  }
+
+  let payloadJson = null;
+  if (type !== 'text') {
+    if (!data.payload || typeof data.payload !== 'object' || Array.isArray(data.payload)) return error('Missing details for that post');
+    payloadJson = JSON.stringify(data.payload);
+    if (payloadJson.length > COMMUNITY_MAX_PAYLOAD) return error('That attachment is too large', 413);
+  }
+
+  if (!body && !photo && !payloadJson) return error('Write something or attach a photo, workout or PR');
+
+  const recent = await DB.prepare(
+    'SELECT COUNT(*) AS n FROM community_posts WHERE user_id = ? AND created_at > ?'
+  ).bind(session.user_id, communityDayAgo()).first();
+  if (recent && recent.n >= COMMUNITY_POSTS_PER_DAY) return error('You have reached today\'s posting limit', 429);
+
+  const id = generateId();
+  await DB.prepare(
+    'INSERT INTO community_posts (id, user_id, type, body, payload_json, photo_data, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)'
+  ).bind(id, session.user_id, type, body, payloadJson, photo, new Date().toISOString()).run();
+
+  const row = await DB.prepare(`${COMMUNITY_POST_SELECT} WHERE p.id = ?2`).bind(session.user_id, id).first();
+  return json({ success: true, post: communityPostOut(row, session.user_id) });
+}
+
+async function communityDeletePost(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+
+  let data;
+  try { data = await request.json(); } catch (e) { return error('Invalid request'); }
+  const id = data && data.id;
+  if (typeof id !== 'string' || !COMMUNITY_ID.test(id)) return error('Invalid request');
+
+  const post = await DB.prepare('SELECT user_id FROM community_posts WHERE id = ?').bind(id).first();
+  if (!post) return error('Post not found', 404);
+  if (post.user_id !== session.user_id) return error('You can only delete your own posts', 403);
+
+  await DB.batch([
+    DB.prepare('DELETE FROM community_likes WHERE post_id = ?').bind(id),
+    DB.prepare('DELETE FROM community_comments WHERE post_id = ?').bind(id),
+    DB.prepare('DELETE FROM community_posts WHERE id = ?').bind(id)
+  ]);
+  return json({ success: true });
+}
+
+async function communityToggleLike(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+
+  let data;
+  try { data = await request.json(); } catch (e) { return error('Invalid request'); }
+  const postId = data && data.post_id;
+  if (typeof postId !== 'string' || !COMMUNITY_ID.test(postId)) return error('Invalid request');
+
+  const post = await DB.prepare('SELECT id FROM community_posts WHERE id = ?').bind(postId).first();
+  if (!post) return error('Post not found', 404);
+
+  const existing = await DB.prepare(
+    'SELECT 1 AS x FROM community_likes WHERE post_id = ? AND user_id = ?'
+  ).bind(postId, session.user_id).first();
+
+  if (existing) {
+    await DB.prepare('DELETE FROM community_likes WHERE post_id = ? AND user_id = ?').bind(postId, session.user_id).run();
+  } else {
+    await DB.prepare(
+      'INSERT OR IGNORE INTO community_likes (post_id, user_id, created_at) VALUES (?, ?, ?)'
+    ).bind(postId, session.user_id, new Date().toISOString()).run();
+  }
+
+  const count = await DB.prepare('SELECT COUNT(*) AS n FROM community_likes WHERE post_id = ?').bind(postId).first();
+  return json({ success: true, liked: !existing, like_count: (count && count.n) || 0 });
+}
+
+function communityCommentOut(row, viewerId) {
+  return {
+    id: row.id,
+    post_id: row.post_id,
+    user_id: row.user_id,
+    body: row.body || '',
+    created_at: row.created_at,
+    author_name: row.author_name,
+    has_avatar: !!row.has_avatar,
+    can_delete: row.user_id === viewerId || row.post_owner === viewerId
+  };
+}
+
+const COMMUNITY_COMMENT_SELECT = `
+  SELECT c.id, c.post_id, c.user_id, c.body, c.created_at, p.user_id AS post_owner,
+    ${COMMUNITY_AUTHOR} AS author_name,
+    EXISTS(SELECT 1 FROM user_blobs b WHERE b.user_id = c.user_id AND b.blob_key = 'profile_pic') AS has_avatar
+  FROM community_comments c
+  JOIN community_posts p ON p.id = c.post_id
+  JOIN users u ON u.id = c.user_id
+  LEFT JOIN user_settings s ON s.user_id = c.user_id`;
+
+async function communityComments(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+
+  const postId = new URL(request.url).searchParams.get('post_id') || '';
+  if (!COMMUNITY_ID.test(postId)) return error('Invalid request');
+
+  const rows = await DB.prepare(
+    `${COMMUNITY_COMMENT_SELECT} WHERE c.post_id = ? ORDER BY c.created_at ASC LIMIT 200`
+  ).bind(postId).all();
+  return json({ comments: (rows.results || []).map(r => communityCommentOut(r, session.user_id)) });
+}
+
+async function communityAddComment(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+
+  let data;
+  try { data = await request.json(); } catch (e) { return error('Invalid request'); }
+  const postId = data && data.post_id;
+  if (typeof postId !== 'string' || !COMMUNITY_ID.test(postId)) return error('Invalid request');
+  const body = typeof data.body === 'string' ? data.body.trim() : '';
+  if (!body) return error('Write a comment first');
+  if (body.length > COMMUNITY_MAX_COMMENT) return error(`Comments are limited to ${COMMUNITY_MAX_COMMENT} characters`);
+
+  const post = await DB.prepare('SELECT id FROM community_posts WHERE id = ?').bind(postId).first();
+  if (!post) return error('Post not found', 404);
+
+  const recent = await DB.prepare(
+    'SELECT COUNT(*) AS n FROM community_comments WHERE user_id = ? AND created_at > ?'
+  ).bind(session.user_id, communityDayAgo()).first();
+  if (recent && recent.n >= COMMUNITY_COMMENTS_PER_DAY) return error('You have reached today\'s comment limit', 429);
+
+  const id = generateId();
+  await DB.prepare(
+    'INSERT INTO community_comments (id, post_id, user_id, body, created_at) VALUES (?, ?, ?, ?, ?)'
+  ).bind(id, postId, session.user_id, body, new Date().toISOString()).run();
+
+  const row = await DB.prepare(`${COMMUNITY_COMMENT_SELECT} WHERE c.id = ?`).bind(id).first();
+  const count = await DB.prepare('SELECT COUNT(*) AS n FROM community_comments WHERE post_id = ?').bind(postId).first();
+  return json({ success: true, comment: communityCommentOut(row, session.user_id), comment_count: (count && count.n) || 0 });
+}
+
+async function communityDeleteComment(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+
+  let data;
+  try { data = await request.json(); } catch (e) { return error('Invalid request'); }
+  const id = data && data.id;
+  if (typeof id !== 'string' || !COMMUNITY_ID.test(id)) return error('Invalid request');
+
+  const row = await DB.prepare(
+    'SELECT c.post_id, c.user_id, p.user_id AS post_owner FROM community_comments c JOIN community_posts p ON p.id = c.post_id WHERE c.id = ?'
+  ).bind(id).first();
+  if (!row) return error('Comment not found', 404);
+  if (row.user_id !== session.user_id && row.post_owner !== session.user_id) return error('You cannot delete that comment', 403);
+
+  await DB.prepare('DELETE FROM community_comments WHERE id = ?').bind(id).run();
+  const count = await DB.prepare('SELECT COUNT(*) AS n FROM community_comments WHERE post_id = ?').bind(row.post_id).first();
+  return json({ success: true, comment_count: (count && count.n) || 0 });
+}
+
+// Images are stored as data URLs; serve them as real image responses so <img> tags can load them.
+function communityImageResponse(dataUrl, cacheControl) {
+  const notFound = () => new Response('Not found', { status: 404, headers: CORS });
+  if (typeof dataUrl !== 'string') return notFound();
+  const m = /^data:(image\/(?:jpeg|png|webp|gif|heic|heif));base64,([A-Za-z0-9+/]+=*)$/.exec(dataUrl);
+  if (!m) return notFound();
+  let bin;
+  try { bin = atob(m[2]); } catch (e) { return notFound(); }
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new Response(bytes, {
+    headers: { ...CORS, 'Content-Type': m[1], 'Cache-Control': cacheControl, 'X-Content-Type-Options': 'nosniff' }
+  });
+}
+
+async function communityPhoto(path, DB) {
+  const id = path.slice('/community/photo/'.length);
+  if (!COMMUNITY_ID.test(id)) return new Response('Not found', { status: 404, headers: CORS });
+  const row = await DB.prepare('SELECT photo_data FROM community_posts WHERE id = ?').bind(id).first();
+  return communityImageResponse(row && row.photo_data, 'public, max-age=31536000, immutable');
+}
+
+async function communityAvatar(path, DB) {
+  const userId = path.slice('/community/avatar/'.length);
+  if (!COMMUNITY_ID.test(userId)) return new Response('Not found', { status: 404, headers: CORS });
+  const row = await DB.prepare(
+    'SELECT data_json FROM user_blobs WHERE user_id = ? AND blob_key = ?'
+  ).bind(userId, 'profile_pic').first();
+  let dataUrl = null;
+  try { dataUrl = row ? JSON.parse(row.data_json) : null; } catch (e) {}
+  return communityImageResponse(dataUrl, 'public, max-age=300');
 }
 
 // ══════════════════════════════════════════════════════

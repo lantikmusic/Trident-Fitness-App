@@ -121,8 +121,41 @@ CREATE TABLE IF NOT EXISTS user_blobs (
   FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
+-- ── Community: posts ──
+CREATE TABLE IF NOT EXISTS community_posts (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  type TEXT NOT NULL DEFAULT 'text',
+  body TEXT NOT NULL DEFAULT '',
+  payload_json TEXT,
+  photo_data TEXT,
+  created_at TEXT NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- ── Community: likes (one per user per post) ──
+CREATE TABLE IF NOT EXISTS community_likes (
+  post_id TEXT NOT NULL,
+  user_id TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  PRIMARY KEY (post_id, user_id)
+);
+
+-- ── Community: comments ──
+CREATE TABLE IF NOT EXISTS community_comments (
+  id TEXT PRIMARY KEY,
+  post_id TEXT NOT NULL,
+  user_id TEXT NOT NULL,
+  body TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+
 -- ── Indexes for performance ──
 CREATE INDEX IF NOT EXISTS idx_macro_logs_user_date ON macro_logs(user_id, log_date);
 CREATE INDEX IF NOT EXISTS idx_progress_logs_user ON progress_logs(user_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_expires ON sessions(expires_at);
+CREATE INDEX IF NOT EXISTS idx_community_posts_created ON community_posts(created_at);
+CREATE INDEX IF NOT EXISTS idx_community_posts_user ON community_posts(user_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_community_comments_post ON community_comments(post_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_community_comments_user ON community_comments(user_id, created_at);
