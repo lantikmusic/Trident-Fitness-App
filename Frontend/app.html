@@ -2109,6 +2109,9 @@ async function loadFromCloud() {
           // Restore active program and day index into runtime variables
           selectedProgram = ws.program;
           if(ws.dayIdx != null) workoutDayIdx = ws.dayIdx;
+          // Calendar-aligned programs follow today's date, not the day saved in the account
+          const calIdx = calendarDayIdx(ws.program);
+          if(calIdx != null) { workoutDayIdx = calIdx; workoutState.dayIdx = calIdx; }
         }
       } catch(e) {}
     }
@@ -3657,6 +3660,7 @@ const PROGRAMS = {
     name:'LANTIK Hybrid Training - Football/Muay Thai',
     short:'Hybrid',
     icon:'bolt',
+    calendarAligned:true,
     desc:'Weekly hybrid plan for flag football + Muay Thai — the heaviest training sits mid-week (furthest from game day), with built-in recovery the day after and the day before your Sunday game',
     daysPerWeek:'4 training days + 2 recovery · 12 weeks',
     days:[
@@ -3810,6 +3814,7 @@ const PROGRAMS_MALE = {
     name:'LANTIK Hybrid Training - Football/Muay Thai',
     short:'Hybrid',
     icon:'bolt',
+    calendarAligned:true,
     desc:'Weekly hybrid plan for flag football + Muay Thai — the heaviest training sits mid-week (furthest from game day), with built-in recovery the day after and the day before your Sunday game',
     daysPerWeek:'4 training days + 2 recovery · 12 weeks',
     days:[
@@ -4055,6 +4060,15 @@ function getProgram(key) {
   return PROGRAMS[key] || PROGRAMS_MALE[key] || null;
 }
 
+// For programs whose days are literal Mon–Sun slots (calendarAligned), returns today's slot;
+// null for every other program. Pure: reads the clock, writes nothing.
+function calendarDayIdx(key) {
+  const prog = (typeof key === 'string') ? getProgram(key) : null;
+  if(!prog || !prog.calendarAligned || !Array.isArray(prog.days)) return null;
+  const idx = getTodayIdx();
+  return (Number.isInteger(idx) && idx >= 0 && idx < prog.days.length) ? idx : null;
+}
+
 function getActivePrograms() {
   const gender = getCurrentGender();
   const focus  = (load('trident_goals_v1') || {}).focus;
@@ -4268,6 +4282,31 @@ let workoutDayIdx = (workoutState.dayIdx != null) ? workoutState.dayIdx : (() =>
   return first >= 0 ? first : 0;
 })();
 
+// Calendar-aligned programs always open on today's day. In memory only — nothing is written to
+// storage during startup, and a failure here must never stop the app from loading.
+try {
+  const calIdx = calendarDayIdx(workoutState.program);
+  if(calIdx != null) { workoutDayIdx = calIdx; workoutState.dayIdx = calIdx; }
+} catch(e) { console.warn('Calendar day sync skipped:', e); }
+
+// A home-screen app can sit in the background for days: when it comes back on a new date,
+// treat the workout day as a fresh launch would.
+let _calendarSyncDate = new Date().toDateString();
+document.addEventListener('visibilitychange', () => {
+  if(document.visibilityState !== 'visible') return;
+  try {
+    const today = new Date().toDateString();
+    if(today === _calendarSyncDate) return;
+    _calendarSyncDate = today;
+    const calIdx = calendarDayIdx(selectedProgram);
+    if(calIdx == null) return;
+    workoutDayIdx = calIdx; workoutState.dayIdx = calIdx; activeExerciseIdx = 0;
+    if(_workoutScreen === 'active') _workoutScreen = 'preview';
+    renderDashboard();
+    if(currentPage === 'workout') renderWorkout();
+  } catch(e) { console.warn('Calendar day sync skipped:', e); }
+});
+
 function renderWorkout(){
   if(!selectedProgram || !getProgram(selectedProgram)){
     selectedProgram = null;
@@ -4452,6 +4491,9 @@ function startProgram(){
   } else {
     workoutDayIdx = 0;
   }
+  // Calendar-aligned programs start on today's actual weekday instead
+  const calIdx = calendarDayIdx(selectedProgram);
+  if(calIdx != null) workoutDayIdx = calIdx;
   workoutState.dayIdx = workoutDayIdx;
   save(WORKOUT_KEY, workoutState);
   activeExerciseIdx = 0;
