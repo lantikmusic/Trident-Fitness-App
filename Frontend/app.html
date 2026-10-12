@@ -3600,6 +3600,7 @@ const PROGRAMS = {
     name:'LANTIK Hybrid Training - Football/Muay Thai',
     short:'Hybrid',
     icon:'bolt',
+    calendarAligned:true,
     desc:'Weekly hybrid plan for flag football + Muay Thai — the heaviest training sits mid-week (furthest from game day), with built-in recovery the day after and the day before your Sunday game',
     daysPerWeek:'4 training days + 2 recovery · 12 weeks',
     days:[
@@ -3753,6 +3754,7 @@ const PROGRAMS_MALE = {
     name:'LANTIK Hybrid Training - Football/Muay Thai',
     short:'Hybrid',
     icon:'bolt',
+    calendarAligned:true,
     desc:'Weekly hybrid plan for flag football + Muay Thai — the heaviest training sits mid-week (furthest from game day), with built-in recovery the day after and the day before your Sunday game',
     daysPerWeek:'4 training days + 2 recovery · 12 weeks',
     days:[
@@ -4199,16 +4201,33 @@ if(workoutState.program && !getProgram(workoutState.program)){
 }
 let selectedProgram = workoutState.program;
 let workoutWeek = workoutState.weekOffset || 0;
-// Restore saved day index — never derive from weekday (getTodayIdx) which causes rest day mismatches
+// Restore saved day index — never derive from weekday (getTodayIdx) which causes rest day mismatches,
+// EXCEPT for calendar-aligned programs (e.g. LANTIK Hybrid) whose days are literal Mon-Sun slots.
 let workoutDayIdx = (workoutState.dayIdx != null) ? workoutState.dayIdx : (() => {
   if(!workoutState.program) return 0;
   const prog = getProgram(workoutState.program);
   if(!prog) return 0;
+  if(prog.calendarAligned) return getTodayIdx();
   const first = prog.days.findIndex(d =>
     d.name !== 'Rest' && d.name !== 'Recovery' &&
     d.type !== 'recovery' && d.exercises && d.exercises.length > 0
   );
   return first >= 0 ? first : 0;
+})();
+
+// Calendar-aligned programs: auto-resync to today's weekday once per real calendar day,
+// without overriding a same-day manual day-tab selection (tracked via workoutState.lastSyncDate).
+(() => {
+  if(!workoutState.program) return;
+  const prog = getProgram(workoutState.program);
+  if(!prog || !prog.calendarAligned) return;
+  const todayStr = new Date().toDateString();
+  if(workoutState.lastSyncDate !== todayStr) {
+    workoutDayIdx = getTodayIdx();
+    workoutState.dayIdx = workoutDayIdx;
+    workoutState.lastSyncDate = todayStr;
+    save(WORKOUT_KEY, workoutState);
+  }
 })();
 
 function renderWorkout(){
@@ -4384,9 +4403,12 @@ function startProgram(){
   save(WORKOUT_KEY,workoutState);
   // Sync program selection to cloud immediately
   cloudPost('/workout', { program: workoutState.program, state: workoutState });
-  // Always start on the first real training day (Day 1), not today's weekday index
+  // Calendar-aligned programs (e.g. LANTIK Hybrid) start on today's actual weekday.
+  // All other programs start on the first real training day (Day 1), not today's weekday index.
   const prog = getProgram(selectedProgram);
-  if(prog) {
+  if(prog && prog.calendarAligned) {
+    workoutDayIdx = getTodayIdx();
+  } else if(prog) {
     const firstTrainingDay = prog.days.findIndex(d =>
       d.name !== 'Rest' && d.name !== 'Recovery' &&
       d.type !== 'recovery' && d.exercises && d.exercises.length > 0
@@ -4396,6 +4418,7 @@ function startProgram(){
     workoutDayIdx = 0;
   }
   workoutState.dayIdx = workoutDayIdx;
+  workoutState.lastSyncDate = new Date().toDateString();
   save(WORKOUT_KEY, workoutState);
   activeExerciseIdx = 0;
   _workoutScreen = 'preview';
