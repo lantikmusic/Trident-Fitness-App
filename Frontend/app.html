@@ -946,6 +946,104 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .cm-chip.on{border-color:var(--pink);color:var(--pink);}
 .cm-pick{display:block;width:100%;text-align:left;background:var(--bg4);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 12px;color:var(--text);font-family:inherit;font-size:13px;line-height:1.4;margin-bottom:6px;cursor:pointer;}
 .cm-pick small{display:block;color:var(--text3);font-size:11px;}
+/* ── LANTIK Hybrid program ── */
+.hy-day-title{font-size:13px;font-weight:600;color:var(--text2);margin:2px 2px 10px;}
+.hy-slot{background:var(--bg3);border:0.5px solid var(--pink-border);border-radius:var(--radius-lg);padding:14px;margin-bottom:10px;cursor:pointer;}
+.hy-slot-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;}
+.hy-tag{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--pink);}
+.hy-slot-name{font-size:16px;font-weight:700;letter-spacing:-0.02em;line-height:1.25;}
+.hy-slot-meta{font-size:12px;color:var(--text3);margin-top:3px;}
+.hy-warn-line{font-size:12px;color:#FFD60A;margin-top:8px;line-height:1.4;}
+.hy-chip{flex-shrink:0;font-size:11px;font-weight:600;color:var(--text3);background:var(--bg4);border-radius:99px;padding:3px 9px;white-space:nowrap;}
+.hy-chip.done{color:var(--green);background:rgba(48,209,88,.12);}
+.hy-chip.live{color:var(--pink);background:var(--pink-dim);}
+.hy-chip.warn{color:#FFD60A;background:rgba(255,214,10,.12);}
+.hy-bar{height:4px;background:var(--bg4);border-radius:99px;overflow:hidden;margin-top:10px;}
+.hy-bar>div{height:100%;background:var(--pink);border-radius:99px;transition:width .3s;}
+.hy-card{background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:14px;margin-bottom:10px;}
+.hy-card-title{font-size:15px;font-weight:700;margin-bottom:4px;}
+.hy-card-sub{font-size:12px;color:var(--text3);line-height:1.5;margin-bottom:10px;}
+.hy-rot-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-bottom:10px;}
+.hy-rot{background:var(--bg4);border:0.5px solid var(--border2);border-radius:99px;padding:6px 10px;color:var(--text2);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;}
+.hy-rot.next{background:var(--pink);border-color:var(--pink);color:#000;}
+.hy-rot.todo{border-style:dashed;}
+.hy-rot-arrow{color:var(--text3);font-size:11px;}
+.hy-kv{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:13px;padding:6px 0;border-top:0.5px solid var(--border);}
+.hy-kv.top{align-items:flex-start;}
+.hy-kv>span:first-child{color:var(--text2);min-width:0;word-break:break-word;}
+.hy-kv>:last-child{text-align:right;flex-shrink:0;max-width:62%;word-break:break-word;}
+.hy-muted{color:var(--text3);font-size:12px;}
+.hy-good{color:var(--green);font-size:12px;font-weight:600;}
+.hy-link{background:none;border:none;padding:0;color:var(--pink);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;text-align:right;}
+.hy-ghost{display:block;width:100%;padding:11px;border-radius:var(--radius);border:0.5px dashed var(--border2);background:transparent;color:var(--text2);font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;margin-bottom:10px;}
+.hy-hist{display:flex;justify-content:space-between;gap:10px;width:100%;background:none;border:none;border-top:0.5px solid var(--border);padding:9px 0;color:var(--text);font-family:inherit;font-size:13px;text-align:left;cursor:pointer;}
+.hy-block{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;margin-top:12px;padding:10px 12px;background:var(--bg4);border:0.5px solid var(--border2);border-radius:var(--radius);color:var(--text);font-family:inherit;font-size:12px;font-weight:600;text-align:left;cursor:pointer;}
+.hy-block-edit{color:var(--pink);flex-shrink:0;}
+.hy-block-tip{font-size:12px;color:var(--text3);line-height:1.5;margin-top:8px;}
+.hy-back{background:none;border:none;color:var(--pink);font-family:inherit;font-size:14px;font-weight:600;padding:4px 0;margin-bottom:8px;cursor:pointer;}
+.hy-head{margin-bottom:12px;}
+.hy-title{font-size:22px;font-weight:700;letter-spacing:-0.03em;line-height:1.2;margin-top:4px;}
+.hy-goal{font-size:13px;color:var(--text2);line-height:1.5;margin-top:6px;}
+.hy-overall-row{display:flex;justify-content:space-between;gap:10px;font-size:11px;color:var(--text3);margin-top:6px;}
+.hy-overall-row span:first-child{color:var(--text);font-weight:600;flex-shrink:0;}
+.hy-overall-row span:last-child{text-align:right;}
+.hy-banner{background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--radius);padding:10px 12px;font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:10px;}
+.hy-banner strong{color:var(--text);}
+.hy-banner.warn{border-color:rgba(255,214,10,.45);background:rgba(255,214,10,.07);}
+.hy-section{background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--radius-lg);margin-bottom:10px;overflow:hidden;}
+.hy-section.primer{border-color:var(--pink-border);background:linear-gradient(180deg,var(--pink-dim),transparent 120px),var(--bg3);}
+.hy-section-head{display:flex;align-items:center;gap:10px;width:100%;padding:14px;background:none;border:none;color:var(--text);font-family:inherit;text-align:left;cursor:pointer;}
+.hy-section-head.static{cursor:default;}
+.hy-section-title{flex:1;font-size:12px;font-weight:800;letter-spacing:.12em;}
+.hy-section.primer .hy-section-title{color:var(--pink);}
+.hy-section-sub{font-weight:500;letter-spacing:0;color:var(--text3);}
+.hy-section-count{font-size:12px;font-weight:600;color:var(--text3);flex-shrink:0;}
+.hy-section-count.done{color:var(--green);}
+.hy-section-body{padding:0 10px 10px;}
+.hy-pad{padding:0 4px 4px;}
+.hy-chev{color:var(--text3);font-size:14px;flex-shrink:0;transition:transform .2s;}
+.hy-chev.down,.hy-ex.open>.hy-ex-head .hy-chev{transform:rotate(90deg);}
+.hy-ex{background:var(--bg4);border:0.5px solid var(--border);border-radius:var(--radius);margin-bottom:6px;overflow:hidden;}
+.hy-ex.open{border-color:var(--pink);}
+.hy-ex.done{border-color:rgba(48,209,88,.35);}
+.hy-ex.omitted,.hy-ex.skipped{opacity:.6;}
+.hy-ex-head{display:flex;align-items:center;gap:10px;padding:11px 12px;cursor:pointer;}
+.hy-ex-title{flex:1;min-width:0;}
+.hy-ex-name{font-size:14px;font-weight:600;line-height:1.3;word-break:break-word;}
+.hy-ex-rx{font-size:11px;color:var(--text3);margin-top:2px;}
+.hy-check{width:28px;height:28px;flex-shrink:0;border-radius:8px;border:1.5px solid var(--border2);background:transparent;color:#000;font-size:14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;}
+.hy-check.on{background:var(--green);border-color:var(--green);}
+.hy-dot{width:22px;height:22px;flex-shrink:0;border-radius:50%;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#000;}
+.hy-dot.on{background:var(--green);border-color:var(--green);}
+.hy-dot.off{color:var(--text3);}
+.hy-ex-body{padding:0 12px 12px;}
+.hy-cue{font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:8px;white-space:pre-wrap;word-break:break-word;}
+.hy-last{font-size:12px;color:var(--pink);margin-bottom:8px;line-height:1.5;}
+.hy-sets{display:flex;flex-direction:column;gap:6px;margin-bottom:8px;}
+.hy-sets .set-row{background:var(--bg3);}
+.hy-input{display:block;width:100%;background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 12px;color:var(--text);font-family:inherit;font-size:16px;outline:none;margin-top:8px;}
+.hy-card .hy-input,.cm-sheet .hy-input{background:var(--bg4);}
+textarea.hy-input{resize:vertical;line-height:1.45;}
+.hy-field{display:block;margin-top:10px;}
+.hy-field>span{display:block;font-size:11px;color:var(--text3);margin-bottom:2px;}
+.hy-field .hy-input{margin-top:4px;}
+.hy-grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.hy-actions,.hy-adjust{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+.hy-actions button,.hy-adjust button{background:var(--bg3);border:0.5px solid var(--border2);border-radius:99px;padding:8px 12px;color:var(--text2);font-family:inherit;font-size:12px;font-weight:500;cursor:pointer;}
+.hy-adjust{margin:0 0 4px;}
+.hy-rpe{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin-top:4px;}
+.hy-rpe button,.hy-seg button{background:var(--bg4);border:0.5px solid var(--border2);border-radius:8px;padding:9px 0;color:var(--text2);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;}
+.hy-ex .hy-rpe button,.hy-pad .hy-seg button{background:var(--bg3);}
+.hy-rpe button.on,.hy-seg button.on{background:var(--pink);border-color:var(--pink);color:#000;}
+.hy-seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px;margin-top:4px;}
+.hy-notes{margin:0;padding:0 14px 6px 28px;font-size:13px;color:var(--text2);line-height:1.6;}
+.hy-sheet-sec{font-size:11px;font-weight:800;letter-spacing:.12em;color:var(--pink);margin:14px 0 4px;}
+.hy-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.hy-stats div{background:var(--bg4);border-radius:var(--radius);padding:10px 6px;text-align:center;}
+.hy-stats b{display:block;font-size:18px;font-weight:700;color:var(--pink);}
+.hy-stats span{display:block;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-top:2px;}
+.hy-edit-btns{display:flex;gap:4px;}
+.hy-edit-btns button{width:32px;height:32px;border-radius:8px;border:0.5px solid var(--border2);background:var(--bg4);color:var(--text2);font-family:inherit;font-size:13px;cursor:pointer;}
 </style>
 </head>
 <body>
@@ -1543,6 +1641,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
         <button class="pink-btn finish-workout-btn" id="finishWorkoutBtn" onclick="finishWorkout()">Finish Workout</button>
       </div>
     </div>
+    <!-- LANTIK Hybrid program (own week and session screens) -->
+    <div id="hybridWorkout" style="display:none;"></div>
   </div>
 </div>
 
@@ -1852,6 +1952,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
     <button class="pink-btn" id="cmPostBtn" onclick="cmSubmitPost()">Post</button>
     <button class="ghost-btn" onclick="cmCloseCompose()" style="margin-top:8px;">Cancel</button>
   </div>
+</div>
+
+<div class="cm-overlay" id="hySheetOverlay" onclick="if(event.target===this)hySheetClose()">
+  <div class="cm-sheet" id="hySheet"></div>
 </div>
 
 <!-- Settings Gear Button (always visible) -->
@@ -2184,6 +2288,10 @@ async function loadFromCloud() {
     if(workout && workout.state_json) {
       try {
         const ws = JSON.parse(workout.state_json);
+        // The Hybrid program's state rides along in the account copy but is merged separately
+        const cloudHybrid = ws.hybrid;
+        delete ws.hybrid;
+        hyAdoptCloud(cloudHybrid);
         if(ws.program) {
           workoutState = { ...workoutState, ...ws };
           save(WORKOUT_KEY, workoutState);
@@ -2314,6 +2422,8 @@ function showWorkoutScreen(screen) {
   if(programSel) programSel.style.display = screen === 'programs' ? 'block' : 'none';
   if(preview)    preview.style.display    = screen === 'preview'  ? 'block' : 'none';
   if(activeWo)   activeWo.style.display   = screen === 'active'   ? 'block' : 'none';
+  const hybridEl = document.getElementById('hybridWorkout');
+  if(hybridEl)   hybridEl.style.display   = screen === 'hybrid'   ? 'block' : 'none';
 }
 
 function navTo(page) {
@@ -3740,54 +3850,22 @@ const PROGRAMS = {
     ]
   },
   lantikHybrid: {
-    name:'LANTIK Hybrid Training - Football/Muay Thai',
+    name:'LANTIK Hybrid Athlete Training Program',
     short:'Hybrid',
     icon:'bolt',
     calendarAligned:true,
-    desc:'Weekly hybrid plan for flag football + Muay Thai — the heaviest training sits mid-week (furthest from game day), with built-in recovery the day after and the day before your Sunday game',
-    daysPerWeek:'4 training days + 2 recovery · 12 weeks',
+    hybrid:true,
+    desc:'Explosive power, acceleration, athletic strength and lean muscle for a flag-football receiver who trains Muay Thai — three lifts, two field sessions, two Muay Thai sessions, a recovery day and Sunday games',
+    daysPerWeek:'7-day schedule · rotating Upper/Lower lifts',
+    // Sessions, sections and the lifting rotation live in HY_WORKOUTS / HY_WEEK (see "LANTIK HYBRID ATHLETE PROGRAM").
     days:[
-      {name:'Monday — Active Recovery (Post-Game)',type:'recovery',exercises:[]},
-      {name:'Tuesday — Heavy Lower Power (Gym)',exercises:[
-        {name:'Trap Bar Deadlift',sets:3,reps:'6',p2:{sets:4,reps:'4'},p3:{sets:5,reps:'2'}},
-        {name:'Back Squat',sets:3,reps:'8',p2:{sets:4,reps:'5'},p3:{sets:5,reps:'3'}},
-        {name:'Bulgarian Split Squat',sets:3,reps:'10 each',p2:{sets:4,reps:'8 each'},p3:{sets:4,reps:'6 each'}},
-        {name:'Broad Jumps',sets:3,reps:'5',p2:{sets:4,reps:'5'},p3:{sets:5,reps:'5'},type:'explosive'},
-        {name:'Nordic Curl',sets:3,reps:'6',p2:{sets:3,reps:'8'},p3:{sets:4,reps:'8'}},
-        {name:'Standing Calf Raises',sets:3,reps:'15',p2:{sets:4,reps:'15'},p3:{sets:4,reps:'12'}}
-      ]},
-      {name:'Wednesday — Muay Thai Power & Rotational Core (Bag/Gym)',exercises:[
-        {name:'Landmine Press',sets:3,reps:'10 each',p2:{sets:4,reps:'8 each'},p3:{sets:4,reps:'6 each'}},
-        {name:'Cable Woodchop (High-to-Low)',sets:3,reps:'12 each',p2:{sets:4,reps:'10 each'},p3:{sets:4,reps:'8 each'}},
-        {name:'Med Ball Rotational Throw',sets:3,reps:'8 each',p2:{sets:4,reps:'6 each'},p3:{sets:4,reps:'5 each'},type:'explosive'},
-        {name:'Heavy Bag Combinations',sets:6,reps:'2 min rounds',p2:{sets:6,reps:'3 min rounds'},p3:{sets:8,reps:'3 min rounds'},type:'conditioning'},
-        {name:'Hanging Knee Raise',sets:3,reps:'15',p2:{sets:3,reps:'20'},p3:{sets:4,reps:'20'}},
-        {name:'Farmer Carry',sets:3,reps:'40m',p2:{sets:3,reps:'50m'},p3:{sets:4,reps:'50m'},type:'conditioning'}
-      ]},
-      {name:'Thursday — Upper Strength & Explosive Push/Pull (Gym)',exercises:[
-        {name:'Bench Press',sets:3,reps:'8',p2:{sets:4,reps:'5'},p3:{sets:5,reps:'3'}},
-        {name:'Explosive Pull-Ups',sets:3,reps:'6',p2:{sets:4,reps:'6'},p3:{sets:4,reps:'5'}},
-        {name:'Push Press',sets:3,reps:'8',p2:{sets:4,reps:'5'},p3:{sets:5,reps:'3'}},
-        {name:'Plyo Push-Ups',sets:3,reps:'10',p2:{sets:4,reps:'8'},p3:{sets:4,reps:'10'}},
-        {name:'Band Pull-Aparts',sets:3,reps:'20',p2:{sets:4,reps:'15'},p3:{sets:4,reps:'15'}},
-        {name:'Battle Ropes',sets:3,reps:'30s',p2:{sets:4,reps:'30s'},p3:{sets:5,reps:'30s'},type:'conditioning'}
-      ]},
-      {name:'Friday — Speed, Agility & Footwork (Field)',type:'field',exercises:[
-        {name:'5-10-5 Shuttle',sets:4,reps:'1 rep',p2:{sets:5,reps:'1 rep'},p3:{sets:6,reps:'1 rep'},type:'agility'},
-        {name:'Ladder Drills',sets:3,reps:'2 min',p2:{sets:4,reps:'2 min'},p3:{sets:4,reps:'2 min'},type:'agility'},
-        {name:'Mirror Reaction Drills',sets:4,reps:'30s',p2:{sets:4,reps:'30s'},p3:{sets:5,reps:'30s'},type:'agility'},
-        {name:'Lateral Bounds',sets:3,reps:'8 each',p2:{sets:4,reps:'6 each'},p3:{sets:4,reps:'6 each'},type:'explosive'},
-        {name:'Sprint Starts (10-20yd)',sets:6,reps:'1 sprint',p2:{sets:8,reps:'1 sprint'},p3:{sets:8,reps:'1 sprint'},type:'speed'},
-        {name:'Shadow Boxing w/ Footwork',sets:4,reps:'2 min',p2:{sets:5,reps:'2 min'},p3:{sets:6,reps:'2 min'},type:'conditioning'}
-      ]},
-      {name:'Saturday — Active Recovery (Game Eve)',type:'recovery',exercises:[]},
-      {name:'Sunday — GAME DAY 🏈 Pre-Game Activation',exercises:[
-        {name:'Leg Swings (Dynamic)',sets:2,reps:'10 each',type:'mobility'},
-        {name:'High Knees',sets:2,reps:'20m',type:'agility'},
-        {name:'A-Skips',sets:2,reps:'20m',type:'agility'},
-        {name:'Build-Up Sprints (50%-75%-90%)',sets:3,reps:'20m',type:'speed'},
-        {name:'Band Lateral Walks',sets:2,reps:'10 each',type:'mobility'}
-      ]}
+      {name:'Monday — Recovery and Mobility',type:'recovery',exercises:[]},
+      {name:'Tuesday — Lift + Muay Thai',exercises:[]},
+      {name:'Wednesday — Football Practice A',type:'field',exercises:[]},
+      {name:'Thursday — Lift + Muay Thai',exercises:[]},
+      {name:'Friday — Lift',exercises:[]},
+      {name:'Saturday — Football Practice B',type:'field',exercises:[]},
+      {name:'Sunday — Game Day',exercises:[]}
     ]
   }
 };
@@ -3894,54 +3972,22 @@ const PROGRAMS_MALE = {
     ]
   },
   lantikHybrid: {
-    name:'LANTIK Hybrid Training - Football/Muay Thai',
+    name:'LANTIK Hybrid Athlete Training Program',
     short:'Hybrid',
     icon:'bolt',
     calendarAligned:true,
-    desc:'Weekly hybrid plan for flag football + Muay Thai — the heaviest training sits mid-week (furthest from game day), with built-in recovery the day after and the day before your Sunday game',
-    daysPerWeek:'4 training days + 2 recovery · 12 weeks',
+    hybrid:true,
+    desc:'Explosive power, acceleration, athletic strength and lean muscle for a flag-football receiver who trains Muay Thai — three lifts, two field sessions, two Muay Thai sessions, a recovery day and Sunday games',
+    daysPerWeek:'7-day schedule · rotating Upper/Lower lifts',
+    // Sessions, sections and the lifting rotation live in HY_WORKOUTS / HY_WEEK (see "LANTIK HYBRID ATHLETE PROGRAM").
     days:[
-      {name:'Monday — Active Recovery (Post-Game)',type:'recovery',exercises:[]},
-      {name:'Tuesday — Heavy Lower Power (Gym)',exercises:[
-        {name:'Trap Bar Deadlift',sets:3,reps:'6',p2:{sets:4,reps:'4'},p3:{sets:5,reps:'2'}},
-        {name:'Back Squat',sets:3,reps:'8',p2:{sets:4,reps:'5'},p3:{sets:5,reps:'3'}},
-        {name:'Bulgarian Split Squat',sets:3,reps:'10 each',p2:{sets:4,reps:'8 each'},p3:{sets:4,reps:'6 each'}},
-        {name:'Broad Jumps',sets:3,reps:'5',p2:{sets:4,reps:'5'},p3:{sets:5,reps:'5'},type:'explosive'},
-        {name:'Nordic Curl',sets:3,reps:'6',p2:{sets:3,reps:'8'},p3:{sets:4,reps:'8'}},
-        {name:'Standing Calf Raises',sets:3,reps:'15',p2:{sets:4,reps:'15'},p3:{sets:4,reps:'12'}}
-      ]},
-      {name:'Wednesday — Muay Thai Power & Rotational Core (Bag/Gym)',exercises:[
-        {name:'Landmine Press',sets:3,reps:'10 each',p2:{sets:4,reps:'8 each'},p3:{sets:4,reps:'6 each'}},
-        {name:'Cable Woodchop (High-to-Low)',sets:3,reps:'12 each',p2:{sets:4,reps:'10 each'},p3:{sets:4,reps:'8 each'}},
-        {name:'Med Ball Rotational Throw',sets:3,reps:'8 each',p2:{sets:4,reps:'6 each'},p3:{sets:4,reps:'5 each'},type:'explosive'},
-        {name:'Heavy Bag Combinations',sets:6,reps:'2 min rounds',p2:{sets:6,reps:'3 min rounds'},p3:{sets:8,reps:'3 min rounds'},type:'conditioning'},
-        {name:'Hanging Knee Raise',sets:3,reps:'15',p2:{sets:3,reps:'20'},p3:{sets:4,reps:'20'}},
-        {name:'Farmer Carry',sets:3,reps:'40m',p2:{sets:3,reps:'50m'},p3:{sets:4,reps:'50m'},type:'conditioning'}
-      ]},
-      {name:'Thursday — Upper Strength & Explosive Push/Pull (Gym)',exercises:[
-        {name:'Bench Press',sets:3,reps:'8',p2:{sets:4,reps:'5'},p3:{sets:5,reps:'3'}},
-        {name:'Explosive Pull-Ups',sets:3,reps:'6',p2:{sets:4,reps:'6'},p3:{sets:4,reps:'5'}},
-        {name:'Push Press',sets:3,reps:'8',p2:{sets:4,reps:'5'},p3:{sets:5,reps:'3'}},
-        {name:'Plyo Push-Ups',sets:3,reps:'10',p2:{sets:4,reps:'8'},p3:{sets:4,reps:'10'}},
-        {name:'Band Pull-Aparts',sets:3,reps:'20',p2:{sets:4,reps:'15'},p3:{sets:4,reps:'15'}},
-        {name:'Battle Ropes',sets:3,reps:'30s',p2:{sets:4,reps:'30s'},p3:{sets:5,reps:'30s'},type:'conditioning'}
-      ]},
-      {name:'Friday — Speed, Agility & Footwork (Field)',type:'field',exercises:[
-        {name:'5-10-5 Shuttle',sets:4,reps:'1 rep',p2:{sets:5,reps:'1 rep'},p3:{sets:6,reps:'1 rep'},type:'agility'},
-        {name:'Ladder Drills',sets:3,reps:'2 min',p2:{sets:4,reps:'2 min'},p3:{sets:4,reps:'2 min'},type:'agility'},
-        {name:'Mirror Reaction Drills',sets:4,reps:'30s',p2:{sets:4,reps:'30s'},p3:{sets:5,reps:'30s'},type:'agility'},
-        {name:'Lateral Bounds',sets:3,reps:'8 each',p2:{sets:4,reps:'6 each'},p3:{sets:4,reps:'6 each'},type:'explosive'},
-        {name:'Sprint Starts (10-20yd)',sets:6,reps:'1 sprint',p2:{sets:8,reps:'1 sprint'},p3:{sets:8,reps:'1 sprint'},type:'speed'},
-        {name:'Shadow Boxing w/ Footwork',sets:4,reps:'2 min',p2:{sets:5,reps:'2 min'},p3:{sets:6,reps:'2 min'},type:'conditioning'}
-      ]},
-      {name:'Saturday — Active Recovery (Game Eve)',type:'recovery',exercises:[]},
-      {name:'Sunday — GAME DAY 🏈 Pre-Game Activation',exercises:[
-        {name:'Leg Swings (Dynamic)',sets:2,reps:'10 each',type:'mobility'},
-        {name:'High Knees',sets:2,reps:'20m',type:'agility'},
-        {name:'A-Skips',sets:2,reps:'20m',type:'agility'},
-        {name:'Build-Up Sprints (50%-75%-90%)',sets:3,reps:'20m',type:'speed'},
-        {name:'Band Lateral Walks',sets:2,reps:'10 each',type:'mobility'}
-      ]}
+      {name:'Monday — Recovery and Mobility',type:'recovery',exercises:[]},
+      {name:'Tuesday — Lift + Muay Thai',exercises:[]},
+      {name:'Wednesday — Football Practice A',type:'field',exercises:[]},
+      {name:'Thursday — Lift + Muay Thai',exercises:[]},
+      {name:'Friday — Lift',exercises:[]},
+      {name:'Saturday — Football Practice B',type:'field',exercises:[]},
+      {name:'Sunday — Game Day',exercises:[]}
     ]
   },
   fatLoss_ppl: {
@@ -4391,6 +4437,12 @@ document.addEventListener('visibilitychange', () => {
 });
 
 function renderWorkout(){
+  if(hyActive()) {
+    // The LANTIK Hybrid program has its own week and session screens
+    showWorkoutScreen('hybrid');
+    hyRender();
+    return;
+  }
   if(!selectedProgram || !getProgram(selectedProgram)){
     selectedProgram = null;
     showWorkoutScreen('programs');
@@ -4562,7 +4614,7 @@ function startProgram(){
   workoutWeek=0;
   save(WORKOUT_KEY,workoutState);
   // Sync program selection to cloud immediately
-  cloudPost('/workout', { program: workoutState.program, state: workoutState });
+  cloudPost('/workout', { program: workoutState.program, state: workoutCloudState() });
   // Always start on the first real training day (Day 1), not today's weekday index
   const prog = getProgram(selectedProgram);
   if(prog) {
@@ -4870,7 +4922,7 @@ function finishWorkout() {
   save(WORKOUT_KEY, workoutState);
   save(PR_KEY, prData);
   // Cloud sync
-  cloudPost('/workout', { program: workoutState.program, state: workoutState });
+  cloudPost('/workout', { program: workoutState.program, state: workoutCloudState() });
   cloudPost('/prs', prData);
 
   // Show summary with phase advancement option if applicable
@@ -6603,6 +6655,8 @@ function renderDashboard(){
       <div class="dwc-sub">🔥 ${customWo.calories} kcal burned · ${customWo.duration} min</div>
       <button onclick="openCustomWorkout()" style="margin-top:10px;width:100%;padding:8px;border-radius:var(--radius);border:0.5px solid var(--border2);background:transparent;font-family:inherit;font-size:12px;color:var(--text3);cursor:pointer;">Edit / Change</button>
     </div>`;
+  } else if(workoutState.program && getProgram(workoutState.program) && getProgram(workoutState.program).hybrid){
+    dashWo.innerHTML = hyDashHTML();
   } else if(workoutState.program){
     const prog=getProgram(workoutState.program);
     // workoutDayIdx is the user's current program day; fall back to 0 if out of range
@@ -6906,6 +6960,7 @@ function restTimerDone() {
 }
 
 function saveRestLog() {
+  if(hyRest) { hySaveLoggedSet(); return; } // a Hybrid-program set is being logged
   const ei  = restTimer.activeEi;
   const s   = restTimer.activeSet;
   if(ei === null) { closeRest(); return; }
@@ -6966,6 +7021,7 @@ function closeRest() {
   document.querySelectorAll('.rest-btn').forEach(b => b.classList.remove('resting'));
   // Reset for next use
   restTimer.remaining = restTimer.duration;
+  hyRestReset(); // put the sheet back if the Hybrid program re-labelled it
 }
 
 // Tap backdrop to close
@@ -8242,6 +8298,1314 @@ function drawExProgressChart(sessions, bodyweight) {
     });
   }
 }
+
+// ══════════════════════════════════════
+// LANTIK HYBRID ATHLETE PROGRAM
+// ══════════════════════════════════════
+// A fixed weekly calendar (recovery, field sessions, Muay Thai, game day) whose gym slots are
+// filled from a continuous Upper/Lower rotation that never resets with the week. It has its own
+// saved state (HY_KEY) and its own screen (#hybridWorkout); the generic program screens and
+// their logs are not touched.
+const HY_KEY = 'trident_hybrid_v1';
+const HY_ROTATION = ['upperA', 'lowerA', 'upperB', 'lowerB', 'upperC', 'lowerC'];
+const HY_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const HY_BLOCK = [
+  null,
+  { name: 'Baseline', tip: 'Establish baseline loads and clean technique.' },
+  { name: 'Small progression', tip: 'Add a little load or a rep where last week left 2+ reps in reserve. Your call — nothing is increased for you.' },
+  { name: 'Top week', tip: 'Highest planned load of the block. No maxing out and no grinding reps.' },
+  { name: 'Deload', tip: 'Lifting sets are cut by about a third and sprint volume is trimmed. Keep the movement sharp.' }
+];
+
+// Input fields a set can record. "lbs/add" go in the first box, everything else in the second.
+const HY_F = {
+  lbs:      { label: 'Weight (lbs)', ph: 'lbs', step: '2.5', unit: '' },
+  add:      { label: 'Added weight (lbs)', ph: '+lbs', step: '2.5', unit: '' },
+  ft:       { label: 'Distance (ft)', ph: 'ft', step: 'any', unit: ' ft' },
+  reps:     { label: 'Reps', ph: 'reps', step: '1', unit: '' },
+  contacts: { label: 'Contacts', ph: 'contacts', step: '1', unit: '' },
+  sec:      { label: 'Time (sec)', ph: 'sec', step: 'any', unit: 's' },
+  hold:     { label: 'Seconds', ph: 'sec', step: '1', unit: 's' },
+  min:      { label: 'Minutes', ph: 'min', step: '1', unit: ' min' }
+};
+// kind → [first field, second field, values required to count the set]
+const HY_KIND = {
+  strength:   ['lbs', 'reps', true],
+  bodyweight: [null, 'reps', true],
+  plyo:       [null, 'reps', false],
+  sprint:     [null, 'sec', false],
+  mobility:   [null, 'reps', false],
+  drill:      [null, 'reps', false],
+  timed:      [null, 'min', false],
+  check:      [null, null, false]
+};
+
+// id is stable across workouts so an exercise keeps one history wherever it appears.
+function hyEx(id, name, kind, sets, reps, o) {
+  return Object.assign({ id, name, kind, sets, reps }, o || {});
+}
+
+const HY_WORKOUTS = {
+  recovery: {
+    id: 'recovery', name: 'Recovery and Mobility', category: 'recovery', tag: 'Recovery',
+    goal: 'Low-intensity movement to recover from Sunday\'s two games.',
+    notes: [
+      'No heavy lifting, hard sprinting, or intense conditioning.',
+      'Keep mobility comfortable and pain-free.',
+      'This session supports recovery after Sunday\'s two games.'
+    ],
+    sections: [{ key: 'main', title: 'RECOVERY', checkable: true, items: [
+      hyEx('easy_walk_cycle', 'Easy Walk or Cycling', 'timed', 1, '20–30 min', { cue: 'Conversational pace.' }),
+      hyEx('ankle_mobility', 'Ankle Mobility', 'mobility', 2, '10 per side'),
+      hyEx('hip_9090', '90/90 Hip Rotations', 'mobility', 2, '8 per side'),
+      hyEx('adductor_rockbacks', 'Adductor Rock-Backs', 'mobility', 2, '10'),
+      hyEx('hamstring_mobility', 'Gentle Hamstring Mobility', 'mobility', 2, '30 sec', { f2: 'hold' })
+    ] }]
+  },
+
+  upperA: {
+    id: 'upperA', name: 'Upper A — Power and Strength', short: 'Upper A', category: 'strength', tag: 'Strength', body: 'upper',
+    goal: 'Explosive upper-body power first, then heavy pressing and pulling, then accessories.',
+    notes: [
+      'Medicine-ball throws: maximum intent and clean technique.',
+      'Leave about 1–3 reps in reserve on heavy compound lifts.',
+      'Do not train to failure.'
+    ],
+    sections: [
+      { key: 'primer', title: 'PRIMER', checkable: true, items: [
+        hyEx('band_pull_aparts', 'Band Pull-Aparts', 'mobility', 2, '12'),
+        hyEx('scap_pushups', 'Scapular Push-Ups', 'mobility', 2, '8'),
+        hyEx('mb_chest_pass', 'Medicine-Ball Chest Pass', 'plyo', 3, '3', { cue: 'Explosive. Maximum intent, clean technique.' }),
+        hyEx('bench_warmup', 'Bench Press Warm-Up Sets', 'strength', 3, 'progressive', { rx: '2–3 progressive sets', cue: 'Build toward your working weight. These are warm-ups, not working sets.' })
+      ] },
+      { key: 'main', title: 'MAIN WORKOUT', items: [
+        hyEx('bench_press', 'Barbell Bench Press', 'strength', 4, '4–6', { rest: 150, restText: '2–3 min' }),
+        hyEx('weighted_pullups', 'Weighted Pull-Ups', 'strength', 4, '5–6', { rest: 120, restText: '2 min', f1: 'add' }),
+        hyEx('incline_db_press', 'Incline Dumbbell Press', 'strength', 3, '6–8', { rest: 105, restText: '90–120 sec' }),
+        hyEx('chest_supported_row', 'Chest-Supported Row', 'strength', 3, '6–8', { rest: 105, restText: '90–120 sec' }),
+        hyEx('face_pulls', 'Face Pulls', 'strength', 2, '12–15', { rest: 60, restText: '60 sec' }),
+        hyEx('pallof_press', 'Pallof Press', 'strength', 3, '10 per side', { rest: 50, restText: '45–60 sec' })
+      ] }
+    ]
+  },
+
+  lowerA: {
+    id: 'lowerA', name: 'Lower A — Strength and Power', short: 'Lower A', category: 'strength', tag: 'Strength', body: 'lower',
+    goal: 'Heavy lower-body strength with a short power primer. About 45–60 minutes.',
+    lighterText: 'Squats drop to 2 working sets and Bulgarian split squats are left out.',
+    notes: [
+      'About 45–60 minutes.',
+      'Wednesday is the main sprint day, so adjust this session to how your legs feel.',
+      'Legs heavy or fatigued? Use the lighter session: 2 squat sets and no Bulgarian split squats.',
+      'If jumping hurts or landings are sloppy, skip the jumps.',
+      'Avoid grinding reps and training to failure.'
+    ],
+    sections: [
+      { key: 'primer', title: 'PRIMER', checkable: true, items: [
+        hyEx('ankle_rocks', 'Ankle Rocks', 'mobility', 1, '10 per side'),
+        hyEx('glute_bridges', 'Glute Bridges', 'mobility', 2, '8'),
+        hyEx('bw_squats', 'Bodyweight Squats', 'mobility', 2, '6'),
+        hyEx('box_jumps', 'Box Jumps', 'plyo', 3, '2', { cue: 'Only if you feel fresh and can land under control.' })
+      ] },
+      { key: 'main', title: 'MAIN WORKOUT', items: [
+        hyEx('back_squat', 'Back Squat', 'strength', 3, '4–5', { rest: 150, restText: '2–3 min', lighterSets: 2 }),
+        hyEx('romanian_deadlift', 'Romanian Deadlift', 'strength', 3, '5–6', { rest: 120, restText: '2 min' }),
+        hyEx('bulgarian_split_squat', 'Bulgarian Split Squat', 'strength', 2, '6 per leg', { rest: 105, restText: '90–120 sec', lighterOmit: true }),
+        hyEx('hamstring_curl', 'Hamstring Curl', 'strength', 2, '8', { rest: 90, restText: '90 sec' }),
+        hyEx('standing_calf_raise', 'Standing Calf Raise', 'strength', 2, '10–12', { rest: 60, restText: '60 sec' }),
+        hyEx('hanging_knee_raise', 'Hanging Knee Raise', 'bodyweight', 3, '8–12', { rest: 60, restText: '60 sec' })
+      ] }
+    ]
+  },
+
+  upperB: {
+    id: 'upperB', name: 'Upper B — Strength and Hypertrophy', short: 'Upper B', category: 'strength', tag: 'Strength', body: 'upper',
+    goal: 'Maintain or build lean muscle without piling on fatigue before Sunday. About 50–65 minutes.',
+    notes: [
+      'About 50–65 minutes.',
+      'Keep 1–3 reps in reserve on most working sets.',
+      'The aim is lean muscle without unnecessary fatigue before Sunday\'s games.'
+    ],
+    sections: [
+      { key: 'primer', title: 'PRIMER', checkable: true, items: [
+        hyEx('band_external_rotations', 'Band External Rotations', 'mobility', 2, '10'),
+        hyEx('scap_pushups', 'Scapular Push-Ups', 'mobility', 2, '8'),
+        hyEx('plyo_pushups', 'Plyometric Push-Ups', 'plyo', 3, '3', { cue: 'Fast and clean.' })
+      ] },
+      { key: 'main', title: 'MAIN WORKOUT', items: [
+        hyEx('landmine_press', 'Landmine Press', 'strength', 3, '5–6', { rest: 120, restText: '2 min', alts: ['Overhead Press'], cue: 'Landmine press or overhead press — use Substitute to switch.' }),
+        hyEx('one_arm_db_row', 'One-Arm Dumbbell Row', 'strength', 3, '8 per side', { rest: 90, restText: '90 sec' }),
+        hyEx('db_bench_press', 'Dumbbell Bench Press', 'strength', 3, '8–10', { rest: 90, restText: '90 sec' }),
+        hyEx('lat_pulldown', 'Lat Pulldown', 'strength', 3, '8–10', { rest: 90, restText: '90 sec' }),
+        hyEx('lateral_raise', 'Lateral Raise', 'strength', 2, '12–15', { rest: 60, restText: '60 sec' }),
+        hyEx('biceps_curl', 'Biceps Curl', 'strength', 2, '10–12', { rest: 60, restText: '60 sec' }),
+        hyEx('triceps_pressdown', 'Triceps Cable Pressdown', 'strength', 2, '10–12', { rest: 60, restText: '60 sec' })
+      ] }
+    ]
+  },
+
+  // Not supplied yet: the athlete sets these up in the app. Nothing is invented for them.
+  lowerB: { id: 'lowerB', name: 'Lower B', short: 'Lower B', category: 'strength', tag: 'Strength', body: 'lower', placeholder: true, goal: 'Not set up yet.', notes: [] },
+  upperC: { id: 'upperC', name: 'Upper C', short: 'Upper C', category: 'strength', tag: 'Strength', body: 'upper', placeholder: true, goal: 'Not set up yet.', notes: [] },
+  lowerC: { id: 'lowerC', name: 'Lower C', short: 'Lower C', category: 'strength', tag: 'Strength', body: 'lower', placeholder: true, goal: 'Not set up yet.', notes: [] },
+
+  footballA: {
+    id: 'footballA', name: 'Football Practice A — Speed and Separation', category: 'field', tag: 'Field training',
+    goal: 'The main sprint session of the week: speed and mechanics, not exhaustion. About 45–60 minutes.',
+    notes: [
+      'The warm-up takes about 10–12 minutes; the whole session about 45–60.',
+      'Rest 2–3 minutes between hard sprints, or longer when you need it.',
+      'Sprint reps are for speed and mechanics, not exhaustion.',
+      'No HIIT or exhausting conditioning finisher.'
+    ],
+    sections: [
+      { key: 'primer', title: 'PRIMER', checkable: true, items: [
+        hyEx('easy_jog', 'Easy Jog', 'timed', 1, '2 min'),
+        hyEx('leg_swings', 'Leg Swings', 'mobility', 1, '10 per side'),
+        hyEx('walking_lunges', 'Walking Lunges', 'mobility', 1, '8 per side'),
+        hyEx('a_skips', 'A-Skips', 'drill', 2, '10 yd'),
+        hyEx('high_knees', 'High Knees', 'drill', 2, '10 yd'),
+        hyEx('progressive_runs', 'Progressive Runs', 'drill', 2, '15 yd'),
+        hyEx('pogo_jumps', 'Pogo Jumps', 'plyo', 2, '10 contacts', { f2: 'contacts' }),
+        hyEx('broad_jumps', 'Broad Jumps', 'plyo', 2, '2', { f1: 'ft', cue: 'Log your best distance if you want to track it.' }),
+        hyEx('prog_accel_10yd', 'Progressive 10-Yard Accelerations', 'sprint', 2, '10 yd', { rx: '2 reps', cue: 'Build to fast but controlled.' })
+      ] },
+      { key: 'main', title: 'MAIN WORKOUT', items: [
+        hyEx('accel_10yd', '10-Yard Accelerations', 'sprint', 3, '10 yd', { rx: '3 reps', rest: 150, restText: '2–3 min' }),
+        hyEx('sprint_20yd', '20-Yard Sprints', 'sprint', 3, '20 yd', { rx: '3 reps', rest: 150, restText: '2–3 min' }),
+        hyEx('wr_releases', 'Wide-Receiver Releases', 'drill', 1, '3–4 per side'),
+        hyEx('route_breaks', 'Route Breaks and Sharp Cuts', 'drill', 1, '4–6 quality reps'),
+        hyEx('catching_on_move', 'Catching on the Move', 'timed', 1, '5–10 min')
+      ] }
+    ]
+  },
+
+  footballB: {
+    id: 'footballB', name: 'Football Practice B — Technique and Low-Fatigue Primer', category: 'field', tag: 'Field training',
+    goal: 'A short, low-fatigue touch the day before the games. About 20–30 minutes.',
+    recoveryOnlyOption: true,
+    notes: [
+      'About 20–30 minutes in total.',
+      'No exhausting conditioning.',
+      'Skip jumps and accelerations if you are sore or fatigued.'
+    ],
+    sections: [
+      { key: 'primer', title: 'PRIMER', checkable: true, items: [
+        hyEx('a_skips', 'A-Skips', 'drill', 2, '10 yd'),
+        hyEx('pogo_jumps', 'Pogo Jumps', 'plyo', 2, '8 contacts', { f2: 'contacts' }),
+        hyEx('vertical_jumps', 'Vertical Jumps', 'plyo', 2, '2', { freshOnly: true }),
+        hyEx('accel_10yd_submax', '10-Yard Accelerations', 'sprint', 2, '10 yd', { rx: '2 reps at 85–90%', freshOnly: true, cue: 'About 85–90% effort, and only if you feel fresh.' })
+      ] },
+      { key: 'main', title: 'MAIN WORKOUT', items: [
+        hyEx('stance_first_step', 'Stance and First-Step Mechanics', 'drill', 1, '3–4 reps'),
+        hyEx('wr_releases', 'Receiver Releases', 'drill', 1, '2–3 per side'),
+        hyEx('easy_route_timing', 'Easy Route Timing and Catching', 'timed', 1, '5–10 min'),
+        hyEx('controlled_route_breaks', 'Controlled Route Breaks', 'drill', 1, '3–4 reps')
+      ] }
+    ]
+  },
+
+  muayThai: {
+    id: 'muayThai', name: 'Muay Thai', category: 'sport', tag: 'Sport practice',
+    goal: 'Technical striking, footwork, defense, pad work and controlled combinations.',
+    notes: [
+      'Set the intensity to match how recovered you feel.',
+      'After a demanding lower-body morning, favour technique and pad work.',
+      'No conditioning finisher is added.'
+    ],
+    sections: []
+  },
+
+  gameDay: {
+    id: 'gameDay', name: 'Two Flag Football Games', category: 'competition', tag: 'Game day',
+    goal: 'Compete. A 12–15 minute warm-up, then two games.',
+    games: 2,
+    notes: [
+      'Between games: walk, hydrate, take in some carbohydrates, and do a short progressive re-warm-up.',
+      'After the games: a 5–10 minute easy walk and a recovery meal.'
+    ],
+    sections: [{ key: 'primer', title: 'PRE-GAME WARM-UP', checkable: true, sub: '12–15 minutes', items: [
+      hyEx('pregame_jog_mobility', 'Easy Jog and Dynamic Mobility', 'check', 1, ''),
+      hyEx('pregame_skips_shuffles', 'A-Skips and Lateral Shuffles', 'check', 1, ''),
+      hyEx('prog_accel_10yd', 'Progressive 10-Yard Accelerations', 'sprint', 2, '10 yd', { rx: '2 reps' }),
+      hyEx('controlled_route_breaks', 'Controlled Route Breaks', 'drill', 1, '1–2 reps'),
+      hyEx('pregame_catches', 'A Few Catches and Short Routes', 'check', 1, '')
+    ] }]
+  }
+};
+
+// Monday-first. A gym slot has no fixed workout: it takes whatever is next in the rotation.
+const HY_WEEK = [
+  [{ key: 'rec', workout: 'recovery' }],
+  [{ key: 'gym', gym: true, time: 'Morning' }, { key: 'mt', workout: 'muayThai', time: 'Evening' }],
+  [{ key: 'fb', workout: 'footballA' }],
+  [{ key: 'gym', gym: true, time: 'Morning' }, { key: 'mt', workout: 'muayThai', time: 'Evening' }],
+  [{ key: 'gym', gym: true, time: 'Morning' }],
+  [{ key: 'fb', workout: 'footballB' }],
+  [{ key: 'game', workout: 'gameDay' }]
+];
+const HY_EXTRA_GYM = { key: 'gymx', gym: true, extra: true, time: 'Added' };
+
+// ── Saved state ──────────────────────────────────────────────────────────────
+function hyDefaultState() {
+  return { v: 1, updatedAt: 0, rotationIdx: 0, rotationLog: [], block: { on: false, anchor: null }, sessions: {}, custom: {}, subs: {} };
+}
+// Accepts anything (missing, partial, from the cloud) and always returns a usable state.
+function hyNormalize(raw) {
+  const d = hyDefaultState();
+  if(!raw || typeof raw !== 'object' || Array.isArray(raw)) return d;
+  const isObj = v => !!v && typeof v === 'object' && !Array.isArray(v);
+  d.updatedAt = Number(raw.updatedAt) || 0;
+  d.rotationIdx = Number.isInteger(raw.rotationIdx) && raw.rotationIdx >= 0 && raw.rotationIdx < HY_ROTATION.length ? raw.rotationIdx : 0;
+  d.rotationLog = Array.isArray(raw.rotationLog) ? raw.rotationLog.filter(isObj).slice(-40) : [];
+  if(isObj(raw.block)) d.block = { on: !!raw.block.on, anchor: typeof raw.block.anchor === 'string' ? raw.block.anchor : null };
+  if(isObj(raw.custom)) Object.keys(raw.custom).forEach(id => {
+    const c = raw.custom[id];
+    if(!HY_WORKOUTS[id] || !HY_WORKOUTS[id].placeholder || !isObj(c)) return;
+    const clean = list => (Array.isArray(list) ? list : []).filter(e => isObj(e) && typeof e.id === 'string' && /^[a-z0-9_]{1,40}$/.test(e.id) && typeof e.name === 'string' && e.name.trim())
+      .map(e => ({ id: e.id, name: e.name.slice(0, 60), kind: HY_KIND[e.kind] ? e.kind : 'strength', sets: Math.min(10, Math.max(1, parseInt(e.sets, 10) || 1)), reps: String(e.reps == null ? '' : e.reps).slice(0, 24), rest: Math.min(600, Math.max(0, parseInt(e.rest, 10) || 0)), cue: String(e.cue || '').slice(0, 160) }));
+    d.custom[id] = { primer: clean(c.primer), main: clean(c.main) };
+  });
+  if(isObj(raw.subs)) Object.keys(raw.subs).forEach(id => {
+    if(!isObj(raw.subs[id])) return;
+    d.subs[id] = {};
+    Object.keys(raw.subs[id]).forEach(k => { if(typeof raw.subs[id][k] === 'string' && raw.subs[id][k].trim()) d.subs[id][k] = raw.subs[id][k].slice(0, 60); });
+  });
+  if(isObj(raw.sessions)) Object.keys(raw.sessions).forEach(sid => {
+    const s = raw.sessions[sid];
+    if(!/^\d{4}-\d{2}-\d{2}_[a-z]+$/.test(sid) || !isObj(s) || !HY_WORKOUTS[s.workoutId]) return;
+    const ex = {};
+    if(isObj(s.ex)) Object.keys(s.ex).forEach(k => {
+      const e = s.ex[k];
+      if(!isObj(e)) return;
+      ex[k] = {
+        sets: (Array.isArray(e.sets) ? e.sets : []).slice(0, 20).map(st => isObj(st) ? { w: String(st.w == null ? '' : st.w).slice(0, 10), r: String(st.r == null ? '' : st.r).slice(0, 10), done: !!st.done } : { w: '', r: '', done: false }),
+        done: !!e.done, skipped: !!e.skipped, reason: String(e.reason || '').slice(0, 120), note: String(e.note || '').slice(0, 200)
+      };
+    });
+    const wantGames = HY_WORKOUTS[s.workoutId].games || 0;
+    d.sessions[sid] = {
+      id: sid, workoutId: s.workoutId, date: sid.slice(0, 10), slot: sid.slice(11),
+      status: ['in_progress', 'completed', 'skipped'].includes(s.status) ? s.status : 'in_progress',
+      startedAt: Number(s.startedAt) || 0, finishedAt: Number(s.finishedAt) || 0,
+      blockWeek: [1, 2, 3, 4].includes(s.blockWeek) ? s.blockWeek : 0,
+      lighter: !!s.lighter, recoveryOnly: !!s.recoveryOnly, advanced: !!s.advanced,
+      notes: String(s.notes || '').slice(0, 1000), rpe: Number.isInteger(s.rpe) && s.rpe >= 1 && s.rpe <= 10 ? s.rpe : null,
+      duration: String(s.duration || '').slice(0, 6), intensity: ['Light', 'Moderate', 'Hard'].includes(s.intensity) ? s.intensity : '',
+      games: (Array.isArray(s.games) ? s.games : []).slice(0, 2).map(g => isObj(g) ? { done: !!g.done, duration: String(g.duration || '').slice(0, 6), rpe: Number.isInteger(g.rpe) && g.rpe >= 1 && g.rpe <= 10 ? g.rpe : null, result: String(g.result || '').slice(0, 60), notes: String(g.notes || '').slice(0, 400) } : { done: false, duration: '', rpe: null, result: '', notes: '' }),
+      ex
+    };
+    while(d.sessions[sid].games.length < wantGames) d.sessions[sid].games.push({ done: false, duration: '', rpe: null, result: '', notes: '' });
+  });
+  return d;
+}
+function hyLoadState() {
+  try { return hyNormalize(load(HY_KEY)); } catch(e) { console.warn('Hybrid program state reset:', e); return hyDefaultState(); }
+}
+let hyState = hyLoadState();
+// What is on screen. Never saved.
+let hyView = { dayIdx: hyDow(new Date()), open: null, exOpen: null, collapsed: {}, date: new Date().toDateString() };
+
+// The account copy of the workout state carries this program's state with it.
+function workoutCloudState() {
+  return Object.assign({}, workoutState, { hybrid: hyState });
+}
+function hySave(sync) {
+  hyState.updatedAt = Date.now();
+  // Keep the newest 200 sessions so storage cannot grow without bound.
+  const ids = Object.keys(hyState.sessions);
+  if(ids.length > 200) ids.sort().slice(0, ids.length - 200).forEach(id => { delete hyState.sessions[id]; });
+  try { save(HY_KEY, hyState); } catch(e) { console.warn('Hybrid program state not saved:', e); }
+  if(sync && isLoggedIn()) cloudPost('/workout', { program: workoutState.program, state: workoutCloudState() });
+}
+// The account copy replaces the local one only when it is strictly newer.
+function hyAdoptCloud(remote) {
+  if(!remote || typeof remote !== 'object') return;
+  if((Number(remote.updatedAt) || 0) <= (hyState.updatedAt || 0)) return;
+  hyState = hyNormalize(remote);
+  try { save(HY_KEY, hyState); } catch(e) {}
+  if(currentPage === 'workout' && hyActive()) hyRender();
+}
+
+// ── Small helpers ────────────────────────────────────────────────────────────
+function hyEsc(v) {
+  return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+function hyActive() {
+  const prog = selectedProgram ? getProgram(selectedProgram) : null;
+  return !!(prog && prog.hybrid);
+}
+function hyDow(d) { return (d.getDay() + 6) % 7; }
+function hyISO(d) {
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function hyMonday(d) {
+  const m = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  m.setDate(m.getDate() - hyDow(m));
+  return m;
+}
+function hyDayDate(dayIdx) {
+  const m = hyMonday(new Date());
+  m.setDate(m.getDate() + dayIdx);
+  return m;
+}
+function hyDateLabel(iso) {
+  const p = String(iso).split('-').map(Number);
+  const d = new Date(p[0], (p[1] || 1) - 1, p[2] || 1);
+  return isNaN(d) ? '' : d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+}
+function hySid(dayIdx, slotKey) { return hyISO(hyDayDate(dayIdx)) + '_' + slotKey; }
+
+// Workout definition with the athlete's own set-up merged in for the placeholder workouts.
+function hyWorkout(id) {
+  const w = HY_WORKOUTS[id];
+  if(!w) return null;
+  if(!w.placeholder) return w;
+  const c = hyState.custom[id] || { primer: [], main: [] };
+  const sections = [];
+  if(c.primer.length) sections.push({ key: 'primer', title: 'PRIMER', checkable: true, items: c.primer });
+  if(c.main.length) sections.push({ key: 'main', title: 'MAIN WORKOUT', items: c.main });
+  return Object.assign({}, w, { sections, configured: sections.length > 0, goal: sections.length ? 'Your own session.' : w.goal });
+}
+function hyConfigured(id) { const w = hyWorkout(id); return !!w && (!w.placeholder || w.configured); }
+function hyExName(workoutId, key, ex) {
+  const sub = hyState.subs[workoutId] && hyState.subs[workoutId][key];
+  return sub || ex.name;
+}
+function hyFields(ex) {
+  const k = HY_KIND[ex.kind] || HY_KIND.strength;
+  const f1 = ex.f1 !== undefined ? ex.f1 : k[0], f2 = ex.f2 !== undefined ? ex.f2 : k[1];
+  return { f1: f1 ? HY_F[f1] : null, f2: f2 ? HY_F[f2] : null, required: k[2] };
+}
+function hyRxText(ex, sets) {
+  if(ex.kind === 'check') return ex.rx || '';
+  if(ex.rx && sets === ex.sets) return ex.rx;
+  if(ex.kind === 'sprint') return `${sets} × ${ex.reps}`;
+  if(ex.sets === 1 && sets === 1) return ex.reps;
+  return `${sets} × ${ex.reps}`;
+}
+function hySetText(ex, st) {
+  if(!st || !st.done) return '';
+  const f = hyFields(ex);
+  const a = f.f1 && st.w ? `${st.w}${f.f1.unit}` : '', b = f.f2 && st.r ? `${st.r}${f.f2.unit}` : '';
+  if(a && b) return `${a} × ${b}`;
+  return a || b || '✓';
+}
+
+// ── Four-week block ──────────────────────────────────────────────────────────
+function hyBlockWeek() {
+  if(!hyState.block.on || !hyState.block.anchor) return 0;
+  const p = hyState.block.anchor.split('-').map(Number);
+  const anchor = new Date(p[0], (p[1] || 1) - 1, p[2] || 1);
+  if(isNaN(anchor)) return 0;
+  const weeks = Math.round((hyMonday(new Date()) - hyMonday(anchor)) / 604800000);
+  return ((weeks % 4) + 4) % 4 + 1;
+}
+function hySetBlockWeek(week) {
+  if(!week) { hyState.block = { on: false, anchor: null }; }
+  else {
+    const m = hyMonday(new Date());
+    m.setDate(m.getDate() - (week - 1) * 7);
+    hyState.block = { on: true, anchor: hyISO(m) };
+  }
+  hySave(true);
+  hySheetClose();
+  hyRender();
+}
+
+// ── Sessions and the rotation ────────────────────────────────────────────────
+function hyDaySlots(dayIdx) {
+  const slots = HY_WEEK[dayIdx].slice();
+  if(hyState.sessions[hySid(dayIdx, HY_EXTRA_GYM.key)]) slots.push(HY_EXTRA_GYM);
+  return slots;
+}
+// Which workout a slot shows. Looking never changes anything: a gym slot is bound to a
+// workout only once a session is started in it.
+function hySlotWorkoutId(dayIdx, slot) {
+  if(!slot.gym) return slot.workout;
+  const existing = hyState.sessions[hySid(dayIdx, slot.key)];
+  if(existing) return existing.workoutId;
+  const today = hyDow(new Date());
+  let ahead = 0;
+  for(let d = today; d < dayIdx; d++) {
+    HY_WEEK[d].forEach(sl => {
+      if(!sl.gym) return;
+      const s = hyState.sessions[hySid(d, sl.key)];
+      if(!s || (s.status === 'in_progress' && !s.advanced)) ahead++;
+    });
+  }
+  return HY_ROTATION[(hyState.rotationIdx + ahead) % HY_ROTATION.length];
+}
+function hyCtx() {
+  if(!hyView.open) return null;
+  const dayIdx = hyView.dayIdx;
+  const slot = hyDaySlots(dayIdx).find(s => s.key === hyView.open) || (hyView.open === HY_EXTRA_GYM.key ? HY_EXTRA_GYM : null);
+  if(!slot) return null;
+  const sid = hySid(dayIdx, slot.key);
+  const sess = hyState.sessions[sid] || null;
+  const workoutId = sess ? sess.workoutId : hySlotWorkoutId(dayIdx, slot);
+  return { dayIdx, slot, sid, sess, workoutId, workout: hyWorkout(workoutId), future: dayIdx > hyDow(new Date()) };
+}
+// Creates the session on the first real action (a logged set, a tick, a note), never on viewing.
+function hyEnsureSession() {
+  const c = hyCtx();
+  if(!c || c.future) return null;
+  if(c.sess) return c.sess;
+  const sess = {
+    id: c.sid, workoutId: c.workoutId, date: c.sid.slice(0, 10), slot: c.slot.key, status: 'in_progress',
+    startedAt: Date.now(), finishedAt: 0, blockWeek: hyBlockWeek(), lighter: false, recoveryOnly: false, advanced: false,
+    notes: '', rpe: null, duration: '', intensity: '', games: [], ex: {}
+  };
+  if(c.workout && c.workout.games) for(let i = 0; i < c.workout.games; i++) sess.games.push({ done: false, duration: '', rpe: null, result: '', notes: '' });
+  hyState.sessions[c.sid] = sess;
+  return sess;
+}
+function hyExState(sess, key) {
+  if(!sess.ex[key]) sess.ex[key] = { sets: [], done: false, skipped: false, reason: '', note: '' };
+  return sess.ex[key];
+}
+function hyFind(workout, key) {
+  const dot = key.indexOf('.'), sKey = key.slice(0, dot), id = key.slice(dot + 1);
+  const section = (workout.sections || []).find(s => s.key === sKey);
+  const ex = section ? section.items.find(e => e.id === id) : null;
+  return ex ? { section, ex } : null;
+}
+// Sets actually prescribed today, after the lighter-session, recovery-only and deload rules.
+function hyRx(workout, section, ex, sess) {
+  let sets = ex.sets, omitted = '';
+  const week = sess ? sess.blockWeek : hyBlockWeek();
+  if(section.key === 'main') {
+    if(sess && sess.lighter) {
+      const explicit = section.items.some(e => e.lighterSets || e.lighterOmit);
+      if(ex.lighterOmit) omitted = 'Left out of the lighter session';
+      else if(ex.lighterSets) sets = Math.min(sets, ex.lighterSets);
+      else if(!explicit && ex.kind === 'strength' && sets >= 3) sets -= 1;
+    }
+    if(week === 4) {
+      if(ex.kind === 'strength' || ex.kind === 'bodyweight') sets = Math.max(1, Math.round(sets * 0.65));
+      else if(ex.kind === 'sprint') sets = Math.max(1, sets - 1);
+    }
+  }
+  if(sess && sess.recoveryOnly && ex.freshOnly) omitted = 'Left out — recovery-only session';
+  return { sets, omitted };
+}
+// 'done' | 'skipped' | 'omitted' | '' — and how many sets are logged.
+function hyExStatus(workout, section, ex, sess) {
+  const rx = hyRx(workout, section, ex, sess);
+  const st = sess ? sess.ex[section.key + '.' + ex.id] : null;
+  const logged = st ? st.sets.filter(s => s && s.done).length : 0;
+  let status = '';
+  if(rx.omitted) status = 'omitted';
+  else if(st && st.skipped) status = 'skipped';
+  else if(st && st.done) status = 'done';
+  else if(!section.checkable && logged >= rx.sets) status = 'done';
+  return { status, logged, rx };
+}
+function hySectionProgress(workout, section, sess) {
+  let total = 0, done = 0, skipped = 0;
+  section.items.forEach(ex => {
+    const s = hyExStatus(workout, section, ex, sess).status;
+    if(s === 'omitted') return;
+    total++;
+    if(s === 'done') done++;
+    if(s === 'skipped') skipped++;
+  });
+  return { total, done, skipped, complete: total > 0 && done + skipped >= total };
+}
+function hyGamesProgress(workout, sess) {
+  const total = workout.games || 0;
+  const done = sess ? sess.games.filter(g => g && g.done).length : 0;
+  return { total, done, skipped: 0, complete: total > 0 && done >= total };
+}
+function hySessionProgress(workout, sess) {
+  const parts = (workout.sections || []).map(s => hySectionProgress(workout, s, sess));
+  if(workout.games) parts.push(hyGamesProgress(workout, sess));
+  if(workout.category === 'sport') parts.push({ total: 1, done: sess && sess.status === 'completed' ? 1 : 0, skipped: 0 });
+  const total = parts.reduce((a, p) => a + p.total, 0), done = parts.reduce((a, p) => a + p.done + p.skipped, 0);
+  return { total, done, pct: total ? Math.round(done / total * 100) : 0 };
+}
+// Working sets only: logged strength and bodyweight sets in the main section. Primer sets,
+// jumps, throws, sprints and mobility never count toward sets, volume or records.
+function hyTotals(workout, sess) {
+  const out = { sets: 0, volume: 0, exercises: [] };
+  if(!sess) return out;
+  (workout.sections || []).filter(s => s.key === 'main').forEach(section => {
+    section.items.forEach(ex => {
+      if(ex.kind !== 'strength' && ex.kind !== 'bodyweight') return;
+      const st = sess.ex['main.' + ex.id];
+      if(!st || st.skipped) return;
+      const done = st.sets.filter(s => s && s.done);
+      if(!done.length) return;
+      out.sets += done.length;
+      const f1 = hyFields(ex).f1, loaded = f1 === HY_F.lbs, record = loaded || f1 === HY_F.add;
+      if(loaded) done.forEach(s => { out.volume += (parseFloat(s.w) || 0) * (parseFloat(s.r) || 0); });
+      out.exercises.push({ id: ex.id, name: hyExName(workout.id, 'main.' + ex.id, ex), loaded, record, sets: done.map(s => ({ w: parseFloat(s.w) || 0, r: parseFloat(s.r) || 0 })) });
+    });
+  });
+  out.volume = Math.round(out.volume);
+  return out;
+}
+function hyRotationNote(action, workoutId, sid) {
+  hyState.rotationLog.push({ action, workoutId, sid: sid || '', at: Date.now() });
+  if(hyState.rotationLog.length > 40) hyState.rotationLog = hyState.rotationLog.slice(-40);
+}
+// The rotation moves only here: when a gym session is finished, or the athlete chooses to move on.
+function hyAdvanceRotation(sess, action) {
+  if(sess.advanced) return false;
+  if(HY_ROTATION[hyState.rotationIdx] !== sess.workoutId) return false;
+  hyState.rotationIdx = (hyState.rotationIdx + 1) % HY_ROTATION.length;
+  sess.advanced = true;
+  hyRotationNote(action, sess.workoutId, sess.id);
+  return true;
+}
+function hyLastCompletedGym() {
+  return Object.keys(hyState.sessions).map(id => hyState.sessions[id])
+    .filter(s => s.status === 'completed' && HY_ROTATION.includes(s.workoutId))
+    .sort((a, b) => (b.finishedAt || 0) - (a.finishedAt || 0))[0] || null;
+}
+// Earlier logged sets of one exercise in the same kind of section, newest first.
+function hyHistory(exId, sectionKey, exceptSid) {
+  const out = [];
+  Object.keys(hyState.sessions).forEach(sid => {
+    if(sid === exceptSid) return;
+    const sess = hyState.sessions[sid], st = sess.ex[sectionKey + '.' + exId];
+    if(!st) return;
+    const done = st.sets.filter(s => s && s.done);
+    if(done.length) out.push({ sid, date: sess.date, workoutId: sess.workoutId, sets: done, note: st.note });
+  });
+  return out.sort((a, b) => a.sid < b.sid ? 1 : -1);
+}
+
+// ── Screen: the week ─────────────────────────────────────────────────────────
+function hyRender() {
+  const root = document.getElementById('hybridWorkout');
+  if(!root) return;
+  if(hyView.dayIdx < 0 || hyView.dayIdx > 6) hyView.dayIdx = hyDow(new Date());
+  root.innerHTML = hyView.open && hyCtx() ? hySessionHTML() : hyWeekHTML();
+}
+function hyStatusChip(workout, sess, future) {
+  if(sess && sess.status === 'completed') return `<span class="hy-chip done">✓ Completed</span>`;
+  if(sess && sess.status === 'skipped') return `<span class="hy-chip">Skipped</span>`;
+  if(sess) return `<span class="hy-chip live">In progress · ${hySessionProgress(workout, sess).pct}%</span>`;
+  if(workout.placeholder && !workout.configured) return `<span class="hy-chip warn">Needs set-up</span>`;
+  return future ? `<span class="hy-chip">Planned</span>` : `<span class="hy-chip">Not started</span>`;
+}
+function hySlotMeta(workout) {
+  if(workout.category === 'sport') return 'Practice entry: duration, intensity, notes';
+  const parts = (workout.sections || []).map(s => `${s.title.charAt(0) + s.title.slice(1).toLowerCase()} ${s.items.length}`);
+  if(workout.games) parts.push(`${workout.games} games`);
+  return parts.join(' · ') || 'No exercises yet';
+}
+function hyWeekHTML() {
+  const prog = getProgram(selectedProgram);
+  const today = hyDow(new Date()), dayIdx = hyView.dayIdx;
+  const week = hyBlockWeek();
+  const tabs = HY_DAYS.map((d, i) => {
+    const date = hyDayDate(i);
+    return `<button class="wday-tab${i === dayIdx ? ' active' : ''}" onclick="hyPickDay(${i})">${d.slice(0, 3)} ${date.getDate()}${i === today ? ' •' : ''}</button>`;
+  }).join('');
+  const slots = hyDaySlots(dayIdx).map(slot => {
+    const workout = hyWorkout(hySlotWorkoutId(dayIdx, slot));
+    const sess = hyState.sessions[hySid(dayIdx, slot.key)] || null;
+    const prog2 = sess ? hySessionProgress(workout, sess) : null;
+    const when = [slot.time, workout.tag].filter(Boolean).join(' · ');
+    const lowerBeforeGames = slot.gym && workout.body === 'lower' && dayIdx >= 4 && !(sess && sess.status !== 'in_progress');
+    return `<div class="hy-slot" onclick="hyOpen('${slot.key}')">
+      <div class="hy-slot-top"><span class="hy-tag">${hyEsc(when)}</span>${hyStatusChip(workout, sess, dayIdx > today)}</div>
+      <div class="hy-slot-name">${hyEsc(workout.name)}</div>
+      <div class="hy-slot-meta">${hyEsc(hySlotMeta(workout))}${slot.gym && !slot.extra ? ` · rotation ${HY_ROTATION.indexOf(workout.id) + 1} of ${HY_ROTATION.length}` : ''}</div>
+      ${lowerBeforeGames ? `<div class="hy-warn-line">Lower-body session close to Sunday's games — open it to move, lighten or skip.</div>` : ''}
+      ${prog2 && sess.status === 'in_progress' ? `<div class="hy-bar"><div style="width:${prog2.pct}%"></div></div>` : ''}
+    </div>`;
+  }).join('');
+  const hasGym = hyDaySlots(dayIdx).some(s => s.gym);
+  const nextId = HY_ROTATION[hyState.rotationIdx], last = hyLastCompletedGym();
+  const rotation = HY_ROTATION.map((id, i) => {
+    const w = hyWorkout(id);
+    return `<button class="hy-rot${i === hyState.rotationIdx ? ' next' : ''}${hyConfigured(id) ? '' : ' todo'}" onclick="hyPreview('${id}')">${hyEsc(w.short)}</button>`;
+  }).join('<span class="hy-rot-arrow">→</span>');
+  const history = Object.keys(hyState.sessions).map(id => hyState.sessions[id]).filter(s => s.status !== 'in_progress')
+    .sort((a, b) => a.id < b.id ? 1 : -1).slice(0, 8);
+  return `
+    <div class="wo-preview-program-card">
+      <div class="wo-preview-prog-eyebrow">Active Program</div>
+      <div class="wo-preview-prog-name">${hyEsc(prog.name)}</div>
+      <div class="wo-preview-prog-desc">${hyEsc(prog.desc)}</div>
+      <button class="hy-block" onclick="hyBlockSheet()">
+        <span>${week ? `4-week block · Week ${week} of 4 — ${HY_BLOCK[week].name}` : '4-week block · off'}</span><span class="hy-block-edit">Change</span>
+      </button>
+      ${week ? `<div class="hy-block-tip">${hyEsc(HY_BLOCK[week].tip)}</div>` : ''}
+    </div>
+    <div class="workout-day-tabs">${tabs}</div>
+    <div class="hy-day-title">${HY_DAYS[dayIdx]} · ${hyEsc(hyDateLabel(hyISO(hyDayDate(dayIdx))).replace(/^\w+, /, ''))}${dayIdx === today ? ' · Today' : ''}</div>
+    ${slots}
+    ${!hasGym && dayIdx <= today ? `<button class="hy-ghost" onclick="hyAddGym()">＋ Add a gym session on ${HY_DAYS[dayIdx]}</button>` : ''}
+    <div class="hy-card">
+      <div class="hy-card-title">Lifting rotation</div>
+      <div class="hy-card-sub">Continues from where you left off. It does not restart on Mondays, and it only moves when you finish or skip a gym session.</div>
+      <div class="hy-rot-row">${rotation}</div>
+      <div class="hy-kv"><span>Next gym workout</span><button class="hy-link" onclick="hyPreview('${nextId}')">${hyEsc(hyWorkout(nextId).name)}</button></div>
+      <div class="hy-kv"><span>Last completed</span>${last ? `<button class="hy-link" onclick="hySummary('${last.id}')">${hyEsc(hyWorkout(last.workoutId).short)} · ${hyEsc(hyDateLabel(last.date))}</button>` : '<span class="hy-muted">None yet</span>'}</div>
+      <button class="hy-ghost" style="margin-top:10px;" onclick="hySetNextSheet()">Set the next workout…</button>
+    </div>
+    ${history.length ? `<div class="hy-card">
+      <div class="hy-card-title">History</div>
+      ${history.map(s => {
+        const w = hyWorkout(s.workoutId), t = hyTotals(w, s);
+        const bits = [s.status === 'skipped' ? 'Skipped' : (t.sets ? `${t.sets} working sets` : 'Completed'), s.rpe ? `RPE ${s.rpe}` : ''].filter(Boolean).join(' · ');
+        return `<button class="hy-hist" onclick="hySummary('${s.id}')"><span>${hyEsc(hyDateLabel(s.date))} · ${hyEsc(w.short || w.name)}</span><span class="hy-muted">${hyEsc(bits)}</span></button>`;
+      }).join('')}
+    </div>` : ''}
+    <button class="wo-change-prog-btn" onclick="changeProgram()">Change program</button>`;
+}
+function hyPickDay(i) { hyView.dayIdx = i; hyView.open = null; hyRender(); }
+function hyOpen(slotKey) {
+  hyView.open = slotKey; hyView.exOpen = null; hyView.collapsed = {};
+  hyRender();
+  const top = document.getElementById('hybridWorkout');
+  if(top && top.scrollIntoView) top.scrollIntoView({ block: 'start' });
+}
+function hyBack() { hyView.open = null; hyView.exOpen = null; hyRender(); }
+function hyAddGym() {
+  if(hyView.dayIdx > hyDow(new Date())) return;
+  hyView.open = HY_EXTRA_GYM.key; hyView.exOpen = null; hyView.collapsed = {};
+  hyRender();
+}
+
+// ── Screen: one session ──────────────────────────────────────────────────────
+function hyRpeHTML(value, handler) {
+  let h = '<div class="hy-rpe">';
+  for(let i = 1; i <= 10; i++) h += `<button class="${value === i ? 'on' : ''}" onclick="${handler}(${i})">${i}</button>`;
+  return h + '</div>';
+}
+function hyExerciseHTML(c, section, ex) {
+  const key = section.key + '.' + ex.id;
+  const info = hyExStatus(c.workout, section, ex, c.sess);
+  const st = c.sess ? c.sess.ex[key] : null;
+  const open = hyView.exOpen === key;
+  const name = hyEsc(hyExName(c.workout.id, key, ex));
+  const subbed = hyState.subs[c.workout.id] && hyState.subs[c.workout.id][key];
+  const f = hyFields(ex);
+  const rxLine = [hyRxText(ex, info.rx.sets), ex.restText ? `rest ${ex.restText}` : (ex.rest ? `rest ${ex.rest} sec` : '')].filter(Boolean).join(' · ');
+  let lead, right;
+  if(info.status === 'omitted') { lead = `<span class="hy-dot off">–</span>`; right = `<span class="hy-muted">Left out</span>`; }
+  else if(section.checkable) {
+    const on = info.status === 'done';
+    lead = `<button class="hy-check${on ? ' on' : ''}" aria-pressed="${on}" aria-label="Mark ${name} done" onclick="event.stopPropagation();hyToggleDone('${key}')">${on ? '✓' : ''}</button>`;
+    right = info.status === 'skipped' ? `<span class="hy-muted">Skipped</span>` : (info.logged ? `<span class="hy-muted">${info.logged} logged</span>` : '');
+  } else {
+    lead = `<span class="hy-dot${info.status === 'done' ? ' on' : ''}">${info.status === 'done' ? '✓' : ''}</span>`;
+    right = info.status === 'skipped' ? `<span class="hy-muted">Skipped</span>` : `<span class="${info.status === 'done' ? 'hy-good' : 'hy-muted'}">${info.logged}/${info.rx.sets}</span>`;
+  }
+  let body = '';
+  if(open) {
+    const last = hyHistory(ex.id, section.key, c.sid)[0];
+    let rows = '';
+    if(info.status !== 'omitted' && ex.kind !== 'check') {
+      const count = Math.max(info.rx.sets, st ? st.sets.length : 0);
+      for(let i = 0; i < count; i++) {
+        const set = st && st.sets[i], done = !!(set && set.done);
+        rows += `<div class="set-row${done ? ' completed' : ''}">
+          <div class="set-num">${i + 1}</div>
+          <div class="set-display"><div class="set-stat"><div class="set-stat-val${done ? '' : ' empty'}">${done ? hyEsc(hySetText(ex, set)) : '—'}</div><div class="set-stat-lbl">${hyEsc([f.f1 && f.f1.ph, f.f2 && f.f2.ph].filter(Boolean).join(' × '))}</div></div></div>
+          <button class="rest-btn${done ? ' done' : ''}" ${c.future ? 'disabled' : ''} onclick="hyLogSet('${key}',${i})">${done ? '✓ Edit' : (ex.rest ? 'Log + rest' : 'Log')}</button>
+        </div>`;
+      }
+    }
+    body = `<div class="hy-ex-body">
+      ${ex.cue ? `<div class="hy-cue">${hyEsc(ex.cue)}</div>` : ''}
+      ${info.rx.omitted ? `<div class="hy-cue">${hyEsc(info.rx.omitted)}.</div>` : ''}
+      ${subbed ? `<div class="hy-muted" style="margin-bottom:8px;">Substituted for ${hyEsc(ex.name)}.</div>` : ''}
+      ${last ? `<div class="hy-last">Last time (${hyEsc(hyDateLabel(last.date))}): ${last.sets.map(s => hyEsc(hySetText(ex, s))).join(' · ')}</div>` : ''}
+      ${rows ? `<div class="hy-sets">${rows}</div>` : ''}
+      ${info.status !== 'omitted' && !c.future ? `
+        ${ex.kind !== 'check' ? `<button class="add-set-btn" onclick="hyAddSet('${key}')">＋ Add Set</button>` : ''}
+        ${st && st.skipped ? `<input class="hy-input" maxlength="120" placeholder="Reason (optional)" value="${hyEsc(st.reason)}" onchange="hySetExText('${key}','reason',this.value)">` : ''}
+        <input class="hy-input" maxlength="200" placeholder="Notes — quality, how it felt (optional)" value="${hyEsc(st ? st.note : '')}" onchange="hySetExText('${key}','note',this.value)">
+        <div class="hy-actions">
+          ${!section.checkable && !f.required ? `<button onclick="hyMarkAll('${key}')">${info.status === 'done' ? 'Undo done' : 'Mark done'}</button>` : ''}
+          <button onclick="hyExHistory('${key}')">History</button>
+          <button onclick="hySubSheet('${key}')">Substitute</button>
+          <button onclick="hyToggleSkip('${key}')">${st && st.skipped ? 'Undo skip' : 'Skip'}</button>
+        </div>` : ''}
+    </div>`;
+  }
+  return `<div class="hy-ex${open ? ' open' : ''}${info.status ? ' ' + info.status : ''}">
+    <div class="hy-ex-head" onclick="hyToggleEx('${key}')">
+      ${lead}
+      <div class="hy-ex-title"><div class="hy-ex-name">${name}</div>${rxLine ? `<div class="hy-ex-rx">${hyEsc(rxLine)}</div>` : ''}</div>
+      ${right}<span class="hy-chev">›</span>
+    </div>${body}
+  </div>`;
+}
+function hySectionHTML(c, section) {
+  const p = hySectionProgress(c.workout, section, c.sess);
+  const shut = !!hyView.collapsed[section.key];
+  const primer = section.key === 'primer';
+  return `<div class="hy-section${primer ? ' primer' : ''}">
+    <button class="hy-section-head" aria-expanded="${!shut}" onclick="hyToggleSection('${section.key}')">
+      <span class="hy-section-title">${hyEsc(section.title)}${section.sub ? `<span class="hy-section-sub"> · ${hyEsc(section.sub)}</span>` : ''}</span>
+      <span class="hy-section-count${p.complete ? ' done' : ''}">${p.complete ? '✓ ' : ''}${p.done}/${p.total}${p.skipped ? ` · ${p.skipped} skipped` : ''}</span>
+      <span class="hy-chev${shut ? '' : ' down'}">›</span>
+    </button>
+    ${shut ? '' : `<div class="hy-section-body">${section.items.map(ex => hyExerciseHTML(c, section, ex)).join('')}</div>`}
+  </div>`;
+}
+function hyGamesHTML(c) {
+  let h = '';
+  for(let i = 0; i < c.workout.games; i++) {
+    const g = (c.sess && c.sess.games[i]) || { done: false, duration: '', rpe: null, result: '', notes: '' };
+    h += `<div class="hy-ex${g.done ? ' done' : ''}">
+      <div class="hy-ex-head">
+        <button class="hy-check${g.done ? ' on' : ''}" aria-pressed="${g.done}" aria-label="Mark game ${i + 1} played" ${c.future ? 'disabled' : ''} onclick="hyGameToggle(${i})">${g.done ? '✓' : ''}</button>
+        <div class="hy-ex-title"><div class="hy-ex-name">Game ${i + 1}</div><div class="hy-ex-rx">${g.done ? 'Played' : 'Not played yet'}</div></div>
+      </div>
+      <div class="hy-ex-body">
+        <div class="hy-grid2">
+          <label class="hy-field"><span>Duration (min)</span><input class="hy-input" type="number" inputmode="numeric" min="0" max="300" value="${hyEsc(g.duration)}" ${c.future ? 'disabled' : ''} onchange="hyGameText(${i},'duration',this.value)"></label>
+          <label class="hy-field"><span>Result or score</span><input class="hy-input" maxlength="60" value="${hyEsc(g.result)}" ${c.future ? 'disabled' : ''} onchange="hyGameText(${i},'result',this.value)"></label>
+        </div>
+        <div class="hy-field"><span>Perceived exertion (1 easy – 10 max)</span>${hyRpeHTML(g.rpe, 'hyGameRpe.bind(null,' + i + ')')}</div>
+        <label class="hy-field"><span>Notes — catches, touchdowns, how it went</span><textarea class="hy-input" rows="2" maxlength="400" ${c.future ? 'disabled' : ''} onchange="hyGameText(${i},'notes',this.value)">${hyEsc(g.notes)}</textarea></label>
+      </div>
+    </div>`;
+  }
+  const p = hyGamesProgress(c.workout, c.sess);
+  return `<div class="hy-section">
+    <div class="hy-section-head static"><span class="hy-section-title">GAMES</span><span class="hy-section-count${p.complete ? ' done' : ''}">${p.complete ? '✓ ' : ''}${p.done}/${p.total}</span></div>
+    <div class="hy-section-body">${h}</div>
+  </div>`;
+}
+function hySessionHTML() {
+  const c = hyCtx(), w = c.workout, sess = c.sess;
+  const date = hyISO(hyDayDate(c.dayIdx));
+  const overall = hySessionProgress(w, sess);
+  const week = sess ? sess.blockWeek : hyBlockWeek();
+  const done = sess && sess.status === 'completed', skipped = sess && sess.status === 'skipped';
+  const isGym = !!c.slot.gym;
+  const needsSetup = w.placeholder && !w.configured;
+  const banners = [];
+  if(c.future) banners.push(`<div class="hy-banner">Preview — this is planned for ${HY_DAYS[c.dayIdx]}. You can log it on the day.</div>`);
+  if(skipped) banners.push(`<div class="hy-banner">Skipped. <button class="hy-link" onclick="hyUndoSkip()">Undo skip</button></div>`);
+  if(week && (w.category === 'strength' || w.category === 'field')) banners.push(`<div class="hy-banner"><strong>Week ${week} of 4 — ${HY_BLOCK[week].name}.</strong> ${hyEsc(HY_BLOCK[week].tip)}</div>`);
+  if(isGym && w.body === 'lower' && c.dayIdx >= 4 && !done && !skipped) banners.push(`<div class="hy-banner warn"><strong>Lower-body session close to Sunday's games.</strong> The rotation landed here, but you don't have to do it hard: lighten it, skip it for today and keep it next, or move on.</div>`);
+  if(sess && sess.lighter) banners.push(`<div class="hy-banner">Lighter session on. ${hyEsc(w.lighterText || 'One set is taken off each main lift.')}</div>`);
+  if(sess && sess.recoveryOnly) banners.push(`<div class="hy-banner">Recovery-only: jumps and accelerations are left out.</div>`);
+  let middle;
+  if(needsSetup) {
+    middle = `<div class="hy-card"><div class="hy-card-title">${hyEsc(w.name)} needs setting up</div>
+      <div class="hy-card-sub">This workout was left for you to design. Nothing has been filled in for you. Add its primer and main exercises, or skip it for now.</div>
+      <button class="pink-btn" onclick="hyEditor('${w.id}')">Set up ${hyEsc(w.short)}</button>
+      ${isGym && !c.future ? `<button class="hy-ghost" style="margin:8px 0 0;" onclick="hySkipToConfigured()">Skip to the next workout that is set up</button>` : ''}</div>`;
+  } else if(w.category === 'sport') {
+    middle = `<div class="hy-section"><div class="hy-section-head static"><span class="hy-section-title">PRACTICE</span><span class="hy-section-count${done ? ' done' : ''}">${done ? '✓ Done' : 'Not logged'}</span></div>
+      <div class="hy-section-body"><div class="hy-pad">
+        <label class="hy-field"><span>Duration (min)</span><input class="hy-input" type="number" inputmode="numeric" min="0" max="300" value="${hyEsc(sess ? sess.duration : '')}" ${c.future ? 'disabled' : ''} onchange="hySessionText('duration',this.value)"></label>
+        <div class="hy-field"><span>Intensity — match it to how recovered you feel</span><div class="hy-seg">${['Light', 'Moderate', 'Hard'].map(v => `<button class="${sess && sess.intensity === v ? 'on' : ''}" ${c.future ? 'disabled' : ''} onclick="hySetIntensity('${v}')">${v}</button>`).join('')}</div></div>
+      </div></div></div>`;
+  } else {
+    middle = (w.sections || []).map(s => hySectionHTML(c, s)).join('') + (w.games ? hyGamesHTML(c) : '');
+  }
+  const parts = (w.sections || []).map(s => { const p = hySectionProgress(w, s, sess); return `${s.title.charAt(0) + s.title.slice(1).toLowerCase()} ${p.done}/${p.total}`; });
+  if(w.games) parts.push(`Games ${hyGamesProgress(w, sess).done}/${w.games}`);
+  return `
+    <button class="hy-back" onclick="hyBack()">‹ ${HY_DAYS[c.dayIdx]}</button>
+    <div class="hy-head">
+      <div class="hy-tag">${hyEsc([HY_DAYS[c.dayIdx], hyDateLabel(date).replace(/^\w+, /, ''), c.slot.time].filter(Boolean).join(' · '))} · ${hyEsc(w.tag)}</div>
+      <div class="hy-title">${hyEsc(w.name)}</div>
+      <div class="hy-goal">${hyEsc(w.goal)}</div>
+      ${needsSetup ? '' : `<div class="hy-overall"><div class="hy-bar"><div style="width:${overall.pct}%"></div></div><div class="hy-overall-row"><span>${done ? '✓ Session completed' : `Session ${overall.pct}%`}</span><span>${hyEsc(parts.join(' · '))}</span></div></div>`}
+    </div>
+    ${banners.join('')}
+    ${middle}
+    ${(w.notes || []).length ? `<div class="hy-section"><button class="hy-section-head" aria-expanded="${!!hyView.collapsed.notesOpen}" onclick="hyToggleSection('notesOpen')"><span class="hy-section-title">COACHING NOTES</span><span class="hy-chev${hyView.collapsed.notesOpen ? ' down' : ''}">›</span></button>
+      ${hyView.collapsed.notesOpen ? `<div class="hy-section-body"><ul class="hy-notes">${w.notes.map(n => `<li>${hyEsc(n)}</li>`).join('')}</ul></div>` : ''}</div>` : ''}
+    ${needsSetup || c.future ? '' : `
+      <div class="hy-card">
+        <div class="hy-card-title">Session notes</div>
+        <textarea class="hy-input" rows="3" maxlength="1000" placeholder="Recovery, how you felt, anything to remember" onchange="hySessionText('notes',this.value)">${hyEsc(sess ? sess.notes : '')}</textarea>
+        <div class="hy-field" style="margin-top:10px;"><span>Session perceived exertion (1 easy – 10 max)</span>${hyRpeHTML(sess ? sess.rpe : null, 'hySetRpe')}</div>
+        <button class="hy-link" style="margin-top:10px;" onclick="openLogWeight()">Log body weight</button>
+      </div>
+      <div class="hy-adjust">
+        ${isGym && !done ? `<button onclick="hyToggleLighter()">${sess && sess.lighter ? 'Back to the full session' : 'Lighter session'}</button>` : ''}
+        ${w.recoveryOnlyOption && !done ? `<button onclick="hyToggleRecoveryOnly()">${sess && sess.recoveryOnly ? 'Back to the full session' : 'Make it recovery-only'}</button>` : ''}
+        ${w.placeholder ? `<button onclick="hyEditor('${w.id}')">Edit exercises</button>` : ''}
+        ${!done && !skipped ? `<button onclick="hySkipSheet()">Skip…</button>` : ''}
+      </div>
+      <div class="finish-workout-wrap"><button class="pink-btn finish-workout-btn" onclick="hyFinish()">${done ? 'Update Finished Workout' : (w.category === 'sport' ? 'Save Practice' : w.category === 'competition' ? 'Finish Game Day' : 'Finish Workout')}</button></div>`}`;
+}
+function hyToggleEx(key) { hyView.exOpen = hyView.exOpen === key ? null : key; hyRender(); }
+function hyToggleSection(key) { hyView.collapsed[key] = !hyView.collapsed[key]; hyRender(); }
+
+// ── Actions inside a session ─────────────────────────────────────────────────
+function hyGuard() {
+  const c = hyCtx();
+  if(!c) return null;
+  if(c.future) { showToast(`Planned for ${HY_DAYS[c.dayIdx]} — log it on the day`); return null; }
+  return c;
+}
+function hyToggleDone(key) {
+  const c = hyGuard(); if(!c) return;
+  const st = hyExState(hyEnsureSession(), key);
+  st.done = !st.done;
+  if(st.done) st.skipped = false;
+  hySave(); hyRender();
+}
+function hyMarkAll(key) {
+  const c = hyGuard(); if(!c) return;
+  const found = hyFind(c.workout, key); if(!found) return;
+  const sess = hyEnsureSession(), st = hyExState(sess, key);
+  const info = hyExStatus(c.workout, found.section, found.ex, sess);
+  if(info.status === 'done') { st.done = false; st.sets = st.sets.map(s => (s && (s.w || s.r)) ? s : { w: '', r: '', done: false }); }
+  else { st.done = true; st.skipped = false; }
+  hySave(); hyRender();
+}
+function hyToggleSkip(key) {
+  const c = hyGuard(); if(!c) return;
+  const st = hyExState(hyEnsureSession(), key);
+  st.skipped = !st.skipped;
+  if(st.skipped) st.done = false; else st.reason = '';
+  hySave(); hyRender();
+}
+function hySetExText(key, field, value) {
+  const c = hyGuard(); if(!c || (field !== 'reason' && field !== 'note')) return;
+  hyExState(hyEnsureSession(), key)[field] = String(value).slice(0, field === 'note' ? 200 : 120);
+  hySave();
+}
+function hyAddSet(key) {
+  const c = hyGuard(); if(!c) return;
+  const found = hyFind(c.workout, key); if(!found) return;
+  const sess = hyEnsureSession(), st = hyExState(sess, key);
+  const need = hyRx(c.workout, found.section, found.ex, sess).sets;
+  while(st.sets.length < need) st.sets.push({ w: '', r: '', done: false });
+  if(st.sets.length < 20) st.sets.push({ w: '', r: '', done: false });
+  hySave(); hyRender();
+}
+function hySessionText(field, value) {
+  const c = hyGuard(); if(!c || !['notes', 'duration'].includes(field)) return;
+  hyEnsureSession()[field] = String(value).slice(0, field === 'notes' ? 1000 : 6);
+  hySave();
+}
+function hySetRpe(n) {
+  const c = hyGuard(); if(!c) return;
+  const sess = hyEnsureSession();
+  sess.rpe = sess.rpe === n ? null : n;
+  hySave(); hyRender();
+}
+function hySetIntensity(v) {
+  const c = hyGuard(); if(!c) return;
+  const sess = hyEnsureSession();
+  sess.intensity = sess.intensity === v ? '' : v;
+  hySave(); hyRender();
+}
+function hyGame(i) { const sess = hyEnsureSession(); return sess && sess.games[i] ? sess.games[i] : null; }
+function hyGameToggle(i) { const c = hyGuard(); if(!c) return; const g = hyGame(i); if(!g) return; g.done = !g.done; hySave(); hyRender(); }
+function hyGameText(i, field, value) {
+  const c = hyGuard(); if(!c || !['duration', 'result', 'notes'].includes(field)) return;
+  const g = hyGame(i); if(!g) return;
+  g[field] = String(value).slice(0, field === 'notes' ? 400 : field === 'result' ? 60 : 6);
+  hySave();
+}
+function hyGameRpe(i, n) { const c = hyGuard(); if(!c) return; const g = hyGame(i); if(!g) return; g.rpe = g.rpe === n ? null : n; hySave(); hyRender(); }
+function hyToggleLighter() {
+  const c = hyGuard(); if(!c) return;
+  const sess = hyEnsureSession();
+  sess.lighter = !sess.lighter;
+  hySave(); hyRender();
+  showToast(sess.lighter ? 'Lighter session on' : 'Full session restored');
+}
+function hyToggleRecoveryOnly() {
+  const c = hyGuard(); if(!c) return;
+  const sess = hyEnsureSession();
+  sess.recoveryOnly = !sess.recoveryOnly;
+  hySave(); hyRender();
+}
+
+// ── Logging a set through the app's rest-timer sheet ─────────────────────────
+// The sheet is shared with the other programs, so it is re-labelled for this set and put back
+// exactly as it was when it closes (hyRestReset, called from closeRest).
+let hyRest = null;
+function hyLogSet(key, setIdx) {
+  const c = hyGuard(); if(!c) return;
+  const found = hyFind(c.workout, key); if(!found) return;
+  const ex = found.ex, f = hyFields(ex);
+  if(!f.f1 && !f.f2) return;
+  const st = c.sess ? c.sess.ex[key] : null;
+  const cur = st && st.sets[setIdx], prev = setIdx > 0 && st ? st.sets[setIdx - 1] : null;
+  const last = hyHistory(ex.id, found.section.key, c.sid)[0];
+  let w = '', r = '';
+  if(cur && cur.done) { w = cur.w; r = cur.r; }
+  else if(prev && prev.done) { w = prev.w; r = prev.r; }
+  else if(last && f.f1 === HY_F.lbs) { w = (last.sets[setIdx] || last.sets[last.sets.length - 1]).w; }
+  const overlay = document.getElementById('restOverlay');
+  const wIn = document.getElementById('restLogWeight'), rIn = document.getElementById('restLogReps');
+  const cols = overlay.querySelectorAll('.rest-log-col');
+  hyRest = { key, setIdx, required: f.required, duration: restTimer.duration };
+  [[cols[0], wIn, f.f1], [cols[1], rIn, f.f2]].forEach(([col, input, field]) => {
+    col.style.display = field ? '' : 'none';
+    if(!field) return;
+    col.querySelector('.rest-log-label').textContent = field.label;
+    input.placeholder = field.ph;
+    input.step = field.step;
+  });
+  wIn.value = f.f1 ? w : '';
+  rIn.value = f.f2 ? r : '';
+  const timed = !!ex.rest;
+  overlay.querySelectorAll('.rest-timer-presets, .rest-timer-row, .rest-timer-skip').forEach(el => { el.style.display = timed ? '' : 'none'; });
+  overlay.querySelector('.rest-timer-label').textContent = timed ? 'Rest Timer' : 'Log';
+  overlay.querySelector('.rest-log-title').textContent = f.required ? 'Log completed set' : 'Log it (numbers optional)';
+  document.getElementById('restTimerEx').textContent = `${hyExName(c.workout.id, key, ex)} — ${ex.kind === 'sprint' ? 'Rep' : 'Set'} ${setIdx + 1}`;
+  restTimer.activeEi = null; restTimer.activeSet = null;
+  clearInterval(restTimer.interval);
+  overlay.classList.add('show');
+  if(timed) {
+    restTimer.duration = ex.rest; restTimer.remaining = ex.rest;
+    hyRestPresets(ex.rest);
+    updateRestTimerDisplay();
+    startRestCountdown();
+  }
+}
+function hySaveLoggedSet() {
+  const job = hyRest;
+  const w = document.getElementById('restLogWeight').value.trim(), r = document.getElementById('restLogReps').value.trim();
+  const c = hyGuard();
+  if(!job || !c) { closeRest(); return; }
+  const found = hyFind(c.workout, job.key);
+  if(!found) { closeRest(); return; }
+  const sess = hyEnsureSession(), st = hyExState(sess, job.key);
+  while(st.sets.length <= job.setIdx) st.sets.push({ w: '', r: '', done: false });
+  const empty = !w && !r;
+  // A loaded set needs a number to count; emptying both boxes clears a set logged by mistake.
+  st.sets[job.setIdx] = (empty && job.required) ? { w: '', r: '', done: false } : { w: w.slice(0, 10), r: r.slice(0, 10), done: true };
+  const logged = st.sets.filter(s => s && s.done).length;
+  if(logged) st.skipped = false;
+  if(found.section.checkable && logged >= hyRx(c.workout, found.section, found.ex, sess).sets) st.done = true;
+  hySave();
+  closeRest();
+  hyRender();
+  showToast(empty && job.required ? 'Set cleared' : 'Set logged!');
+}
+function hyRestPresets(secs) {
+  const map = { '30s': 30, '60s': 60, '90s': 90, '2m': 120 };
+  document.querySelectorAll('#restOverlay .rest-preset').forEach(b => b.classList.toggle('active', map[b.textContent.trim()] === secs));
+}
+function hyRestReset() {
+  if(!hyRest) return;
+  const overlay = document.getElementById('restOverlay');
+  const wIn = document.getElementById('restLogWeight'), rIn = document.getElementById('restLogReps');
+  const cols = overlay.querySelectorAll('.rest-log-col');
+  cols.forEach(col => { col.style.display = ''; });
+  cols[0].querySelector('.rest-log-label').textContent = 'Weight (lbs)';
+  cols[1].querySelector('.rest-log-label').textContent = 'Reps';
+  wIn.placeholder = 'lbs'; wIn.step = '2.5';
+  rIn.placeholder = 'reps'; rIn.removeAttribute('step');
+  overlay.querySelectorAll('.rest-timer-presets, .rest-timer-row, .rest-timer-skip').forEach(el => { el.style.display = ''; });
+  overlay.querySelector('.rest-timer-label').textContent = 'Rest Timer';
+  overlay.querySelector('.rest-log-title').textContent = 'Log completed set';
+  restTimer.duration = hyRest.duration;
+  restTimer.remaining = hyRest.duration;
+  hyRestPresets(hyRest.duration);
+  hyRest = null;
+}
+
+// ── Bottom sheet shared by this program's dialogs ────────────────────────────
+function hySheet(html) {
+  document.getElementById('hySheet').innerHTML = html;
+  document.getElementById('hySheetOverlay').style.display = 'flex';
+}
+function hySheetClose() { document.getElementById('hySheetOverlay').style.display = 'none'; }
+function hyWorkoutListHTML(workout) {
+  if(!(workout.sections || []).length) return `<div class="hy-muted" style="margin:8px 0 14px;">No exercises yet.</div>`;
+  return workout.sections.map(s => `<div class="hy-sheet-sec">${hyEsc(s.title)}</div>` +
+    s.items.map(ex => `<div class="hy-kv"><span>${hyEsc(hyExName(workout.id, s.key + '.' + ex.id, ex))}</span><span class="hy-muted">${hyEsc(hyRxText(ex, ex.sets))}</span></div>`).join('')).join('');
+}
+function hyPreview(id) {
+  const w = hyWorkout(id);
+  const pos = HY_ROTATION.indexOf(id);
+  hySheet(`<div class="cm-sheet-title">${hyEsc(w.name)}</div>
+    <div class="hy-muted">Rotation ${pos + 1} of ${HY_ROTATION.length}${pos === hyState.rotationIdx ? ' · next up' : ''}</div>
+    ${w.placeholder && !w.configured ? `<div class="hy-banner warn" style="margin-top:12px;">Needs setting up — nothing has been filled in for you.</div>` : hyWorkoutListHTML(w)}
+    ${w.placeholder ? `<button class="pink-btn" style="margin-top:14px;" onclick="hyEditor('${id}')">${w.configured ? 'Edit exercises' : 'Set up ' + hyEsc(w.short)}</button>` : ''}
+    <button class="ghost-btn" style="margin-top:8px;" onclick="hySheetClose()">Close</button>`);
+}
+function hySetNextSheet() {
+  hySheet(`<div class="cm-sheet-title">Set the next gym workout</div>
+    <div class="hy-muted" style="margin-bottom:12px;">Moves the rotation to the workout you pick. Your history is not changed.</div>
+    ${HY_ROTATION.map((id, i) => `<button class="cm-pick" onclick="hySetNext(${i})">${hyEsc(hyWorkout(id).name)}${i === hyState.rotationIdx ? '<small>Currently next</small>' : (hyConfigured(id) ? '' : '<small>Needs setting up</small>')}</button>`).join('')}
+    <button class="ghost-btn" style="margin-top:8px;" onclick="hySheetClose()">Cancel</button>`);
+}
+function hySetNext(i) {
+  if(!(i >= 0 && i < HY_ROTATION.length)) return;
+  hyState.rotationIdx = i;
+  hyRotationNote('set', HY_ROTATION[i], '');
+  hySave(true); hySheetClose(); hyRender();
+  showToast(`${hyWorkout(HY_ROTATION[i]).short} is next`);
+}
+function hyBlockSheet() {
+  const week = hyBlockWeek();
+  hySheet(`<div class="cm-sheet-title">Four-week training block</div>
+    <div class="hy-muted" style="margin-bottom:12px;">Optional. It adds guidance each week and a lighter fourth week. Loads are never raised for you.</div>
+    ${[1, 2, 3, 4].map(n => `<button class="cm-pick" onclick="hySetBlockWeek(${n})">This is week ${n} — ${HY_BLOCK[n].name}${week === n ? ' ✓' : ''}<small>${hyEsc(HY_BLOCK[n].tip)}</small></button>`).join('')}
+    <button class="cm-pick" onclick="hySetBlockWeek(0)">Turn the block off${week ? '' : ' ✓'}<small>Same prescription every week.</small></button>
+    <button class="ghost-btn" style="margin-top:8px;" onclick="hySheetClose()">Close</button>`);
+}
+function hySubSheet(key) {
+  const c = hyGuard(); if(!c) return;
+  const found = hyFind(c.workout, key); if(!found) return;
+  const current = hyState.subs[c.workout.id] && hyState.subs[c.workout.id][key];
+  const options = (found.ex.alts || []).concat((typeof EXERCISE_SWAPS !== 'undefined' && EXERCISE_SWAPS[found.ex.name]) || []).filter((v, i, a) => a.indexOf(v) === i).slice(0, 5);
+  window._hySubKey = key;
+  hySheet(`<div class="cm-sheet-title">Substitute ${hyEsc(found.ex.name)}</div>
+    <div class="hy-muted" style="margin-bottom:12px;">The plan keeps the original; this only changes what you do in its place. Sets, reps and history stay with this slot.</div>
+    ${options.map((o, i) => `<button class="cm-pick" onclick="hySub(${i})">${hyEsc(o)}</button>`).join('')}
+    <input class="hy-input" id="hySubInput" maxlength="60" placeholder="Or type another exercise" value="${hyEsc(current || '')}">
+    <button class="pink-btn" style="margin-top:10px;" onclick="hySub(-1)">Use this exercise</button>
+    ${current ? `<button class="ghost-btn" style="margin-top:8px;" onclick="hySub(-2)">Go back to ${hyEsc(found.ex.name)}</button>` : ''}
+    <button class="ghost-btn" style="margin-top:8px;" onclick="hySheetClose()">Cancel</button>`);
+  window._hySubOptions = options;
+}
+function hySub(choice) {
+  const c = hyCtx(), key = window._hySubKey; if(!c || !key) return;
+  let name = '';
+  if(choice >= 0) name = (window._hySubOptions || [])[choice] || '';
+  else if(choice === -1) name = (document.getElementById('hySubInput').value || '').trim();
+  if(choice === -1 && !name) { showToast('Type an exercise name'); return; }
+  if(!hyState.subs[c.workout.id]) hyState.subs[c.workout.id] = {};
+  if(name) hyState.subs[c.workout.id][key] = name.slice(0, 60); else delete hyState.subs[c.workout.id][key];
+  hySave(true); hySheetClose(); hyRender();
+}
+function hyExHistory(key) {
+  const c = hyCtx(); if(!c) return;
+  const found = hyFind(c.workout, key); if(!found) return;
+  const rows = hyHistory(found.ex.id, found.section.key, null);
+  hySheet(`<div class="cm-sheet-title">${hyEsc(hyExName(c.workout.id, key, found.ex))}</div>
+    <div class="hy-muted" style="margin-bottom:12px;">${rows.length ? `${rows.length} session${rows.length > 1 ? 's' : ''} logged` : 'Nothing logged yet.'}</div>
+    ${rows.slice(0, 20).map(h => `<div class="hy-kv top"><span>${hyEsc(hyDateLabel(h.date))}</span><span>${h.sets.map(s => hyEsc(hySetText(found.ex, s))).join(' · ')}${h.note ? `<br><span class="hy-muted">${hyEsc(h.note)}</span>` : ''}</span></div>`).join('')}
+    <button class="ghost-btn" style="margin-top:12px;" onclick="hySheetClose()">Close</button>`);
+}
+
+// ── Skipping, finishing, summaries ───────────────────────────────────────────
+function hySkipSheet() {
+  const c = hyGuard(); if(!c) return;
+  if(!c.slot.gym) {
+    hySheet(`<div class="cm-sheet-title">Skip ${hyEsc(c.workout.name)}?</div>
+      <div class="hy-muted" style="margin-bottom:12px;">It is recorded as skipped. What you logged stays.</div>
+      <button class="pink-btn" onclick="hySkip(false)">Skip this session</button>
+      <button class="ghost-btn" style="margin-top:8px;" onclick="hySheetClose()">Cancel</button>`);
+    return;
+  }
+  const isNext = HY_ROTATION[hyState.rotationIdx] === c.workoutId;
+  const after = hyWorkout(HY_ROTATION[(HY_ROTATION.indexOf(c.workoutId) + 1) % HY_ROTATION.length]);
+  hySheet(`<div class="cm-sheet-title">Skip ${hyEsc(c.workout.short)} today?</div>
+    <div class="hy-muted" style="margin-bottom:12px;">Choose what the rotation does. Nothing changes until you pick one.</div>
+    <button class="cm-pick" onclick="hySkip(false)">Skip today, keep ${hyEsc(c.workout.short)} next<small>Moves it to your next gym session. The sequence is unchanged.</small></button>
+    ${isNext ? `<button class="cm-pick" onclick="hySkip(true)">Skip it and move on to ${hyEsc(after.short)}<small>${hyEsc(c.workout.short)} is passed over for this round.</small></button>` : ''}
+    <button class="ghost-btn" style="margin-top:8px;" onclick="hySheetClose()">Cancel</button>`);
+}
+function hySkip(advance) {
+  const c = hyGuard(); if(!c) return;
+  const sess = hyEnsureSession();
+  sess.status = 'skipped'; sess.finishedAt = Date.now();
+  if(advance && c.slot.gym) hyAdvanceRotation(sess, 'skipped');
+  else if(c.slot.gym) hyRotationNote('kept', sess.workoutId, sess.id);
+  hySave(true); hySheetClose(); hyView.open = null; hyRender();
+  showToast(advance ? `Skipped — ${hyWorkout(HY_ROTATION[hyState.rotationIdx]).short} is next` : 'Skipped');
+}
+function hyUndoSkip() {
+  const c = hyCtx(); if(!c || !c.sess || c.sess.status !== 'skipped') return;
+  const sess = c.sess;
+  // Step the rotation back only if this skip moved it and nothing has moved it since.
+  if(sess.advanced && HY_ROTATION[(HY_ROTATION.indexOf(sess.workoutId) + 1) % HY_ROTATION.length] === HY_ROTATION[hyState.rotationIdx]) {
+    hyState.rotationIdx = HY_ROTATION.indexOf(sess.workoutId);
+    hyRotationNote('unskipped', sess.workoutId, sess.id);
+  }
+  sess.advanced = false; sess.status = 'in_progress'; sess.finishedAt = 0;
+  hySave(true); hyRender();
+}
+function hySkipToConfigured() {
+  const c = hyGuard(); if(!c) return;
+  for(let step = 1; step <= HY_ROTATION.length; step++) {
+    const i = (hyState.rotationIdx + step) % HY_ROTATION.length;
+    if(hyConfigured(HY_ROTATION[i])) {
+      hyState.rotationIdx = i;
+      hyRotationNote('set', HY_ROTATION[i], '');
+      hySave(true); hyRender();
+      showToast(`${hyWorkout(HY_ROTATION[i]).short} is next`);
+      return;
+    }
+  }
+}
+function hyPending(workout, sess) {
+  let n = 0;
+  (workout.sections || []).forEach(section => {
+    const p = hySectionProgress(workout, section, sess);
+    n += p.total - p.done - p.skipped;
+  });
+  if(workout.games) n += workout.games - hyGamesProgress(workout, sess).done;
+  return n;
+}
+function hyFinish() {
+  const c = hyGuard(); if(!c) return;
+  const w = c.workout;
+  if(!c.sess && w.category !== 'sport') { showToast('Nothing logged yet'); return; }
+  const sess = hyEnsureSession();
+  const pending = hyPending(w, sess);
+  // Finishing never ticks anything off: unfinished items stay unfinished.
+  if(pending > 0 && !confirm(`${pending} item${pending > 1 ? 's are' : ' is'} not done. Finish anyway? ${pending > 1 ? 'They stay' : 'It stays'} marked as not done.`)) return;
+  const first = sess.status !== 'completed';
+  sess.status = 'completed';
+  if(first) sess.finishedAt = Date.now();
+  // Records come from working sets only: weighted lifts in the main section.
+  const prs = [];
+  let prData = load(PR_KEY) || {};
+  hyTotals(w, sess).exercises.filter(e => e.record).forEach(e => {
+    const best = Math.max(0, ...e.sets.map(s => s.w));
+    if(best <= 0) return;
+    const exKey = e.name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+    const prev = (prData[exKey] && prData[exKey].weight) || 0;
+    if(best > prev) {
+      prs.push({ name: e.name, weight: best, prev });
+      prData[exKey] = { weight: best, date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }), ts: Date.now() };
+    }
+  });
+  if(prs.length) { try { save(PR_KEY, prData); } catch(e) {} if(isLoggedIn()) cloudPost('/prs', prData); }
+  const moved = c.slot.gym ? hyAdvanceRotation(sess, 'completed') : false;
+  hySave(true);
+  hyRender();
+  hySummary(sess.id, { prs, moved });
+  if(prs.length) showPRPopup(prs, 0, () => {});
+}
+function hySummary(sid, extra) {
+  const sess = hyState.sessions[sid]; if(!sess) return;
+  const w = hyWorkout(sess.workoutId), t = hyTotals(w, sess), x = extra || {};
+  const stats = [];
+  (w.sections || []).forEach(s => { const p = hySectionProgress(w, s, sess); stats.push([`${p.done}/${p.total}`, s.title.charAt(0) + s.title.slice(1).toLowerCase()]); });
+  if(w.games) stats.push([`${hyGamesProgress(w, sess).done}/${w.games}`, 'Games']);
+  if(t.sets) stats.push([t.sets, 'Working sets']);
+  if(t.volume) stats.push([t.volume.toLocaleString(), 'lbs lifted']);
+  if(sess.duration) stats.push([sess.duration, 'Minutes']);
+  if(sess.rpe) stats.push([sess.rpe, 'Session RPE']);
+  window._hyShare = t.exercises.length ? { type: 'workout', payload: { program: 'LANTIK Hybrid Athlete', day: w.name.slice(0, 80), week: sess.blockWeek || 1, volume: t.volume, sets: t.sets, exercises: t.exercises.slice(0, 12).map(e => ({ name: e.name.slice(0, 60), sets: e.sets.slice(0, 8) })) } } : null;
+  const detail = (w.sections || []).map(section => {
+    const lines = section.items.map(ex => {
+      const st = sess.ex[section.key + '.' + ex.id];
+      if(!st) return '';
+      const done = st.sets.filter(s => s && s.done);
+      const text = st.skipped ? `Skipped${st.reason ? ' — ' + hyEsc(st.reason) : ''}` : (done.length ? done.map(s => hyEsc(hySetText(ex, s))).join(' · ') : (st.done ? 'Done' : ''));
+      return text ? `<div class="hy-kv top"><span>${hyEsc(hyExName(w.id, section.key + '.' + ex.id, ex))}</span><span>${text}${st.note ? `<br><span class="hy-muted">${hyEsc(st.note)}</span>` : ''}</span></div>` : '';
+    }).join('');
+    return lines ? `<div class="hy-sheet-sec">${hyEsc(section.title)}</div>${lines}` : '';
+  }).join('');
+  const games = (sess.games || []).map((g, i) => g.done ? `<div class="hy-kv top"><span>Game ${i + 1}</span><span>${hyEsc([g.result, g.duration ? g.duration + ' min' : '', g.rpe ? 'RPE ' + g.rpe : ''].filter(Boolean).join(' · ') || 'Played')}${g.notes ? `<br><span class="hy-muted">${hyEsc(g.notes)}</span>` : ''}</span></div>` : '').join('');
+  hySheet(`<div class="cm-sheet-title">${sess.status === 'skipped' ? 'Skipped' : (extra ? 'Session saved' : 'Session')} — ${hyEsc(w.short || w.name)}</div>
+    <div class="hy-muted" style="margin-bottom:12px;">${hyEsc(hyDateLabel(sess.date))}${sess.intensity ? ' · ' + hyEsc(sess.intensity) + ' intensity' : ''}${sess.lighter ? ' · lighter session' : ''}${sess.recoveryOnly ? ' · recovery-only' : ''}</div>
+    ${stats.length ? `<div class="hy-stats">${stats.map(s => `<div><b>${hyEsc(s[0])}</b><span>${hyEsc(s[1])}</span></div>`).join('')}</div>` : ''}
+    ${x.moved ? `<div class="hy-banner">Rotation moved on. Next gym workout: <strong>${hyEsc(hyWorkout(HY_ROTATION[hyState.rotationIdx]).short)}</strong>.</div>` : ''}
+    ${detail}${games ? `<div class="hy-sheet-sec">GAMES</div>${games}` : ''}
+    ${sess.notes ? `<div class="hy-sheet-sec">NOTES</div><div class="hy-cue">${hyEsc(sess.notes)}</div>` : ''}
+    ${window._hyShare && sess.status === 'completed' && isLoggedIn() ? `<button class="ghost-btn" style="margin-top:14px;" onclick="hyShare()">Share to Community</button>` : ''}
+    <button class="pink-btn" style="margin-top:8px;" onclick="hySheetClose()">Done</button>`);
+}
+function hyShare() {
+  const share = window._hyShare; if(!share) return;
+  hySheetClose();
+  navTo('community');
+  cmOpenCompose(share);
+}
+
+// ── Setting up the three workouts that were left open ────────────────────────
+function hyEditor(id) {
+  const w = HY_WORKOUTS[id];
+  if(!w || !w.placeholder) return;
+  if(!hyState.custom[id]) hyState.custom[id] = { primer: [], main: [] };
+  const c = hyState.custom[id];
+  const list = sec => c[sec].length ? c[sec].map((e, i) => `<div class="hy-kv top"><span>${hyEsc(e.name)}<br><span class="hy-muted">${hyEsc(hyRxText(e, e.sets))}${e.rest ? ' · rest ' + e.rest + ' sec' : ''}${e.kind === 'strength' ? ' · weighted' : ''}</span></span>
+      <span class="hy-edit-btns"><button aria-label="Move up" onclick="hyEditMove('${id}','${sec}',${i},-1)">↑</button><button aria-label="Move down" onclick="hyEditMove('${id}','${sec}',${i},1)">↓</button><button aria-label="Remove" onclick="hyEditRemove('${id}','${sec}',${i})">✕</button></span></div>`).join('') : `<div class="hy-muted" style="margin-bottom:8px;">Nothing added yet.</div>`;
+  hySheet(`<div class="cm-sheet-title">Set up ${hyEsc(w.name)}</div>
+    <div class="hy-muted" style="margin-bottom:6px;">Explosive work in the primer, then strength, then accessories.</div>
+    <div class="hy-sheet-sec">PRIMER</div>${list('primer')}
+    <div class="hy-sheet-sec">MAIN WORKOUT</div>${list('main')}
+    <div class="hy-sheet-sec">ADD AN EXERCISE</div>
+    <div class="hy-seg" id="hyEdSection"><button class="on" data-v="main" onclick="hyEdPick(this)">Main workout</button><button data-v="primer" onclick="hyEdPick(this)">Primer</button></div>
+    <label class="hy-field"><span>Exercise name</span><input class="hy-input" id="hyEdName" maxlength="60"></label>
+    <div class="hy-grid2">
+      <label class="hy-field"><span>Sets</span><input class="hy-input" id="hyEdSets" type="number" inputmode="numeric" min="1" max="10" value="3"></label>
+      <label class="hy-field"><span>Reps (e.g. 6–8)</span><input class="hy-input" id="hyEdReps" maxlength="24" value="6–8"></label>
+    </div>
+    <div class="hy-grid2">
+      <label class="hy-field"><span>Rest (sec, 0 for none)</span><input class="hy-input" id="hyEdRest" type="number" inputmode="numeric" min="0" max="600" value="90"></label>
+      <label class="hy-field"><span>Tracks weight?</span><select class="hy-input" id="hyEdKind"><option value="strength">Yes — weight and reps</option><option value="bodyweight">No — reps only</option></select></label>
+    </div>
+    <label class="hy-field"><span>Coaching cue (optional)</span><input class="hy-input" id="hyEdCue" maxlength="160"></label>
+    <button class="ghost-btn" onclick="hyEditAdd('${id}')">＋ Add exercise</button>
+    <button class="pink-btn" style="margin-top:8px;" onclick="hyEditDone()">Done</button>`);
+}
+function hyEdPick(btn) {
+  btn.parentNode.querySelectorAll('button').forEach(b => b.classList.toggle('on', b === btn));
+}
+function hyEditAdd(id) {
+  const c = hyState.custom[id]; if(!c) return;
+  const name = document.getElementById('hyEdName').value.trim();
+  if(!name) { showToast('Give the exercise a name'); return; }
+  const picked = document.querySelector('#hyEdSection button.on');
+  const sec = picked && picked.dataset.v === 'primer' ? 'primer' : 'main';
+  if(c[sec].length >= 15) { showToast('That section is full'); return; }
+  // A fresh id per added exercise: its history can never collide with another one's.
+  const eid = 'c_' + Date.now().toString(36) + Math.floor(Math.random() * 1296).toString(36);
+  c[sec].push({
+    id: eid, name: name.slice(0, 60), kind: document.getElementById('hyEdKind').value === 'bodyweight' ? 'bodyweight' : 'strength',
+    sets: Math.min(10, Math.max(1, parseInt(document.getElementById('hyEdSets').value, 10) || 1)),
+    reps: (document.getElementById('hyEdReps').value || '').trim().slice(0, 24) || '—',
+    rest: Math.min(600, Math.max(0, parseInt(document.getElementById('hyEdRest').value, 10) || 0)),
+    cue: (document.getElementById('hyEdCue').value || '').trim().slice(0, 160)
+  });
+  hySave();
+  hyEditor(id);
+}
+function hyEditMove(id, sec, i, dir) {
+  const list = hyState.custom[id] && hyState.custom[id][sec], j = i + dir;
+  if(!list || j < 0 || j >= list.length) return;
+  const item = list[i]; list[i] = list[j]; list[j] = item;
+  hySave(); hyEditor(id);
+}
+function hyEditRemove(id, sec, i) {
+  const list = hyState.custom[id] && hyState.custom[id][sec];
+  if(!list || !list[i]) return;
+  if(!confirm(`Remove ${list[i].name}? Sets already logged for it stay in your history.`)) return;
+  list.splice(i, 1);
+  hySave(); hyEditor(id);
+}
+function hyEditDone() { hySave(true); hySheetClose(); hyRender(); }
+
+// ── Dashboard card ───────────────────────────────────────────────────────────
+function hyDashHTML() {
+  const prog = getProgram(workoutState.program), today = hyDow(new Date());
+  const rows = hyDaySlots(today).map(slot => {
+    const w = hyWorkout(hySlotWorkoutId(today, slot)), sess = hyState.sessions[hySid(today, slot.key)];
+    const state = sess ? (sess.status === 'completed' ? '✓ done' : sess.status === 'skipped' ? 'skipped' : `${hySessionProgress(w, sess).pct}%`) : '';
+    return `<div class="dwc-ex">${hyEsc([slot.time, w.name].filter(Boolean).join(' — '))}${state ? ` <span style="color:var(--pink);">· ${state}</span>` : ''}</div>`;
+  }).join('');
+  return `<div class="dash-workout-card" onclick="navTo('workout')" style="cursor:pointer;">
+    <div class="dwc-eyebrow">${hyEsc(prog.name)}</div>
+    <div class="dwc-title">${HY_DAYS[today]}</div>
+    <div class="dwc-exercises">${rows}</div>
+    <button onclick="event.stopPropagation();openCustomWorkout()" style="margin-top:10px;width:100%;padding:8px;border-radius:var(--radius);border:0.5px solid var(--border2);background:transparent;font-family:inherit;font-size:12px;color:var(--text3);cursor:pointer;">↔ Swap for custom workout</button>
+  </div>`;
+}
+
+// Left open overnight: come back to today's day, unless a session is open on screen.
+document.addEventListener('visibilitychange', () => {
+  if(document.visibilityState !== 'visible') return;
+  try {
+    const today = new Date().toDateString();
+    if(today === hyView.date) return;
+    hyView.date = today;
+    if(hyView.open) return;
+    hyView.dayIdx = hyDow(new Date());
+    if(currentPage === 'workout' && hyActive()) hyRender();
+  } catch(e) { console.warn('Hybrid day refresh skipped:', e); }
+});
 
 // ══════════════════════════════════════
 // COMMUNITY (shared feed: posts, likes, comments)
