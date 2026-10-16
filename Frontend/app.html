@@ -3862,7 +3862,7 @@ const PROGRAMS = {
     icon:'bolt',
     calendarAligned:true,
     hybrid:true,
-    desc:'Lean muscle, strength and explosive power for a flag-football receiver who trains Muay Thai — a continuous Lower/Upper lifting rotation around two football sessions, two Muay Thai sessions, two recovery days and Sunday\'s two games',
+    desc:'Lean muscle, strength and explosive power for a flag-football receiver who trains Muay Thai — a fixed weekly Lower/Upper split (Tue Lower A, Wed Upper A, Thu Lower B, Fri Upper B) around two football sessions, two Muay Thai sessions, two recovery days and Sunday\'s two games',
     daysPerWeek:'7-day schedule · Lower A → Upper A → Lower B → Upper B',
     // Sessions, sections and the lifting rotation live in HY_WORKOUTS / HY_WEEK (see "LANTIK HYBRID ATHLETE PROGRAM").
     days:[
@@ -3984,7 +3984,7 @@ const PROGRAMS_MALE = {
     icon:'bolt',
     calendarAligned:true,
     hybrid:true,
-    desc:'Lean muscle, strength and explosive power for a flag-football receiver who trains Muay Thai — a continuous Lower/Upper lifting rotation around two football sessions, two Muay Thai sessions, two recovery days and Sunday\'s two games',
+    desc:'Lean muscle, strength and explosive power for a flag-football receiver who trains Muay Thai — a fixed weekly Lower/Upper split (Tue Lower A, Wed Upper A, Thu Lower B, Fri Upper B) around two football sessions, two Muay Thai sessions, two recovery days and Sunday\'s two games',
     daysPerWeek:'7-day schedule · Lower A → Upper A → Lower B → Upper B',
     // Sessions, sections and the lifting rotation live in HY_WORKOUTS / HY_WEEK (see "LANTIK HYBRID ATHLETE PROGRAM").
     days:[
@@ -4876,18 +4876,27 @@ function checkExercisePR(ex, sets) {
   return newPRs;
 }
 
+var _prOnComplete = null;
 function showPRPopup(prs, idx, callback) {
-  // Show each PR as a toast notification, then call callback when done
-  if(!prs || prs.length === 0) { if(callback) callback(); return; }
-  let i = 0;
-  function showNext() {
-    if(i >= prs.length) { if(callback) callback(); return; }
-    const pr = prs[i++];
-    const prev = pr.prev > 0 ? ` (was ${pr.prev} lbs)` : ' (first PR!)';
-    showToast(`🏆 New PR! ${pr.name} — ${pr.weight} lbs${prev}`, 2800);
-    setTimeout(showNext, 3000);
-  }
-  showNext();
+  // The trophy card sits above the summary sheet and the rest timer, one PR at a time.
+  idx = idx || 0;
+  if(!prs || idx >= prs.length) { if(callback) callback(); return; }
+  const pr = prs[idx];
+  const overlay = document.getElementById('prOverlay'), popup = document.getElementById('prPopup');
+  if(!overlay || !popup) { showToast(`New PR! ${pr.name} — ${pr.weight} lbs`, 2800); if(callback) callback(); return; }
+  _prOnComplete = callback || null;
+  overlay._prs = prs;
+  overlay._currentIdx = idx;
+  document.getElementById('prExName').textContent = pr.name;
+  document.getElementById('prWeightDisplay').textContent = `${pr.weight} lbs`;
+  document.getElementById('prPrevBest').textContent = pr.prev > 0 ? `Previous best: ${pr.prev} lbs` : 'Your first recorded weight for this lift';
+  overlay.style.display = 'block';
+  overlay.style.pointerEvents = 'auto';
+  void popup.offsetWidth; // apply the hidden starting state now, so the change below animates
+  document.getElementById('prBackdrop').style.background = 'rgba(0,0,0,0.6)';
+  popup.style.transform = 'translate(-50%,-50%) scale(1)';
+  popup.style.opacity = '1';
+  try { launchConfetti(); } catch(e) {}
 }
 
 function finishWorkout() {
@@ -6852,13 +6861,14 @@ let restTimer = {
   remaining: 60,
   activeEi: null,
   activeSet: null,
-  exName: ''
+  exName: '',
+  endsAt: 0
 };
 
 function setRestDuration(secs) {
   restTimer.duration = secs;
   restTimer.remaining = secs;
-  clearInterval(restTimer.interval);
+  stopRestCountdown();
   updateRestTimerDisplay();
   startRestCountdown();
   // Update preset buttons
@@ -6925,21 +6935,28 @@ function startRest(ei, setIdx, exName, suggested) {
   if(btn) btn.classList.add('resting');
 
   updateRestTimerDisplay();
-  clearInterval(restTimer.interval);
+  stopRestCountdown();
   startRestCountdown();
 }
 
 function startRestCountdown() {
-  clearInterval(restTimer.interval);
-  restTimer.interval = setInterval(() => {
-    restTimer.remaining--;
-    updateRestTimerDisplay();
-    if(restTimer.remaining <= 0) {
-      clearInterval(restTimer.interval);
-      restTimerDone();
-    }
-  }, 1000);
+  stopRestCountdown();
+  // Count down to a fixed end time, so the timer stays right while the phone is
+  // locked or another app is open (the phone pauses the page in the background).
+  restTimer.endsAt = Date.now() + restTimer.remaining * 1000;
+  restTimer.interval = setInterval(restTimerTick, 250);
 }
+function stopRestCountdown() {
+  clearInterval(restTimer.interval);
+  restTimer.endsAt = 0;
+}
+function restTimerTick() {
+  if(!restTimer.endsAt) return;
+  const left = Math.max(0, Math.ceil((restTimer.endsAt - Date.now()) / 1000));
+  if(left !== restTimer.remaining) { restTimer.remaining = left; updateRestTimerDisplay(); }
+  if(left <= 0) { stopRestCountdown(); restTimerDone(); }
+}
+document.addEventListener('visibilitychange', () => { if(!document.hidden) restTimerTick(); });
 
 function updateRestTimerDisplay() {
   const t = restTimer.remaining;
@@ -7014,7 +7031,7 @@ function adjustRest(secs) {
   if(secs > 0) restTimer.duration = Math.max(restTimer.duration, restTimer.remaining);
   updateRestTimerDisplay();
   // Restart countdown from new remaining time
-  clearInterval(restTimer.interval);
+  stopRestCountdown();
   if(restTimer.remaining > 0) startRestCountdown();
 }
 
@@ -7023,7 +7040,7 @@ function skipRest() {
 }
 
 function closeRest() {
-  clearInterval(restTimer.interval);
+  stopRestCountdown();
   document.getElementById('restOverlay').classList.remove('show');
   document.querySelectorAll('.rest-btn').forEach(b => b.classList.remove('resting'));
   // Reset for next use
@@ -8309,15 +8326,14 @@ function drawExProgressChart(sessions, bodyweight) {
 // ══════════════════════════════════════
 // LANTIK HYBRID ATHLETE PROGRAM
 // ══════════════════════════════════════
-// A fixed weekly calendar (recovery, field sessions, Muay Thai, game day) plus a continuous
-// Lower A → Upper A → Lower B → Upper B lifting rotation that never resets with the week. The
-// calendar says which days can take a lift; the rotation says which lift is due; hyPlan() puts
-// the two together and holds a lift back rather than place it on an unsuitable day. It has its
-// own saved state (HY_KEY) and its own screen (#hybridWorkout); the generic program screens and
-// their logs are not touched.
+// A fixed weekly calendar: recovery, field sessions, Muay Thai, game day, and one lift on each of
+// Tuesday–Friday (Lower A, Upper A, Lower B, Upper B). The calendar decides: a missed lift is shown
+// as missed and nothing shifts to another day. It has its own saved state (HY_KEY) and its own
+// screen (#hybridWorkout); the generic program screens and their logs are not touched.
 const HY_KEY = 'trident_hybrid_v1';
 const HY_ROTATION = ['lowerA', 'upperA', 'lowerB', 'upperB'];
 const HY_GYM_DAYS = [1, 2, 3, 4]; // Tuesday–Friday: the only days a lift is ever planned (Monday-first index)
+const HY_CAL_LIFT = { 1: 'lowerA', 2: 'upperA', 3: 'lowerB', 4: 'upperB' }; // the lift each of those days always has
 const HY_STATUS = {
   normal:     { name: 'Normal training', tip: 'Train the plan as written.' },
   reduced:    { name: 'Reduced — fatigue', tip: 'New sessions start as the lighter version, with fewer accessory sets and no nudges to add load.' },
@@ -8548,7 +8564,7 @@ const HY_WORKOUTS = {
     reminders: ['Hydrate through the day.', 'Eat normally, with enough carbohydrate for two games.', 'Get a full night of sleep.'],
     notes: [
       'No hard lower-body lifting, high-volume jumps, exhaustive conditioning or maximal sprinting today.',
-      'A lower-body lift is never placed here. If one is due it stays next in the rotation for a suitable day.'
+      'No lifting is planned on Saturday.'
     ],
     sections: [{ key: 'main', title: 'OPTIONAL RECOVERY', checkable: true, optional: true, items: [
       hyEx('easy_walk', 'Easy Walk', 'timed', 1, '10–20 min'),
@@ -8611,7 +8627,7 @@ const HY_WORKOUTS = {
   }
 };
 
-// Monday-first. A gym slot has no fixed workout: hyPlan() decides whether the due lift goes there.
+// Monday-first. A gym slot's lift comes from HY_CAL_LIFT.
 const HY_WEEK = [
   [{ key: 'rec', workout: 'recovery' }],
   [{ key: 'fb', workout: 'footballPerf', time: 'Field' }, { key: 'gym', gym: true, time: 'Gym' }],
@@ -8818,84 +8834,14 @@ function hyDaySlots(dayIdx) {
   });
   return slots;
 }
-function hyIsoDate(iso) {
-  const p = String(iso).split('-').map(Number);
-  return new Date(p[0], (p[1] || 1) - 1, p[2] || 1);
-}
-function hyDaysBetween(fromIso, toIso) {
-  return Math.round((hyIsoDate(toIso) - hyIsoDate(fromIso)) / 86400000);
-}
-// Date of the last lower-body lift actually completed ('' if none).
-function hyLastLowerIso() {
-  const todayIso = hyISO(new Date());
-  let last = '';
-  Object.keys(hyState.sessions).forEach(sid => {
-    const x = hyState.sessions[sid];
-    if(x.status === 'completed' && HY_WORKOUTS[x.workoutId].body === 'lower' && x.date <= todayIso && x.date > last) last = x.date;
-  });
-  return last;
-}
-// A day the athlete chose for the workout that is due. Ignored once it is stale.
-function hyPlacement() {
-  const pl = hyState.placement;
-  if(!pl || pl.workoutId !== HY_ROTATION[hyState.rotationIdx] || pl.date < hyISO(new Date())) return null;
-  return pl;
-}
-// Why a workout should not be lifted on a given day ('' when the day suits it).
-function hyUnsuitable(workoutId, iso, lastLowerIso, placement) {
-  const dow = hyDow(hyIsoDate(iso));
-  if(!HY_GYM_DAYS.includes(dow)) return 'no lifting is planned on this day';
-  if(placement && placement.workoutId === workoutId) {
-    if(placement.date === iso) return '';
-    if(iso < placement.date) return 'you moved it to ' + hyDateLabel(placement.date);
-  }
-  if(HY_WORKOUTS[workoutId].body === 'lower') {
-    if(dow === 4) return 'Friday is too close to Sunday\'s games for a lower-body lift';
-    if(lastLowerIso && hyDaysBetween(lastLowerIso, iso) < 2) return 'it is too soon after your last lower-body lift';
-  }
-  return '';
-}
-// The lifting plan from today forward: which gym workout lands on which day, and where the
-// rotation is being held back instead of putting a lift on a day that does not suit it. A held
-// workout is never skipped: it stays next in the rotation. Reading the plan changes nothing.
-function hyPlan() {
-  const out = {};
-  const now = new Date();
-  const placement = hyPlacement();
-  let p = hyState.rotationIdx, first = true, lastLower = hyLastLowerIso();
-  for(let i = 0; i < 14; i++) {
-    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i), iso = hyISO(d);
-    if(!HY_GYM_DAYS.includes(hyDow(d))) continue;
-    const sess = hyState.sessions[iso + '_gym'];
-    if(sess) {
-      // Already started here. If it is the due workout and still open, it moves the rotation when finished.
-      if(sess.status === 'in_progress' && !sess.advanced && HY_ROTATION[p % HY_ROTATION.length] === sess.workoutId) {
-        if(HY_WORKOUTS[sess.workoutId].body === 'lower') lastLower = iso;
-        p++; first = false;
-      }
-      continue;
-    }
-    const id = HY_ROTATION[p % HY_ROTATION.length];
-    const why = hyUnsuitable(id, iso, lastLower, first ? placement : null);
-    if(why) { out[iso] = { held: id, why }; continue; }
-    out[iso] = { workoutId: id };
-    if(HY_WORKOUTS[id].body === 'lower') lastLower = iso;
-    p++; first = false;
-  }
-  const days = Object.keys(out).sort();
-  days.forEach(iso => { if(out[iso].held) out[iso].movedTo = days.find(k => k > iso && out[k].workoutId === out[iso].held) || ''; });
-  return out;
-}
-// Which workout a slot shows (null when the plan is holding the due lift back from this day).
-// Looking never changes anything: a gym slot is bound to a workout only once a session is started.
-function hySlotWorkoutId(dayIdx, slot, plan) {
+// Which workout a slot shows. Looking never changes anything: a gym slot is bound to a workout
+// only once a session is started.
+function hySlotWorkoutId(dayIdx, slot) {
   if(!slot.gym) return slot.workout;
   const existing = hyState.sessions[hySid(dayIdx, slot.key)];
   if(existing) return existing.workoutId;
-  // An earlier day this week with nothing logged: the due workout can still be logged late.
-  if(dayIdx < hyDow(new Date())) return HY_ROTATION[hyState.rotationIdx];
-  const entry = (plan || hyPlan())[hyISO(hyDayDate(dayIdx))];
-  return entry && entry.workoutId ? entry.workoutId : null;
+  // The calendar decides: each gym day always has its own lift, whatever happened earlier in the week.
+  return HY_CAL_LIFT[dayIdx] || null;
 }
 function hyCtx() {
   if(!hyView.open) return null;
@@ -8905,7 +8851,7 @@ function hyCtx() {
   const sid = hySid(dayIdx, slot.key);
   const sess = hyState.sessions[sid] || null;
   const workoutId = sess ? sess.workoutId : hySlotWorkoutId(dayIdx, slot);
-  if(!workoutId) return null; // a gym slot the plan is holding back has nothing to open
+  if(!workoutId) return null;
   return { dayIdx, slot, sid, sess, workoutId, workout: hyWorkout(workoutId), future: dayIdx > hyDow(new Date()) };
 }
 // Creates the session on the first real action (a logged set, a tick, a note), never on viewing.
@@ -8913,13 +8859,11 @@ function hyEnsureSession() {
   const c = hyCtx();
   if(!c || c.future) return null;
   if(c.sess) return c.sess;
-  const place = hyPlacement();
-  const forcedToday = !!(c.slot.gym && place && place.forced && place.date === c.sid.slice(0, 10) && place.workoutId === c.workoutId);
   const sess = {
     id: c.sid, workoutId: c.workoutId, date: c.sid.slice(0, 10), slot: c.slot.key, status: 'in_progress',
     startedAt: Date.now(), finishedAt: 0, blockWeek: hyBlockWeek(),
-    // A lift starts as the lighter version when fatigue is flagged, or when it was pushed onto a day that does not suit it.
-    lighter: c.workout.category === 'strength' && (hyState.readiness.status === 'reduced' || forcedToday),
+    // A lift starts as the lighter version when fatigue is flagged.
+    lighter: c.workout.category === 'strength' && hyState.readiness.status === 'reduced',
     recoveryOnly: false, advanced: false, check: '', noImpact: false, restricted: false, restDay: false, types: [],
     notes: '', rpe: null, duration: '', intensity: '', games: [], ex: {}
   };
@@ -9039,11 +8983,6 @@ function hyAdvanceRotation(sess, action) {
   hyRotationNote(action, sess.workoutId, sess.id);
   return true;
 }
-function hyLastCompletedGym() {
-  return Object.keys(hyState.sessions).map(id => hyState.sessions[id])
-    .filter(s => s.status === 'completed' && HY_ROTATION.includes(s.workoutId))
-    .sort((a, b) => (b.finishedAt || 0) - (a.finishedAt || 0))[0] || null;
-}
 // Earlier logged sets of one exercise in the same kind of section, newest first.
 function hyHistory(exId, sectionKey, exceptSid) {
   const out = [];
@@ -9083,10 +9022,11 @@ function hyRender() {
   if(hyView.dayIdx < 0 || hyView.dayIdx > 6) hyView.dayIdx = hyDow(new Date());
   root.innerHTML = hyView.open && hyCtx() ? hySessionHTML() : hyWeekHTML();
 }
-function hyStatusChip(workout, sess, future) {
+function hyStatusChip(workout, sess, future, past) {
   if(sess && sess.status === 'completed') return `<span class="hy-chip done">✓ Completed</span>`;
   if(sess && sess.status === 'skipped') return `<span class="hy-chip">Skipped</span>`;
-  if(sess) return `<span class="hy-chip live">In progress · ${hySessionProgress(workout, sess).pct}%</span>`;
+  if(sess) return past ? `<span class="hy-chip warn">Not finished · ${hySessionProgress(workout, sess).pct}%</span>` : `<span class="hy-chip live">In progress · ${hySessionProgress(workout, sess).pct}%</span>`;
+  if(past) return `<span class="hy-chip">${workout.category === 'strength' ? 'Missed' : 'Not logged'}</span>`;
   if(workout.placeholder && !workout.configured) return `<span class="hy-chip warn">Needs set-up</span>`;
   return future ? `<span class="hy-chip">Planned</span>` : `<span class="hy-chip">Not started</span>`;
 }
@@ -9099,55 +9039,40 @@ function hySlotMeta(workout) {
 function hyWeekHTML() {
   const prog = getProgram(selectedProgram);
   const today = hyDow(new Date()), dayIdx = hyView.dayIdx;
-  const week = hyBlockWeek(), status = hyState.readiness.status, plan = hyPlan();
+  const week = hyBlockWeek(), status = hyState.readiness.status;
   const iso = hyISO(hyDayDate(dayIdx));
-  const nextId = HY_ROTATION[hyState.rotationIdx], next = hyWorkout(nextId), last = hyLastCompletedGym();
-  const nextDate = Object.keys(plan).sort().find(k => plan[k].workoutId === nextId) || '';
-  const chosen = hyPlacement();
   const tabs = HY_DAYS.map((d, i) => {
     const date = hyDayDate(i);
     return `<button class="wday-tab${i === dayIdx ? ' active' : ''}" onclick="hyPickDay(${i})">${d.slice(0, 3)} ${date.getDate()}${i === today ? ' •' : ''}</button>`;
   }).join('');
   const slots = hyDaySlots(dayIdx).map(slot => {
     const sess = hyState.sessions[hySid(dayIdx, slot.key)] || null;
-    const wid = hySlotWorkoutId(dayIdx, slot, plan);
-    if(!wid) {
-      // The rotation's next lift does not suit this day: say so, and keep it queued.
-      const held = plan[iso] && plan[iso].held ? plan[iso] : null;
-      if(!held) return '';
-      const hw = hyWorkout(held.held), moved = held.why.indexOf('you moved it') === 0;
-      return `<div class="hy-slot held">
-        <div class="hy-slot-top"><span class="hy-tag">${hyEsc([slot.time, 'Strength'].filter(Boolean).join(' · '))}</span><span class="hy-chip">No lift planned</span></div>
-        <div class="hy-slot-name">${hyEsc(hw.name)} is due — not today</div>
-        <div class="hy-slot-meta">${hyEsc(held.why.charAt(0).toUpperCase() + held.why.slice(1))}.${!moved && held.movedTo ? ` It is planned for ${hyEsc(hyDateLabel(held.movedTo))}.` : ''} It stays next in the rotation and is not skipped.</div>
-        <div class="hy-actions">
-          <button onclick="hyMoveSheet()">Choose a day</button>
-          ${dayIdx === today && !moved ? `<button onclick="hyPlaceOn('${iso}',true)">Do it today, lighter</button>` : ''}
-          <button onclick="hySkipDueSheet()">Skip it in the rotation…</button>
-        </div>
-      </div>`;
-    }
+    const wid = hySlotWorkoutId(dayIdx, slot);
+    if(!wid) return '';
     const workout = hyWorkout(wid);
     const prog2 = sess ? hySessionProgress(workout, sess) : null;
     const when = [slot.legacy ? 'Earlier plan' : slot.time, workout.tag].filter(Boolean).join(' · ');
     let why = '';
-    if(slot.gym && !sess && dayIdx >= today) {
-      if(chosen && chosen.date === iso && chosen.workoutId === wid) why = chosen.forced ? 'You chose to do this today. It starts as the lighter version.' : 'You moved this here.';
-      else if(wid === 'lowerB' && dayIdx === 3) why = 'Placed here by the rotation: Saturday is kept clear before Sunday\'s games.';
+    if(dayIdx < today && slot.gym) {
+      if(!sess) why = 'Nothing was logged. If you did it, open it to log it late.';
+      else if(sess.status === 'in_progress') why = 'Not finished. If you did it, open it and tap Finish.';
     }
     return `<div class="hy-slot" onclick="hyOpen('${slot.key}')">
-      <div class="hy-slot-top"><span class="hy-tag">${hyEsc(when)}</span>${hyStatusChip(workout, sess, dayIdx > today)}</div>
+      <div class="hy-slot-top"><span class="hy-tag">${hyEsc(when)}</span>${hyStatusChip(workout, sess, dayIdx > today, dayIdx < today)}</div>
       <div class="hy-slot-name">${hyEsc(workout.name)}</div>
-      <div class="hy-slot-meta">${hyEsc(hySlotMeta(workout))}${slot.gym && HY_ROTATION.includes(workout.id) ? ` · rotation ${HY_ROTATION.indexOf(workout.id) + 1} of ${HY_ROTATION.length}` : ''}</div>
-      ${why ? `<div class="hy-slot-meta" style="color:var(--pink);">${hyEsc(why)}</div>` : ''}
+      <div class="hy-slot-meta">${hyEsc(hySlotMeta(workout))}</div>
+      ${why ? `<div class="hy-slot-meta" style="color:var(--text2);">${hyEsc(why)}</div>` : ''}
       ${slot.gym && workout.body === 'lower' && dayIdx === 4 && !(sess && sess.status !== 'in_progress') ? `<div class="hy-warn-line">Lower-body lift close to Sunday's games — keep it light, or move it.</div>` : ''}
       ${prog2 && sess.status === 'in_progress' ? `<div class="hy-bar"><div style="width:${prog2.pct}%"></div></div>` : ''}
     </div>`;
   }).join('');
-  const rotation = HY_ROTATION.map((id, i) => {
-    const w = hyWorkout(id);
-    return `<button class="hy-rot${i === hyState.rotationIdx ? ' next' : ''}${hyConfigured(id) ? '' : ' todo'}" onclick="hyPreview('${id}')">${hyEsc(w.short)}</button>`;
-  }).join('<span class="hy-rot-arrow">→</span>');
+  // The four lifts of this week, one per gym day, with what happened to each.
+  const lifts = HY_GYM_DAYS.map(d => {
+    const sess = hyState.sessions[hySid(d, 'gym')] || null, w = hyWorkout(sess ? sess.workoutId : HY_CAL_LIFT[d]);
+    const state = sess ? (sess.status === 'completed' ? '✓ Done' : sess.status === 'skipped' ? 'Skipped' : (d < today ? 'Not finished' : 'In progress'))
+      : (d < today ? 'Missed' : d === today ? 'Today' : (w.placeholder && !w.configured ? 'Needs set-up' : 'Planned'));
+    return `<button class="hy-hist" onclick="hyPickDay(${d})"><span>${HY_DAYS[d].slice(0, 3)} · ${hyEsc(w.short || w.name)}</span><span class="hy-muted">${hyEsc(state)}</span></button>`;
+  }).join('');
   const history = Object.keys(hyState.sessions).map(id => hyState.sessions[id]).filter(x => x.status !== 'in_progress')
     .sort((a, b) => a.id < b.id ? 1 : -1).slice(0, 8);
   return `
@@ -9167,18 +9092,11 @@ function hyWeekHTML() {
     <div class="workout-day-tabs">${tabs}</div>
     <div class="hy-day-title">${HY_DAYS[dayIdx]} · ${hyEsc(hyDateLabel(iso).replace(/^\w+, /, ''))}${dayIdx === today ? ' · Today' : ''}</div>
     ${slots}
-    ${dayIdx === 5 ? `<div class="hy-banner">Saturday stays free of lifting before Sunday's games — a lower-body session is never placed here. ${hyEsc(next.name)} is next in the rotation${nextDate ? `, planned for ${hyEsc(hyDateLabel(nextDate))}` : ''}.</div>` : ''}
+    ${dayIdx === 5 ? `<div class="hy-banner">Saturday stays free of lifting before Sunday's games.</div>` : ''}
     <div class="hy-card">
-      <div class="hy-card-title">Lifting rotation</div>
-      <div class="hy-card-sub">Lower A, Upper A, Lower B, Upper B, then round again. It carries on from where you left off, does not restart on Mondays, and only moves when you finish or skip a gym workout.</div>
-      <div class="hy-rot-row">${rotation}</div>
-      <div class="hy-kv"><span>Next gym workout</span><button class="hy-link" onclick="hyPreview('${nextId}')">${hyEsc(next.name)}</button></div>
-      <div class="hy-kv"><span>Planned for</span><span>${nextDate ? hyEsc(hyDateLabel(nextDate)) + (nextDate === hyISO(new Date()) ? ' · today' : '') : 'In progress or not placed yet'}</span></div>
-      <div class="hy-kv"><span>Last completed</span>${last ? `<button class="hy-link" onclick="hySummary('${last.id}')">${hyEsc(hyWorkout(last.workoutId).short)} · ${hyEsc(hyDateLabel(last.date))}</button>` : '<span class="hy-muted">None yet</span>'}</div>
-      <div class="hy-actions">
-        <button onclick="hyMoveSheet()">Move it to another day…</button>
-        <button onclick="hySetNextSheet()">Set the next workout…</button>
-      </div>
+      <div class="hy-card-title">This week's lifts</div>
+      <div class="hy-card-sub">Every week: Tuesday Lower A, Wednesday Upper A, Thursday Lower B, Friday Upper B. A missed lift stays missed — the next days don't shift.</div>
+      ${lifts}
     </div>
     ${history.length ? `<div class="hy-card">
       <div class="hy-card-title">History</div>
@@ -9361,9 +9279,8 @@ function hySessionHTML() {
   let middle;
   if(needsSetup) {
     middle = `<div class="hy-card"><div class="hy-card-title">${hyEsc(w.name)} needs setting up</div>
-      <div class="hy-card-sub">This workout was left for you to design. Nothing has been filled in for you. Add its primer and main exercises, or skip it for now.</div>
-      <button class="pink-btn" onclick="hyEditor('${w.id}')">Set up ${hyEsc(w.short)}</button>
-      ${isGym && !c.future ? `<button class="hy-ghost" style="margin:8px 0 0;" onclick="hySkipToConfigured()">Skip to the next workout that is set up</button>` : ''}</div>`;
+      <div class="hy-card-sub">This workout was left for you to design. Nothing has been filled in for you. Add its primer and main exercises.</div>
+      <button class="pink-btn" onclick="hyEditor('${w.id}')">Set up ${hyEsc(w.short)}</button></div>`;
   } else if(w.category === 'sport') {
     const types = sess ? sess.types : [];
     middle = `<div class="hy-section"><div class="hy-section-head static"><span class="hy-section-title">PRACTICE</span><span class="hy-section-count${done ? ' done' : ''}">${done ? '✓ Done' : 'Not logged'}</span></div>
@@ -9377,7 +9294,6 @@ function hySessionHTML() {
   }
   const parts = (w.sections || []).filter(sec => !sec.optional).map(sec => { const pr = hySectionProgress(w, sec, sess); return `${sec.title.charAt(0) + sec.title.slice(1).toLowerCase()} ${pr.done}/${pr.total}`; });
   if(w.games) parts.push(`Games ${hyGamesProgress(w, sess).done}/${w.games}`);
-  const canMove = isGym && !sess && !c.future && c.workoutId === HY_ROTATION[hyState.rotationIdx];
   return `
     <button class="hy-back" onclick="hyBack()">‹ ${HY_DAYS[c.dayIdx]}</button>
     <div class="hy-head">
@@ -9402,7 +9318,6 @@ function hySessionHTML() {
         ${w.category === 'strength' && !done && !skipped ? `<button onclick="hyToggleLighter()">${sess && sess.lighter ? 'Back to the full session' : 'Lighter session'}</button>` : ''}
         ${hasImpact && !done && !skipped && status !== 'restricted' ? `<button onclick="hyToggleNoImpact()">${sess && sess.noImpact ? 'Put impact work back' : 'Leave out impact work'}</button>` : ''}
         ${w.recoveryOnlyOption && !done ? `<button onclick="hyToggleRecoveryOnly()">${sess && sess.recoveryOnly ? 'Back to the full session' : 'Make it recovery-only'}</button>` : ''}
-        ${canMove ? `<button onclick="hyMoveSheet()">Move to another day…</button>` : ''}
         ${w.placeholder ? `<button onclick="hyEditor('${w.id}')">Edit exercises</button>` : ''}
         ${!done && !skipped ? `<button onclick="hySkipSheet()">Skip…</button>` : ''}
       </div>
@@ -9568,7 +9483,7 @@ function hyLogSet(key, setIdx) {
   overlay.querySelector('.rest-log-title').textContent = f.required ? 'Log completed set' : 'Log it (numbers optional)';
   document.getElementById('restTimerEx').textContent = `${hyExName(c.workout.id, key, ex)} — ${ex.kind === 'sprint' ? 'Rep' : 'Set'} ${setIdx + 1}`;
   restTimer.activeEi = null; restTimer.activeSet = null;
-  clearInterval(restTimer.interval);
+  stopRestCountdown();
   overlay.classList.add('show');
   if(timed) {
     restTimer.duration = ex.rest; restTimer.remaining = ex.rest;
@@ -9633,26 +9548,12 @@ function hyWorkoutListHTML(workout) {
 }
 function hyPreview(id) {
   const w = hyWorkout(id);
-  const pos = HY_ROTATION.indexOf(id);
+  const day = HY_GYM_DAYS.find(d => HY_CAL_LIFT[d] === id);
   hySheet(`<div class="cm-sheet-title">${hyEsc(w.name)}</div>
-    <div class="hy-muted">Rotation ${pos + 1} of ${HY_ROTATION.length}${pos === hyState.rotationIdx ? ' · next up' : ''}</div>
+    ${day !== undefined ? `<div class="hy-muted">Every ${HY_DAYS[day]}</div>` : ''}
     ${w.placeholder && !w.configured ? `<div class="hy-banner warn" style="margin-top:12px;">Needs setting up — nothing has been filled in for you.</div>` : hyWorkoutListHTML(w)}
     ${w.placeholder ? `<button class="pink-btn" style="margin-top:14px;" onclick="hyEditor('${id}')">${w.configured ? 'Edit exercises' : 'Set up ' + hyEsc(w.short)}</button>` : ''}
     <button class="ghost-btn" style="margin-top:8px;" onclick="hySheetClose()">Close</button>`);
-}
-function hySetNextSheet() {
-  hySheet(`<div class="cm-sheet-title">Set the next gym workout</div>
-    <div class="hy-muted" style="margin-bottom:12px;">Moves the rotation to the workout you pick. Your history is not changed.</div>
-    ${HY_ROTATION.map((id, i) => `<button class="cm-pick" onclick="hySetNext(${i})">${hyEsc(hyWorkout(id).name)}${i === hyState.rotationIdx ? '<small>Currently next</small>' : (hyConfigured(id) ? '' : '<small>Needs setting up</small>')}</button>`).join('')}
-    <button class="ghost-btn" style="margin-top:8px;" onclick="hySheetClose()">Cancel</button>`);
-}
-function hySetNext(i) {
-  if(!(i >= 0 && i < HY_ROTATION.length)) return;
-  hyState.rotationIdx = i;
-  hyState.placement = null;
-  hyRotationNote('set', HY_ROTATION[i], '');
-  hySave(true); hySheetClose(); hyRender();
-  showToast(`${hyWorkout(HY_ROTATION[i]).short} is next`);
 }
 function hyStatusSheet() {
   const status = hyState.readiness.status;
@@ -9669,47 +9570,6 @@ function hySetStatus(status) {
   hyState.readiness = { status, since: Date.now() };
   hySave(true); hySheetClose(); hyRender();
   showToast(HY_STATUS[status].name);
-}
-function hyMoveSheet() {
-  const id = HY_ROTATION[hyState.rotationIdx], w = hyWorkout(id);
-  const started = Object.keys(hyState.sessions).some(sid => { const x = hyState.sessions[sid]; return x.slot === 'gym' && x.workoutId === id && x.status === 'in_progress' && !x.advanced; });
-  if(started) { showToast(`${w.short} is already started`); return; }
-  const now = new Date(), lastLower = hyLastLowerIso(), chosen = hyPlacement(), options = [];
-  for(let i = 0; i < 14 && options.length < 6; i++) {
-    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i), iso = hyISO(d);
-    if(!HY_GYM_DAYS.includes(hyDow(d)) || hyState.sessions[iso + '_gym']) continue;
-    if(!hyUnsuitable(id, iso, lastLower, null)) options.push(iso);
-  }
-  hySheet(`<div class="cm-sheet-title">Move ${hyEsc(w.name)}</div>
-    <div class="hy-muted" style="margin-bottom:12px;">These are the days that suit it. It stays next in the rotation until you do it or choose to skip it — moving it never skips it.</div>
-    ${options.map(iso => `<button class="cm-pick" onclick="hyPlaceOn('${iso}')">${hyEsc(hyDateLabel(iso))}${chosen && chosen.date === iso ? ' ✓' : ''}${iso === hyISO(now) ? '<small>Today</small>' : ''}</button>`).join('') || '<div class="hy-muted" style="margin-bottom:8px;">No suitable day in the next two weeks.</div>'}
-    ${chosen ? `<button class="cm-pick" onclick="hyPlaceOn('')">Let the plan place it<small>Goes to the first day that suits it.</small></button>` : ''}
-    <button class="ghost-btn" style="margin-top:8px;" onclick="hySheetClose()">Cancel</button>`);
-}
-function hyPlaceOn(iso, forced) {
-  const id = HY_ROTATION[hyState.rotationIdx];
-  if(!iso) hyState.placement = null;
-  else if(/^\d{4}-\d{2}-\d{2}$/.test(iso)) hyState.placement = { workoutId: id, date: iso, forced: !!forced };
-  hySave(true); hySheetClose(); hyRender();
-  showToast(iso ? `${hyWorkout(id).short} planned for ${hyDateLabel(iso)}` : 'The plan will place it');
-}
-// Skipping the due lift from a day that is holding it back (no session exists to skip).
-function hySkipDueSheet() {
-  const id = HY_ROTATION[hyState.rotationIdx], w = hyWorkout(id);
-  const after = hyWorkout(HY_ROTATION[(hyState.rotationIdx + 1) % HY_ROTATION.length]);
-  hySheet(`<div class="cm-sheet-title">Skip ${hyEsc(w.short)} in the rotation?</div>
-    <div class="hy-muted" style="margin-bottom:12px;">It will not be marked as done. It simply comes round again next cycle.</div>
-    <button class="cm-pick" onclick="hySheetClose();hyMoveSheet()">Reschedule it<small>Keep ${hyEsc(w.short)} next and pick a day that suits it.</small></button>
-    <button class="cm-pick" onclick="hySkipDue()">Skip it — move on to ${hyEsc(after.short)}<small>${hyEsc(w.short)} is passed over for this round.</small></button>
-    <button class="ghost-btn" style="margin-top:8px;" onclick="hySheetClose()">Cancel</button>`);
-}
-function hySkipDue() {
-  const id = HY_ROTATION[hyState.rotationIdx];
-  hyState.rotationIdx = (hyState.rotationIdx + 1) % HY_ROTATION.length;
-  hyState.placement = null;
-  hyRotationNote('skipped', id, '');
-  hySave(true); hySheetClose(); hyRender();
-  showToast(`${hyWorkout(HY_ROTATION[hyState.rotationIdx]).short} is next`);
 }
 function hyBlockSheet() {
   const week = hyBlockWeek();
@@ -9757,19 +9617,9 @@ function hyExHistory(key) {
 // ── Skipping, finishing, summaries ───────────────────────────────────────────
 function hySkipSheet() {
   const c = hyGuard(); if(!c) return;
-  if(!c.slot.gym) {
-    hySheet(`<div class="cm-sheet-title">Skip ${hyEsc(c.workout.name)}?</div>
-      <div class="hy-muted" style="margin-bottom:12px;">It is recorded as skipped. Nothing is marked as done, and what you logged stays.</div>
-      <button class="pink-btn" onclick="hySkip(false)">Skip this session</button>
-      <button class="ghost-btn" style="margin-top:8px;" onclick="hySheetClose()">Cancel</button>`);
-    return;
-  }
-  const isNext = HY_ROTATION[hyState.rotationIdx] === c.workoutId;
-  const after = hyWorkout(HY_ROTATION[(HY_ROTATION.indexOf(c.workoutId) + 1) % HY_ROTATION.length]);
-  hySheet(`<div class="cm-sheet-title">Skip ${hyEsc(c.workout.short)} today?</div>
-    <div class="hy-muted" style="margin-bottom:12px;">Choose what the rotation does. Nothing is marked as done either way.</div>
-    <button class="cm-pick" onclick="hySkip(false)">Reschedule it — keep ${hyEsc(c.workout.short)} next<small>It moves to the next day that suits it. The sequence is unchanged.</small></button>
-    ${isNext ? `<button class="cm-pick" onclick="hySkip(true)">Skip it in the rotation — move on to ${hyEsc(after.short)}<small>${hyEsc(c.workout.short)} is passed over for this round.</small></button>` : ''}
+  hySheet(`<div class="cm-sheet-title">Skip ${hyEsc(c.workout.name)}?</div>
+    <div class="hy-muted" style="margin-bottom:12px;">It is recorded as skipped. Nothing is marked as done, what you logged stays, and the rest of the week is unchanged.</div>
+    <button class="pink-btn" onclick="hySkip(false)">Skip this session</button>
     <button class="ghost-btn" style="margin-top:8px;" onclick="hySheetClose()">Cancel</button>`);
 }
 function hySkip(advance) {
@@ -9792,20 +9642,6 @@ function hyUndoSkip() {
   }
   sess.advanced = false; sess.status = 'in_progress'; sess.finishedAt = 0;
   hySave(true); hyRender();
-}
-function hySkipToConfigured() {
-  const c = hyGuard(); if(!c) return;
-  for(let step = 1; step <= HY_ROTATION.length; step++) {
-    const i = (hyState.rotationIdx + step) % HY_ROTATION.length;
-    if(hyConfigured(HY_ROTATION[i])) {
-      hyState.rotationIdx = i;
-      hyState.placement = null;
-      hyRotationNote('set', HY_ROTATION[i], '');
-      hySave(true); hyRender();
-      showToast(`${hyWorkout(HY_ROTATION[i]).short} is next`);
-      return;
-    }
-  }
 }
 function hyPending(workout, sess) {
   if(sess && sess.restDay) return 0;
@@ -9875,11 +9711,17 @@ function hySummary(sid, extra) {
   hySheet(`<div class="cm-sheet-title">${sess.status === 'skipped' ? 'Skipped' : (extra ? 'Session saved' : 'Session')} — ${hyEsc(w.short || w.name)}</div>
     <div class="hy-muted" style="margin-bottom:12px;">${hyEsc(hyDateLabel(sess.date))}${sess.restDay ? ' · complete rest day' : ''}${(sess.types || []).length ? ' · ' + hyEsc(sess.types.join(', ')) : ''}${sess.intensity ? ' · ' + hyEsc(sess.intensity) + ' intensity' : ''}${sess.lighter ? ' · lighter session' : ''}${sess.recoveryOnly ? ' · recovery-only' : ''}${sess.restricted ? ' · impact work locked' : ''}${sess.check === 'tired' ? ' · felt tired' : sess.check === 'pain' ? ' · reported pain' : ''}</div>
     ${stats.length ? `<div class="hy-stats">${stats.map(s => `<div><b>${hyEsc(s[0])}</b><span>${hyEsc(s[1])}</span></div>`).join('')}</div>` : ''}
-    ${x.moved ? `<div class="hy-banner">Rotation moved on. Next gym workout: <strong>${hyEsc(hyWorkout(HY_ROTATION[hyState.rotationIdx]).short)}</strong>.</div>` : ''}
     ${detail}${games ? `<div class="hy-sheet-sec">GAMES</div>${games}` : ''}
     ${sess.notes ? `<div class="hy-sheet-sec">NOTES</div><div class="hy-cue">${hyEsc(sess.notes)}</div>` : ''}
     ${window._hyShare && sess.status === 'completed' && isLoggedIn() ? `<button class="ghost-btn" style="margin-top:14px;" onclick="hyShare()">Share to Community</button>` : ''}
-    <button class="pink-btn" style="margin-top:8px;" onclick="hySheetClose()">Done</button>`);
+    <button class="pink-btn" style="margin-top:8px;" onclick="${extra ? 'hySummaryDone()' : 'hySheetClose()'}">Done</button>`);
+}
+// Done on the summary of a session just finished: back to the day, as the other programs do.
+function hySummaryDone() {
+  hySheetClose();
+  hyBack();
+  window.scrollTo(0, 0);
+  showToast('Workout saved!');
 }
 function hyShare() {
   const share = window._hyShare; if(!share) return;
@@ -9954,13 +9796,10 @@ function hyEditDone() { hySave(true); hySheetClose(); hyRender(); }
 
 // ── Dashboard card ───────────────────────────────────────────────────────────
 function hyDashHTML() {
-  const prog = getProgram(workoutState.program), today = hyDow(new Date()), plan = hyPlan();
+  const prog = getProgram(workoutState.program), today = hyDow(new Date());
   const rows = hyDaySlots(today).map(slot => {
-    const wid = hySlotWorkoutId(today, slot, plan);
-    if(!wid) {
-      const held = plan[hyISO(new Date())];
-      return held && held.held ? `<div class="dwc-ex">No lift today — ${hyEsc(hyWorkout(held.held).short)} is held for a day that suits it</div>` : '';
-    }
+    const wid = hySlotWorkoutId(today, slot);
+    if(!wid) return '';
     const w = hyWorkout(wid), sess = hyState.sessions[hySid(today, slot.key)];
     const state = sess ? (sess.status === 'completed' ? '✓ done' : sess.status === 'skipped' ? 'skipped' : `${hySessionProgress(w, sess).pct}%`) : '';
     return `<div class="dwc-ex">${hyEsc([slot.legacy ? '' : slot.time, w.name].filter(Boolean).join(' — '))}${state ? ` <span style="color:var(--pink);">· ${state}</span>` : ''}</div>`;
