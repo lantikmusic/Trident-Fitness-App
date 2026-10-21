@@ -131,19 +131,25 @@ export default {
     if (path === '/community/posts/delete'    && request.method === 'POST') return community(communityDeletePost, request, env.DB);
     if (path === '/community/like'            && request.method === 'POST') return community(communityToggleLike, request, env.DB);
     if (path === '/community/comments'        && request.method === 'GET')  return community(communityComments, request, env.DB);
-    if (path === '/community/comments'        && request.method === 'POST') return community(communityAddComment, request, env.DB);
+    if (path === '/community/comments'        && request.method === 'POST') return community(communityAddComment, request, env.DB, env, ctx);
     if (path === '/community/comments/delete' && request.method === 'POST') return community(communityDeleteComment, request, env.DB);
     if (path.startsWith('/community/photo/')  && request.method === 'GET')  return community(communityPhoto, path, env.DB);
     if (path.startsWith('/community/avatar/') && request.method === 'GET')  return community(communityAvatar, path, env.DB);
     if (path === '/community/profile'         && request.method === 'GET')  return community(communityProfile, request, env.DB);
-    if (path === '/community/follow'          && request.method === 'POST') return community(communityToggleFollow, request, env.DB);
+    if (path === '/community/follow'          && request.method === 'POST') return community(communityToggleFollow, request, env.DB, env, ctx);
     if (path === '/community/block'           && request.method === 'POST') return community(communityToggleBlock, request, env.DB);
 
     // ── Direct messages ──
     if (path === '/dm/threads'                && request.method === 'GET')  return community(dmThreads, request, env.DB);
     if (path === '/dm/unread'                 && request.method === 'GET')  return community(dmUnread, request, env.DB);
     if (path === '/dm/messages'               && request.method === 'GET')  return community(dmMessages, request, env.DB);
-    if (path === '/dm/send'                   && request.method === 'POST') return community(dmSend, request, env.DB);
+    if (path === '/dm/send'                   && request.method === 'POST') return community(dmSend, request, env.DB, env, ctx);
+
+    // ── Push notifications ──
+    if (path === '/push/key'                  && request.method === 'GET')  return community(pushKey, env);
+    if (path === '/push/subscribe'            && request.method === 'POST') return community(pushSubscribe, request, env.DB, env);
+    if (path === '/push/unsubscribe'          && request.method === 'POST') return community(pushUnsubscribe, request, env.DB);
+    if (path === '/push/test'                 && request.method === 'POST') return community(pushTest, request, env.DB, env);
 
     // ── Profile picture on its own (does not touch the other settings) ──
     if (path === '/user/profile-pic'          && request.method === 'POST') return community(saveProfilePic, request, env.DB);
@@ -925,7 +931,7 @@ async function communityComments(request, DB) {
   return json({ comments: (rows.results || []).map(r => communityCommentOut(r, session.user_id)) });
 }
 
-async function communityAddComment(request, DB) {
+async function communityAddComment(request, DB, env, ctx) {
   const session = await validateSession(request, DB);
   if (!session) return error('Unauthorized', 401);
 
@@ -937,7 +943,7 @@ async function communityAddComment(request, DB) {
   if (!body) return error('Write a comment first');
   if (body.length > COMMUNITY_MAX_COMMENT) return error(`Comments are limited to ${COMMUNITY_MAX_COMMENT} characters`);
 
-  const post = await DB.prepare('SELECT id FROM community_posts WHERE id = ?').bind(postId).first();
+  const post = await DB.prepare('SELECT id, user_id FROM community_posts WHERE id = ?').bind(postId).first();
   if (!post) return error('Post not found', 404);
 
   const recent = await DB.prepare(
@@ -952,6 +958,9 @@ async function communityAddComment(request, DB) {
 
   const row = await DB.prepare(`${COMMUNITY_COMMENT_SELECT} WHERE c.id = ?`).bind(id).first();
   const count = await DB.prepare('SELECT COUNT(*) AS n FROM community_comments WHERE post_id = ?').bind(postId).first();
+  if (post.user_id !== session.user_id && !(await dmBlockedBetween(DB, post.user_id, session.user_id))) {
+    pushLater(ctx, env, DB, post.user_id, { title: `${(row && row.author_name) || 'Someone'} commented on your post`, body: body.slice(0, 140), tag: 'post-' + postId, open: 'post:' + postId });
+  }
   return json({ success: true, comment: communityCommentOut(row, session.user_id), comment_count: (count && count.n) || 0 });
 }
 
@@ -1015,7 +1024,7 @@ async function communityProfile(request, DB) {
   });
 }
 
-async function communityToggleFollow(request, DB) {
+async function communityToggleFollow(request, DB, env, ctx) {
   const session = await validateSession(request, DB);
   if (!session) return error('Unauthorized', 401);
   const target = await communityTarget(request);
@@ -1029,6 +1038,8 @@ async function communityToggleFollow(request, DB) {
     const blocked = await DB.prepare('SELECT 1 AS x FROM dm_blocks WHERE (blocker_id = ?1 AND blocked_id = ?2) OR (blocker_id = ?2 AND blocked_id = ?1)').bind(session.user_id, target).first();
     if (blocked) return error('You cannot follow this member', 403);
     await DB.prepare('INSERT OR IGNORE INTO community_follows (follower_id, followee_id, created_at) VALUES (?, ?, ?)').bind(session.user_id, target, new Date().toISOString()).run();
+    const me = await communityUserRow(DB, session.user_id);
+    pushLater(ctx, env, DB, target, { title: 'New follower', body: `${(me && me.name) || 'Someone'} started following you`, tag: 'follow-' + session.user_id, open: 'profile:' + session.user_id });
   }
   const count = await DB.prepare('SELECT COUNT(*) AS n FROM community_follows WHERE followee_id = ?').bind(target).first();
   return json({ success: true, following: !existing, followers: (count && count.n) || 0 });
@@ -1125,7 +1136,7 @@ async function dmMessages(request, DB) {
   });
 }
 
-async function dmSend(request, DB) {
+async function dmSend(request, DB, env, ctx) {
   const session = await validateSession(request, DB);
   if (!session) return error('Unauthorized', 401);
   let data;
@@ -1143,7 +1154,149 @@ async function dmSend(request, DB) {
   const id = generateId(), now = new Date().toISOString();
   await DB.prepare('INSERT INTO dm_messages (id, sender_id, recipient_id, body, created_at) VALUES (?, ?, ?, ?, ?)')
     .bind(id, session.user_id, to, body, now).run();
+  const me = await communityUserRow(DB, session.user_id);
+  pushLater(ctx, env, DB, to, { title: (me && me.name) || 'New message', body: body.slice(0, 140), tag: 'dm-' + session.user_id, open: 'dm:' + session.user_id, urgent: true });
   return json({ success: true, message: { id, body, created_at: now, mine: true, read: false } });
+}
+
+// ── Web Push (RFC 8030 delivery, RFC 8291 aes128gcm encryption, RFC 8292 VAPID) ──
+// The VAPID private key is the Cloudflare secret VAPID_PRIVATE_JWK (a P-256 JWK with d, x, y).
+const PUSH_HOST = /^(?:[a-z0-9-]+\.)*(?:push\.apple\.com|fcm\.googleapis\.com|push\.services\.mozilla\.com|notify\.windows\.com)$/;
+const PUSH_MAX_PER_USER = 10;
+const textBytes = s => new TextEncoder().encode(s);
+function b64url(bytes) {
+  let s = '';
+  for (const b of new Uint8Array(bytes)) s += String.fromCharCode(b);
+  return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+function unb64url(str) {
+  const s = String(str).replace(/-/g, '+').replace(/_/g, '/');
+  const bin = atob(s + '==='.slice((s.length + 3) % 4));
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+function joinBytes(...parts) {
+  const out = new Uint8Array(parts.reduce((n, p) => n + p.length, 0));
+  let o = 0;
+  for (const p of parts) { out.set(p, o); o += p.length; }
+  return out;
+}
+async function hkdf(salt, ikm, info, length) {
+  const key = await crypto.subtle.importKey('raw', ikm, 'HKDF', false, ['deriveBits']);
+  return new Uint8Array(await crypto.subtle.deriveBits({ name: 'HKDF', hash: 'SHA-256', salt, info }, key, length * 8));
+}
+let vapidCache = null;
+async function vapidKeys(env) {
+  if (!env.VAPID_PRIVATE_JWK) return null;
+  if (vapidCache && vapidCache.src === env.VAPID_PRIVATE_JWK) return vapidCache;
+  const jwk = JSON.parse(env.VAPID_PRIVATE_JWK);
+  const key = await crypto.subtle.importKey('jwk', { kty: 'EC', crv: 'P-256', d: jwk.d, x: jwk.x, y: jwk.y, ext: true },
+    { name: 'ECDSA', namedCurve: 'P-256' }, false, ['sign']);
+  vapidCache = { src: env.VAPID_PRIVATE_JWK, key, pub: joinBytes(new Uint8Array([4]), unb64url(jwk.x), unb64url(jwk.y)) };
+  return vapidCache;
+}
+async function vapidHeader(endpoint, keys) {
+  const head = b64url(textBytes(JSON.stringify({ typ: 'JWT', alg: 'ES256' })));
+  const claims = b64url(textBytes(JSON.stringify({ aud: new URL(endpoint).origin, exp: Math.floor(Date.now() / 1000) + 12 * 3600, sub: 'https://tridentfitness.netlify.app' })));
+  const sig = await crypto.subtle.sign({ name: 'ECDSA', hash: 'SHA-256' }, keys.key, textBytes(`${head}.${claims}`));
+  return `vapid t=${head}.${claims}.${b64url(sig)}, k=${b64url(keys.pub)}`;
+}
+// `fixed` is only for checking against the RFC 8291 example: { senderJwk, salt }.
+async function encryptPush(p256dh, auth, payload, fixed) {
+  const uaPub = unb64url(p256dh), authSecret = unb64url(auth);
+  const local = fixed
+    ? { privateKey: await crypto.subtle.importKey('jwk', fixed.senderJwk, { name: 'ECDH', namedCurve: 'P-256' }, true, ['deriveBits']),
+        publicKey: await crypto.subtle.importKey('jwk', { kty: 'EC', crv: 'P-256', x: fixed.senderJwk.x, y: fixed.senderJwk.y, ext: true }, { name: 'ECDH', namedCurve: 'P-256' }, true, []) }
+    : await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, ['deriveBits']);
+  const asPub = new Uint8Array(await crypto.subtle.exportKey('raw', local.publicKey));
+  const uaKey = await crypto.subtle.importKey('raw', uaPub, { name: 'ECDH', namedCurve: 'P-256' }, false, []);
+  const shared = new Uint8Array(await crypto.subtle.deriveBits({ name: 'ECDH', public: uaKey }, local.privateKey, 256));
+  const ikm = await hkdf(authSecret, shared, joinBytes(textBytes('WebPush: info\0'), uaPub, asPub), 32);
+  const salt = fixed ? fixed.salt : crypto.getRandomValues(new Uint8Array(16));
+  const cek = await hkdf(salt, ikm, textBytes('Content-Encoding: aes128gcm\0'), 16);
+  const nonce = await hkdf(salt, ikm, textBytes('Content-Encoding: nonce\0'), 12);
+  const aes = await crypto.subtle.importKey('raw', cek, 'AES-GCM', false, ['encrypt']);
+  const sealed = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv: nonce }, aes, joinBytes(payload, new Uint8Array([2]))));
+  const header = new Uint8Array(21);
+  header.set(salt, 0);
+  new DataView(header.buffer).setUint32(16, 4096);
+  header[20] = asPub.length;
+  return joinBytes(header, asPub, sealed);
+}
+async function pushOne(env, DB, sub, message, keys) {
+  const body = await encryptPush(sub.p256dh, sub.auth, textBytes(JSON.stringify(message)));
+  const res = await fetch(sub.endpoint, {
+    method: 'POST',
+    headers: {
+      'Authorization': await vapidHeader(sub.endpoint, keys),
+      'Content-Encoding': 'aes128gcm',
+      'Content-Type': 'application/octet-stream',
+      'TTL': '86400',
+      'Urgency': message.urgent ? 'high' : 'normal'
+    },
+    body
+  });
+  // The device unsubscribed or the subscription expired: forget it.
+  if (res.status === 404 || res.status === 410) await DB.prepare('DELETE FROM push_subscriptions WHERE endpoint = ?').bind(sub.endpoint).run();
+  let detail = '';
+  if (!res.ok) { try { detail = (await res.text()).slice(0, 200); } catch (e) {} }
+  return { host: new URL(sub.endpoint).host, status: res.status, detail };
+}
+async function pushToUser(env, DB, userId, message) {
+  const keys = await vapidKeys(env);
+  if (!keys) return [];
+  const rows = await DB.prepare('SELECT endpoint, p256dh, auth FROM push_subscriptions WHERE user_id = ?').bind(userId).all();
+  const msg = { title: String(message.title || 'Trident Fitness').slice(0, 80), body: String(message.body || '').slice(0, 160), tag: message.tag || '', open: message.open || '', urgent: !!message.urgent };
+  return Promise.all((rows.results || []).map(sub => pushOne(env, DB, sub, msg, keys).catch(e => ({ host: '', status: 0, detail: String(e && e.message || e) }))));
+}
+// Sends after the response has gone back, so posting a message or comment is never slowed down.
+function pushLater(ctx, env, DB, userId, message) {
+  const job = pushToUser(env, DB, userId, message).catch(e => console.error('Push failed:', e && e.message));
+  if (ctx && ctx.waitUntil) ctx.waitUntil(job);
+}
+async function pushKey(env) {
+  const keys = await vapidKeys(env);
+  if (!keys) return error('Notifications are not set up on the server', 503);
+  return json({ key: b64url(keys.pub) });
+}
+async function pushSubscribe(request, DB, env) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+  let data;
+  try { data = await request.json(); } catch (e) { return error('Invalid request'); }
+  const endpoint = data && data.endpoint, keys = (data && data.keys) || {};
+  let url;
+  try { url = new URL(endpoint); } catch (e) { return error('Invalid subscription'); }
+  // PUSH_ALLOW_LOCAL is only ever set in local test runs (.dev.vars), never on the live Worker.
+  const localTest = env && env.PUSH_ALLOW_LOCAL === '1' && url.protocol === 'http:' && url.hostname === '127.0.0.1';
+  if ((!localTest && (url.protocol !== 'https:' || !PUSH_HOST.test(url.hostname))) || endpoint.length > 1000) return error('Invalid subscription');
+  let pub, auth;
+  try { pub = unb64url(keys.p256dh); auth = unb64url(keys.auth); } catch (e) { return error('Invalid subscription'); }
+  if (pub.length !== 65 || pub[0] !== 4 || auth.length !== 16) return error('Invalid subscription');
+  const now = new Date().toISOString();
+  await DB.prepare(`INSERT INTO push_subscriptions (endpoint, user_id, p256dh, auth, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)
+    ON CONFLICT(endpoint) DO UPDATE SET user_id = excluded.user_id, p256dh = excluded.p256dh, auth = excluded.auth, updated_at = excluded.updated_at`)
+    .bind(endpoint, session.user_id, keys.p256dh, keys.auth, now, now).run();
+  // Keep the newest few devices per account.
+  await DB.prepare(`DELETE FROM push_subscriptions WHERE user_id = ?1 AND endpoint NOT IN
+    (SELECT endpoint FROM push_subscriptions WHERE user_id = ?1 ORDER BY updated_at DESC LIMIT ${PUSH_MAX_PER_USER})`).bind(session.user_id).run();
+  return json({ success: true });
+}
+async function pushUnsubscribe(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+  let data;
+  try { data = await request.json(); } catch (e) { return error('Invalid request'); }
+  if (!data || typeof data.endpoint !== 'string') return error('Invalid request');
+  await DB.prepare('DELETE FROM push_subscriptions WHERE endpoint = ? AND user_id = ?').bind(data.endpoint, session.user_id).run();
+  return json({ success: true });
+}
+async function pushTest(request, DB, env) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+  const results = await pushToUser(env, DB, session.user_id, { title: 'Trident Fitness', body: 'Notifications are working. 💪', tag: 'test', open: '' });
+  return json({ sent: results.filter(r => r.status >= 200 && r.status < 300).length, results });
 }
 
 // ── Profile picture ──

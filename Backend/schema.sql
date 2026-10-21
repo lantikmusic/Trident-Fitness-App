@@ -186,3 +186,14 @@ CREATE TABLE IF NOT EXISTS dm_messages (
 );
 CREATE INDEX IF NOT EXISTS idx_dm_pair ON dm_messages(sender_id, recipient_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_dm_inbox ON dm_messages(recipient_id, read_at);
+
+-- ── Push notification subscriptions (one row per device) ──
+CREATE TABLE IF NOT EXISTS push_subscriptions (
+  endpoint TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  p256dh TEXT NOT NULL,
+  auth TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_push_user ON push_subscriptions(user_id);

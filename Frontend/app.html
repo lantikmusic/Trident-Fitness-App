@@ -920,6 +920,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .cm-follow{margin-left:auto;flex-shrink:0;background:var(--pink);color:#000;border:none;border-radius:99px;padding:6px 12px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;}
 .cm-follow.on{background:transparent;color:var(--text2);border:0.5px solid var(--border2);}
 .cm-overlay-top{z-index:420;}
+.push-btn{flex-shrink:0;background:var(--pink);color:#000;border:none;border-radius:99px;padding:8px 14px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;}
+.push-btn.off{background:transparent;color:var(--text2);border:0.5px solid var(--border2);}
+.push-btn:disabled{opacity:.5;}
+.cm-push-card{display:flex;align-items:center;gap:12px;background:var(--bg3);border:0.5px solid var(--pink-border);border-radius:var(--radius);padding:12px 14px;margin-bottom:12px;font-size:13px;color:var(--text2);}
 .cm-prof{text-align:center;margin-bottom:14px;}
 .cm-prof .cm-avatar{margin:0 auto 10px;}
 .cm-prof-name{font-size:20px;font-weight:700;word-break:break-word;}
@@ -2077,6 +2081,15 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
   </div>
 
   <!-- Theme Color -->
+  <div class="settings-section">
+    <div class="settings-section-label">Notifications</div>
+    <div class="settings-row">
+      <div style="min-width:0;padding-right:10px;"><div class="settings-row-label">Push notifications</div><div class="settings-row-sub" id="pushStatus">Messages, new followers and comments on your posts</div></div>
+      <div class="settings-row-right"><button class="push-btn" id="pushBtn" style="display:none;" onclick="pushToggle()">Turn on</button></div>
+    </div>
+    <button class="ghost-btn" id="pushTestBtn" style="display:none;margin-top:4px;" onclick="pushSendTest()">Send a test notification</button>
+  </div>
+
   <div class="settings-section">
     <div class="settings-section-label">Accent Color</div>
     <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:12px;">
@@ -7140,6 +7153,7 @@ function saveUSDAKey() {
 
 function openSettings() {
   loadSettingsInputs();
+  pushRefreshUI();
   renderSettingsProgPicker();
   const overlay = document.getElementById('settingsOverlay');
   const sheet = document.getElementById('settingsSheet');
@@ -10288,8 +10302,10 @@ function cmInboxHTML() {
       ${th.unread ? `<span class="cm-unread">${cmNum(th.unread)}</span>` : ''}
     </button>`;
   }).join('');
+  const nudge = window._pushState === 'off'
+    ? `<div class="cm-push-card"><div style="flex:1;">Get a notification when someone messages you.</div><button class="push-btn" onclick="pushEnable().then(()=>{ if(cmDm.view==='inbox') cmDmShow(cmInboxHTML()); })">Turn on</button></div>` : '';
   return `<div class="cm-dm-head"><div class="cm-dm-title">Messages</div><button class="cm-dm-x" onclick="cmCloseDm()">Done</button></div>
-    <div class="cm-dm-body">${body}</div>`;
+    <div class="cm-dm-body">${nudge}${body}</div>`;
 }
 async function cmLoadInbox() {
   const r = await cmApi('/dm/threads');
@@ -10300,6 +10316,7 @@ async function cmLoadInbox() {
 }
 function cmOpenInbox() {
   if(!isLoggedIn()) { showToast('Sign in to use messages'); return; }
+  pushRefreshUI().then(() => { if(cmDm.view === 'inbox') cmDmShow(cmInboxHTML()); });
   cmDm.view = 'inbox'; cmDm.with = null; cmDm.thread = null;
   if(!Array.isArray(cmDm.threads)) cmDm.threads = null;
   cmDmShow(cmInboxHTML());
@@ -10377,6 +10394,141 @@ async function cmSendDm() {
   cmDrawThread();
   const body2 = document.getElementById('cmDmBody'); if(body2) body2.scrollTop = body2.scrollHeight;
 }
+// ── Push notifications ──
+// iPhone delivers them only to the app opened from the Home Screen (iOS 16.4+). The service worker
+// (sw.js) shows them; tapping one opens the conversation, profile or post it is about.
+const PUSH_ON_KEY = 'trident_push_on_v1';
+window._pushState = 'unknown';
+function pushSupported() { return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window; }
+function pushIsIOSBrowserTab() { return /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.navigator.standalone; }
+function pushKeyBytes(b64) {
+  const s = b64.replace(/-/g, '+').replace(/_/g, '/'), bin = atob(s + '==='.slice((s.length + 3) % 4));
+  return Uint8Array.from(bin, c => c.charCodeAt(0));
+}
+async function pushRegistration() {
+  if(!pushSupported()) return null;
+  try { return await navigator.serviceWorker.register('sw.js'); } catch(e) { console.warn('Service worker not registered:', e); return null; }
+}
+async function pushCurrent() {
+  const reg = await pushRegistration();
+  if(!reg) return null;
+  try { return await reg.pushManager.getSubscription(); } catch(e) { return null; }
+}
+async function pushSendSubscription(sub) {
+  const r = await cmApi('/push/subscribe', 'POST', sub.toJSON());
+  return r.ok;
+}
+// Works out what to show: unsupported, needs-home-screen, blocked, signed-out, on or off.
+async function pushRefreshUI() {
+  let state;
+  if(!pushSupported()) state = pushIsIOSBrowserTab() ? 'homescreen' : 'unsupported';
+  else if(!isLoggedIn()) state = 'signedout';
+  else if(Notification.permission === 'denied') state = 'blocked';
+  else state = (Notification.permission === 'granted' && await pushCurrent() && localStorage.getItem(PUSH_ON_KEY) === '1') ? 'on' : 'off';
+  window._pushState = state;
+  const status = document.getElementById('pushStatus'), btn = document.getElementById('pushBtn'), test = document.getElementById('pushTestBtn');
+  if(!status) return state;
+  const text = {
+    homescreen: 'Open Trident from its Home Screen icon to turn these on.',
+    unsupported: 'Not available on this device. iPhone needs iOS 16.4 or later, with Trident opened from the Home Screen.',
+    signedout: 'Sign in to get notifications.',
+    blocked: 'Blocked for Trident. Turn them on in iPhone Settings → Notifications → Trident.',
+    on: 'On for this phone: messages, new followers and comments on your posts.',
+    off: 'Get notified about messages, new followers and comments on your posts.'
+  }[state];
+  status.textContent = text;
+  btn.style.display = (state === 'on' || state === 'off') ? '' : 'none';
+  btn.textContent = state === 'on' ? 'Turn off' : 'Turn on';
+  btn.classList.toggle('off', state === 'on');
+  test.style.display = state === 'on' ? 'block' : 'none';
+  return state;
+}
+async function pushEnable() {
+  if(!pushSupported()) { showToast(pushIsIOSBrowserTab() ? 'Open Trident from its Home Screen icon first' : 'Notifications are not available here'); return; }
+  if(!isLoggedIn()) { showToast('Sign in first'); return; }
+  // Must be the first thing after the tap, or iPhone ignores the request.
+  const permission = await Notification.requestPermission();
+  if(permission !== 'granted') { showToast('Notifications were not allowed'); pushRefreshUI(); return; }
+  const btn = document.getElementById('pushBtn'); if(btn) btn.disabled = true;
+  try {
+    const reg = await pushRegistration();
+    if(!reg) throw new Error('no service worker');
+    await navigator.serviceWorker.ready;
+    const k = await cmApi('/push/key');
+    if(!k.ok || !k.data || !k.data.key) { showToast('Notifications are not set up on the server yet'); return; }
+    let sub = await reg.pushManager.getSubscription();
+    if(!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: pushKeyBytes(k.data.key) });
+    if(!(await pushSendSubscription(sub))) { showToast('Could not turn on notifications — try again'); return; }
+    localStorage.setItem(PUSH_ON_KEY, '1');
+    showToast('Notifications on');
+  } catch(e) {
+    console.warn('Push subscribe failed:', e);
+    showToast('Could not turn on notifications — try again');
+  } finally {
+    if(btn) btn.disabled = false;
+    pushRefreshUI();
+  }
+}
+async function pushDisable() {
+  const sub = await pushCurrent();
+  if(sub) {
+    await cmApi('/push/unsubscribe', 'POST', { endpoint: sub.endpoint });
+    try { await sub.unsubscribe(); } catch(e) {}
+  }
+  localStorage.removeItem(PUSH_ON_KEY);
+  showToast('Notifications off');
+  pushRefreshUI();
+}
+function pushToggle() { if(window._pushState === 'on') pushDisable(); else pushEnable(); }
+async function pushSendTest() {
+  const btn = document.getElementById('pushTestBtn'); if(btn) btn.disabled = true;
+  const r = await cmApi('/push/test', 'POST', {});
+  if(btn) btn.disabled = false;
+  if(r.ok && r.data && r.data.sent) showToast('Sent — it should arrive in a few seconds');
+  else {
+    const res = r.data && Array.isArray(r.data.results) && r.data.results[0];
+    showToast(res ? `Not delivered (${res.status}${res.detail ? ': ' + String(res.detail).slice(0, 60) : ''})` : 'Not delivered — turn notifications off and on again', 5000);
+  }
+}
+// Signing out: this phone stops receiving the account's notifications.
+async function pushForgetDevice() {
+  const sub = await pushCurrent();
+  if(sub && isLoggedIn()) await cmApi('/push/unsubscribe', 'POST', { endpoint: sub.endpoint });
+}
+// Opens what a tapped notification was about.
+async function openFromNotification(open) {
+  const m = /^(dm|profile|post):([A-Za-z0-9-]{1,64})$/.exec(String(open || ''));
+  if(!m || !isLoggedIn()) return;
+  navTo('community');
+  if(m[1] === 'dm') { cmOpenThread(m[2]); return; }
+  if(m[1] === 'profile') { cmOpenProfile(m[2]); return; }
+  for(let i = 0; i < 20 && !cmFindPost(m[2]); i++) await new Promise(r => setTimeout(r, 250));
+  if(!cmFindPost(m[2])) return;
+  cmState.open[m[2]] = true;
+  cmRedrawPost(m[2]);
+  cmLoadComments(m[2]);
+  const el = document.getElementById('cm-post-' + m[2]); if(el) el.scrollIntoView({ block: 'start' });
+}
+try {
+  if(pushSupported()) {
+    navigator.serviceWorker.addEventListener('message', e => { if(e.data && e.data.type === 'trident-open') openFromNotification(e.data.open); });
+    pushRegistration();
+  }
+  const openParam = new URLSearchParams(location.search).get('open');
+  if(openParam) {
+    history.replaceState(null, '', location.pathname);
+    setTimeout(() => openFromNotification(openParam), 1500);
+  }
+  // Keep this phone attached to the signed-in account (it may have signed in as someone else since).
+  setTimeout(async () => {
+    try {
+      if(!pushSupported() || !isLoggedIn() || Notification.permission !== 'granted' || localStorage.getItem(PUSH_ON_KEY) !== '1') return;
+      const sub = await pushCurrent();
+      if(sub) pushSendSubscription(sub);
+    } catch(e) {}
+  }, 5000);
+} catch(e) { console.warn('Push setup skipped:', e); }
+
 // Check for new messages when the app comes back to the front, and once a minute while it is open.
 document.addEventListener('visibilitychange', () => { if(!document.hidden && isLoggedIn()) cmRefreshUnread(); });
 setInterval(() => { if(!document.hidden && isLoggedIn() && !cmDm.timer) cmRefreshUnread(); }, 60000);
@@ -10700,6 +10852,7 @@ try {
 }
 
 async function handleLogout() {
+  try { await Promise.race([pushForgetDevice(), new Promise(r => setTimeout(r, 3000))]); } catch(e) {}
   await cloudPost('/auth/logout', {});
   localStorage.removeItem('trident_session_token');
   showToast('Signed out — see you soon!');
