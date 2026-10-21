@@ -3874,7 +3874,7 @@ const PROGRAMS = {
     icon:'bolt',
     calendarAligned:true,
     hybrid:true,
-    desc:'Lean muscle, strength and explosive power for a flag-football receiver who trains Muay Thai — a fixed weekly Lower/Upper split (Tue Lower A, Wed Upper A, Thu Lower B, Fri Upper B) around two football sessions, two Muay Thai sessions, two recovery days and Sunday\'s two games',
+    desc:'Builds an explosive athlete while keeping lean muscle and strength: heavy leg strength Tuesday, upper-body strength Wednesday, explosive leg power Thursday and upper-body muscle Friday, around two football sessions, two Muay Thai sessions, two recovery days and Sunday\'s two games',
     daysPerWeek:'7-day schedule · Lower A → Upper A → Lower B → Upper B',
     // Sessions, sections and the lifting rotation live in HY_WORKOUTS / HY_WEEK (see "LANTIK HYBRID ATHLETE PROGRAM").
     days:[
@@ -3996,7 +3996,7 @@ const PROGRAMS_MALE = {
     icon:'bolt',
     calendarAligned:true,
     hybrid:true,
-    desc:'Lean muscle, strength and explosive power for a flag-football receiver who trains Muay Thai — a fixed weekly Lower/Upper split (Tue Lower A, Wed Upper A, Thu Lower B, Fri Upper B) around two football sessions, two Muay Thai sessions, two recovery days and Sunday\'s two games',
+    desc:'Builds an explosive athlete while keeping lean muscle and strength: heavy leg strength Tuesday, upper-body strength Wednesday, explosive leg power Thursday and upper-body muscle Friday, around two football sessions, two Muay Thai sessions, two recovery days and Sunday\'s two games',
     daysPerWeek:'7-day schedule · Lower A → Upper A → Lower B → Upper B',
     // Sessions, sections and the lifting rotation live in HY_WORKOUTS / HY_WEEK (see "LANTIK HYBRID ATHLETE PROGRAM").
     days:[
@@ -8437,8 +8437,8 @@ const HY_WORKOUTS = {
 
   lowerA: {
     id: 'lowerA', name: 'Lower A — Strength and Power', short: 'Lower A', category: 'strength', tag: 'Strength', body: 'lower',
-    goal: 'The main lower-body strength session of the week. Strength without unnecessary fatigue.',
-    lighterText: 'Squats drop to 2 working sets, Bulgarian split squats are left out, and the accessories lose a set.',
+    goal: 'The heavy lower-body strength day — the strength that your speed and power are built on. Done early in the week so the legs are fresh for Sunday.',
+    lighterText: 'Squats drop to 2 working sets, Bulgarian split squats and Nordic curls are left out, and the accessories lose a set.',
     notes: [
       'Done after the field work on Tuesday, or hours later if you split the day.',
       'You do not have to do everything at full volume: if readiness is poor, use the lighter session.',
@@ -8456,7 +8456,7 @@ const HY_WORKOUTS = {
         hyEx('back_squat', 'Back Squat', 'strength', 3, '4–5', { rest: 180, restText: '2–4 min', lighterSets: 2 }),
         hyEx('romanian_deadlift', 'Romanian Deadlift', 'strength', 3, '5–6', { rest: 150, restText: '2–3 min' }),
         hyEx('bulgarian_split_squat', 'Bulgarian Split Squat', 'strength', 2, '6 per leg', { rest: 105, restText: '90–120 sec', lighterOmit: true }),
-        hyEx('hamstring_curl', 'Hamstring Curl', 'strength', 2, '8', { rest: 90, restText: '90 sec', acc: true }),
+        hyEx('nordic_hamstring_curl', 'Nordic Hamstring Curl', 'bodyweight', 2, '3–5', { rest: 120, restText: '2 min', lighterOmit: true, alts: ['Hamstring Curl', 'Glute-Ham Raise'], cue: 'Lower yourself as slowly as you can control; use a band for help. Done on Tuesday so any soreness is gone by Sunday.' }),
         hyEx('standing_calf_raise', 'Standing Calf Raise', 'strength', 2, '10–12', { rest: 60, restText: '60 sec', acc: true }),
         hyEx('hanging_knee_raise', 'Hanging Knee Raise', 'bodyweight', 3, '8–12', { rest: 60, restText: '60 sec', acc: true })
       ] },
@@ -8498,13 +8498,13 @@ const HY_WORKOUTS = {
   lowerB: {
     id: 'lowerB', name: 'Lower B — Explosive Power', short: 'Lower B', category: 'strength', tag: 'Power', body: 'lower',
     goal: 'Explosive lower-body power the way NFL and UFC strength coaches build it: Olympic-lift speed, loaded jumps, single-leg drive and rotational hip power. Low reps, full rest, quality over fatigue — Sunday\'s games are three days away.',
-    lighterText: 'Hang power cleans drop to 3 sets, Nordic curls are left out, and the accessories lose a set.',
+    lighterText: 'Hang power cleans drop to 3 sets and the accessories lose a set.',
     notes: [
       'Power work is about speed: make every rep fast and crisp. End the set the moment bar speed or jump height drops — never grind a rep.',
       'Trap bar jumps use a light load, about 20–30% of your trap bar deadlift. Land softly and reset between reps.',
       'If you have not been coached on the hang power clean, use Swap for the hang high pull or a kettlebell swing.',
-      'Nordic curls: lower yourself as slowly as you can control. Use a band for help, or leave them out if your hamstrings are sore.',
-      'Rest fully between sets. This is power training, not conditioning.'
+      'Rest fully between sets. This is power training, not conditioning.',
+      'Nothing here should leave you sore on Sunday: the heavy, soreness-heavy work (squats, RDLs, Nordic curls) is on Tuesday.'
     ],
     sections: [
       { key: 'primer', title: 'PRIMER', checkable: true, items: [
@@ -8518,7 +8518,6 @@ const HY_WORKOUTS = {
         hyEx('trap_bar_jump', 'Trap Bar Jump', 'strength', 3, '3', { rest: 120, restText: '2 min', impact: true, alt: 'Fast Trap Bar Deadlift (no jump)', alts: ['Dumbbell Jump Squat', 'Box Jump'], cue: 'Light load, jump as high as you can, land softly, reset each rep.' }),
         hyEx('explosive_step_up', 'Explosive Step-Up', 'strength', 3, '4 per leg', { rest: 90, restText: '90 sec', alts: ['Rear-Foot-Elevated Split Squat', 'Reverse Lunge'], cue: 'Drive through the top foot and stand up fast. Dumbbells or a light bar.' }),
         hyEx('landmine_rotation', 'Landmine Rotation', 'strength', 2, '6 per side', { rest: 60, restText: '60 sec', acc: true, alts: ['Cable Woodchop', 'Medicine-Ball Rotational Slam'], cue: 'Turn from the hips, not the arms — rotational power for strikes and cuts.' }),
-        hyEx('nordic_hamstring_curl', 'Nordic Hamstring Curl', 'bodyweight', 2, '3–5', { rest: 120, restText: '2 min', lighterOmit: true, cue: 'Lower slowly, as far as you can control. Hamstring protection for sprinting.' }),
         hyEx('copenhagen_plank', 'Copenhagen Plank', 'bodyweight', 2, '20 sec per side', { f2: 'hold', rest: 60, restText: '60 sec', acc: true, cue: 'Groin strength for cutting and kicking.' })
       ] },
       { key: 'cooldown', title: 'OPTIONAL COOLDOWN', checkable: true, optional: true, items: [
@@ -8530,8 +8529,8 @@ const HY_WORKOUTS = {
 
   upperB: {
     id: 'upperB', name: 'Upper B — Strength and Hypertrophy', short: 'Upper B', category: 'strength', tag: 'Strength', body: 'upper',
-    goal: 'Maintain or build lean muscle without piling on fatigue before Sunday.',
-    lighterText: 'Lateral raises, curls and pressdowns lose a set. The main lifts stay as written.',
+    goal: 'The muscle-building upper-body day: keeps you lean and strong with moderate reps, without piling on fatigue before Sunday.',
+    lighterText: 'Lateral raises, curls, pressdowns and neck work lose a set. The main lifts stay as written.',
     notes: [
       'Keep 1–3 reps in reserve on most working sets.',
       'Plyometric push-ups only if you are ready for explosive upper-body work and can keep the technique clean.',
@@ -8550,7 +8549,8 @@ const HY_WORKOUTS = {
         hyEx('lat_pulldown', 'Lat Pulldown', 'strength', 3, '8–10', { rest: 90, restText: '90 sec' }),
         hyEx('lateral_raise', 'Lateral Raise', 'strength', 2, '12–15', { rest: 60, restText: '60 sec', acc: true }),
         hyEx('biceps_curl', 'Biceps Curl', 'strength', 2, '10–12', { rest: 60, restText: '60 sec', acc: true }),
-        hyEx('triceps_pressdown', 'Cable Triceps Pressdown', 'strength', 2, '10–12', { rest: 60, restText: '60 sec', acc: true })
+        hyEx('triceps_pressdown', 'Cable Triceps Pressdown', 'strength', 2, '10–12', { rest: 60, restText: '60 sec', acc: true }),
+        hyEx('neck_training', 'Neck Flexion and Extension', 'bodyweight', 2, '12–15 each way', { rest: 60, restText: '60 sec', acc: true, alts: ['Plate Neck Curl', 'Band Neck Extension'], cue: 'Slow and controlled with a band or a light plate. Protects the neck in the clinch and on contact.' })
       ] }
     ]
   },
@@ -9000,6 +9000,13 @@ function hyTotals(workout, sess) {
       out.exercises.push({ id: ex.id, name: hyExName(workout.id, 'main.' + ex.id, ex), loaded, record, sets: done.map(s => ({ w: parseFloat(s.w) || 0, r: parseFloat(s.r) || 0 })) });
     });
   });
+  // Main-workout sets logged on an exercise that has since left the plan still count (never as a new record).
+  Object.keys(sess.ex).filter(key => key.indexOf('main.') === 0 && !hyFind(workout, key)).forEach(key => {
+    const st = sess.ex[key], done = (st.sets || []).filter(s => s && s.done);
+    if(st.skipped || !done.length) return;
+    out.sets += done.length;
+    done.forEach(s => { out.volume += (parseFloat(s.w) || 0) * (parseFloat(s.r) || 0); });
+  });
   out.volume = Math.round(out.volume);
   return out;
 }
@@ -9129,7 +9136,7 @@ function hyWeekHTML() {
     ${dayIdx === 5 ? `<div class="hy-banner">Saturday stays free of lifting before Sunday's games.</div>` : ''}
     <div class="hy-card">
       <div class="hy-card-title">This week's lifts</div>
-      <div class="hy-card-sub">Every week: Tuesday Lower A, Wednesday Upper A, Thursday Lower B, Friday Upper B. A missed lift stays missed — the next days don't shift.</div>
+      <div class="hy-card-sub">Every week: Tuesday Lower A (leg strength), Wednesday Upper A (upper strength), Thursday Lower B (explosive power), Friday Upper B (muscle). A missed lift stays missed — the next days don't shift.</div>
       ${lifts}
     </div>
     ${history.length ? `<div class="hy-card">
@@ -9777,7 +9784,7 @@ function hySummary(sid, extra) {
       return text ? `<div class="hy-kv top"><span>${hyEsc(hyExName(w.id, section.key + '.' + ex.id, ex))}</span><span>${text}${st.note ? `<br><span class="hy-muted">${hyEsc(st.note)}</span>` : ''}</span></div>` : '';
     }).join('');
     return lines ? `<div class="hy-sheet-sec">${hyEsc(section.title)}</div>${lines}` : '';
-  }).join('');
+  }).join('') + hyRetiredLines(w, sess);
   const games = (sess.games || []).map((g, i) => g.done ? `<div class="hy-kv top"><span>Game ${i + 1}</span><span>${hyEsc([g.result, g.duration ? g.duration + ' min' : '', g.rpe ? 'RPE ' + g.rpe : ''].filter(Boolean).join(' · ') || 'Played')}${g.notes ? `<br><span class="hy-muted">${hyEsc(g.notes)}</span>` : ''}</span></div>` : '').join('');
   hySheet(`<div class="cm-sheet-title">${sess.status === 'skipped' ? 'Skipped' : (extra ? 'Session saved' : 'Session')} — ${hyEsc(w.short || w.name)}</div>
     <div class="hy-muted" style="margin-bottom:12px;">${hyEsc(hyDateLabel(sess.date))}${sess.restDay ? ' · complete rest day' : ''}${(sess.types || []).length ? ' · ' + hyEsc(sess.types.join(', ')) : ''}${sess.intensity ? ' · ' + hyEsc(sess.intensity) + ' intensity' : ''}${sess.lighter ? ' · lighter session' : ''}${sess.recoveryOnly ? ' · recovery-only' : ''}${sess.restricted ? ' · impact work locked' : ''}${sess.check === 'tired' ? ' · felt tired' : sess.check === 'pain' ? ' · reported pain' : ''}</div>
@@ -9793,6 +9800,21 @@ function hySummaryDone() {
   hyBack();
   window.scrollTo(0, 0);
   showToast('Workout saved!');
+}
+// Sets logged on an exercise that has since been taken out of the workout stay visible.
+function hyRetiredLines(w, sess) {
+  const lines = Object.keys(sess.ex || {}).filter(key => !hyFind(w, key)).map(key => {
+    const st = sess.ex[key], id = key.slice(key.indexOf('.') + 1);
+    const done = st.sets.filter(s => s && s.done);
+    if(!done.length && !st.done) return '';
+    let known = null;
+    Object.keys(HY_WORKOUTS).some(wid => (HY_WORKOUTS[wid].sections || []).some(s => s.items.some(e => { if(e.id === id) known = e; return !!known; })));
+    const ex = known || { kind: done.some(s => s.w) ? 'strength' : 'bodyweight' };
+    const name = known ? known.name : id.split('_').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
+    const text = done.length ? done.map(s => hyEsc(hySetText(ex, s))).join(' · ') : 'Done';
+    return `<div class="hy-kv top"><span>${hyEsc(name)}</span><span>${text}${st.note ? `<br><span class="hy-muted">${hyEsc(st.note)}</span>` : ''}</span></div>`;
+  }).join('');
+  return lines ? `<div class="hy-sheet-sec">NO LONGER IN THIS WORKOUT</div>${lines}` : '';
 }
 function hyShare() {
   const share = window._hyShare; if(!share) return;
