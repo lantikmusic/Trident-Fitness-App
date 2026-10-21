@@ -1008,6 +1008,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .hy-ex.done{border-color:rgba(48,209,88,.35);}
 .hy-ex.omitted,.hy-ex.skipped{opacity:.6;}
 .hy-ex-head{display:flex;align-items:center;gap:10px;padding:11px 12px;cursor:pointer;}
+.hy-ex-tools{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px;}
+.hy-ex-tools .swap-btn{margin:0;}
 .hy-ex-title{flex:1;min-width:0;}
 .hy-ex-name{font-size:14px;font-weight:600;line-height:1.3;word-break:break-word;}
 .hy-ex-rx{font-size:11px;color:var(--text3);margin-top:2px;}
@@ -8494,30 +8496,30 @@ const HY_WORKOUTS = {
 
   // The second lower-body session. Its exercises were not supplied: the athlete sets it up in the app.
   lowerB: {
-    id: 'lowerB', name: 'Lower B — Hinge and Single-Leg Strength', short: 'Lower B', category: 'strength', tag: 'Strength', body: 'lower',
-    goal: 'The second lower-body session: hinge strength, single-leg control and groin and hamstring resilience for cutting. Moderate, three days before Sunday\'s games.',
-    lighterText: 'Trap bar deadlifts drop to 2 working sets, Nordic curls are left out, and the accessories lose a set.',
+    id: 'lowerB', name: 'Lower B — Explosive Power', short: 'Lower B', category: 'strength', tag: 'Power', body: 'lower',
+    goal: 'Explosive lower-body power the way NFL and UFC strength coaches build it: Olympic-lift speed, loaded jumps, single-leg drive and rotational hip power. Low reps, full rest, quality over fatigue — Sunday\'s games are three days away.',
+    lighterText: 'Hang power cleans drop to 3 sets, Nordic curls are left out, and the accessories lose a set.',
     notes: [
-      'Keep 2–3 reps in reserve on every set: Sunday\'s games are three days away.',
+      'Power work is about speed: make every rep fast and crisp. End the set the moment bar speed or jump height drops — never grind a rep.',
+      'Trap bar jumps use a light load, about 20–30% of your trap bar deadlift. Land softly and reset between reps.',
+      'If you have not been coached on the hang power clean, use Swap for the hang high pull or a kettlebell swing.',
       'Nordic curls: lower yourself as slowly as you can control. Use a band for help, or leave them out if your hamstrings are sore.',
-      'Pogo hops only if you feel fresh. Skip them if you already did enough jumping on the field today.',
-      'Avoid grinding reps and training to failure.'
+      'Rest fully between sets. This is power training, not conditioning.'
     ],
     sections: [
       { key: 'primer', title: 'PRIMER', checkable: true, items: [
-        hyEx('glute_bridges', 'Glute Bridges', 'mobility', 2, '8'),
         hyEx('lateral_band_walk', 'Lateral Band Walk', 'mobility', 2, '10 per side'),
-        hyEx('kettlebell_swing', 'Kettlebell Swing', 'strength', 3, '5', { rest: 60, restText: '60 sec', cue: 'Explosive hips, crisp lockout. Stop the set when the snap fades.' }),
-        hyEx('pogo_hops', 'Pogo Hops', 'plyo', 2, '10', { rest: 60, restText: '60 sec', impact: true, cue: 'Quick, stiff ankles, small hops. Only if you feel fresh.' })
+        hyEx('hip_airplanes', 'Hip Airplanes', 'mobility', 2, '5 per side', { cue: 'Slow and controlled: balance on one leg and rotate the hips open and closed.' }),
+        hyEx('pogo_hops', 'Pogo Hops', 'plyo', 2, '10', { rest: 60, restText: '60 sec', impact: true, cue: 'Quick, stiff ankles, small hops. Only if you feel fresh.' }),
+        hyEx('mb_rotational_toss', 'Rotational Medicine-Ball Scoop Toss', 'plyo', 3, '3 per side', { rest: 60, restText: '60 sec', cue: 'Load the back hip and throw through the wall — the same hip turn as a hook or a cross.' })
       ] },
       { key: 'main', title: 'MAIN WORKOUT', items: [
-        hyEx('trap_bar_deadlift', 'Trap Bar Deadlift', 'strength', 3, '4–5', { rest: 150, restText: '2–3 min', lighterSets: 2 }),
-        hyEx('reverse_lunge', 'Reverse Lunge', 'strength', 2, '8 per leg', { rest: 90, restText: '90 sec' }),
-        hyEx('single_leg_rdl', 'Single-Leg Romanian Deadlift', 'strength', 2, '8 per leg', { rest: 90, restText: '90 sec' }),
-        hyEx('nordic_hamstring_curl', 'Nordic Hamstring Curl', 'bodyweight', 2, '3–5', { rest: 120, restText: '2 min', lighterOmit: true, cue: 'Eccentric: lower slowly, as far as you can control.' }),
-        hyEx('copenhagen_plank', 'Copenhagen Plank', 'bodyweight', 2, '20 sec per side', { f2: 'hold', rest: 60, restText: '60 sec', acc: true }),
-        hyEx('seated_calf_raise', 'Seated Calf Raise', 'strength', 2, '12–15', { rest: 60, restText: '60 sec', acc: true }),
-        hyEx('dead_bug', 'Dead Bug', 'bodyweight', 2, '8 per side', { rest: 45, restText: '45 sec', acc: true })
+        hyEx('hang_power_clean', 'Hang Power Clean', 'strength', 4, '3', { rest: 150, restText: '2–3 min', lighterSets: 3, alts: ['Hang High Pull', 'Kettlebell Swing', 'Dumbbell Snatch'], cue: 'Fast elbows and a violent hip snap. Pick a weight you can move fast for every rep.' }),
+        hyEx('trap_bar_jump', 'Trap Bar Jump', 'strength', 3, '3', { rest: 120, restText: '2 min', impact: true, alt: 'Fast Trap Bar Deadlift (no jump)', alts: ['Dumbbell Jump Squat', 'Box Jump'], cue: 'Light load, jump as high as you can, land softly, reset each rep.' }),
+        hyEx('explosive_step_up', 'Explosive Step-Up', 'strength', 3, '4 per leg', { rest: 90, restText: '90 sec', alts: ['Rear-Foot-Elevated Split Squat', 'Reverse Lunge'], cue: 'Drive through the top foot and stand up fast. Dumbbells or a light bar.' }),
+        hyEx('landmine_rotation', 'Landmine Rotation', 'strength', 2, '6 per side', { rest: 60, restText: '60 sec', acc: true, alts: ['Cable Woodchop', 'Medicine-Ball Rotational Slam'], cue: 'Turn from the hips, not the arms — rotational power for strikes and cuts.' }),
+        hyEx('nordic_hamstring_curl', 'Nordic Hamstring Curl', 'bodyweight', 2, '3–5', { rest: 120, restText: '2 min', lighterOmit: true, cue: 'Lower slowly, as far as you can control. Hamstring protection for sprinting.' }),
+        hyEx('copenhagen_plank', 'Copenhagen Plank', 'bodyweight', 2, '20 sec per side', { f2: 'hold', rest: 60, restText: '60 sec', acc: true, cue: 'Groin strength for cutting and kicking.' })
       ] },
       { key: 'cooldown', title: 'OPTIONAL COOLDOWN', checkable: true, optional: true, items: [
         hyEx('cooldown_walk', 'Easy Walk', 'timed', 1, '5 min'),
@@ -8542,7 +8544,7 @@ const HY_WORKOUTS = {
         hyEx('plyo_pushups', 'Plyometric Push-Ups', 'plyo', 3, '3', { cue: 'Fast and clean. Leave them out if you are not ready for explosive work today.' })
       ] },
       { key: 'main', title: 'MAIN WORKOUT', items: [
-        hyEx('landmine_press', 'Landmine Press', 'strength', 3, '5–6', { rest: 150, restText: '2–3 min', alts: ['Overhead Press'], cue: 'Landmine press or overhead press — use Substitute to switch.' }),
+        hyEx('landmine_press', 'Landmine Press', 'strength', 3, '5–6', { rest: 150, restText: '2–3 min', alts: ['Overhead Press'], cue: 'Landmine press or overhead press — use Swap to switch.' }),
         hyEx('one_arm_db_row', 'One-Arm Dumbbell Row', 'strength', 3, '8 per side', { rest: 90, restText: '90 sec' }),
         hyEx('db_bench_press', 'Dumbbell Bench Press', 'strength', 3, '8–10', { rest: 90, restText: '90 sec' }),
         hyEx('lat_pulldown', 'Lat Pulldown', 'strength', 3, '8–10', { rest: 90, restText: '90 sec' }),
@@ -9168,6 +9170,13 @@ function hyExerciseHTML(c, section, ex) {
   const tags = (ex.effort ? `<span class="hy-eff${ex.effort === 'Max speed' ? ' max' : ''}">${hyEsc(ex.effort)}</span>` : '')
     + (info.rx.alt ? `<span class="hy-eff lock">Non-impact alternative</span>` : '')
     + (locked ? `<span class="hy-eff lock">Restricted</span>` : '');
+  // Progress and Swap, as on the other programs' exercise cards.
+  const canChart = ex.kind === 'strength' || ex.kind === 'bodyweight';
+  const canSwap = ex.kind !== 'check' && !info.rx.alt && !locked;
+  const tools = canChart || canSwap ? `<div class="hy-ex-tools">
+      ${canChart ? `<button class="ex-progress-btn" onclick="event.stopPropagation();hyProgress('${key}')"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Progress</button>` : ''}
+      ${canSwap ? `<button class="swap-btn" onclick="event.stopPropagation();hySubSheet('${key}')">⇄ Swap${subbed ? 'ped' : ''}</button>` : ''}
+    </div>` : '';
   let lead, right;
   if(info.status === 'omitted') { lead = `<span class="hy-dot off">–</span>`; right = `<span class="hy-muted">${locked ? 'Locked' : 'Left out'}</span>`; }
   else if(section.checkable) {
@@ -9199,7 +9208,7 @@ function hyExerciseHTML(c, section, ex) {
       ${ex.cue && !locked ? `<div class="hy-cue">${hyEsc(ex.cue)}</div>` : ''}
       ${locked ? `<div class="hy-cue">Locked while return to impact is restricted. It opens again only when you change your training status after being cleared.</div>` : (info.rx.omitted ? `<div class="hy-cue">${hyEsc(info.rx.omitted)}.</div>` : '')}
       ${info.rx.alt ? `<div class="hy-cue">Standing in for ${hyEsc(ex.name)} while return to impact is restricted.</div>` : ''}
-      ${subbed ? `<div class="hy-muted" style="margin-bottom:8px;">Substituted for ${hyEsc(ex.name)}.</div>` : ''}
+      ${subbed ? `<div class="hy-muted" style="margin-bottom:8px;">Swapped in for ${hyEsc(ex.name)}.</div>` : ''}
       ${last ? `<div class="hy-last">Last time (${hyEsc(hyDateLabel(last.date))}): ${last.sets.map(x => hyEsc(hySetText(ex, x))).join(' · ')}</div>` : ''}
       ${hint ? `<div class="hy-cue">${hyEsc(hint)}</div>` : ''}
       ${rows ? `<div class="hy-sets">${rows}</div>` : ''}
@@ -9210,7 +9219,6 @@ function hyExerciseHTML(c, section, ex) {
         <div class="hy-actions">
           ${!section.checkable && !f.required ? `<button onclick="hyMarkAll('${key}')">${info.status === 'done' ? 'Undo done' : 'Mark done'}</button>` : ''}
           <button onclick="hyExHistory('${key}')">History</button>
-          ${info.rx.alt ? '' : `<button onclick="hySubSheet('${key}')">Substitute</button>`}
           <button onclick="hyToggleSkip('${key}')">${st && st.skipped ? 'Undo skip' : 'Skip'}</button>
         </div>` : ''}
     </div>`;
@@ -9218,7 +9226,7 @@ function hyExerciseHTML(c, section, ex) {
   return `<div class="hy-ex${open ? ' open' : ''}${info.status ? ' ' + info.status : ''}">
     <div class="hy-ex-head" onclick="hyToggleEx('${key}')">
       ${lead}
-      <div class="hy-ex-title"><div class="hy-ex-name">${name}${tags}</div>${rxLine ? `<div class="hy-ex-rx">${hyEsc(rxLine)}</div>` : ''}</div>
+      <div class="hy-ex-title"><div class="hy-ex-name">${name}${tags}</div>${rxLine ? `<div class="hy-ex-rx">${hyEsc(rxLine)}</div>` : ''}${tools}</div>
       ${right}<span class="hy-chev">›</span>
     </div>${body}
   </div>`;
@@ -9612,12 +9620,14 @@ function hyBlockSheet() {
     <button class="ghost-btn" style="margin-top:8px;" onclick="hySheetClose()">Close</button>`);
 }
 function hySubSheet(key) {
-  const c = hyGuard(); if(!c) return;
+  const c = hyCtx(); if(!c) return;
   const found = hyFind(c.workout, key); if(!found) return;
   const current = hyState.subs[c.workout.id] && hyState.subs[c.workout.id][key];
-  const options = (found.ex.alts || []).concat((typeof EXERCISE_SWAPS !== 'undefined' && EXERCISE_SWAPS[found.ex.name]) || []).filter((v, i, a) => a.indexOf(v) === i).slice(0, 5);
+  const lib = typeof getExerciseData === 'function' ? getExerciseData(found.ex.name) : null;
+  const options = (found.ex.alts || []).concat((typeof EXERCISE_SWAPS !== 'undefined' && EXERCISE_SWAPS[found.ex.name]) || [], (lib && lib.alts) || [])
+    .filter((v, i, a) => v && v !== found.ex.name && a.indexOf(v) === i).slice(0, 6);
   window._hySubKey = key;
-  hySheet(`<div class="cm-sheet-title">Substitute ${hyEsc(found.ex.name)}</div>
+  hySheet(`<div class="cm-sheet-title">Swap ${hyEsc(found.ex.name)}</div>
     <div class="hy-muted" style="margin-bottom:12px;">The plan keeps the original; this only changes what you do in its place. Sets, reps and history stay with this slot.</div>
     ${options.map((o, i) => `<button class="cm-pick" onclick="hySub(${i})">${hyEsc(o)}</button>`).join('')}
     <input class="hy-input" id="hySubInput" maxlength="60" placeholder="Or type another exercise" value="${hyEsc(current || '')}">
@@ -9635,6 +9645,35 @@ function hySub(choice) {
   if(!hyState.subs[c.workout.id]) hyState.subs[c.workout.id] = {};
   if(name) hyState.subs[c.workout.id][key] = name.slice(0, 60); else delete hyState.subs[c.workout.id][key];
   hySave(true); hySheetClose(); hyRender();
+}
+// Same chart sheet as the other programs, filled from this program's logged sessions.
+function hyProgress(key) {
+  const c = hyCtx(); if(!c) return;
+  const found = hyFind(c.workout, key); if(!found) return;
+  const ex = found.ex, weighted = ex.kind === 'strength', f = hyFields(ex);
+  const unit = (f.f2 && f.f2.unit.trim()) || 'reps';
+  const sessions = hyHistory(ex.id, found.section.key, null).slice().reverse().map(h => {
+    const w = h.sets.map(s => parseFloat(s.w) || 0), r = h.sets.map(s => parseFloat(s.r) || 0);
+    return { label: hyDateLabel(h.date).replace(/^\w+, /, ''), maxWeight: Math.max(0, ...w), maxReps: Math.max(0, ...r), totalReps: r.reduce((a, b) => a + b, 0), sets: h.sets.length };
+  });
+  document.getElementById('exProgressTitle').textContent = hyExName(c.workout.id, key, ex);
+  const sub = document.getElementById('exProgressSub');
+  if(!sessions.length) {
+    sub.textContent = 'No sessions logged yet';
+    document.getElementById('exProgressChart').style.display = 'none';
+    document.getElementById('exProgressLog').innerHTML = `<div class="ex-progress-empty">Complete a set to start tracking progress</div>`;
+    document.getElementById('exProgressOverlay').style.display = 'flex';
+    return;
+  }
+  sub.textContent = `${sessions.length} session${sessions.length > 1 ? 's' : ''} logged`;
+  const chart = document.getElementById('exProgressChart');
+  chart.style.display = 'block';
+  document.getElementById('exProgressOverlay').style.display = 'flex';
+  drawExProgressChart(sessions, !weighted);
+  document.getElementById('exProgressLog').innerHTML = sessions.slice().reverse().map(s => `<div class="ex-progress-row">
+      <div class="ex-progress-row-date">${hyEsc(s.label)}</div>
+      <div class="ex-progress-row-val">${weighted ? `${s.maxWeight} lbs · ${s.maxReps} reps` : `${s.maxReps} ${hyEsc(unit)} best · ${s.sets} set${s.sets > 1 ? 's' : ''}`}</div>
+    </div>`).join('');
 }
 function hyExHistory(key) {
   const c = hyCtx(); if(!c) return;
