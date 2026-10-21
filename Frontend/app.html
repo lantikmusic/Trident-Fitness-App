@@ -2966,9 +2966,9 @@ async function lookupBarcode(barcode) {
 
   try {
     // LogMeal barcode lookup via Cloudflare Worker
-    const res = await fetch(`${LOGMEAL_PROXY}/v2/barcode_scan/${barcode}`, {
+    const res = await fetch(`${LOGMEAL_PROXY}/v2/barcode_scan/${encodeURIComponent(barcode)}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' }
+      headers: isLoggedIn() ? logMealHeaders() : { 'Content-Type': 'application/json' }
     });
 
     console.log('Barcode status:', res.status);
@@ -3011,7 +3011,7 @@ async function lookupBarcode(barcode) {
     if(!calories && !protein && !carbs && !fat && dishId) {
       const nutritionRes = await fetch(`${LOGMEAL_PROXY}/v2/nutrition/recipe/nutritionalInfo`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: logMealHeaders(),
         body: JSON.stringify({ dishId })
       });
       if(nutritionRes.ok) {
@@ -3539,12 +3539,7 @@ function addFoodToLib(){
 
 
 
-function setGender(gender) {
-  const s = load('trident_settings_v1') || {};
-  s.gender = gender;
-  save('trident_settings_v1', s);
-  appSettings.gender = gender;
-  // Update button styles
+function paintGenderButtons(gender) {
   const fg = document.getElementById('genderFemale');
   const fm = document.getElementById('genderMale');
   if(fg && fm) {
@@ -3555,12 +3550,27 @@ function setGender(gender) {
     fm.style.color = gender==='male' ? '#000' : 'var(--text2)';
     fm.style.borderColor = gender==='male' ? 'var(--pink)' : 'var(--border2)';
   }
-  // Reset program selection since programs changed
-  workoutState.program = null;
-  save('trident_workout_v1', workoutState);
-  selectedProgram = null;
+}
+
+function setGender(gender) {
+  const s = load('trident_settings_v1') || {};
+  const changed = (s.gender || appSettings.gender) !== gender;
+  s.gender = gender;
+  save('trident_settings_v1', s);
+  appSettings.gender = gender;
+  paintGenderButtons(gender);
+  if(!changed) return; // same gender (e.g. Settings just opened): nothing else to do
+  // The program list changed. Keep the current program if the new list has it too.
+  const list = gender === 'male' ? PROGRAMS_MALE : PROGRAMS;
+  if(workoutState.program && !list[workoutState.program]) {
+    workoutState.program = null;
+    save('trident_workout_v1', workoutState);
+    selectedProgram = null;
+    showToast('Gender updated — choose a program from the new list');
+  } else {
+    showToast('Gender updated');
+  }
   renderWorkout();
-  showToast('Gender updated — programs refreshed');
 }
 
 const PROGRAMS = {
@@ -7095,7 +7105,7 @@ function closeSettings() {
 function loadSettingsInputs() {
   // Restore gender buttons
   const gender = appSettings.gender || 'female';
-  setGender(gender);
+  paintGenderButtons(gender); // showing Settings must never change the selected program
   // Restore USDA key
   const savedKey = localStorage.getItem(USDA_KEY_STORAGE) || '';
   const keyEl = document.getElementById('usdaKeyInput');
@@ -7649,6 +7659,7 @@ function obFinish() {
 
   // ── Apply gender (updates button state + refreshes programs) ──
   setGender(appSettings.gender);
+  renderWorkout();
 
   // ── Save to goalsData (same format as Goals tab) ──
   const g = load(GOALS_KEY) || {};
@@ -7686,11 +7697,14 @@ function obFinish() {
 // ══════════════════════════════════════
 // GEMINI API KEY MANAGEMENT
 // ══════════════════════════════════════
-const LOGMEAL_TOKEN = '676027383a6745629677a74d23a5328471ac49e7';
-const LOGMEAL_PROXY = WORKER_URL; // Routes through Cloudflare Worker to fix CORS
+// LogMeal is reached only through the Cloudflare Worker, which holds the API token as a secret
+// and serves signed-in users. The app itself never has the token.
+const LOGMEAL_PROXY = WORKER_URL;
 
-function getLogMealToken() {
-  return LOGMEAL_TOKEN;
+function logMealHeaders() {
+  const token = getSessionToken();
+  if(!token) throw new Error('Sign in to scan food');
+  return { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
 }
 
 function saveGeminiKey(key) {
@@ -7846,15 +7860,11 @@ async function analyseWithClaude(dataUrl) {
   }
 
   try {
-    // STEP 1: Recognize image — segmentation/complete
-    const blob = await fetch(dataUrl).then(r => r.blob());
-    const formData = new FormData();
-    formData.append('image', blob, 'food.jpg');
-
-    const uploadRes = await fetch('https://api.logmeal.com/v2/image/segmentation/complete?language=eng', {
+    // STEP 1: Recognize image — segmentation/complete (the Worker turns the image into the upload LogMeal expects)
+    const uploadRes = await fetch(`${LOGMEAL_PROXY}/v2/image/segmentation/complete?language=eng`, {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${LOGMEAL_TOKEN}` },
-      body: formData
+      headers: logMealHeaders(),
+      body: JSON.stringify({ image: dataUrl })
     });
 
     if(!uploadRes.ok) {
@@ -7891,12 +7901,9 @@ async function analyseWithClaude(dataUrl) {
     // Build confirmed_class array: [classId per detected region]
     if(topRecognitions.length > 0) {
       const confirmedClass = topRecognitions.map(r => r.id);
-      const confirmRes = await fetch('https://api.logmeal.com/v2/image/confirm/dish/v1.0', {
+      const confirmRes = await fetch(`${LOGMEAL_PROXY}/v2/image/confirm/dish/v1.0`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${LOGMEAL_TOKEN}`,
-          'Content-Type': 'application/json'
-        },
+        headers: logMealHeaders(),
         body: JSON.stringify({
           imageId,
           confirmedClass: confirmedClass.length === 1 ? confirmedClass[0] : confirmedClass,
@@ -7912,12 +7919,9 @@ async function analyseWithClaude(dataUrl) {
     }
 
     // STEP 3: Trigger ingredients computation — required before nutrition
-    const ingredientsRes = await fetch('https://api.logmeal.com/v2/nutrition/recipe/ingredients/v1.0', {
+    const ingredientsRes = await fetch(`${LOGMEAL_PROXY}/v2/nutrition/recipe/ingredients/v1.0`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${LOGMEAL_TOKEN}`,
-        'Content-Type': 'application/json'
-      },
+      headers: logMealHeaders(),
       body: JSON.stringify({ imageId })
     });
     if(ingredientsRes.ok) {
@@ -7927,12 +7931,9 @@ async function analyseWithClaude(dataUrl) {
     }
 
     // STEP 4: Get nutrition info
-    const nutritionRes = await fetch('https://api.logmeal.com/v2/nutrition/recipe/nutritionalInfo/v1.0', {
+    const nutritionRes = await fetch(`${LOGMEAL_PROXY}/v2/nutrition/recipe/nutritionalInfo/v1.0`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${LOGMEAL_TOKEN}`,
-        'Content-Type': 'application/json'
-      },
+      headers: logMealHeaders(),
       body: JSON.stringify({ imageId })
     });
 
@@ -8492,7 +8493,38 @@ const HY_WORKOUTS = {
   },
 
   // The second lower-body session. Its exercises were not supplied: the athlete sets it up in the app.
-  lowerB: { id: 'lowerB', name: 'Lower B', short: 'Lower B', category: 'strength', tag: 'Strength', body: 'lower', placeholder: true, goal: 'Not set up yet.', notes: [] },
+  lowerB: {
+    id: 'lowerB', name: 'Lower B — Hinge and Single-Leg Strength', short: 'Lower B', category: 'strength', tag: 'Strength', body: 'lower',
+    goal: 'The second lower-body session: hinge strength, single-leg control and groin and hamstring resilience for cutting. Moderate, three days before Sunday\'s games.',
+    lighterText: 'Trap bar deadlifts drop to 2 working sets, Nordic curls are left out, and the accessories lose a set.',
+    notes: [
+      'Keep 2–3 reps in reserve on every set: Sunday\'s games are three days away.',
+      'Nordic curls: lower yourself as slowly as you can control. Use a band for help, or leave them out if your hamstrings are sore.',
+      'Pogo hops only if you feel fresh. Skip them if you already did enough jumping on the field today.',
+      'Avoid grinding reps and training to failure.'
+    ],
+    sections: [
+      { key: 'primer', title: 'PRIMER', checkable: true, items: [
+        hyEx('glute_bridges', 'Glute Bridges', 'mobility', 2, '8'),
+        hyEx('lateral_band_walk', 'Lateral Band Walk', 'mobility', 2, '10 per side'),
+        hyEx('kettlebell_swing', 'Kettlebell Swing', 'strength', 3, '5', { rest: 60, restText: '60 sec', cue: 'Explosive hips, crisp lockout. Stop the set when the snap fades.' }),
+        hyEx('pogo_hops', 'Pogo Hops', 'plyo', 2, '10', { rest: 60, restText: '60 sec', impact: true, cue: 'Quick, stiff ankles, small hops. Only if you feel fresh.' })
+      ] },
+      { key: 'main', title: 'MAIN WORKOUT', items: [
+        hyEx('trap_bar_deadlift', 'Trap Bar Deadlift', 'strength', 3, '4–5', { rest: 150, restText: '2–3 min', lighterSets: 2 }),
+        hyEx('reverse_lunge', 'Reverse Lunge', 'strength', 2, '8 per leg', { rest: 90, restText: '90 sec' }),
+        hyEx('single_leg_rdl', 'Single-Leg Romanian Deadlift', 'strength', 2, '8 per leg', { rest: 90, restText: '90 sec' }),
+        hyEx('nordic_hamstring_curl', 'Nordic Hamstring Curl', 'bodyweight', 2, '3–5', { rest: 120, restText: '2 min', lighterOmit: true, cue: 'Eccentric: lower slowly, as far as you can control.' }),
+        hyEx('copenhagen_plank', 'Copenhagen Plank', 'bodyweight', 2, '20 sec per side', { f2: 'hold', rest: 60, restText: '60 sec', acc: true }),
+        hyEx('seated_calf_raise', 'Seated Calf Raise', 'strength', 2, '12–15', { rest: 60, restText: '60 sec', acc: true }),
+        hyEx('dead_bug', 'Dead Bug', 'bodyweight', 2, '8 per side', { rest: 45, restText: '45 sec', acc: true })
+      ] },
+      { key: 'cooldown', title: 'OPTIONAL COOLDOWN', checkable: true, optional: true, items: [
+        hyEx('cooldown_walk', 'Easy Walk', 'timed', 1, '5 min'),
+        hyEx('hip_hamstring_mobility', 'Hip and Hamstring Mobility', 'check', 1, '', { rx: 'a few easy minutes' })
+      ] }
+    ]
+  },
 
   upperB: {
     id: 'upperB', name: 'Upper B — Strength and Hypertrophy', short: 'Upper B', category: 'strength', tag: 'Strength', body: 'upper',

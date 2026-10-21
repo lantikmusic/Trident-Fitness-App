@@ -1,7 +1,8 @@
 // Trident Fitness - Cloudflare Worker
 // Handles: Auth (signup/login/sessions) + LogMeal API proxy
 
-const LOGMEAL_TOKEN = '676027383a6745629677a74d23a5328471ac49e7';
+// The LogMeal API token is a Cloudflare secret (env.LOGMEAL_TOKEN), set with:
+//   npx wrangler secret put LOGMEAL_TOKEN
 const LOGMEAL_API_BASE = 'https://api.logmeal.es';
 const SESSION_DURATION_DAYS = 30;
 
@@ -136,7 +137,7 @@ export default {
     if (path.startsWith('/community/avatar/') && request.method === 'GET')  return community(communityAvatar, path, env.DB);
 
     // ── LogMeal Proxy Routes ──
-    if (path.startsWith('/v2/')) return handleLogMealProxy(request, path);
+    if (path.startsWith('/v2/')) return handleLogMealProxy(request, path + url.search, env);
 
     return error('Not found', 404);
   }
@@ -989,12 +990,18 @@ async function communityAvatar(path, DB) {
 // LOGMEAL PROXY
 // ══════════════════════════════════════════════════════
 
-async function handleLogMealProxy(request, path) {
+async function handleLogMealProxy(request, path, env) {
   try {
-    const logmealUrl = `${LOGMEAL_API_BASE}${path}`;
+    // Signed-in users only, so the proxy cannot be used by anyone else on the app's LogMeal plan.
+    const session = await validateSession(request, env.DB);
+    if (!session) return error('Sign in to use food scanning', 401);
+    const LOGMEAL_TOKEN = env.LOGMEAL_TOKEN;
+    if (!LOGMEAL_TOKEN) return error('Food scanning is not set up on the server', 503);
+    const logmealUrl = `${env.LOGMEAL_API_BASE || LOGMEAL_API_BASE}${path}`;
     const contentType = request.headers.get('Content-Type') || '';
     const isMultipart = contentType.includes('multipart');
-    const isImageEndpoint = path.includes('/image/');
+    // Photo uploads (segmentation/recognition). /image/confirm/ calls are plain JSON and are forwarded as-is.
+    const isImageEndpoint = path.includes('/image/') && !path.includes('/image/confirm/');
 
     let logmealRequest;
 
