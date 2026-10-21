@@ -908,6 +908,48 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .cm-avatar{width:36px;height:36px;border-radius:50%;background:var(--bg5);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--text2);overflow:hidden;}
 .cm-avatar img{width:100%;height:100%;object-fit:cover;display:block;}
 .cm-avatar.sm{width:28px;height:28px;font-size:12px;}
+.cm-avatar.lg{width:72px;height:72px;font-size:28px;}
+.nav-item{position:relative;}
+.nav-dot{position:absolute;top:2px;left:calc(50% + 6px);min-width:16px;height:16px;padding:0 4px;border-radius:99px;background:var(--red);color:#fff;font-size:10px;font-weight:700;line-height:16px;text-align:center;}
+.cm-top{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.cm-top .seg-toggle{margin-top:0;flex:1;max-width:none;}
+.cm-inbox-btn{position:relative;flex-shrink:0;width:42px;height:42px;border-radius:50%;border:0.5px solid var(--border2);background:var(--bg3);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.cm-inbox-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;}
+.cm-inbox-btn .nav-dot{top:-3px;left:auto;right:-3px;}
+.cm-who{display:flex;align-items:center;gap:10px;min-width:0;background:none;border:none;padding:0;color:inherit;font:inherit;text-align:left;cursor:pointer;}
+.cm-follow{margin-left:auto;flex-shrink:0;background:var(--pink);color:#000;border:none;border-radius:99px;padding:6px 12px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;}
+.cm-follow.on{background:transparent;color:var(--text2);border:0.5px solid var(--border2);}
+.cm-overlay-top{z-index:420;}
+.cm-prof{text-align:center;margin-bottom:14px;}
+.cm-prof .cm-avatar{margin:0 auto 10px;}
+.cm-prof-name{font-size:20px;font-weight:700;word-break:break-word;}
+.cm-prof-stats{display:flex;justify-content:center;gap:18px;margin:10px 0 14px;font-size:12px;color:var(--text3);}
+.cm-prof-stats b{display:block;font-size:17px;color:var(--text);}
+.cm-prof-btns{display:flex;gap:8px;}
+.cm-prof-btns button{flex:1;}
+.cm-tag{display:inline-block;margin-top:6px;font-size:11px;color:var(--text3);background:var(--bg4);border-radius:99px;padding:3px 9px;}
+.cm-mini{background:var(--bg4);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 12px;margin-bottom:8px;text-align:left;}
+.cm-mini .cm-photo{max-height:220px;margin:8px 0 0;}
+.cm-dm{position:fixed;inset:0;z-index:410;background:var(--bg);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);}
+.cm-dm-head{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:0.5px solid var(--border);flex-shrink:0;}
+.cm-dm-title{font-size:18px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cm-dm-x{background:none;border:none;color:var(--pink);font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;padding:6px 2px;flex-shrink:0;}
+.cm-dm-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 16px;}
+.cm-thread{display:flex;align-items:center;gap:12px;width:100%;background:none;border:none;border-bottom:0.5px solid var(--border);padding:12px 0;color:inherit;font:inherit;text-align:left;cursor:pointer;}
+.cm-thread-main{flex:1;min-width:0;}
+.cm-thread-top{display:flex;justify-content:space-between;gap:8px;}
+.cm-thread-name{font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cm-thread-last{font-size:13px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px;}
+.cm-thread.unread .cm-thread-last{color:var(--text);font-weight:600;}
+.cm-unread{flex-shrink:0;min-width:20px;height:20px;padding:0 6px;border-radius:99px;background:var(--pink);color:#000;font-size:11px;font-weight:700;line-height:20px;text-align:center;}
+.cm-msgs{display:flex;flex-direction:column;gap:6px;}
+.cm-msg{max-width:78%;padding:9px 12px;border-radius:18px;font-size:14px;line-height:1.4;white-space:pre-wrap;word-break:break-word;background:var(--bg4);align-self:flex-start;border-bottom-left-radius:6px;}
+.cm-msg.mine{background:var(--pink);color:#000;align-self:flex-end;border-bottom-left-radius:18px;border-bottom-right-radius:6px;}
+.cm-msg-time{font-size:10px;color:var(--text3);margin:4px 4px 6px;}
+.cm-msg-time.mine{text-align:right;}
+.cm-dm-bar{display:flex;gap:8px;align-items:flex-end;padding:10px 16px calc(10px + env(safe-area-inset-bottom));border-top:0.5px solid var(--border);flex-shrink:0;}
+.cm-dm-bar textarea{flex:1;min-width:0;max-height:120px;resize:none;background:var(--bg4);border:0.5px solid var(--border);border-radius:20px;padding:10px 14px;color:var(--text);font-family:inherit;font-size:16px;line-height:1.3;}
+.cm-dm-note{padding:14px 16px calc(14px + env(safe-area-inset-bottom));border-top:0.5px solid var(--border);color:var(--text3);font-size:13px;text-align:center;flex-shrink:0;}
 .cm-name{font-size:14px;font-weight:600;line-height:1.2;word-break:break-word;}
 .cm-time{font-size:11px;color:var(--text3);margin-top:2px;}
 .cm-del{margin-left:auto;flex-shrink:0;background:none;border:none;color:var(--text3);font-family:inherit;font-size:12px;cursor:pointer;padding:6px;}
@@ -1963,6 +2005,11 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
   </div>
 </div>
 
+<div class="cm-overlay cm-overlay-top" id="cmSheetOverlay" onclick="if(event.target===this)cmSheetClose()">
+  <div class="cm-sheet" id="cmSheet"></div>
+</div>
+<div class="cm-dm" id="cmDm" style="display:none;" role="dialog" aria-label="Messages"></div>
+
 <div class="cm-overlay" id="hySheetOverlay" onclick="if(event.target===this)hySheetClose()">
   <div class="cm-sheet" id="hySheet"></div>
 </div>
@@ -2131,6 +2178,7 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
   <button class="nav-item" onclick="navTo('community')" id="nav-community">
     <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
     <span class="nav-label">Community</span>
+    <span class="nav-dot" id="cmNavDot" style="display:none;"></span>
   </button>
 </nav>
 
@@ -2266,6 +2314,8 @@ async function loadFromCloud() {
       appSettings = s;
       updateProfilePicDisplay();
     }
+    // The server has no picture for this account but this phone does: upload it so others can see it.
+    if(settings && !settings.profile_pic && localStorage.getItem(PROFILE_PIC_KEY)) syncProfilePicUp();
 
     // Apply goals
     if(goals && Object.keys(goals).length > 0) {
@@ -9926,7 +9976,8 @@ document.addEventListener('visibilitychange', () => {
 const CM_PAGE_SIZE = 15;
 const CM_HEART = '<svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21.2l7.8-7.7 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
 const CM_BUBBLE = '<svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5z"/></svg>';
-let cmState = { posts: [], next: null, status: 'idle', loadedAt: 0, busy: false, comments: {}, open: {} };
+let cmState = { posts: [], next: null, status: 'idle', loadedAt: 0, busy: false, comments: {}, open: {}, scope: 'all' };
+const CM_MAIL = '<svg viewBox="0 0 24 24"><path d="M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/><path d="M3.5 6.5 12 13l8.5-6.5"/></svg>';
 let cmDraft = { photo: null, attach: null, options: null, sending: false };
 
 function cmEsc(v) {
@@ -10026,7 +10077,7 @@ function cmCommentsHTML(id) {
       return `<div class="cm-comment">
         ${cmAvatarHTML(c, true)}
         <div class="cm-comment-bubble">
-          <div class="cm-comment-name">${cmEsc(c.author_name || 'Member')}</div>
+          <button class="cm-comment-name cm-link" style="text-decoration:none;font-size:12px;font-weight:600;" onclick="cmOpenProfile('${cmSafeId(c.user_id)}')">${cmEsc(c.author_name || 'Member')}</button>
           <div class="cm-comment-text">${cmEsc(c.body)}</div>
           <div class="cm-comment-meta">${cmEsc(cmTimeAgo(c.created_at))}${c.can_delete ? ` · <button class="cm-link" onclick="cmDeleteComment('${id}','${cid}')">Delete</button>` : ''}</div>
         </div>
@@ -10048,9 +10099,11 @@ function cmPostHTML(p) {
   const name = cmEsc(p.author_name || 'Member');
   return `<div class="cm-post" id="cm-post-${id}">
     <div class="cm-head">
-      ${cmAvatarHTML(p)}
-      <div style="min-width:0;"><div class="cm-name">${name}</div><div class="cm-time">${cmEsc(cmTimeAgo(p.created_at))}</div></div>
-      ${p.mine ? `<button class="cm-del" onclick="cmDeletePost('${id}')">Delete</button>` : ''}
+      <button class="cm-who" onclick="cmOpenProfile('${cmSafeId(p.user_id)}')" aria-label="Open ${name}'s profile">
+        ${cmAvatarHTML(p)}
+        <div style="min-width:0;"><div class="cm-name">${name}</div><div class="cm-time">${cmEsc(cmTimeAgo(p.created_at))}</div></div>
+      </button>
+      ${p.mine ? `<button class="cm-del" onclick="cmDeletePost('${id}')">Delete</button>` : (p.following ? '' : `<button class="cm-follow" onclick="cmToggleFollow('${cmSafeId(p.user_id)}')">Follow</button>`)}
     </div>
     ${p.body ? `<div class="cm-body">${cmEsc(p.body)}</div>` : ''}
     ${cmAttachHTML(p.type, p.payload)}
@@ -10066,13 +10119,20 @@ function cmPostHTML(p) {
 function cmDraw() {
   const root = document.getElementById('cmRoot');
   if(!root) return;
-  let html = `<button class="cm-compose-btn" onclick="cmOpenCompose()">＋ Share a post, photo, workout or PR</button>`;
+  const following = cmState.scope === 'following';
+  let html = `<div class="cm-top">
+      <div class="seg-toggle"><button class="seg-btn${following ? '' : ' active'}" onclick="cmSetScope('all')">Main Feed</button><button class="seg-btn${following ? ' active' : ''}" onclick="cmSetScope('following')">Following</button></div>
+      <button class="cm-inbox-btn" onclick="cmOpenInbox()" aria-label="Messages">${CM_MAIL}<span class="nav-dot" id="cmInboxDot" style="display:${cmDm.unread ? 'block' : 'none'};">${cmDm.unread > 99 ? '99+' : cmNum(cmDm.unread)}</span></button>
+    </div>
+    <button class="cm-compose-btn" onclick="cmOpenCompose()">＋ Share a post, photo, workout or PR</button>`;
   if(cmState.status === 'loading') {
     html += `<div class="cm-empty">Loading the feed…</div>`;
   } else if(cmState.status === 'error') {
     html += `<div class="cm-empty">The community feed isn't available right now.<br><br><button class="cm-chip" onclick="cmLoadFeed(true)">Try again</button></div>`;
   } else if(!cmState.posts.length) {
-    html += `<div class="cm-empty">No posts yet.<br>Be the first to share something.</div>`;
+    html += following
+      ? `<div class="cm-empty">Posts from people you follow show up here.<br>Tap someone's name or picture on a post to see their profile and follow them.</div>`
+      : `<div class="cm-empty">No posts yet.<br>Be the first to share something.</div>`;
   } else {
     html += cmState.posts.map(cmPostHTML).join('');
     if(cmState.next) html += `<button class="ghost-btn" onclick="cmLoadFeed(false)">Load more</button>`;
@@ -10103,15 +10163,234 @@ function renderCommunity() {
   }
   cmDraw();
   if(cmState.status === 'idle' || cmState.status === 'error' || Date.now() - cmState.loadedAt > 30000) cmLoadFeed(true);
+  cmRefreshUnread();
 }
+
+function cmSetScope(scope) {
+  if(scope === cmState.scope) return;
+  cmState.scope = scope;
+  cmState.posts = []; cmState.next = null; cmState.status = 'loading'; cmState.open = {};
+  cmState.busy = false;
+  cmDraw();
+  cmLoadFeed(true);
+}
+
+// ── Following and profiles ──
+function cmSheet(html) { document.getElementById('cmSheet').innerHTML = html; document.getElementById('cmSheetOverlay').style.display = 'flex'; }
+function cmSheetClose() { document.getElementById('cmSheetOverlay').style.display = 'none'; cmProfileOpen = null; }
+let cmProfileOpen = null;
+
+async function cmToggleFollow(uid) {
+  uid = cmSafeId(uid); if(!uid) return;
+  const r = await cmApi('/community/follow', 'POST', { user_id: uid });
+  if(!r.ok || !r.data) { showToast((r.data && r.data.error) || 'Could not update — try again'); return; }
+  cmState.posts.forEach(p => { if(p.user_id === uid) p.following = !!r.data.following; });
+  if(cmState.scope === 'following') cmLoadFeed(true); else cmDraw();
+  if(cmProfileOpen === uid) cmOpenProfile(uid);
+  showToast(r.data.following ? 'Following' : 'Unfollowed');
+}
+
+async function cmToggleBlock(uid, name) {
+  uid = cmSafeId(uid); if(!uid) return;
+  const prof = cmProfileOpen === uid ? window._cmProf : null;
+  if(!(prof && prof.blocked) && !confirm(`Block ${name}? You won't see their posts, neither of you can message the other, and any follows between you are removed.`)) return;
+  const r = await cmApi('/community/block', 'POST', { user_id: uid });
+  if(!r.ok || !r.data) { showToast('Could not update — try again'); return; }
+  showToast(r.data.blocked ? 'Blocked' : 'Unblocked');
+  cmLoadFeed(true);
+  if(cmDm.with === uid) cmLoadThread(true);
+  cmOpenProfile(uid);
+}
+
+function cmMiniPostHTML(p) {
+  const id = cmSafeId(p && p.id);
+  if(!id) return '';
+  return `<div class="cm-mini">
+    <div class="cm-time" style="margin:0 0 4px;">${cmEsc(cmTimeAgo(p.created_at))} · ${cmNum(p.like_count)} likes · ${cmNum(p.comment_count)} comments</div>
+    ${p.body ? `<div class="cm-body" style="margin-bottom:6px;">${cmEsc(p.body)}</div>` : ''}
+    ${cmAttachHTML(p.type, p.payload)}
+    ${p.has_photo ? `<img class="cm-photo" src="${WORKER_URL}/community/photo/${id}" alt="" loading="lazy">` : ''}
+  </div>`;
+}
+
+async function cmOpenProfile(uid) {
+  uid = cmSafeId(uid); if(!uid) return;
+  cmProfileOpen = uid;
+  if(document.getElementById('cmSheetOverlay').style.display !== 'flex') cmSheet(`<div class="cm-empty">Loading…</div>`);
+  const [r, posts] = await Promise.all([cmApi(`/community/profile?user_id=${uid}`), cmApi(`/community/feed?limit=10&user=${uid}`)]);
+  if(cmProfileOpen !== uid) return;
+  if(!r.ok || !r.data) { cmSheet(`<div class="cm-empty">This profile could not be loaded.</div><button class="ghost-btn" onclick="cmSheetClose()">Close</button>`); return; }
+  const pr = r.data; window._cmProf = pr;
+  const name = cmEsc(pr.name || 'Member'), list = posts.ok && posts.data && Array.isArray(posts.data.posts) ? posts.data.posts : [];
+  const safeName = cmEsc(String(pr.name || 'Member').replace(/['"\\]/g, ''));
+  cmSheet(`<div class="cm-prof">
+      ${cmAvatarHTML({ user_id: uid, author_name: pr.name, has_avatar: pr.has_avatar }).replace('cm-avatar', 'cm-avatar lg')}
+      <div class="cm-prof-name">${name}</div>
+      ${pr.follows_you && !pr.is_me ? `<div class="cm-tag">Follows you</div>` : ''}
+      <div class="cm-prof-stats"><div><b>${cmNum(pr.posts)}</b>posts</div><div><b>${cmNum(pr.followers)}</b>followers</div><div><b>${cmNum(pr.following)}</b>following</div></div>
+      ${pr.is_me ? '' : pr.blocked ? `<div class="hy-muted" style="margin-bottom:10px;">You blocked ${name}.</div>` : `<div class="cm-prof-btns">
+        <button class="${pr.is_following ? 'ghost-btn' : 'pink-btn'}" onclick="cmToggleFollow('${uid}')">${pr.is_following ? 'Following ✓' : 'Follow'}</button>
+        <button class="ghost-btn" onclick="cmSheetClose();cmOpenThread('${uid}')">Message</button>
+      </div>`}
+    </div>
+    ${pr.blocked ? '' : (list.length ? list.map(cmMiniPostHTML).join('') : `<div class="cm-empty" style="padding:18px 0;">No posts yet.</div>`)}
+    ${pr.is_me ? '' : `<button class="cm-link" style="display:block;margin:14px auto 4px;color:var(--text3);font-size:12px;" onclick="cmToggleBlock('${uid}','${safeName}')">${pr.blocked ? 'Unblock' : 'Block'} ${name}</button>`}
+    <button class="ghost-btn" style="margin-top:10px;" onclick="cmSheetClose()">Close</button>`);
+}
+
+// ── Direct messages ──
+let cmDm = { view: null, with: null, threads: null, thread: null, unread: 0, timer: null, sending: false };
+
+function cmSetUnread(n) {
+  cmDm.unread = Math.max(0, cmNum(n));
+  const text = cmDm.unread > 99 ? '99+' : String(cmDm.unread);
+  ['cmNavDot', 'cmInboxDot'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) { el.textContent = text; el.style.display = cmDm.unread ? 'block' : 'none'; }
+  });
+}
+async function cmRefreshUnread() {
+  if(!isLoggedIn()) { cmSetUnread(0); return; }
+  const r = await cmApi('/dm/unread');
+  if(r.ok && r.data) cmSetUnread(r.data.unread);
+}
+
+function cmDmShow(html) {
+  const el = document.getElementById('cmDm');
+  el.innerHTML = html;
+  el.style.display = 'flex';
+}
+function cmCloseDm() {
+  clearInterval(cmDm.timer); cmDm.timer = null;
+  cmDm.view = null; cmDm.with = null; cmDm.thread = null;
+  document.getElementById('cmDm').style.display = 'none';
+  cmRefreshUnread();
+}
+function cmDmPoll(fn, ms) {
+  clearInterval(cmDm.timer);
+  cmDm.timer = setInterval(() => { if(!document.hidden) fn(); }, ms);
+}
+
+function cmInboxHTML() {
+  const t = cmDm.threads;
+  let body;
+  if(t === null) body = `<div class="cm-empty">Loading…</div>`;
+  else if(t === false) body = `<div class="cm-empty">Messages could not be loaded.<br><br><button class="cm-chip" onclick="cmLoadInbox()">Try again</button></div>`;
+  else if(!t.length) body = `<div class="cm-empty">No messages yet.<br>Open someone's profile from a post and tap Message.</div>`;
+  else body = t.map(th => {
+    const uid = cmSafeId(th.user_id); if(!uid) return '';
+    return `<button class="cm-thread${th.unread ? ' unread' : ''}" onclick="cmOpenThread('${uid}')">
+      ${cmAvatarHTML({ user_id: uid, author_name: th.name, has_avatar: th.has_avatar })}
+      <div class="cm-thread-main">
+        <div class="cm-thread-top"><span class="cm-thread-name">${cmEsc(th.name || 'Member')}</span><span class="cm-time" style="margin:0;flex-shrink:0;">${cmEsc(cmTimeAgo(th.last_at))}</span></div>
+        <div class="cm-thread-last">${th.last_mine ? 'You: ' : ''}${cmEsc(th.last_body)}</div>
+      </div>
+      ${th.unread ? `<span class="cm-unread">${cmNum(th.unread)}</span>` : ''}
+    </button>`;
+  }).join('');
+  return `<div class="cm-dm-head"><div class="cm-dm-title">Messages</div><button class="cm-dm-x" onclick="cmCloseDm()">Done</button></div>
+    <div class="cm-dm-body">${body}</div>`;
+}
+async function cmLoadInbox() {
+  const r = await cmApi('/dm/threads');
+  if(cmDm.view !== 'inbox') return;
+  if(r.ok && r.data && Array.isArray(r.data.threads)) { cmDm.threads = r.data.threads; cmSetUnread(r.data.unread); }
+  else if(cmDm.threads === null) cmDm.threads = false;
+  cmDmShow(cmInboxHTML());
+}
+function cmOpenInbox() {
+  if(!isLoggedIn()) { showToast('Sign in to use messages'); return; }
+  cmDm.view = 'inbox'; cmDm.with = null; cmDm.thread = null;
+  if(!Array.isArray(cmDm.threads)) cmDm.threads = null;
+  cmDmShow(cmInboxHTML());
+  cmLoadInbox();
+  cmDmPoll(cmLoadInbox, 15000);
+}
+
+function cmThreadHTML() {
+  const t = cmDm.thread, uid = cmDm.with;
+  const user = t && t.user ? t.user : { user_id: uid, author_name: '', has_avatar: false };
+  const name = cmEsc((t && t.user && t.user.name) || 'Member');
+  let body;
+  if(!t) body = `<div class="cm-empty">Loading…</div>`;
+  else if(t === false) body = `<div class="cm-empty">This conversation could not be loaded.</div>`;
+  else if(!t.messages.length) body = `<div class="cm-empty">Say hi to ${name}.</div>`;
+  else {
+    body = '<div class="cm-msgs">' + t.messages.map((m, i) => {
+      const next = t.messages[i + 1];
+      const showTime = !next || next.mine !== m.mine || (Date.parse(next.created_at) - Date.parse(m.created_at)) > 600000;
+      return `<div class="cm-msg${m.mine ? ' mine' : ''}">${cmEsc(m.body)}</div>${showTime ? `<div class="cm-msg-time${m.mine ? ' mine' : ''}">${cmEsc(cmTimeAgo(m.created_at))}${m.mine && !next && m.read ? ' · Seen' : ''}</div>` : ''}`;
+    }).join('') + '</div>';
+  }
+  const bar = !t || t === false ? '' : (t.can_send
+    ? `<div class="cm-dm-bar"><textarea id="cmDmInput" rows="1" maxlength="1000" placeholder="Message ${name}" aria-label="Message" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea><button class="cm-send" id="cmDmSend" onclick="cmSendDm()">Send</button></div>`
+    : `<div class="cm-dm-note">${t.blocked ? `You blocked ${name}. Unblock them from their profile to message again.` : `You can't message ${name}.`}</div>`);
+  return `<div class="cm-dm-head">
+      <button class="cm-dm-x" onclick="cmOpenInbox()" aria-label="Back to messages">‹</button>
+      <button class="cm-who" onclick="cmOpenProfile('${cmSafeId(uid)}')">${cmAvatarHTML({ user_id: uid, author_name: user.name, has_avatar: user.has_avatar }).replace('cm-avatar', 'cm-avatar sm')}<span class="cm-dm-title">${name}</span></button>
+    </div>
+    <div class="cm-dm-body" id="cmDmBody">${body}</div>${bar}`;
+}
+// Redraws the conversation, keeping a half-typed message and the scroll position (or staying at the bottom).
+function cmDrawThread() {
+  const input = document.getElementById('cmDmInput'), typed = input ? input.value : '', focused = !!input && document.activeElement === input;
+  const old = document.getElementById('cmDmBody');
+  const atBottom = !old || old.scrollHeight - old.scrollTop - old.clientHeight < 60;
+  cmDmShow(cmThreadHTML());
+  const fresh = document.getElementById('cmDmInput');
+  if(fresh && typed) fresh.value = typed;
+  if(fresh && focused) fresh.focus();
+  const body = document.getElementById('cmDmBody');
+  if(body && atBottom) body.scrollTop = body.scrollHeight;
+}
+async function cmLoadThread(force) {
+  const uid = cmDm.with; if(!uid) return;
+  const r = await cmApi(`/dm/messages?with=${uid}`);
+  if(cmDm.view !== 'thread' || cmDm.with !== uid) return;
+  if(!r.ok || !r.data || !Array.isArray(r.data.messages)) { if(!cmDm.thread) { cmDm.thread = false; cmDrawThread(); } return; }
+  const before = cmDm.thread ? JSON.stringify(cmDm.thread) : '';
+  cmDm.thread = r.data;
+  if(force || JSON.stringify(r.data) !== before) cmDrawThread();
+  cmRefreshUnread();
+}
+function cmOpenThread(uid) {
+  uid = cmSafeId(uid); if(!uid) return;
+  if(!isLoggedIn()) { showToast('Sign in to use messages'); return; }
+  cmDm.view = 'thread'; cmDm.with = uid; cmDm.thread = null;
+  cmDrawThread();
+  cmLoadThread(true);
+  cmDmPoll(() => cmLoadThread(false), 5000);
+}
+async function cmSendDm() {
+  const input = document.getElementById('cmDmInput');
+  const body = input ? input.value.trim() : '';
+  if(!body || cmDm.sending || !cmDm.with) return;
+  cmDm.sending = true;
+  const btn = document.getElementById('cmDmSend'); if(btn) btn.disabled = true;
+  const r = await cmApi('/dm/send', 'POST', { to: cmDm.with, body });
+  cmDm.sending = false;
+  if(btn) btn.disabled = false;
+  if(!r.ok || !r.data || !r.data.message) { showToast((r.data && r.data.error) || 'Message not sent — try again'); return; }
+  if(input) { input.value = ''; input.style.height = 'auto'; }
+  if(cmDm.thread && Array.isArray(cmDm.thread.messages)) cmDm.thread.messages.push(r.data.message);
+  const el = document.getElementById('cmDmBody');
+  cmDrawThread();
+  const body2 = document.getElementById('cmDmBody'); if(body2) body2.scrollTop = body2.scrollHeight;
+}
+// Check for new messages when the app comes back to the front, and once a minute while it is open.
+document.addEventListener('visibilitychange', () => { if(!document.hidden && isLoggedIn()) cmRefreshUnread(); });
+setInterval(() => { if(!document.hidden && isLoggedIn() && !cmDm.timer) cmRefreshUnread(); }, 60000);
+setTimeout(() => { try { if(isLoggedIn()) cmRefreshUnread(); } catch(e) {} }, 4000);
 
 async function cmLoadFeed(reset) {
   if(cmState.busy) return;
   cmState.busy = true;
   if(reset && !cmState.posts.length) { cmState.status = 'loading'; cmDraw(); }
   const before = (!reset && cmState.next) ? `&before=${encodeURIComponent(cmState.next)}` : '';
-  const r = await cmApi(`/community/feed?limit=${CM_PAGE_SIZE}${before}`);
+  const scope = cmState.scope;
+  const r = await cmApi(`/community/feed?limit=${CM_PAGE_SIZE}${before}${scope === 'following' ? '&scope=following' : ''}`);
   cmState.busy = false;
+  if(scope !== cmState.scope) return; // switched tabs while loading
   if(r.status === 401) return;
   if(!r.ok || !r.data || !Array.isArray(r.data.posts)) {
     if(cmState.posts.length) { cmState.status = 'ready'; showToast('Could not refresh the feed'); }
@@ -10537,13 +10816,55 @@ function openProfilePic() {
 function closeProfilePic() {
   document.getElementById('profilePicOverlay').style.display = 'none';
 }
+// Profile pictures are stored as a small square JPEG, so they upload reliably and load fast for everyone.
+function shrinkAvatar(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const side = Math.min(img.naturalWidth, img.naturalHeight);
+        if(!side) { reject(new Error('Photo unreadable')); return; }
+        const out = Math.min(400, side);
+        const canvas = document.createElement('canvas');
+        canvas.width = out; canvas.height = out;
+        canvas.getContext('2d').drawImage(img, (img.naturalWidth - side) / 2, (img.naturalHeight - side) / 2, side, side, 0, 0, out, out);
+        resolve(canvas.toDataURL('image/jpeg', 0.85));
+      } catch(e) { reject(e); }
+    };
+    img.onerror = () => reject(new Error('Photo unreadable'));
+    img.src = src;
+  });
+}
+async function uploadProfilePic(src) {
+  if(!isLoggedIn() || !src) return false;
+  try {
+    const res = await fetch(`${WORKER_URL}/user/profile-pic`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${getSessionToken()}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: src })
+    });
+    return res.ok;
+  } catch(e) { return false; }
+}
+// A picture that only ever reached this phone (saved while signed out, or the upload failed) is sent up now.
+async function syncProfilePicUp() {
+  try {
+    const local = localStorage.getItem(PROFILE_PIC_KEY);
+    if(!local) return;
+    const small = local.length > 300000 || !local.startsWith('data:image/jpeg') ? await shrinkAvatar(local) : local;
+    if(small !== local) { try { localStorage.setItem(PROFILE_PIC_KEY, small); } catch(e) {} }
+    await uploadProfilePic(small);
+  } catch(e) { console.warn('Profile picture not synced:', e); }
+}
 function previewProfilePic(input) {
   const file = input.files[0];
   if(!file) return;
   const reader = new FileReader();
-  reader.onload = e => {
-    document.getElementById('profilePicPreview').innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">`;
-    document.getElementById('profilePicPreview').dataset.src = e.target.result;
+  reader.onload = async e => {
+    let src = e.target.result;
+    try { src = await shrinkAvatar(src); } catch(err) { showToast('That photo could not be read'); return; }
+    document.getElementById('profilePicPreview').innerHTML = `<img src="${src}" style="width:100%;height:100%;object-fit:cover;">`;
+    document.getElementById('profilePicPreview').dataset.src = src;
   };
   reader.readAsDataURL(file);
 }
@@ -10555,7 +10876,7 @@ function saveProfilePic() {
   const s = load(SETTINGS_KEY) || {};
   s.profilePic = src;
   save(SETTINGS_KEY, s);
-  cloudPost('/user/settings', { ...s, profile_pic: src });
+  uploadProfilePic(src).then(ok => { if(!ok && isLoggedIn()) showToast('Saved on this phone — it will upload next time you open the app'); });
   closeProfilePic();
   updateProfilePicDisplay();
   showToast('✓ Profile picture saved!');

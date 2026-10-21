@@ -135,6 +135,18 @@ export default {
     if (path === '/community/comments/delete' && request.method === 'POST') return community(communityDeleteComment, request, env.DB);
     if (path.startsWith('/community/photo/')  && request.method === 'GET')  return community(communityPhoto, path, env.DB);
     if (path.startsWith('/community/avatar/') && request.method === 'GET')  return community(communityAvatar, path, env.DB);
+    if (path === '/community/profile'         && request.method === 'GET')  return community(communityProfile, request, env.DB);
+    if (path === '/community/follow'          && request.method === 'POST') return community(communityToggleFollow, request, env.DB);
+    if (path === '/community/block'           && request.method === 'POST') return community(communityToggleBlock, request, env.DB);
+
+    // ── Direct messages ──
+    if (path === '/dm/threads'                && request.method === 'GET')  return community(dmThreads, request, env.DB);
+    if (path === '/dm/unread'                 && request.method === 'GET')  return community(dmUnread, request, env.DB);
+    if (path === '/dm/messages'               && request.method === 'GET')  return community(dmMessages, request, env.DB);
+    if (path === '/dm/send'                   && request.method === 'POST') return community(dmSend, request, env.DB);
+
+    // ── Profile picture on its own (does not touch the other settings) ──
+    if (path === '/user/profile-pic'          && request.method === 'POST') return community(saveProfilePic, request, env.DB);
 
     // ── LogMeal Proxy Routes ──
     if (path.startsWith('/v2/')) return handleLogMealProxy(request, path + url.search, env);
@@ -727,7 +739,8 @@ const COMMUNITY_POST_SELECT = `
     (SELECT COUNT(*) FROM community_likes l WHERE l.post_id = p.id) AS like_count,
     (SELECT COUNT(*) FROM community_comments c WHERE c.post_id = p.id) AS comment_count,
     EXISTS(SELECT 1 FROM community_likes l2 WHERE l2.post_id = p.id AND l2.user_id = ?1) AS liked,
-    EXISTS(SELECT 1 FROM user_blobs b WHERE b.user_id = p.user_id AND b.blob_key = 'profile_pic') AS has_avatar
+    EXISTS(SELECT 1 FROM user_blobs b WHERE b.user_id = p.user_id AND b.blob_key = 'profile_pic') AS has_avatar,
+    EXISTS(SELECT 1 FROM community_follows f WHERE f.follower_id = ?1 AND f.followee_id = p.user_id) AS following
   FROM community_posts p
   JOIN users u ON u.id = p.user_id
   LEFT JOIN user_settings s ON s.user_id = p.user_id`;
@@ -748,6 +761,7 @@ function communityPostOut(row, viewerId) {
     comment_count: row.comment_count || 0,
     liked: !!row.liked,
     has_avatar: !!row.has_avatar,
+    following: !!row.following,
     mine: row.user_id === viewerId
   };
 }
@@ -763,10 +777,18 @@ async function communityFeed(request, DB) {
   const url = new URL(request.url);
   const limit = Math.min(Math.max(parseInt(url.searchParams.get('limit'), 10) || 15, 1), 30);
   const before = url.searchParams.get('before') || null;
+  // scope=following: people you follow, plus your own posts. user=<id>: one person's posts.
+  const scope = url.searchParams.get('scope') === 'following' ? 'following' : 'all';
+  const only = url.searchParams.get('user') || null;
+  if (only !== null && !COMMUNITY_ID.test(only)) return error('Invalid request');
 
   const rows = await DB.prepare(
-    `${COMMUNITY_POST_SELECT} WHERE (?2 IS NULL OR p.created_at < ?2) ORDER BY p.created_at DESC LIMIT ?3`
-  ).bind(session.user_id, before, limit + 1).all();
+    `${COMMUNITY_POST_SELECT} WHERE (?2 IS NULL OR p.created_at < ?2)
+      AND p.user_id NOT IN (SELECT blocked_id FROM dm_blocks WHERE blocker_id = ?1)
+      AND (?4 = 'all' OR p.user_id = ?1 OR p.user_id IN (SELECT followee_id FROM community_follows WHERE follower_id = ?1))
+      AND (?5 IS NULL OR p.user_id = ?5)
+    ORDER BY p.created_at DESC LIMIT ?3`
+  ).bind(session.user_id, before, limit + 1, scope, only).all();
 
   const list = rows.results || [];
   const page = list.slice(0, limit);
@@ -951,6 +973,193 @@ async function communityDeleteComment(request, DB) {
   await DB.prepare('DELETE FROM community_comments WHERE id = ?').bind(id).run();
   const count = await DB.prepare('SELECT COUNT(*) AS n FROM community_comments WHERE post_id = ?').bind(row.post_id).first();
   return json({ success: true, comment_count: (count && count.n) || 0 });
+}
+
+// ── Follows, profiles and blocking ──
+async function communityUserRow(DB, userId) {
+  return DB.prepare(
+    `SELECT u.id, ${COMMUNITY_AUTHOR} AS name,
+       EXISTS(SELECT 1 FROM user_blobs b WHERE b.user_id = u.id AND b.blob_key = 'profile_pic') AS has_avatar
+     FROM users u LEFT JOIN user_settings s ON s.user_id = u.id WHERE u.id = ?`
+  ).bind(userId).first();
+}
+
+async function communityTarget(request) {
+  let data;
+  try { data = await request.json(); } catch (e) { return null; }
+  const id = data && data.user_id;
+  return typeof id === 'string' && COMMUNITY_ID.test(id) ? id : null;
+}
+
+async function communityProfile(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+  const userId = new URL(request.url).searchParams.get('user_id') || '';
+  if (!COMMUNITY_ID.test(userId)) return error('Invalid request');
+  const user = await communityUserRow(DB, userId);
+  if (!user) return error('Member not found', 404);
+  const me = session.user_id;
+  const stats = await DB.prepare(
+    `SELECT
+       (SELECT COUNT(*) FROM community_follows WHERE followee_id = ?1) AS followers,
+       (SELECT COUNT(*) FROM community_follows WHERE follower_id = ?1) AS following,
+       (SELECT COUNT(*) FROM community_posts WHERE user_id = ?1) AS posts,
+       EXISTS(SELECT 1 FROM community_follows WHERE follower_id = ?2 AND followee_id = ?1) AS is_following,
+       EXISTS(SELECT 1 FROM community_follows WHERE follower_id = ?1 AND followee_id = ?2) AS follows_you,
+       EXISTS(SELECT 1 FROM dm_blocks WHERE blocker_id = ?2 AND blocked_id = ?1) AS blocked`
+  ).bind(userId, me).first();
+  return json({
+    user_id: user.id, name: user.name, has_avatar: !!user.has_avatar, is_me: user.id === me,
+    followers: stats.followers || 0, following: stats.following || 0, posts: stats.posts || 0,
+    is_following: !!stats.is_following, follows_you: !!stats.follows_you, blocked: !!stats.blocked
+  });
+}
+
+async function communityToggleFollow(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+  const target = await communityTarget(request);
+  if (!target) return error('Invalid request');
+  if (target === session.user_id) return error('You cannot follow yourself');
+  if (!(await communityUserRow(DB, target))) return error('Member not found', 404);
+  const existing = await DB.prepare('SELECT 1 AS x FROM community_follows WHERE follower_id = ? AND followee_id = ?').bind(session.user_id, target).first();
+  if (existing) {
+    await DB.prepare('DELETE FROM community_follows WHERE follower_id = ? AND followee_id = ?').bind(session.user_id, target).run();
+  } else {
+    const blocked = await DB.prepare('SELECT 1 AS x FROM dm_blocks WHERE (blocker_id = ?1 AND blocked_id = ?2) OR (blocker_id = ?2 AND blocked_id = ?1)').bind(session.user_id, target).first();
+    if (blocked) return error('You cannot follow this member', 403);
+    await DB.prepare('INSERT OR IGNORE INTO community_follows (follower_id, followee_id, created_at) VALUES (?, ?, ?)').bind(session.user_id, target, new Date().toISOString()).run();
+  }
+  const count = await DB.prepare('SELECT COUNT(*) AS n FROM community_follows WHERE followee_id = ?').bind(target).first();
+  return json({ success: true, following: !existing, followers: (count && count.n) || 0 });
+}
+
+// Blocking someone hides their posts from you, stops messages both ways and removes follows both ways.
+async function communityToggleBlock(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+  const target = await communityTarget(request);
+  if (!target || target === session.user_id) return error('Invalid request');
+  if (!(await communityUserRow(DB, target))) return error('Member not found', 404);
+  const me = session.user_id;
+  const existing = await DB.prepare('SELECT 1 AS x FROM dm_blocks WHERE blocker_id = ? AND blocked_id = ?').bind(me, target).first();
+  if (existing) {
+    await DB.prepare('DELETE FROM dm_blocks WHERE blocker_id = ? AND blocked_id = ?').bind(me, target).run();
+  } else {
+    await DB.batch([
+      DB.prepare('INSERT OR IGNORE INTO dm_blocks (blocker_id, blocked_id, created_at) VALUES (?, ?, ?)').bind(me, target, new Date().toISOString()),
+      DB.prepare('DELETE FROM community_follows WHERE (follower_id = ?1 AND followee_id = ?2) OR (follower_id = ?2 AND followee_id = ?1)').bind(me, target)
+    ]);
+  }
+  return json({ success: true, blocked: !existing });
+}
+
+// ── Direct messages ──
+const DM_MAX_BODY = 1000;
+const DM_PER_HOUR = 60;
+
+async function dmBlockedBetween(DB, a, b) {
+  return !!(await DB.prepare('SELECT 1 AS x FROM dm_blocks WHERE (blocker_id = ?1 AND blocked_id = ?2) OR (blocker_id = ?2 AND blocked_id = ?1)').bind(a, b).first());
+}
+
+async function dmUnread(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+  const row = await DB.prepare(
+    'SELECT COUNT(*) AS n FROM dm_messages WHERE recipient_id = ?1 AND read_at IS NULL AND sender_id NOT IN (SELECT blocked_id FROM dm_blocks WHERE blocker_id = ?1)'
+  ).bind(session.user_id).first();
+  return json({ unread: (row && row.n) || 0 });
+}
+
+async function dmThreads(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+  const me = session.user_id;
+  const rows = await DB.prepare(
+    `SELECT t.other_id, t.last_at,
+       (SELECT m.body FROM dm_messages m WHERE (m.sender_id = ?1 AND m.recipient_id = t.other_id) OR (m.sender_id = t.other_id AND m.recipient_id = ?1) ORDER BY m.created_at DESC LIMIT 1) AS last_body,
+       (SELECT m.sender_id FROM dm_messages m WHERE (m.sender_id = ?1 AND m.recipient_id = t.other_id) OR (m.sender_id = t.other_id AND m.recipient_id = ?1) ORDER BY m.created_at DESC LIMIT 1) AS last_sender,
+       (SELECT COUNT(*) FROM dm_messages m WHERE m.sender_id = t.other_id AND m.recipient_id = ?1 AND m.read_at IS NULL) AS unread,
+       ${COMMUNITY_AUTHOR} AS name,
+       EXISTS(SELECT 1 FROM user_blobs b WHERE b.user_id = t.other_id AND b.blob_key = 'profile_pic') AS has_avatar
+     FROM (
+       SELECT other_id, MAX(created_at) AS last_at FROM (
+         SELECT recipient_id AS other_id, created_at FROM dm_messages WHERE sender_id = ?1
+         UNION ALL
+         SELECT sender_id AS other_id, created_at FROM dm_messages WHERE recipient_id = ?1
+       ) GROUP BY other_id
+     ) t
+     JOIN users u ON u.id = t.other_id
+     LEFT JOIN user_settings s ON s.user_id = t.other_id
+     WHERE t.other_id NOT IN (SELECT blocked_id FROM dm_blocks WHERE blocker_id = ?1)
+     ORDER BY t.last_at DESC LIMIT 50`
+  ).bind(me).all();
+  const threads = (rows.results || []).map(r => ({
+    user_id: r.other_id, name: r.name, has_avatar: !!r.has_avatar, last_at: r.last_at,
+    last_body: (r.last_body || '').slice(0, 140), last_mine: r.last_sender === me, unread: r.unread || 0
+  }));
+  return json({ threads, unread: threads.reduce((n, t) => n + t.unread, 0) });
+}
+
+async function dmMessages(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+  const me = session.user_id;
+  const other = new URL(request.url).searchParams.get('with') || '';
+  if (!COMMUNITY_ID.test(other) || other === me) return error('Invalid request');
+  const user = await communityUserRow(DB, other);
+  if (!user) return error('Member not found', 404);
+  const rows = await DB.prepare(
+    `SELECT id, sender_id, body, created_at, read_at FROM dm_messages
+     WHERE (sender_id = ?1 AND recipient_id = ?2) OR (sender_id = ?2 AND recipient_id = ?1)
+     ORDER BY created_at DESC LIMIT 100`
+  ).bind(me, other).all();
+  await DB.prepare('UPDATE dm_messages SET read_at = ? WHERE sender_id = ? AND recipient_id = ? AND read_at IS NULL')
+    .bind(new Date().toISOString(), other, me).run();
+  const iBlocked = !!(await DB.prepare('SELECT 1 AS x FROM dm_blocks WHERE blocker_id = ? AND blocked_id = ?').bind(me, other).first());
+  return json({
+    user: { user_id: user.id, name: user.name, has_avatar: !!user.has_avatar },
+    blocked: iBlocked,
+    can_send: !(await dmBlockedBetween(DB, me, other)),
+    messages: (rows.results || []).reverse().map(m => ({ id: m.id, body: m.body, created_at: m.created_at, mine: m.sender_id === me, read: !!m.read_at }))
+  });
+}
+
+async function dmSend(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+  let data;
+  try { data = await request.json(); } catch (e) { return error('Invalid request'); }
+  const to = data && data.to;
+  const body = data && typeof data.body === 'string' ? data.body.trim() : '';
+  if (typeof to !== 'string' || !COMMUNITY_ID.test(to) || to === session.user_id) return error('Invalid request');
+  if (!body) return error('Write a message first');
+  if (body.length > DM_MAX_BODY) return error(`Messages are limited to ${DM_MAX_BODY} characters`);
+  if (!(await communityUserRow(DB, to))) return error('Member not found', 404);
+  if (await dmBlockedBetween(DB, session.user_id, to)) return error('You cannot message this member', 403);
+  const recent = await DB.prepare('SELECT COUNT(*) AS n FROM dm_messages WHERE sender_id = ? AND created_at > ?')
+    .bind(session.user_id, new Date(Date.now() - 3600000).toISOString()).first();
+  if (recent && recent.n >= DM_PER_HOUR) return error('You are sending messages too quickly. Try again later.', 429);
+  const id = generateId(), now = new Date().toISOString();
+  await DB.prepare('INSERT INTO dm_messages (id, sender_id, recipient_id, body, created_at) VALUES (?, ?, ?, ?, ?)')
+    .bind(id, session.user_id, to, body, now).run();
+  return json({ success: true, message: { id, body, created_at: now, mine: true, read: false } });
+}
+
+// ── Profile picture ──
+const PROFILE_PIC_MAX = 400000; // characters of the data URL (the app sends a small square image)
+async function saveProfilePic(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+  let data;
+  try { data = await request.json(); } catch (e) { return error('Invalid request'); }
+  const image = data && data.image;
+  if (typeof image !== 'string' || !/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/]+=*$/.test(image)) return error('That photo could not be read');
+  if (image.length > PROFILE_PIC_MAX) return error('That photo is too large', 413);
+  await DB.prepare(`INSERT INTO user_blobs (user_id, blob_key, data_json, updated_at) VALUES (?, ?, ?, datetime('now'))
+    ON CONFLICT(user_id, blob_key) DO UPDATE SET data_json = excluded.data_json, updated_at = excluded.updated_at`)
+    .bind(session.user_id, 'profile_pic', JSON.stringify(image)).run();
+  return json({ success: true });
 }
 
 // Images are stored as data URLs; serve them as real image responses so <img> tags can load them.

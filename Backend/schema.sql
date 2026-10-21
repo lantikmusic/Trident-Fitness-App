@@ -159,3 +159,30 @@ CREATE INDEX IF NOT EXISTS idx_community_posts_created ON community_posts(create
 CREATE INDEX IF NOT EXISTS idx_community_posts_user ON community_posts(user_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_community_comments_post ON community_comments(post_id, created_at);
 CREATE INDEX IF NOT EXISTS idx_community_comments_user ON community_comments(user_id, created_at);
+
+-- ── Community follows, blocks and direct messages ──
+CREATE TABLE IF NOT EXISTS community_follows (
+  follower_id TEXT NOT NULL,
+  followee_id TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  PRIMARY KEY (follower_id, followee_id)
+);
+CREATE INDEX IF NOT EXISTS idx_follows_followee ON community_follows(followee_id);
+
+CREATE TABLE IF NOT EXISTS dm_blocks (
+  blocker_id TEXT NOT NULL,
+  blocked_id TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  PRIMARY KEY (blocker_id, blocked_id)
+);
+
+CREATE TABLE IF NOT EXISTS dm_messages (
+  id TEXT PRIMARY KEY,
+  sender_id TEXT NOT NULL,
+  recipient_id TEXT NOT NULL,
+  body TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  read_at TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_dm_pair ON dm_messages(sender_id, recipient_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_dm_inbox ON dm_messages(recipient_id, read_at);
