@@ -6949,6 +6949,7 @@ function setRestDuration(secs) {
 }
 
 function startRest(ei, setIdx, exName, suggested) {
+  restAudioPrime();
   restTimer.activeEi = ei;
   restTimer.activeSet = setIdx;
   restTimer.exName = exName;
@@ -7014,16 +7015,23 @@ function startRestCountdown() {
   // locked or another app is open (the phone pauses the page in the background).
   restTimer.endsAt = Date.now() + restTimer.remaining * 1000;
   restTimer.interval = setInterval(restTimerTick, 250);
+  restPushSync();
 }
 function stopRestCountdown() {
   clearInterval(restTimer.interval);
   restTimer.endsAt = 0;
+  restPushSync();
 }
 function restTimerTick() {
   if(!restTimer.endsAt) return;
   const left = Math.max(0, Math.ceil((restTimer.endsAt - Date.now()) / 1000));
   if(left !== restTimer.remaining) { restTimer.remaining = left; updateRestTimerDisplay(); }
-  if(left <= 0) { stopRestCountdown(); restTimerDone(); }
+  if(left <= 0) {
+    // Ended a while ago (the app was in the background): no alarm now, the notification already said so.
+    const late = Date.now() - restTimer.endsAt > 4000;
+    stopRestCountdown();
+    restTimerDone(late);
+  }
 }
 document.addEventListener('visibilitychange', () => { if(!document.hidden) restTimerTick(); });
 
@@ -7043,14 +7051,105 @@ function updateRestTimerDisplay() {
   document.getElementById('restTimerNum').style.color = restTimer.remaining <= 10 ? '#FF453A' : 'var(--text)';
 }
 
-function restTimerDone() {
-  // Vibrate if supported
-  if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
+function restTimerDone(late) {
+  if(!late) {
+    restAlarm();
+    if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
+  }
   document.getElementById('restTimerNum').textContent = 'Go!';
   document.getElementById('restTimerNum').style.color = 'var(--pink)';
   document.getElementById('rtcFill').style.stroke = 'var(--pink)';
   document.getElementById('rtcFill').style.strokeDashoffset = 0;
+  // The timer gets out of the way: the set being logged is saved (if there is something to save) and the sheet closes.
+  setTimeout(restAutoFinish, late ? 0 : 450);
 }
+function restAutoFinish() {
+  const overlay = document.getElementById('restOverlay');
+  if(!overlay.classList.contains('show') || restTimer.endsAt) return; // closed already, or restarted with +15 s
+  const w = document.getElementById('restLogWeight').value.trim(), r = document.getElementById('restLogReps').value.trim();
+  const hasNumbers = !!(w || r);
+  if(hyRest ? (hasNumbers || !hyRest.required) : hasNumbers) saveRestLog();
+  else { closeRest(); showToast('Rest over — time for your next set'); }
+}
+
+// ── Alarm sound ──
+// iPhone only lets a page play sound after a tap, so the sound is unlocked when the timer is started.
+let restAudio = null;
+function restAudioPrime() {
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if(!AC) return;
+    if(!restAudio) restAudio = new AC();
+    if(restAudio.state === 'suspended') restAudio.resume();
+    const buf = restAudio.createBuffer(1, 1, 22050), src = restAudio.createBufferSource();
+    src.buffer = buf; src.connect(restAudio.destination); src.start(0);
+  } catch(e) {}
+}
+function restAlarm() {
+  try {
+    if(!restAudio) return;
+    if(restAudio.state === 'suspended') restAudio.resume();
+    const t0 = restAudio.currentTime + 0.05;
+    // Two bursts of three short beeps.
+    [0, 0.22, 0.44, 0.95, 1.17, 1.39].forEach(dt => {
+      const osc = restAudio.createOscillator(), gain = restAudio.createGain();
+      osc.type = 'square';
+      osc.frequency.value = 1046;
+      gain.gain.setValueAtTime(0.0001, t0 + dt);
+      gain.gain.exponentialRampToValueAtTime(0.35, t0 + dt + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dt + 0.16);
+      osc.connect(gain); gain.connect(restAudio.destination);
+      osc.start(t0 + dt); osc.stop(t0 + dt + 0.18);
+    });
+  } catch(e) {}
+}
+
+// ── Notification when the rest ends while you are in another app ──
+// The phone pauses the app in the background, so the server sends it (a few seconds after the
+// timer's end). If the app is open when the timer ends, it cancels that notification first.
+let restPushTimer = null, restPushPending = false;
+// Only when this phone has notifications on (same flag the Settings switch uses).
+function restPushReady() {
+  try { return isLoggedIn() && localStorage.getItem('trident_push_on_v1') === '1'; } catch(e) { return false; }
+}
+function restPushLabel() {
+  const t = (document.getElementById('restTimerEx').textContent || '').split(' — ')[0].trim();
+  return t.slice(0, 60);
+}
+function restPushSend(body) {
+  try {
+    fetch(`${WORKER_URL}/push/rest`, {
+      method: 'POST', keepalive: true,
+      headers: { 'Authorization': `Bearer ${getSessionToken()}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    }).catch(() => {});
+  } catch(e) {}
+}
+function restPushSync() {
+  clearTimeout(restPushTimer);
+  const ready = restPushReady();
+  if(!ready) return;
+  if(!restTimer.endsAt) {
+    // Stopped, skipped or finished: cancel straight away.
+    if(restPushPending) { restPushPending = false; restPushSend({ cancel: true }); }
+    return;
+  }
+  // Running: wait a moment so quick +15 s taps send one update.
+  restPushTimer = setTimeout(() => {
+    const left = Math.round((restTimer.endsAt - Date.now()) / 1000);
+    if(!restTimer.endsAt || left < 2) return;
+    restPushPending = true;
+    restPushSend({ seconds: left, label: restPushLabel() });
+  }, 400);
+}
+// Leaving the app right after starting the timer: send the pending update now.
+document.addEventListener('visibilitychange', () => {
+  if(document.hidden && restPushTimer && restTimer.endsAt) {
+    clearTimeout(restPushTimer); restPushTimer = null;
+    const left = Math.round((restTimer.endsAt - Date.now()) / 1000);
+    if(left >= 2 && restPushReady()) { restPushPending = true; restPushSend({ seconds: left, label: restPushLabel() }); }
+  }
+});
 
 function saveRestLog() {
   if(hyRest) { hySaveLoggedSet(); return; } // a Hybrid-program set is being logged
@@ -9286,9 +9385,15 @@ function hyExerciseHTML(c, section, ex) {
           <button onclick="hyExHistory('${key}')">History</button>
           <button onclick="hyToggleSkip('${key}')">${st && st.skipped ? 'Undo skip' : 'Skip'}</button>
         </div>` : ''}
+      ${info.status === 'done' && !c.future && !(c.sess && c.sess.status !== 'in_progress') ? (() => {
+        const next = hyPendingAfter(c, key);
+        return next
+          ? `<button class="next-workout-btn glow" onclick="hyNextExercise('${key}')">Next: ${hyEsc(hyExName(c.workout.id, next.key, next.ex))} →</button>`
+          : `<button class="next-workout-btn glow" onclick="hyFinish()">All done — Finish Workout →</button>`;
+      })() : ''}
     </div>`;
   }
-  return `<div class="hy-ex${open ? ' open' : ''}${info.status ? ' ' + info.status : ''}">
+  return `<div class="hy-ex${open ? ' open' : ''}${info.status ? ' ' + info.status : ''}" id="hyex-${key.replace('.', '-')}">
     <div class="hy-ex-head" onclick="hyToggleEx('${key}')">
       ${lead}
       <div class="hy-ex-title"><div class="hy-ex-name">${name}${tags}</div>${rxLine ? `<div class="hy-ex-rx">${hyEsc(rxLine)}</div>` : ''}${tools}</div>
@@ -9559,6 +9664,7 @@ function hyRestDay() {
 let hyRest = null;
 function hyLogSet(key, setIdx) {
   const c = hyGuard(); if(!c || hyLeftOut(c, key)) return;
+  restAudioPrime();
   const found = hyFind(c.workout, key);
   const ex = found.ex, f = hyFields(ex);
   if(!f.f1 && !f.f2) return;
@@ -9611,11 +9717,49 @@ function hySaveLoggedSet() {
   st.sets[job.setIdx] = (empty && job.required) ? { w: '', r: '', done: false } : { w: w.slice(0, 10), r: r.slice(0, 10), done: true };
   const logged = st.sets.filter(s => s && s.done).length;
   if(logged) st.skipped = false;
-  if(found.section.checkable && logged >= hyRx(c.workout, found.section, found.ex, sess).sets) st.done = true;
+  const target = hyRx(c.workout, found.section, found.ex, sess).sets;
+  if(found.section.checkable && logged >= target) st.done = true;
+  hyView.exOpen = job.key; // keep it open so the Next button is right there
   hySave();
   closeRest();
   hyRender();
-  showToast(empty && job.required ? 'Set cleared' : 'Set logged!');
+  const pr = !(empty && job.required) && logged >= target ? hyCheckPR(c.workout, job.key, sess) : null;
+  if(pr) showPRPopup([pr], 0, () => {});
+  else showToast(empty && job.required ? 'Set cleared' : 'Set logged!');
+}
+// A new best weight on a main-workout lift, saved straight away (the end-of-session check then finds nothing new).
+function hyCheckPR(workout, key, sess) {
+  const e = hyTotals(workout, sess).exercises.find(x => 'main.' + x.id === key && x.record);
+  if(!e) return null;
+  const best = Math.max(0, ...e.sets.map(s => s.w));
+  if(best <= 0) return null;
+  const prData = load(PR_KEY) || {};
+  const exKey = e.name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+  const prev = (prData[exKey] && prData[exKey].weight) || 0;
+  if(best <= prev) return null;
+  prData[exKey] = { weight: best, date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }), ts: Date.now() };
+  try { save(PR_KEY, prData); } catch(err) {}
+  if(isLoggedIn()) cloudPost('/prs', prData);
+  return { name: e.name, weight: best, prev };
+}
+// The exercises of this session in order, skipping optional sections.
+function hyPendingAfter(c, fromKey) {
+  const order = [];
+  (c.workout.sections || []).filter(s => !s.optional).forEach(section => section.items.forEach(ex => {
+    const st = hyExStatus(c.workout, section, ex, c.sess).status;
+    order.push({ key: section.key + '.' + ex.id, ex, open: !['done', 'omitted', 'skipped'].includes(st) });
+  }));
+  const i = order.findIndex(o => o.key === fromKey);
+  return order.slice(i + 1).find(o => o.open) || order.slice(0, Math.max(0, i)).find(o => o.open) || null;
+}
+function hyNextExercise(fromKey) {
+  const c = hyCtx(); if(!c) return;
+  const next = hyPendingAfter(c, fromKey);
+  if(!next) return;
+  hyView.exOpen = next.key;
+  hyRender();
+  const el = document.getElementById('hyex-' + next.key.replace('.', '-'));
+  if(el) setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
 }
 function hyRestPresets(secs) {
   const map = { '30s': 30, '60s': 60, '90s': 90, '2m': 120 };
@@ -10491,6 +10635,7 @@ async function pushForgetDevice() {
 }
 // Opens what a tapped notification was about.
 async function openFromNotification(open) {
+  if(String(open) === 'workout') { navTo('workout'); return; }
   const m = /^(dm|profile|post):([A-Za-z0-9-]{1,64})$/.exec(String(open || ''));
   if(!m || !isLoggedIn()) return;
   navTo('community');

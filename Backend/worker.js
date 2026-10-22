@@ -150,6 +150,7 @@ export default {
     if (path === '/push/subscribe'            && request.method === 'POST') return community(pushSubscribe, request, env.DB, env);
     if (path === '/push/unsubscribe'          && request.method === 'POST') return community(pushUnsubscribe, request, env.DB);
     if (path === '/push/test'                 && request.method === 'POST') return community(pushTest, request, env.DB, env);
+    if (path === '/push/rest'                 && request.method === 'POST') return community(pushRest, request, env.DB, env);
 
     // ── Profile picture on its own (does not touch the other settings) ──
     if (path === '/user/profile-pic'          && request.method === 'POST') return community(saveProfilePic, request, env.DB);
@@ -1297,6 +1298,52 @@ async function pushTest(request, DB, env) {
   if (!session) return error('Unauthorized', 401);
   const results = await pushToUser(env, DB, session.user_id, { title: 'Trident Fitness', body: 'Notifications are working. 💪', tag: 'test', open: '' });
   return json({ sent: results.filter(r => r.status >= 200 && r.status < 300).length, results });
+}
+
+// ── Rest-timer notification ──
+// The app tells the server when the rest will end; a Durable Object (one per account) waits and then
+// sends "Rest is over". Starting a new timer replaces the old one; the app cancels it if it is open
+// when the timer ends. Sent 3 seconds after the end so that cancel always arrives first.
+const REST_MAX_SECONDS = 1800;
+async function pushRest(request, DB, env) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+  if (!env.REST_TIMERS) return error('Rest notifications are not available', 503);
+  let data;
+  try { data = await request.json(); } catch (e) { return error('Invalid request'); }
+  const stub = env.REST_TIMERS.get(env.REST_TIMERS.idFromName(session.user_id));
+  if (data && data.cancel) {
+    await stub.fetch('https://rest-timer/', { method: 'POST', body: JSON.stringify({ cancel: true }) });
+    return json({ success: true });
+  }
+  const seconds = Number(data && data.seconds);
+  if (!Number.isFinite(seconds) || seconds < 1 || seconds > REST_MAX_SECONDS) return error('Invalid request');
+  const label = data && typeof data.label === 'string' ? data.label.replace(/\s+/g, ' ').trim().slice(0, 60) : '';
+  await stub.fetch('https://rest-timer/', { method: 'POST', body: JSON.stringify({
+    userId: session.user_id, fireAt: Date.now() + seconds * 1000 + 3000,
+    body: label ? `Time for your next set — ${label}` : 'Time for your next set'
+  }) });
+  return json({ success: true });
+}
+export class RestTimer {
+  constructor(state, env) { this.state = state; this.env = env; }
+  async fetch(request) {
+    const job = await request.json();
+    if (job.cancel) {
+      await this.state.storage.deleteAlarm();
+      await this.state.storage.delete('job');
+    } else {
+      await this.state.storage.put('job', job);
+      await this.state.storage.setAlarm(job.fireAt);
+    }
+    return new Response('ok');
+  }
+  async alarm() {
+    const job = await this.state.storage.get('job');
+    await this.state.storage.delete('job');
+    if (!job) return;
+    await pushToUser(this.env, this.env.DB, job.userId, { title: 'Rest is over', body: job.body, tag: 'rest-timer', open: 'workout', urgent: true });
+  }
 }
 
 // ── Profile picture ──
