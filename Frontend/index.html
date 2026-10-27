@@ -18,6 +18,8 @@
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <title>Trident Fitness</title>
 <style>
+html,body{touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%;}
+
 :root {
   --pink: #32FCFD;
   --pink-dim: rgba(50,252,253,0.10);
@@ -389,6 +391,7 @@ body {
 }
 .screen.active { animation: fadeUp .35s ease; }
 </style>
+<script>/* No zooming: block iOS pinch-zoom (double-tap and tap-in-a-box zoom are stopped by the viewport + touch-action) */try{['gesturestart','gesturechange','gestureend'].forEach(function(t){document.addEventListener(t,function(e){e.preventDefault();},{passive:false});});}catch(e){}</script>
 </head>
 <body>
 
