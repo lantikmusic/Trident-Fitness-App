@@ -2413,6 +2413,7 @@ async function loadFromCloud() {
         if(entry.day_index == null) return;
         const idx = Number(entry.day_index);
         if(!validDay(idx)) return;
+        if(!macroInThisWeek(entry.log_date, idx)) return; // an earlier week's food stays in the past
         if(!storedMacros[idx]) storedMacros[idx] = { meals: { breakfast: { items: [], protein: 0, carbs: 0, fat: 0 }, lunch: { items: [], protein: 0, carbs: 0, fat: 0 }, dinner: { items: [], protein: 0, carbs: 0, fat: 0 } }, burned: 0, notes: '' };
         const meal = entry.meal;
         if(!meal) return;
@@ -2436,6 +2437,7 @@ async function loadFromCloud() {
       Object.entries(macrosBurned).forEach(([key, val]) => {
         const idx = Number(key);
         if(key === '' || !validDay(idx) || !val) return;
+        if(!macroInThisWeek(val.date, idx)) return;
         if(!storedMacros[idx]) storedMacros[idx] = { meals: { breakfast: { items: [], protein: 0, carbs: 0, fat: 0 }, lunch: { items: [], protein: 0, carbs: 0, fat: 0 }, dinner: { items: [], protein: 0, carbs: 0, fat: 0 } }, burned: 0, notes: '' };
         if(val.burned != null) storedMacros[idx].burned = val.burned;
         if(val.notes)          storedMacros[idx].notes  = val.notes;
@@ -2526,6 +2528,38 @@ function dayTotals(day){
   return{protein:Math.round(protein),carbs:Math.round(carbs),fat:Math.round(fat),cal:Math.round(cal),burned:day.burned||0};
 }
 
+// ── Which calendar date each Mon–Sun slot of the macro week is (local time, not UTC) ──
+function localISO(d) {
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function macroWeekMonday() {
+  const now = new Date(), m = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  m.setDate(m.getDate() - ((m.getDay() + 6) % 7));
+  return m;
+}
+function macroSlotDate(dayIdx) {
+  const m = macroWeekMonday();
+  m.setDate(m.getDate() + dayIdx);
+  return localISO(m);
+}
+// An entry saved to the account belongs in this week's slot only if its date is that day (±1 day,
+// for entries saved by older versions of the app, which used the UTC date).
+function macroInThisWeek(dateStr, dayIdx) {
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(String(dateStr || ''))) return false;
+  const slot = new Date(macroSlotDate(dayIdx) + 'T00:00:00'), d = new Date(dateStr + 'T00:00:00');
+  return Math.abs(Math.round((d - slot) / 86400000)) <= 1;
+}
+// New week: start empty. Returns true when it reset.
+function macroWeekCheck() {
+  const WEEK_KEY = 'trident_macro_week_start_v1';
+  const mondayStr = macroWeekMonday().toDateString();
+  if(localStorage.getItem(WEEK_KEY) === mondayStr) return false;
+  macroData = emptyWeek();
+  save(MACRO_KEY, macroData);
+  localStorage.setItem(WEEK_KEY, mondayStr);
+  return true;
+}
+
 // Always returns a full 7-day array, whatever shape was stored (array, keyed object, missing or
 // malformed days, old flat format) — a bad stored value must never stop the app from starting.
 function normalizeMacroWeek(raw){
@@ -2579,7 +2613,7 @@ function saveDay(){
   save(MACRO_KEY,macroData);
   // Cloud sync macro log
   const dayMeals = macroData[cur].meals;
-  const today = new Date().toISOString().split('T')[0];
+  const today = macroSlotDate(cur);
   Object.keys(dayMeals).forEach(meal => {
     const items = dayMeals[meal].items || [];
     items.forEach(item => {
@@ -2600,7 +2634,7 @@ function onActivityInput(){
   macroData[cur].notes=document.getElementById('f-notes').value||'';
   save(MACRO_KEY,macroData);
   // Sync burned calories to cloud
-  cloudPost('/macros/burned', { day_index: cur, date: new Date().toISOString().split('T')[0], burned: macroData[cur].burned, notes: macroData[cur].notes });
+  cloudPost('/macros/burned', { day_index: cur, date: macroSlotDate(cur), burned: macroData[cur].burned, notes: macroData[cur].notes });
   renderHero();renderMacroStats();renderWeekBars();renderWeekTotals();renderLine();updateActivityStats();
   const s=document.getElementById('actSaveStatus'),t=document.getElementById('actSaveText');
   s.classList.add('saved');t.textContent='saved';clearTimeout(window._aT);
@@ -3281,7 +3315,7 @@ function addFoodItem(name, protein, carbs, fat, save2=true, skipLib=false) {
   meal.items.push({name, protein, carbs, fat, cal, time});
   // Sync to cloud immediately
   cloudPost('/macros', {
-    date: new Date().toISOString().split('T')[0],
+    date: macroSlotDate(cur),
     day_index: cur, meal: curMeal,
     food_name: name, calories: cal, protein, carbs, fat
   });
@@ -3306,6 +3340,7 @@ function deleteFoodItem(idx) {
   if(removed) {
     cloudPost('/macros/delete', {
       day_index: cur,
+      date: macroSlotDate(cur),
       meal: curMeal,
       food_name: removed.name,
       calories: removed.cal || 0
@@ -3330,7 +3365,7 @@ function clearFoodLog() {
   meal.protein = 0; meal.carbs = 0; meal.fat = 0;
   save(MACRO_KEY,macroData);
   // Clear from cloud
-  cloudPost('/macros/clear', { day_index: cur, meal: curMeal });
+  cloudPost('/macros/clear', { day_index: cur, meal: curMeal, date: macroSlotDate(cur) });
   loadMealInputs();
   renderFoodLog();
   renderMealTabCals();
@@ -6111,7 +6146,7 @@ function saveProgress(){
   if(!entry.weight&&!entry.bf)return showToast('Please enter at least weight or body fat');
   progressData.unshift(entry);save(PROGRESS_KEY,progressData);
   // Cloud sync
-  cloudPost('/progress', { date: new Date().toISOString().split('T')[0], weight: entry.weight, body_fat: entry.bf });
+  cloudPost('/progress', { date: localISO(new Date()), weight: entry.weight, body_fat: entry.bf });
   ['logWeight','logBF'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   renderProgress();showToast('Progress saved!');
 }
@@ -11065,7 +11100,7 @@ function saveProgressPhoto() {
   photos.unshift(entry);
   save(PROGRESS_PHOTOS_KEY, photos);
   // Cloud sync
-  cloudPost('/photos', { src, caption, date: new Date().toISOString().split('T')[0] });
+  cloudPost('/photos', { src, caption, date: localISO(new Date()) });
   closeProgressPhoto();
   renderProgressPhotos();
   showToast('✓ Progress photo saved!');
@@ -11184,23 +11219,38 @@ function updateProfilePicDisplay() {
 // WEEKLY MACRO RESET
 // ══════════════════════════════════════
 (function checkWeeklyReset() {
-  const WEEK_KEY = 'trident_macro_week_start_v1';
-  const stored = localStorage.getItem(WEEK_KEY);
-  const now = new Date();
-  const day = now.getDay();
-  // Get this week's Monday
-  const monday = new Date(now);
-  monday.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
-  monday.setHours(0,0,0,0);
-  const mondayStr = monday.toDateString();
-  if(stored !== mondayStr) {
-    // New week — reset macro data
-    macroData = emptyWeek();
-    save(MACRO_KEY, macroData);
-    localStorage.setItem(WEEK_KEY, mondayStr);
-    console.log('Weekly macro reset — new week started', mondayStr);
-  }
+  try {
+    if(macroWeekCheck()) console.log('Weekly macro reset — new week started');
+    // One-time clean-up: earlier versions put past weeks' food back into this week when restoring from
+    // the account. Those restored items (marked _synced, no time) are removed here; this week's ones are
+    // restored again, correctly, by the account sync that is already running. Food added on this phone stays.
+    if(localStorage.getItem('trident_macro_week_fix_v1') !== '1' && isLoggedIn()) {
+      macroData.forEach(day => MEALS.forEach(m => {
+        const meal = day.meals[m];
+        meal.items = meal.items.filter(it => !(it && it._synced && !it.time));
+        meal.protein = Math.round(meal.items.reduce((s, it) => s + (it.protein || 0), 0) * 10) / 10;
+        meal.carbs   = Math.round(meal.items.reduce((s, it) => s + (it.carbs || 0), 0) * 10) / 10;
+        meal.fat     = Math.round(meal.items.reduce((s, it) => s + (it.fat || 0), 0) * 10) / 10;
+      }));
+      save(MACRO_KEY, macroData);
+      localStorage.setItem('trident_macro_week_fix_v1', '1');
+    }
+  } catch(e) { console.warn('Weekly macro check skipped:', e); }
 })();
+// Left open overnight into a new week (or a new day): move to today and start the new week empty.
+document.addEventListener('visibilitychange', () => {
+  if(document.hidden) return;
+  try {
+    const today = new Date().toDateString();
+    if(window._macroDay === today) return;
+    const wasToday = cur === (window._macroTodayIdx != null ? window._macroTodayIdx : cur);
+    window._macroDay = today; window._macroTodayIdx = getTodayIdx();
+    const reset = macroWeekCheck();
+    if(reset || wasToday) cur = getTodayIdx();
+    if(typeof renderMacros === 'function') { renderMacros(); renderDashboard(); }
+  } catch(e) {}
+});
+window._macroDay = new Date().toDateString(); window._macroTodayIdx = getTodayIdx();
 </script>
 <!-- Log Weight Popup -->
 <div id="logWeightOverlay" class="log-weight-overlay" style="display:none;" onclick="if(event.target===this)closeLogWeight()">

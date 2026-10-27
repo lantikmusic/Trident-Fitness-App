@@ -506,20 +506,34 @@ async function saveBurned(request, DB) {
   return json({ success: true });
 }
 
+// The app sends the date of the day being edited; only entries saved for that day (±1 day, for
+// entries from older app versions that used the UTC date) are touched, never earlier weeks.
+// Without a date (older app versions) it behaves as before.
+function macroDateWindow(date) {
+  if (typeof date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
+  const d = new Date(date + 'T00:00:00Z');
+  if (isNaN(d)) return null;
+  const shift = n => new Date(d.getTime() + n * 86400000).toISOString().slice(0, 10);
+  return [shift(-1), shift(1)];
+}
+
 async function deleteMacro(request, DB) {
   const session = await validateSession(request, DB);
   if (!session) return error('Unauthorized', 401);
 
   const data = await request.json();
-  // Delete a single matching macro entry by day_index, meal, food_name, and calories
+  const win = macroDateWindow(data.date);
+  // Delete one matching entry (same day, meal, food and calories) — just one, if the same food was logged twice.
   await DB.prepare(
-    'DELETE FROM macro_logs WHERE user_id = ? AND day_index = ? AND meal = ? AND food_name = ? AND calories = ?'
+    `DELETE FROM macro_logs WHERE id = (SELECT id FROM macro_logs WHERE user_id = ? AND day_index = ? AND meal = ? AND food_name = ? AND calories = ?
+      ${win ? 'AND log_date BETWEEN ? AND ?' : ''} ORDER BY created_at DESC LIMIT 1)`
   ).bind(
     session.user_id,
     data.day_index,
     data.meal,
     data.food_name,
-    data.calories || 0
+    data.calories || 0,
+    ...(win || [])
   ).run();
 
   return json({ success: true });
@@ -530,15 +544,17 @@ async function clearMacros(request, DB) {
   if (!session) return error('Unauthorized', 401);
 
   const data = await request.json();
+  const win = macroDateWindow(data.date);
+  const range = win ? ' AND log_date BETWEEN ? AND ?' : '';
   // Clear all macros for a specific day_index + meal, or whole day if no meal specified
   if (data.meal) {
     await DB.prepare(
-      'DELETE FROM macro_logs WHERE user_id = ? AND day_index = ? AND meal = ?'
-    ).bind(session.user_id, data.day_index, data.meal).run();
+      'DELETE FROM macro_logs WHERE user_id = ? AND day_index = ? AND meal = ?' + range
+    ).bind(session.user_id, data.day_index, data.meal, ...(win || [])).run();
   } else {
     await DB.prepare(
-      'DELETE FROM macro_logs WHERE user_id = ? AND day_index = ?'
-    ).bind(session.user_id, data.day_index).run();
+      'DELETE FROM macro_logs WHERE user_id = ? AND day_index = ?' + range
+    ).bind(session.user_id, data.day_index, ...(win || [])).run();
   }
 
   return json({ success: true });
