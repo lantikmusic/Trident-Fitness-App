@@ -2408,6 +2408,13 @@ async function loadFromCloud() {
       // Must stay a full 7-day array: saving any other shape makes the next launch fail.
       const storedMacros = normalizeMacroWeek(load(MACRO_KEY));
       const validDay = i => Number.isInteger(i) && i >= 0 && i < DAYS.length;
+      // How many of each food (name + calories) each meal already has on this phone. Each saved row
+      // is matched to one of them; rows left over are added. Two identical items stay two.
+      const onPhone = {};
+      storedMacros.forEach((day, d) => MEALS.forEach(m => (day.meals[m].items || []).forEach(it => {
+        const k = d + '|' + m + '|' + (it && it.name) + '|' + Math.round((it && it.cal) || 0);
+        onPhone[k] = (onPhone[k] || 0) + 1;
+      })));
       // Restore food items
       macroItems.forEach(entry => {
         if(entry.day_index == null) return;
@@ -2419,10 +2426,9 @@ async function loadFromCloud() {
         if(!meal) return;
         if(!storedMacros[idx].meals) storedMacros[idx].meals = { breakfast: { items: [] }, lunch: { items: [] }, dinner: { items: [] } };
         if(!storedMacros[idx].meals[meal]) storedMacros[idx].meals[meal] = { items: [], protein: 0, carbs: 0, fat: 0 };
-        const exists = storedMacros[idx].meals[meal].items.some(i =>
-          i.name === entry.food_name && i.cal === entry.calories
-        );
-        if(!exists) {
+        const k = idx + '|' + meal + '|' + entry.food_name + '|' + Math.round(entry.calories || 0);
+        if(onPhone[k] > 0) { onPhone[k]--; return; }
+        {
           storedMacros[idx].meals[meal].items.push({
             name: entry.food_name,
             cal: entry.calories,
@@ -3167,6 +3173,20 @@ async function lookupBarcodeOFF(barcode) {
   displayScanResult(foodName, brand, calories, protein, carbs, fat, servingG);
 }
 
+function scanMacroCards(calories, protein, carbs, fat) {
+  return [
+    ['🔥', calories, 'kcal'],
+    ['💪', protein+'g', 'protein'],
+    ['🌾', carbs+'g', 'carbs'],
+    ['🥑', fat+'g', 'fat'],
+  ].map(([icon, val, lbl]) => `
+    <div style="background:var(--bg4);border-radius:8px;padding:8px 6px;text-align:center;">
+      <div style="font-size:14px;">${icon}</div>
+      <div style="font-size:14px;font-weight:700;letter-spacing:-0.02em;margin-top:2px;">${val}</div>
+      <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">${lbl}</div>
+    </div>`).join('');
+}
+
 function displayScanResult(foodName, brand, calories, protein, carbs, fat, servingG) {
   // Prepend brand to food name if not already included
   const displayName = (brand && !foodName.toLowerCase().includes(brand.toLowerCase()))
@@ -3184,17 +3204,7 @@ function displayScanResult(foodName, brand, calories, protein, carbs, fat, servi
     ? `Per serving: ${servingG}g · ${calories} kcal`
     : `Per serving: ${calories} kcal`;
 
-  document.getElementById('scanMacroPreview').innerHTML = [
-    ['🔥', calories, 'kcal'],
-    ['💪', protein+'g', 'protein'],
-    ['🌾', carbs+'g', 'carbs'],
-    ['🥑', fat+'g', 'fat'],
-  ].map(([icon, val, lbl]) => `
-    <div style="background:var(--bg4);border-radius:8px;padding:8px 6px;text-align:center;">
-      <div style="font-size:14px;">${icon}</div>
-      <div style="font-size:14px;font-weight:700;letter-spacing:-0.02em;margin-top:2px;">${val}</div>
-      <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">${lbl}</div>
-    </div>`).join('');
+  document.getElementById('scanMacroPreview').innerHTML = scanMacroCards(calories, protein, carbs, fat);
 
   document.getElementById('scanResult').style.display = 'block';
   setScanStatus('✓ Product found!');
@@ -3209,18 +3219,8 @@ function updateScanMacros() {
   const carbs = Math.round(baseScanMacros.carbs * servings);
   const fat = Math.round(baseScanMacros.fat * servings);
   
-  // Update display
-  document.getElementById('scanMacroPreview').innerHTML = [
-    ['<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M12 2c0 6-6 8-6 13a6 6 0 0 0 12 0c0-5-6-7-6-13z"/><path d="M10 19c0-3 2-4 2-7"/></svg>', calories, 'kcal'],
-    ['<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M18 3a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2v4a4 4 0 0 1-8 0V9a2 2 0 0 1 2-2h4V5a2 2 0 0 1 2-2h2z"/></svg>', protein+'g', 'protein'],
-    ['', carbs+'g', 'carbs'],
-    ['', fat+'g', 'fat'],
-  ].map(([icon, val, lbl]) => `
-    <div style="background:var(--bg4);border-radius:8px;padding:8px 6px;text-align:center;">
-      <div style="font-size:14px;">${icon}</div>
-      <div style="font-size:14px;font-weight:700;letter-spacing:-0.02em;margin-top:2px;">${val}</div>
-      <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">${lbl}</div>
-    </div>`).join('');
+  // Update display (same emoji cards as when the result first appears)
+  document.getElementById('scanMacroPreview').innerHTML = scanMacroCards(calories, protein, carbs, fat);
   
   // Update scannedFoodData so addScannedFood uses the new values
   scannedFoodData = { ...scannedFoodData, calories, protein, carbs, fat };
@@ -3228,14 +3228,15 @@ function updateScanMacros() {
 
 function addScannedFood() {
   if(!scannedFoodData) return;
+  const name = scannedFoodData.name;
   addFoodItem(
-    scannedFoodData.name,
+    name,
     scannedFoodData.protein,
     scannedFoodData.carbs,
     scannedFoodData.fat
   );
-  closeScanner();
-  showToast(`${scannedFoodData.name} added!`);
+  closeScanner(); // clears scannedFoodData
+  showToast(`${name} added!`);
 }
 
 function setScanStatus(msg) {
@@ -3312,7 +3313,7 @@ function addFoodItem(name, protein, carbs, fat, save2=true, skipLib=false) {
   const cal = Math.round(protein*4 + carbs*4 + fat*9);
   const now = new Date();
   const time = now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});
-  meal.items.push({name, protein, carbs, fat, cal, time});
+  meal.items.push({name, protein, carbs, fat, cal, time, _synced:true});
   // Sync to cloud immediately
   cloudPost('/macros', {
     date: macroSlotDate(cur),
@@ -8255,7 +8256,11 @@ function aiAddToMeal() {
   if(!meal.items) meal.items = [];
   const now = new Date();
   const time = now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});
-  meal.items.push({ name, protein, carbs, fat, cal, time, source:'ai' });
+  meal.items.push({ name, protein, carbs, fat, cal, time, source:'ai', _synced:true });
+  cloudPost('/macros', {
+    date: macroSlotDate(cur), day_index: cur, meal: curMeal,
+    food_name: name, calories: cal, protein, carbs, fat
+  });
   // Recalculate meal totals from items
   meal.protein = Math.round(meal.items.reduce((s,it)=>s+(it.protein||0),0)*10)/10;
   meal.carbs   = Math.round(meal.items.reduce((s,it)=>s+(it.carbs||0),0)*10)/10;
@@ -11064,6 +11069,7 @@ function saveCustomWorkout() {
   // Also log burned calories to today's macro data
   macroData[cur].burned = (macroData[cur].burned || 0) + calories;
   save(MACRO_KEY, macroData);
+  cloudPost('/macros/burned', { day_index: cur, date: macroSlotDate(cur), burned: macroData[cur].burned, notes: macroData[cur].notes || '' });
   closeCustomWorkout();
   renderDashboard();
   showToast(`✓ ${name} logged — ${calories} kcal burned!`);
@@ -11221,19 +11227,23 @@ function updateProfilePicDisplay() {
 (function checkWeeklyReset() {
   try {
     if(macroWeekCheck()) console.log('Weekly macro reset — new week started');
-    // One-time clean-up: earlier versions put past weeks' food back into this week when restoring from
-    // the account. Those restored items (marked _synced, no time) are removed here; this week's ones are
-    // restored again, correctly, by the account sync that is already running. Food added on this phone stays.
-    if(localStorage.getItem('trident_macro_week_fix_v1') !== '1' && isLoggedIn()) {
-      macroData.forEach(day => MEALS.forEach(m => {
-        const meal = day.meals[m];
-        meal.items = meal.items.filter(it => !(it && it._synced && !it.time));
-        meal.protein = Math.round(meal.items.reduce((s, it) => s + (it.protein || 0), 0) * 10) / 10;
-        meal.carbs   = Math.round(meal.items.reduce((s, it) => s + (it.carbs || 0), 0) * 10) / 10;
-        meal.fat     = Math.round(meal.items.reduce((s, it) => s + (it.fat || 0), 0) * 10) / 10;
-      }));
+    // One-time clean-up: earlier versions put past weeks' food and burned calories back into this week.
+    // Everything already saved to the account is cleared here and restored again, for this week only,
+    // by the account sync that is already running. Food not yet sent to the account stays.
+    if(localStorage.getItem('trident_macro_week_fix_v2') !== '1' && isLoggedIn()) {
+      macroData.forEach(day => {
+        MEALS.forEach(m => {
+          const meal = day.meals[m];
+          meal.items = meal.items.filter(it => it && !it._synced);
+          meal.protein = Math.round(meal.items.reduce((s, it) => s + (it.protein || 0), 0) * 10) / 10;
+          meal.carbs   = Math.round(meal.items.reduce((s, it) => s + (it.carbs || 0), 0) * 10) / 10;
+          meal.fat     = Math.round(meal.items.reduce((s, it) => s + (it.fat || 0), 0) * 10) / 10;
+        });
+        day.burned = 0; day.notes = '';
+      });
       save(MACRO_KEY, macroData);
       localStorage.setItem('trident_macro_week_fix_v1', '1');
+      localStorage.setItem('trident_macro_week_fix_v2', '1');
     }
   } catch(e) { console.warn('Weekly macro check skipped:', e); }
 })();
