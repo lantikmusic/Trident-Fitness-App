@@ -1338,6 +1338,29 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .ob-handle,.summary-handle,.swap-handle,.settings-handle,.log-weight-handle,.ex-progress-handle{position:relative;cursor:pointer;touch-action:none;-webkit-tap-highlight-color:transparent;}
 .ob-handle::after,.summary-handle::after,.swap-handle::after,.settings-handle::after,.log-weight-handle::after,.ex-progress-handle::after{content:'';position:absolute;left:-70px;right:-70px;top:-18px;bottom:-18px;}
 .cm-sheet::before{cursor:pointer;}
+/* ── Community header buttons, comment likes, activity list ── */
+.cm-page-head{position:relative;}
+.cm-head-actions{position:absolute;right:20px;bottom:0;display:flex;gap:8px;}
+@media(max-width:374px){#page-community .page-title{font-size:28px;}.cm-head-actions{gap:5px;}.cm-head-actions .cm-inbox-btn{width:36px;height:36px;}.cm-head-actions .cm-inbox-btn svg{width:18px;height:18px;}}
+.cm-head-actions .cm-inbox-btn{position:relative;}
+.cm-top .cm-scope{flex:1;}
+.cm-clike{flex-shrink:0;align-self:center;display:flex;flex-direction:column;align-items:center;gap:1px;min-width:30px;padding:4px 2px;background:none;border:none;color:var(--text3);font-family:inherit;font-size:10px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.cm-clike svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linejoin:round;transition:transform .15s;}
+.cm-clike:active svg{transform:scale(1.25);}
+.cm-clike.liked{color:#FF375F;} .cm-clike.liked svg{fill:#FF375F;stroke:#FF375F;}
+.cm-clike span{min-height:12px;}
+.cm-act-list{display:flex;flex-direction:column;}
+.cm-act-row{display:flex;align-items:flex-start;gap:12px;width:100%;padding:11px 8px;margin:0 -8px;border:none;border-radius:14px;background:none;color:var(--text);font-family:inherit;font-size:14px;line-height:1.4;text-align:left;cursor:pointer;width:calc(100% + 16px);}
+.cm-act-row.unread{background:var(--pink-dim);}
+.cm-act-row:active{background:rgba(255,255,255,.05);}
+.cm-act-av{position:relative;flex-shrink:0;}
+.cm-act-av .cm-avatar{width:40px;height:40px;}
+.cm-act-badge{position:absolute;right:-4px;bottom:-4px;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;border:2px solid var(--bg3);}
+.cm-act-badge.like{background:#FF375F;color:#fff;} .cm-act-badge.follow{background:var(--pink);color:#000;font-weight:800;} .cm-act-badge.comment{background:var(--bg5);}
+.cm-act-txt{flex:1;min-width:0;word-break:break-word;}
+.cm-act-txt b{font-weight:700;}
+.cm-act-q{color:var(--text2);}
+.cm-act-txt .cm-time{margin-top:3px;}
 /* ── LANTIK Hybrid program ── */
 .hy-day-title{font-size:13px;font-weight:600;color:var(--text2);margin:2px 2px 10px;}
 .hy-slot{background:var(--bg3);border:0.5px solid var(--pink-border);border-radius:var(--radius-lg);padding:14px;margin-bottom:10px;cursor:pointer;}
@@ -2424,9 +2447,10 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
 
 <!-- COMMUNITY -->
 <div class="page" id="page-community">
-  <div class="page-header compact">
+  <div class="page-header compact cm-page-head">
     <div class="eyebrow">Together</div>
     <div class="page-title">Community</div>
+    <div class="cm-head-actions" id="cmHeadActions"></div>
   </div>
   <div class="container">
     <div style="height:14px;"></div>
@@ -11236,7 +11260,7 @@ const CM_BUBBLE = '<svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3
 let cmState = { posts: [], next: null, status: 'idle', loadedAt: 0, busy: false, comments: {}, open: {}, scope: 'all' };
 const CM_TRASH = '<svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>';
 const CM_SEND = '<svg viewBox="0 0 24 24"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>';
-const CM_MAIL = '<svg viewBox="0 0 24 24"><path d="M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/><path d="M3.5 6.5 12 13l8.5-6.5"/></svg>';
+const CM_MAIL = '<svg viewBox="0 0 24 24"><path d="M14.5 8.5V5.8A1.8 1.8 0 0 0 12.7 4H4.8A1.8 1.8 0 0 0 3 5.8v5.4A1.8 1.8 0 0 0 4.8 13H6v2.8L9 13"/><path d="M11.3 8.5h7.9A1.8 1.8 0 0 1 21 10.3v5.4a1.8 1.8 0 0 1-1.8 1.8H18v2.8l-3.4-2.8h-3.3a1.8 1.8 0 0 1-1.8-1.8v-5.4a1.8 1.8 0 0 1 1.8-1.8z"/></svg>';  // two chat bubbles
 let cmDraft = { photo: null, attach: null, options: null, sending: false };
 
 function cmEsc(v) {
@@ -11359,6 +11383,7 @@ function cmCommentsHTML(id) {
           <div class="cm-comment-text">${cmEsc(c.body)}</div>
           <div class="cm-comment-meta">${cmEsc(cmTimeAgo(c.created_at))}${c.can_delete ? ` · <button class="cm-link" onclick="cmDeleteComment('${id}','${cid}')">Delete</button>` : ''}</div>
         </div>
+        <button class="cm-clike${c.liked ? ' liked' : ''}" onclick="cmToggleCommentLike('${id}','${cid}')" aria-label="${c.liked ? 'Unlike' : 'Like'} comment" aria-pressed="${!!c.liked}">${CM_HEART}<span>${cmNum(c.like_count) || ''}</span></button>
       </div>`;
     }).join('');
   }
@@ -11398,10 +11423,9 @@ function cmDraw() {
   const root = document.getElementById('cmRoot');
   if(!root) return;
   const following = cmState.scope === 'following';
+  cmDrawHeadActions();
   let html = `<div class="cm-top">
       <div class="cm-scope${following ? ' following' : ''}"><span class="cm-scope-pill"></span><button class="cm-scope-btn${following ? '' : ' active'}" onclick="cmSetScope('all')">Main Feed</button><button class="cm-scope-btn${following ? ' active' : ''}" onclick="cmSetScope('following')">Following</button></div>
-      <button class="cm-inbox-btn" onclick="cmOpenSearch()" aria-label="Find friends">${cmSearchIcon()}</button>
-      <button class="cm-inbox-btn" onclick="cmOpenInbox()" aria-label="Messages">${CM_MAIL}<span class="nav-dot" id="cmInboxDot" style="display:${cmDm.unread ? 'block' : 'none'};">${cmDm.unread > 99 ? '99+' : cmNum(cmDm.unread)}</span></button>
     </div>
     ${unGet() || !window._unKnown ? '' : `<div class="cm-un-card">
       <div class="cm-un-ic">@</div>
@@ -11688,21 +11712,124 @@ async function cmSearchFollow(uid) {
   if(cmState.scope === 'following') cmLoadFeed(true);
 }
 
+// ── Header buttons (search, activity, messages) beside the Community title ──
+function cmBellIcon() { return '<svg viewBox="0 0 24 24"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9z"/><path d="M10.3 20a1.9 1.9 0 0 0 3.4 0"/></svg>'; }
+function cmDrawHeadActions() {
+  const el = document.getElementById('cmHeadActions');
+  if(!el) return;
+  const act = window._cmActUnread || 0, dm = cmDm.unread || 0;
+  const dot = (id, n) => `<span class="nav-dot" id="${id}" style="display:${n ? 'block' : 'none'};">${n > 99 ? '99+' : cmNum(n)}</span>`;
+  el.innerHTML = `
+    <button class="cm-inbox-btn" onclick="cmOpenSearch()" aria-label="Find friends">${cmSearchIcon()}</button>
+    <button class="cm-inbox-btn" onclick="cmOpenActivity()" aria-label="Activity">${cmBellIcon()}${dot('cmActDot', act)}</button>
+    <button class="cm-inbox-btn" onclick="cmOpenInbox()" aria-label="Messages">${CM_MAIL}${dot('cmInboxDot', dm)}</button>`;
+}
+
+// ── Comment likes ──
+async function cmToggleCommentLike(postId, commentId) {
+  const list = cmState.comments[postId];
+  const c = Array.isArray(list) ? list.find(x => x.id === commentId) : null;
+  if(!c || c._busy) return;
+  c._busy = true;
+  const was = !!c.liked, before = cmNum(c.like_count);
+  c.liked = !was; c.like_count = Math.max(0, before + (was ? -1 : 1));   // show it right away
+  cmRedrawPost(postId);
+  const r = await cmApi('/community/comments/like', 'POST', { comment_id: commentId });
+  c._busy = false;
+  if(r.ok && r.data) { c.liked = !!r.data.liked; c.like_count = cmNum(r.data.like_count); }
+  else {
+    c.liked = was; c.like_count = before;
+    if(r.status !== 401) showToast(r.status === 404 && !(r.data && r.data.error === 'Comment not found') ? "Comment likes aren't available yet" : ((r.data && r.data.error) || 'Could not like that comment'));
+  }
+  cmRedrawPost(postId);
+}
+
+// ── Open one post (from Activity or a notification), even if it isn't loaded in the feed yet ──
+async function cmOpenPostById(id) {
+  id = cmSafeId(id); if(!id) return;
+  if(currentPage !== 'community') navTo('community');
+  if(!cmFindPost(id)) {
+    const r = await cmApi('/community/post?id=' + encodeURIComponent(id));
+    if(!r.ok || !r.data || !r.data.post) { showToast(r.status === 404 ? 'That post was deleted' : 'Could not open that post'); return; }
+    if(!cmFindPost(id)) cmState.posts.unshift(r.data.post);
+    cmDraw();
+  }
+  cmState.open[id] = true;
+  cmRedrawPost(id);
+  cmLoadComments(id);
+  const el = document.getElementById('cm-post-' + id);
+  if(el) el.scrollIntoView({ block: 'start', behavior: 'smooth' });
+}
+
+// ── Activity: likes, comments and follows on your things ──
+function cmActivityText(it) {
+  const q = it.snippet ? ` <span class="cm-act-q">“${cmEsc(it.snippet)}”</span>` : '';
+  switch(it.kind) {
+    case 'like_post': return `liked your post${q}`;
+    case 'comment': return `commented on your post:${q}`;
+    case 'like_comment': return `liked your comment${q}`;
+    case 'also_commented': return `also commented on a post you commented on:${q}`;
+    case 'follow': return 'started following you';
+    default: return '';
+  }
+}
+function cmActivityIcon(kind) {
+  return kind === 'like_post' || kind === 'like_comment' ? '<span class="cm-act-badge like">♥</span>'
+    : kind === 'follow' ? '<span class="cm-act-badge follow">＋</span>' : '<span class="cm-act-badge comment">💬</span>';
+}
+async function cmOpenActivity() {
+  cmSheet(`<div class="cm-sheet-title">Activity</div><div class="cm-empty" style="padding:22px 0;">Loading…</div>`, true);
+  const r = await cmApi('/community/activity');
+  if(!r.ok || !r.data || !Array.isArray(r.data.items)) {
+    cmSheet(`<div class="cm-sheet-title">Activity</div><div class="cm-empty" style="padding:22px 0;">${r.status === 404 || r.status === 500 ? "Activity isn't available yet — check back soon." : "Couldn't load your activity. Check your connection and try again."}</div><button class="ghost-btn" onclick="cmSheetClose()">Close</button>`);
+    return;
+  }
+  const items = r.data.items;
+  window._cmActItems = items;
+  const rows = items.map((it, i) => {
+    const uid = cmSafeId(it.actor_id); if(!uid) return '';
+    const name = cmEsc(it.actor_name || 'Member');
+    return `<button class="cm-act-row${it.unread ? ' unread' : ''}" onclick="cmActivityTap(${i})">
+      <div class="cm-act-av">${cmAvatarHTML({ user_id: uid, author_name: it.actor_name, has_avatar: it.has_avatar })}${cmActivityIcon(it.kind)}</div>
+      <div class="cm-act-txt"><b>${name}</b> ${cmActivityText(it)}<div class="cm-time">${cmEsc(cmTimeAgo(it.created_at))}</div></div>
+    </button>`;
+  }).join('');
+  cmSheet(`<div class="cm-sheet-title">Activity</div>
+    ${items.length ? `<div class="cm-act-list">${rows}</div>` : `<div class="cm-empty" style="padding:22px 0;"><div class="cm-empty-ic">🔔</div><b>Nothing yet</b>When people like or comment on your posts and comments, or follow you, it shows up here.</div>`}
+    <button class="ghost-btn" style="margin-top:12px;" onclick="cmSheetClose()">Close</button>`);
+  // Opening the list counts as seeing it
+  if(r.data.unread) { const s2 = await cmApi('/community/activity/seen', 'POST', {}); if(s2.ok) cmSetActUnread(0); }
+}
+function cmActivityTap(i) {
+  const it = (window._cmActItems || [])[i];
+  if(!it) return;
+  if(it.kind === 'follow') { cmOpenProfile(it.actor_id); return; }
+  cmSheetClose();
+  cmOpenPostById(it.post_id);
+}
+
 // ── Direct messages ──
 let cmDm = { view: null, with: null, threads: null, thread: null, unread: 0, timer: null, sending: false };
 
 function cmSetUnread(n) {
   cmDm.unread = Math.max(0, cmNum(n));
-  const text = cmDm.unread > 99 ? '99+' : String(cmDm.unread);
-  ['cmNavDot', 'cmInboxDot'].forEach(id => {
-    const el = document.getElementById(id);
-    if(el) { el.textContent = text; el.style.display = cmDm.unread ? 'block' : 'none'; }
-  });
+  cmDotsUpdate();
+}
+function cmSetActUnread(n) {
+  window._cmActUnread = Math.max(0, cmNum(n));
+  cmDotsUpdate();
+}
+// Messages dot (chat button), activity dot (bell), and the Community tab dot (both together)
+function cmDotsUpdate() {
+  const dm = cmDm.unread || 0, act = window._cmActUnread || 0;
+  const set = (id, n) => { const el = document.getElementById(id); if(el) { el.textContent = n > 99 ? '99+' : String(n); el.style.display = n ? 'block' : 'none'; } };
+  set('cmInboxDot', dm); set('cmActDot', act); set('cmNavDot', dm + act);
 }
 async function cmRefreshUnread() {
-  if(!isLoggedIn()) { cmSetUnread(0); return; }
-  const r = await cmApi('/dm/unread');
+  if(!isLoggedIn()) { cmSetUnread(0); cmSetActUnread(0); return; }
+  const [r, a] = await Promise.all([cmApi('/dm/unread'), cmApi('/community/activity/unread')]);
   if(r.ok && r.data) cmSetUnread(r.data.unread);
+  if(a.ok && a.data) cmSetActUnread(a.data.unread);
 }
 
 function cmDmShow(html) {
@@ -11939,12 +12066,8 @@ async function openFromNotification(open) {
   navTo('community');
   if(m[1] === 'dm') { cmOpenThread(m[2]); return; }
   if(m[1] === 'profile') { cmOpenProfile(m[2]); return; }
-  for(let i = 0; i < 20 && !cmFindPost(m[2]); i++) await new Promise(r => setTimeout(r, 250));
-  if(!cmFindPost(m[2])) return;
-  cmState.open[m[2]] = true;
-  cmRedrawPost(m[2]);
-  cmLoadComments(m[2]);
-  const el = document.getElementById('cm-post-' + m[2]); if(el) el.scrollIntoView({ block: 'start' });
+  for(let i = 0; i < 12 && !cmFindPost(m[2]); i++) await new Promise(r => setTimeout(r, 250));
+  cmOpenPostById(m[2]);
 }
 try {
   if(pushSupported()) {

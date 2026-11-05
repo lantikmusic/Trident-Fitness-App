@@ -206,3 +206,18 @@ CREATE TABLE IF NOT EXISTS usernames (
   updated_at TEXT NOT NULL
 );
 CREATE UNIQUE INDEX IF NOT EXISTS idx_usernames_lower ON usernames(username_lower);
+
+-- ── Comment likes (one per user per comment) ──
+CREATE TABLE IF NOT EXISTS community_comment_likes (
+  comment_id TEXT NOT NULL,
+  user_id TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  PRIMARY KEY (comment_id, user_id)
+);
+
+-- ── When each member last opened their Activity list (for the unread dot) ──
+CREATE TABLE IF NOT EXISTS community_activity_seen (
+  user_id TEXT PRIMARY KEY,
+  seen_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_likes_user ON community_likes(user_id);

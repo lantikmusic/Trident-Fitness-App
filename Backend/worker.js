@@ -131,7 +131,12 @@ export default {
     if (path === '/community/feed'            && request.method === 'GET')  return community(communityFeed, request, env.DB);
     if (path === '/community/posts'           && request.method === 'POST') return community(communityCreatePost, request, env.DB);
     if (path === '/community/posts/delete'    && request.method === 'POST') return community(communityDeletePost, request, env.DB);
-    if (path === '/community/like'            && request.method === 'POST') return community(communityToggleLike, request, env.DB);
+    if (path === '/community/like'            && request.method === 'POST') return community(communityToggleLike, request, env.DB, env, ctx);
+    if (path === '/community/comments/like'   && request.method === 'POST') return community(communityToggleCommentLike, request, env.DB, env, ctx);
+    if (path === '/community/post'            && request.method === 'GET')  return community(communityOnePost, request, env.DB);
+    if (path === '/community/activity'        && request.method === 'GET')  return community(communityActivity, request, env.DB);
+    if (path === '/community/activity/unread' && request.method === 'GET')  return community(communityActivityUnread, request, env.DB);
+    if (path === '/community/activity/seen'   && request.method === 'POST') return community(communityActivitySeen, request, env.DB);
     if (path === '/community/comments'        && request.method === 'GET')  return community(communityComments, request, env.DB);
     if (path === '/community/comments'        && request.method === 'POST') return community(communityAddComment, request, env.DB, env, ctx);
     if (path === '/community/comments/delete' && request.method === 'POST') return community(communityDeleteComment, request, env.DB);
@@ -910,6 +915,7 @@ async function communityDeletePost(request, DB) {
   if (!post) return error('Post not found', 404);
   if (post.user_id !== session.user_id) return error('You can only delete your own posts', 403);
 
+  try { await DB.prepare('DELETE FROM community_comment_likes WHERE comment_id IN (SELECT id FROM community_comments WHERE post_id = ?)').bind(id).run(); } catch (e) {}
   await DB.batch([
     DB.prepare('DELETE FROM community_likes WHERE post_id = ?').bind(id),
     DB.prepare('DELETE FROM community_comments WHERE post_id = ?').bind(id),
@@ -918,7 +924,7 @@ async function communityDeletePost(request, DB) {
   return json({ success: true });
 }
 
-async function communityToggleLike(request, DB) {
+async function communityToggleLike(request, DB, env, ctx) {
   const session = await validateSession(request, DB);
   if (!session) return error('Unauthorized', 401);
 
@@ -927,7 +933,7 @@ async function communityToggleLike(request, DB) {
   const postId = data && data.post_id;
   if (typeof postId !== 'string' || !COMMUNITY_ID.test(postId)) return error('Invalid request');
 
-  const post = await DB.prepare('SELECT id FROM community_posts WHERE id = ?').bind(postId).first();
+  const post = await DB.prepare('SELECT id, user_id FROM community_posts WHERE id = ?').bind(postId).first();
   if (!post) return error('Post not found', 404);
 
   const existing = await DB.prepare(
@@ -943,6 +949,10 @@ async function communityToggleLike(request, DB) {
   }
 
   const count = await DB.prepare('SELECT COUNT(*) AS n FROM community_likes WHERE post_id = ?').bind(postId).first();
+  if (!existing && post.user_id !== session.user_id && !(await dmBlockedBetween(DB, post.user_id, session.user_id))) {
+    const me = await communityUserRow(DB, session.user_id);
+    pushLater(ctx, env, DB, post.user_id, { title: `${(me && me.name) || 'Someone'} liked your post`, body: '', tag: 'like-' + postId, open: 'post:' + postId });
+  }
   return json({ success: true, liked: !existing, like_count: (count && count.n) || 0 });
 }
 
@@ -978,7 +988,9 @@ async function communityComments(request, DB) {
   const rows = await DB.prepare(
     `${COMMUNITY_COMMENT_SELECT} WHERE c.post_id = ? ORDER BY c.created_at ASC LIMIT 200`
   ).bind(postId).all();
-  return json({ comments: (rows.results || []).map(r => communityCommentOut(r, session.user_id)) });
+  const list = rows.results || [];
+  const likes = await commentLikesFor(DB, list.map(r => r.id), session.user_id);
+  return json({ comments: list.map(r => Object.assign(communityCommentOut(r, session.user_id), likes[r.id] || { like_count: 0, liked: false })) });
 }
 
 async function communityAddComment(request, DB, env, ctx) {
@@ -1011,6 +1023,14 @@ async function communityAddComment(request, DB, env, ctx) {
   if (post.user_id !== session.user_id && !(await dmBlockedBetween(DB, post.user_id, session.user_id))) {
     pushLater(ctx, env, DB, post.user_id, { title: `${(row && row.author_name) || 'Someone'} commented on your post`, body: body.slice(0, 140), tag: 'post-' + postId, open: 'post:' + postId });
   }
+  const others = await DB.prepare(
+    `SELECT DISTINCT c.user_id FROM community_comments c
+     WHERE c.post_id = ?1 AND c.user_id <> ?2 AND c.user_id <> ?3 AND c.id <> ?4
+       AND c.user_id NOT IN (SELECT blocked_id FROM dm_blocks WHERE blocker_id = ?2)
+       AND c.user_id NOT IN (SELECT blocker_id FROM dm_blocks WHERE blocked_id = ?2)
+     LIMIT 10`
+  ).bind(postId, session.user_id, post.user_id, id).all();
+  (others.results || []).forEach(o => pushLater(ctx, env, DB, o.user_id, { title: `${(row && row.author_name) || 'Someone'} also commented on a post you commented on`, body: body.slice(0, 140), tag: 'post-' + postId, open: 'post:' + postId }));
   return json({ success: true, comment: communityCommentOut(row, session.user_id), comment_count: (count && count.n) || 0 });
 }
 
@@ -1030,11 +1050,149 @@ async function communityDeleteComment(request, DB) {
   if (row.user_id !== session.user_id && row.post_owner !== session.user_id) return error('You cannot delete that comment', 403);
 
   await DB.prepare('DELETE FROM community_comments WHERE id = ?').bind(id).run();
+  try { await DB.prepare('DELETE FROM community_comment_likes WHERE comment_id = ?').bind(id).run(); } catch (e) {}
   const count = await DB.prepare('SELECT COUNT(*) AS n FROM community_comments WHERE post_id = ?').bind(row.post_id).first();
   return json({ success: true, comment_count: (count && count.n) || 0 });
 }
 
 // ── Follows, profiles and blocking ──
+// ══════════════════════════════════════════════════════
+// COMMENT LIKES + ACTIVITY (likes, comments, follows on your things)
+// ══════════════════════════════════════════════════════
+// { comment_id: { like_count, liked } }; never fails the caller (e.g. before the table exists).
+async function commentLikesFor(DB, ids, viewerId) {
+  const out = {};
+  const unique = [...new Set(ids.filter(id => COMMUNITY_ID.test(String(id || ''))))].slice(0, 200);
+  if (!unique.length) return out;
+  try {
+    const marks = unique.map(() => '?').join(',');
+    const rows = await DB.prepare(
+      `SELECT comment_id, COUNT(*) AS n, MAX(user_id = ?) AS mine FROM community_comment_likes WHERE comment_id IN (${marks}) GROUP BY comment_id`
+    ).bind(viewerId, ...unique).all();
+    (rows.results || []).forEach(r => { out[r.comment_id] = { like_count: r.n || 0, liked: !!r.mine }; });
+  } catch (e) {}
+  return out;
+}
+
+async function communityToggleCommentLike(request, DB, env, ctx) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+  let data;
+  try { data = await request.json(); } catch (e) { return error('Invalid request'); }
+  const commentId = data && data.comment_id;
+  if (typeof commentId !== 'string' || !COMMUNITY_ID.test(commentId)) return error('Invalid request');
+  const c = await DB.prepare('SELECT id, post_id, user_id, body FROM community_comments WHERE id = ?').bind(commentId).first();
+  if (!c) return error('Comment not found', 404);
+  const me = session.user_id;
+  const existing = await DB.prepare('SELECT 1 AS x FROM community_comment_likes WHERE comment_id = ? AND user_id = ?').bind(commentId, me).first();
+  if (existing) {
+    await DB.prepare('DELETE FROM community_comment_likes WHERE comment_id = ? AND user_id = ?').bind(commentId, me).run();
+  } else {
+    if (c.user_id !== me && (await dmBlockedBetween(DB, c.user_id, me))) return error('You cannot like this comment', 403);
+    await DB.prepare('INSERT OR IGNORE INTO community_comment_likes (comment_id, user_id, created_at) VALUES (?, ?, ?)').bind(commentId, me, new Date().toISOString()).run();
+    if (c.user_id !== me) {
+      const row = await communityUserRow(DB, me);
+      pushLater(ctx, env, DB, c.user_id, { title: `${(row && row.name) || 'Someone'} liked your comment`, body: String(c.body || '').slice(0, 140), tag: 'clike-' + commentId, open: 'post:' + c.post_id });
+    }
+  }
+  const count = await DB.prepare('SELECT COUNT(*) AS n FROM community_comment_likes WHERE comment_id = ?').bind(commentId).first();
+  return json({ success: true, liked: !existing, like_count: (count && count.n) || 0 });
+}
+
+// One post (to open it from a notification or the activity list).
+async function communityOnePost(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+  const id = new URL(request.url).searchParams.get('id') || '';
+  if (!COMMUNITY_ID.test(id)) return error('Invalid request');
+  const row = await DB.prepare(
+    `${COMMUNITY_POST_SELECT} WHERE p.id = ?2 AND p.user_id NOT IN (SELECT blocked_id FROM dm_blocks WHERE blocker_id = ?1)`
+  ).bind(session.user_id, id).first();
+  if (!row) return error('Post not found', 404);
+  const names = await usernamesFor(DB, [row.user_id]);
+  return json({ post: Object.assign(communityPostOut(row, session.user_id), { author_username: names[row.user_id] || null }) });
+}
+
+// Everything that happened to me, newest first. Each part has the same columns:
+// kind, actor_id, post_id, comment_id, snippet, created_at
+const ACTIVITY_SQL = `
+  SELECT 'like_post' AS kind, l.user_id AS actor_id, p.id AS post_id, NULL AS comment_id, p.body AS snippet, l.created_at
+    FROM community_likes l JOIN community_posts p ON p.id = l.post_id
+    WHERE p.user_id = ?1 AND l.user_id <> ?1
+  UNION ALL
+  SELECT 'comment', c.user_id, c.post_id, c.id, c.body, c.created_at
+    FROM community_comments c JOIN community_posts p ON p.id = c.post_id
+    WHERE p.user_id = ?1 AND c.user_id <> ?1
+  UNION ALL
+  SELECT 'like_comment', cl.user_id, c.post_id, c.id, c.body, cl.created_at
+    FROM community_comment_likes cl JOIN community_comments c ON c.id = cl.comment_id
+    WHERE c.user_id = ?1 AND cl.user_id <> ?1
+  UNION ALL
+  SELECT 'also_commented', c.user_id, c.post_id, c.id, c.body, c.created_at
+    FROM community_comments c JOIN community_posts p ON p.id = c.post_id
+    WHERE p.user_id <> ?1 AND c.user_id <> ?1
+      AND EXISTS (SELECT 1 FROM community_comments m WHERE m.post_id = c.post_id AND m.user_id = ?1 AND m.created_at < c.created_at)
+  UNION ALL
+  SELECT 'follow', f.follower_id, NULL, NULL, NULL, f.created_at
+    FROM community_follows f WHERE f.followee_id = ?1`;
+const ACTIVITY_NOT_BLOCKED = `actor_id NOT IN (SELECT blocked_id FROM dm_blocks WHERE blocker_id = ?1)
+  AND actor_id NOT IN (SELECT blocker_id FROM dm_blocks WHERE blocked_id = ?1)`;
+
+async function activitySeenAt(DB, userId) {
+  const row = await DB.prepare('SELECT seen_at FROM community_activity_seen WHERE user_id = ?').bind(userId).first();
+  return row ? row.seen_at : '';
+}
+
+async function communityActivity(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+  const me = session.user_id;
+  const rows = await DB.prepare(
+    `SELECT a.*, ${COMMUNITY_AUTHOR} AS actor_name,
+       EXISTS(SELECT 1 FROM user_blobs b WHERE b.user_id = a.actor_id AND b.blob_key = 'profile_pic') AS has_avatar
+     FROM (${ACTIVITY_SQL}) a
+     JOIN users u ON u.id = a.actor_id
+     LEFT JOIN user_settings s ON s.user_id = a.actor_id
+     WHERE ${ACTIVITY_NOT_BLOCKED}
+     ORDER BY a.created_at DESC LIMIT 60`
+  ).bind(me).all();
+  const list = rows.results || [];
+  const seenAt = await activitySeenAt(DB, me);
+  const names = await usernamesFor(DB, list.map(r => r.actor_id));
+  return json({
+    seen_at: seenAt,
+    unread: list.filter(r => !seenAt || r.created_at > seenAt).length,
+    items: list.map(r => ({
+      kind: r.kind, actor_id: r.actor_id, actor_name: r.actor_name, actor_username: names[r.actor_id] || null,
+      has_avatar: !!r.has_avatar, post_id: r.post_id, comment_id: r.comment_id,
+      snippet: String(r.snippet || '').slice(0, 120), created_at: r.created_at,
+      unread: !seenAt || r.created_at > seenAt
+    }))
+  });
+}
+
+async function communityActivityUnread(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+  const me = session.user_id;
+  const seenAt = await activitySeenAt(DB, me);
+  const row = await DB.prepare(
+    `SELECT COUNT(*) AS n FROM (SELECT * FROM (${ACTIVITY_SQL}) a WHERE a.created_at > ?2 AND ${ACTIVITY_NOT_BLOCKED} LIMIT 100)`
+  ).bind(me, seenAt || '').first();
+  return json({ unread: (row && row.n) || 0 });
+}
+
+async function communityActivitySeen(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+  const now = new Date().toISOString();
+  await DB.prepare(
+    `INSERT INTO community_activity_seen (user_id, seen_at) VALUES (?, ?)
+     ON CONFLICT(user_id) DO UPDATE SET seen_at = excluded.seen_at`
+  ).bind(session.user_id, now).run();
+  return json({ success: true, seen_at: now });
+}
+
 // ══════════════════════════════════════════════════════
 // USERNAMES — a unique @handle per account, used to find friends
 // ══════════════════════════════════════════════════════
