@@ -395,6 +395,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .dwc-exercises{margin-top:12px;display:flex;flex-direction:column;gap:6px;}
 .dwc-ex{font-size:13px;color:var(--text2);display:flex;align-items:center;gap:6px;}
 .dwc-ex::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--pink);opacity:.6;flex-shrink:0;}
+.dwc-start{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:14px;padding:13px;border-radius:var(--radius-lg);border:none;background:var(--pink);font-family:inherit;font-size:15px;font-weight:700;color:#000;cursor:pointer;box-shadow:0 4px 20px var(--pink-glow);-webkit-tap-highlight-color:transparent;transition:filter .15s,transform .1s;}
+.dwc-start:active{transform:scale(.98);filter:brightness(.92);}
+.dwc-start svg{width:16px;height:16px;flex-shrink:0;}
+.dwc-start.done{background:transparent;color:var(--green);border:0.5px solid rgba(48,209,88,.35);box-shadow:none;}
 /* ════════════════════════════════
    MACROS PAGE
 ════════════════════════════════ */
@@ -4862,6 +4866,38 @@ document.addEventListener('visibilitychange', () => {
   } catch(e) { console.warn('Calendar day sync skipped:', e); }
 });
 
+// ── Home card: Start Workout ──
+function dashStartBtnHTML(label) {
+  const play = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg>';
+  return `<button class="dwc-start" onclick="event.stopPropagation();dashStartWorkout()">${play}${label}</button>`;
+}
+// Any set logged on this program day already (same test the Workout tab uses).
+function dashDayStarted(day, dayIdx) {
+  try {
+    const log = workoutState.logs[getLogKey()] || {};
+    return dayIdx === workoutDayIdx && (day.exercises || []).some((_, i) => (log[i] || []).some(s => s && (s.weight || s.reps)));
+  } catch(e) { return false; }
+}
+// Opens today's scheduled workout, ready to log.
+function dashStartWorkout() {
+  try {
+    if(hyActive()) {
+      const today = hyDow(new Date());
+      hyView.dayIdx = today; hyView.date = new Date().toDateString();
+      hyView.open = null; hyView.exOpen = null;
+      navTo('workout');
+      const next = hyDashNextSlot(today);
+      if(next.slot) hyOpen(next.slot.key);
+      return;
+    }
+    navTo('workout');
+    if(selectedProgram && getProgram(selectedProgram) && _workoutScreen !== 'programs') beginWorkout();
+  } catch(e) {
+    console.warn('Start workout fell back to the Workout tab:', e);
+    try { navTo('workout'); } catch(_) {}
+  }
+}
+
 function renderWorkout(){
   if(hyActive()) {
     // The LANTIK Hybrid program has its own week and session screens
@@ -7044,6 +7080,7 @@ function renderDashboard(){
         <div class="dwc-title">${day.name}</div>
         <div class="dwc-sub">${day.exercises.length} exercises</div>
         <div class="dwc-exercises">${day.exercises.slice(0,4).map(e=>`<div class="dwc-ex">${e.name} — ${e.sets}×${e.reps}</div>`).join('')}${day.exercises.length>4?`<div class="dwc-ex" style="color:var(--pink);">+${day.exercises.length-4} more</div>`:''}</div>
+        ${dashStartBtnHTML(dashDayStarted(day, dashDayIdx) ? 'Continue Workout' : 'Start Workout')}
         <button onclick="event.stopPropagation();openCustomWorkout()" style="margin-top:10px;width:100%;padding:8px;border-radius:var(--radius);border:0.5px solid var(--border2);background:transparent;font-family:inherit;font-size:12px;color:var(--text3);cursor:pointer;">↔ Swap for custom workout</button>
       </div>`;
   } else {
@@ -10395,8 +10432,34 @@ function hyDashHTML() {
     <div class="dwc-eyebrow">${hyEsc(prog.name)}</div>
     <div class="dwc-title">${HY_DAYS[today]}</div>
     <div class="dwc-exercises">${rows}</div>
+    ${hyDashStartHTML(today)}
     <button onclick="event.stopPropagation();openCustomWorkout()" style="margin-top:10px;width:100%;padding:8px;border-radius:var(--radius);border:0.5px solid var(--border2);background:transparent;font-family:inherit;font-size:12px;color:var(--text3);cursor:pointer;">↔ Swap for custom workout</button>
   </div>`;
+}
+
+// Today's next session that isn't finished or skipped. The gym lift comes first on days that
+// also have field or sport work. slot is null when everything today is done.
+function hyDashNextSlot(dayIdx) {
+  let any = false;
+  const open = [];
+  for(const slot of hyDaySlots(dayIdx)) {
+    const wid = hySlotWorkoutId(dayIdx, slot);
+    const w = wid ? hyWorkout(wid) : null;
+    if(!w) continue;
+    any = true;
+    const sess = hyState.sessions[hySid(dayIdx, slot.key)] || null;
+    if(!sess || (sess.status !== 'completed' && sess.status !== 'skipped')) open.push({ slot, sess, w });
+  }
+  const pick = open.find(x => x.slot.gym) || open[0];
+  return pick ? { slot: pick.slot, sess: pick.sess, w: pick.w, any } : { slot: null, sess: null, w: null, any };
+}
+function hyDashStartHTML(dayIdx) {
+  try {
+    const next = hyDashNextSlot(dayIdx);
+    if(next.slot) return dashStartBtnHTML(hyEsc((next.sess ? 'Continue ' : 'Start ') + (next.w.short || next.w.name)));
+    if(next.any) return `<button class="dwc-start done" onclick="event.stopPropagation();dashStartWorkout()">✓ Done for today</button>`;
+  } catch(e) { console.warn('Start button skipped:', e); }
+  return '';
 }
 
 // Left open overnight: come back to today's day, unless a session is open on screen.
