@@ -867,7 +867,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .mg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
 .mg-track{position:relative;height:10px;border-radius:4px;background:rgba(255,255,255,.05);}
 .mg-track.div::after{content:'';position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:rgba(255,255,255,.18);}
-.mg-bar{position:absolute;top:0;bottom:0;border-radius:4px;transition:width .5s ease;}
+.mg-bar{position:absolute;top:0;bottom:0;border-radius:4px;transition:width .8s cubic-bezier(.2,.8,.2,1);}
+@media (prefers-reduced-motion: reduce){.mg-bar{transition:none !important;}.mg-radar.anim .shape{animation:none;}}
 .mg-val{font-size:12px;font-weight:600;color:var(--text2);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;}
 .mg-val .mg-ar{font-size:11px;margin-right:2px;}
 .mg-grow .mg-ar{color:#30D158;} .mg-hold .mg-ar{color:#8E8E93;} .mg-slip .mg-ar{color:#FF9F0A;}
@@ -6999,12 +7000,15 @@ function renderMuscleGrowth(animate) {
   const label = { grow: 'Likely growing', hold: 'Holding steady', slip: 'Slipping', idle: 'Not trained in 3+ weeks', early: 'Needs one more session to compare' };
   const arrow = { grow: '↑', hold: '→', slip: '↓' };
   const open = window._mgOpen;
-  const rows = shown.map(g => {
+  const rows = shown.map((g, gi) => {
     let bar = '';
     if(g.score !== null && g.status !== 'early') {
       const w = Math.max(2, Math.abs(g.score) / maxAbs * (anyNeg ? 50 : 100));
       const pos = anyNeg ? (g.score >= 0 ? `left:50%;` : `right:50%;`) : 'left:0;';
-      bar = `<div class="mg-bar" style="${pos}width:${w}%;background:${MG_COLORS[g.name] || '#8E8E93'}"></div>`;
+      // On opening the tab the bars start empty and fill to their value, one after another, as the radar grows in
+      bar = animate
+        ? `<div class="mg-bar" data-w="${w}" style="${pos}width:0;transition-delay:${150 + gi * 50}ms;background:${MG_COLORS[g.name] || '#8E8E93'}"></div>`
+        : `<div class="mg-bar" style="${pos}width:${w}%;background:${MG_COLORS[g.name] || '#8E8E93'}"></div>`;
     }
     const val = g.status === 'early' ? 'New' : g.status === 'idle' ? 'Idle' : `<span class="mg-ar" aria-hidden="true">${arrow[g.status]}</span>${pct(g.score)}`;
     const safe = cmEsc(g.name);
@@ -7032,6 +7036,11 @@ function renderMuscleGrowth(animate) {
     <div class="mg-rows">${rows}</div>
     ${none.length ? `<div class="mg-none">Not trained yet: ${none.map(cmEsc).join(', ')}</div>` : ''}
     <div class="mg-foot">Strength change since your first session in the window. Tap a muscle on the chart or list to see the lifts behind it. Lifts that keep going up with steady training are the best sign a muscle is growing.</div>`;
+  if(animate) {
+    const fill = () => el.querySelectorAll('.mg-bar[data-w]').forEach(b => { b.style.width = b.dataset.w + '%'; b.removeAttribute('data-w'); });
+    requestAnimationFrame(() => requestAnimationFrame(fill));
+    setTimeout(fill, 1200);   // in case the page was in the background
+  }
 }
 
 function renderProgress(){
