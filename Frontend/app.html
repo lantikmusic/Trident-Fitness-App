@@ -2553,7 +2553,7 @@ async function loadFromCloud() {
       if(goals.tdee)            g.tdee = goals.tdee;
       if(goals.deficit_per_day) g.deficitPerDay = goals.deficit_per_day;
       if(goals.weeks)           g.weeks = goals.weeks;
-      if(goals.current_weight)  g.currentWeight = goals.current_weight;
+      if(goals.current_weight)  { g.currentWeight = goals.current_weight; g.startWeight = goals.current_weight; }
       if(goals.goal_weight)     g.goalWeight = goals.goal_weight;
       save(GOALS_KEY, g);
       goalsData = g;
@@ -2564,8 +2564,10 @@ async function loadFromCloud() {
       const mapped = progress.map(p => ({
         date: p.log_date, weight: p.weight, bf: p.body_fat
       }));
-      save(PROGRESS_KEY, mapped);
-      progressData = mapped;
+      let merged = mapped;
+      try { merged = wtMergeCloud(mapped, progressData, progress.length >= 30); } catch(e) { console.warn('Weight merge skipped:', e); }
+      save(PROGRESS_KEY, merged);
+      progressData = merged;
     }
 
     // Apply workout state
@@ -6541,17 +6543,68 @@ function getExercisePR(exName){
 // ══════════════════════════════════════
 // PROGRESS
 // ══════════════════════════════════════
+// ── Weight log helpers ──
+// Entries carry dates as '2026-11-04' (from the account), 'Nov 5, 2026' or 'Nov 5' (older check-ins).
+const WT_MONTHS = {jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11};
+function wtEntryTime(e) {
+  if(!e) return 0;
+  if(Number.isFinite(e.ts) && e.ts > 0) return e.ts;
+  const str = String(e.date || '').trim();
+  let m = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if(m) return new Date(+m[1], +m[2] - 1, +m[3], 12).getTime();
+  m = str.match(/^([A-Za-z]{3})[a-z]*\.? (\d{1,2})(?:, (\d{4}))?$/);
+  if(m && WT_MONTHS[m[1].toLowerCase()] !== undefined) {
+    const now = new Date();
+    let y = m[3] ? +m[3] : now.getFullYear();
+    let t = new Date(y, WT_MONTHS[m[1].toLowerCase()], +m[2], 12).getTime();
+    if(!m[3] && t > now.getTime() + 86400000) t = new Date(y - 1, WT_MONTHS[m[1].toLowerCase()], +m[2], 12).getTime();
+    return t;
+  }
+  return 0;
+}
+function wtEntryISO(e) { const t = wtEntryTime(e); return t ? localISO(new Date(t)) : ''; }
+// Newest logged body weight from the weight log and Goals check-ins (null if none).
+function goalLatestWeight() {
+  let best = null, bestT = -1;
+  const scan = list => (list || []).forEach(e => {
+    const w = Number(e && e.weight);
+    if(!(w > 0)) return;
+    const t = wtEntryTime(e);
+    if(t > bestT) { best = w; bestT = t; }   // ties keep the earlier (newer) entry
+  });
+  try { scan(progressData); } catch(e) {}
+  try { scan(load(CHECKIN_KEY)); } catch(e) {}
+  return best;
+}
+// The account keeps weights logged through it; entries only on this phone are kept and sent up.
+function wtMergeCloud(server, local, serverFull) {
+  const key = e => wtEntryISO(e) + '|' + (Number(e.weight) || 0) + '|' + (Number(e.bf) || 0);
+  const have = new Set(server.map(key));
+  const oldest = Math.min(...server.map(wtEntryTime).filter(t => t > 0));
+  const extra = [];
+  (local || []).forEach(e => {
+    if(!e || !(Number(e.weight) > 0 || Number(e.bf) > 0) || have.has(key(e))) return;
+    have.add(key(e));
+    extra.push(e);
+    // Only send what the account can't already have (it returns its newest 30)
+    if(!serverFull || wtEntryTime(e) >= oldest) {
+      const iso = wtEntryISO(e);
+      if(iso) cloudPost('/progress', { date: iso, weight: Number(e.weight) || null, body_fat: Number(e.bf) || null });
+    }
+  });
+  return server.concat(extra).map((e, i) => [e, i]).sort((a, b) => (wtEntryTime(b[0]) - wtEntryTime(a[0])) || (a[1] - b[1])).map(x => x[0]);
+}
 let progressData = load(PROGRESS_KEY) || [];
 let weightChart = null;
 
 function saveProgress(){
-  const entry={date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),weight:parseFloat(document.getElementById('logWeight').value)||null,bf:parseFloat(document.getElementById('logBF').value)||null};
+  const entry={date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}),weight:parseFloat(document.getElementById('logWeight').value)||null,bf:parseFloat(document.getElementById('logBF').value)||null,ts:Date.now()};
   if(!entry.weight&&!entry.bf)return showToast('Please enter at least weight or body fat');
   progressData.unshift(entry);save(PROGRESS_KEY,progressData);
   // Cloud sync
   cloudPost('/progress', { date: localISO(new Date()), weight: entry.weight, body_fat: entry.bf });
   ['logWeight','logBF'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  renderProgress();showToast('Progress saved!');
+  renderProgress();try{renderDashboard();}catch(e){}showToast('Progress saved!');
 }
 
 // ══════════════════════════════════════
@@ -7052,6 +7105,7 @@ function saveGoals() {
   goalsData.activity    = document.getElementById('goalActivity').value;
   goalsData.weeks       = parseInt(document.getElementById('goalTimeline').value) || 8;
   goalsData.startDate   = goalsData.startDate || new Date().toISOString();
+  if(goalsData.currentWeight) goalsData.startWeight = goalsData.currentWeight;
   save(GOALS_KEY, goalsData);
   // Cloud sync
   cloudPost('/user/goals', {
@@ -7080,11 +7134,14 @@ function saveCheckin() {
     ts: Date.now()
   };
   // On track if avg calories within 100 of goal
-  entry.onTrack = !!(cal && goalsData.cal && Math.abs(cal - goalsData.cal) <= 150);
+  if(cal && goalsData.cal) entry.onTrack = Math.abs(cal - goalsData.cal) <= 150;
   checkinData.unshift(entry);
   save(CHECKIN_KEY, checkinData);
   // Update current weight in progress
-  if(wt) { const pd = load('trident_progress_v1') || []; pd.unshift({date:entry.date,weight:wt,ts:entry.ts}); save('trident_progress_v1',pd); }
+  if(wt) {
+    progressData.unshift({date:entry.date,weight:wt,ts:entry.ts}); save(PROGRESS_KEY, progressData);
+    cloudPost('/progress', { date: localISO(new Date()), weight: wt, body_fat: null });
+  }
   document.getElementById('checkinWeight').value = '';
   document.getElementById('checkinCals').value = '';
   document.getElementById('checkinWorkouts').value = '';
@@ -7316,13 +7373,16 @@ function renderDashboard(){
   if(g.focus && g.goalWeight && g.currentWeight) {
     const cfg = FOCUS_CONFIG[g.focus];
     const checkins = load(CHECKIN_KEY) || [];
-    const latestWt = checkins.find(c=>c.weight)?.weight || g.currentWeight;
-    const startWt  = g.currentWeight;
-    const targetWt = g.goalWeight;
+    const r1 = n => Math.round(n * 10) / 10;
+    const startWt  = Number(g.startWeight || g.currentWeight);
+    const targetWt = Number(g.goalWeight);
+    const latestWt = goalLatestWeight() || startWt;
+    const dir = Math.sign(targetWt - startWt);              // -1 lose, +1 gain, 0 hold
+    const moved = r1(latestWt - startWt);                    // signed change since the goal was set
     const totalChange = Math.abs(targetWt - startWt);
-    const achieved    = Math.abs(latestWt - startWt);
-    const pct = totalChange > 0 ? Math.min(100, Math.round((achieved / totalChange) * 100)) : 0;
-    const lbsLeft = Math.round(Math.abs(targetWt - latestWt) * 10) / 10;
+    const reached = dir === 0 ? Math.abs(latestWt - targetWt) <= 0.5 : (latestWt - targetWt) * dir >= 0;
+    const pct = reached ? 100 : (totalChange > 0 ? Math.max(0, Math.min(100, Math.round((latestWt - startWt) * dir / totalChange * 100))) : 0);
+    const lbsLeft = reached ? 0 : r1(Math.abs(targetWt - latestWt));
     // Calories needed to reach goal
     const calLeft = Math.round(lbsLeft * 3500);
     // Weekly deficit
@@ -7330,22 +7390,22 @@ function renderDashboard(){
     const weeksLeft = weeklyDeficit > 0 ? Math.ceil((lbsLeft * 3500) / weeklyDeficit) : '—';
     // On track from last check-in
     const lastCheckin = checkins[0];
-    const onTrack = lastCheckin?.onTrack;
+    const onTrack = lastCheckin && lastCheckin.calories ? lastCheckin.onTrack : undefined;
 
     gpEl.innerHTML = dashMacroCardHTML() + `<div class="goal-progress-card" onclick="navTo('goals')" style="cursor:pointer;">
       <div class="gpc-header">
         <div>
           <div class="gpc-title">${cfg.label}</div>
-          <div class="gpc-focus">${lbsLeft} lbs to go${onTrack !== undefined ? ` · <span style="color:${onTrack?'var(--green)':'var(--red)'}">${onTrack?'On Track':'Off Track'}</span>` : ''}</div>
+          <div class="gpc-focus">${reached ? 'Goal reached 🎉' : lbsLeft + (lbsLeft === 1 ? ' lb' : ' lbs') + ' to go'}${onTrack !== undefined ? ` · <span style="color:${onTrack?'var(--green)':'var(--red)'}">${onTrack?'On Track':'Off Track'}</span>` : ''}</div>
         </div>
         <div style="font-size:22px;font-weight:700;color:var(--pink);">${pct}%</div>
       </div>
       <div class="gpc-grid">
-        <div class="gpc-stat"><div class="gpc-stat-val" style="color:var(--pink)">${achieved > 0 ? (latestWt < startWt ? '-' : '+') + achieved : '—'}</div><div class="gpc-stat-lbl">lbs changed</div></div>
+        <div class="gpc-stat"><div class="gpc-stat-val" style="color:var(--pink)">${moved ? (moved > 0 ? '+' : '−') + Math.abs(moved) : '—'}</div><div class="gpc-stat-lbl">lbs changed</div></div>
         <div class="gpc-stat"><div class="gpc-stat-val">${calLeft.toLocaleString()}</div><div class="gpc-stat-lbl">kcal to goal</div></div>
         <div class="gpc-stat"><div class="gpc-stat-val">${weeksLeft}</div><div class="gpc-stat-lbl">weeks left</div></div>
       </div>
-      <div class="gpc-progress-label"><span>Start: ${startWt} lbs</span><span>Goal: ${targetWt} lbs</span></div>
+      <div class="gpc-progress-label"><span>Start: ${startWt} lbs</span><span>Now: ${r1(latestWt)} lbs</span><span>Goal: ${targetWt} lbs</span></div>
       <div class="on-track-bar"><div class="on-track-fill" style="width:${pct}%"></div></div>
       <button class="cbc-log-weight-btn" onclick="event.stopPropagation();openLogWeight()">
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -8881,11 +8941,11 @@ function openLogWeight() {
   const g = load(GOALS_KEY) || {};
   const sub = document.getElementById('logWeightSub');
   if(sub) {
-    const latest = progressData.find(e => e.weight)?.weight;
+    const latest = goalLatestWeight();
     const goal   = g.goalWeight;
     if(latest && goal) {
       const diff = Math.round(Math.abs(latest - goal) * 10) / 10;
-      sub.textContent = `Last logged: ${latest} lbs · Goal: ${goal} lbs (${diff} lbs to go)`;
+      sub.textContent = `Last logged: ${latest} lbs · Goal: ${goal} lbs` + (diff ? ` (${diff} ${diff === 1 ? 'lb' : 'lbs'} to go)` : '');
     } else if(g.currentWeight) {
       sub.textContent = `Starting weight: ${g.currentWeight} lbs`;
     } else {
@@ -8908,11 +8968,10 @@ function saveQuickWeight() {
   const entry = { date, weight: val, ts: Date.now() };
   progressData.unshift(entry);
   save(PROGRESS_KEY, progressData);
-  // Also update current weight in goals so goal progress card stays fresh
+  cloudPost('/progress', { date: localISO(new Date()), weight: val, body_fat: null });
+  // The goal keeps its starting weight; the card reads the newest logged weight.
   const g = load(GOALS_KEY) || {};
-  if(!g.startWeight) g.startWeight = g.currentWeight; // preserve original start
-  g.currentWeight = val;
-  save(GOALS_KEY, g);
+  if(!g.startWeight && g.currentWeight) { g.startWeight = g.currentWeight; save(GOALS_KEY, g); }
   closeLogWeight();
   renderDashboard();
   showToast(`✓ ${val} lbs logged!`);
