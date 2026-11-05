@@ -1065,6 +1065,86 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .cm-chip.on{border-color:var(--pink);color:var(--pink);}
 .cm-pick{display:block;width:100%;text-align:left;background:var(--bg4);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 12px;color:var(--text);font-family:inherit;font-size:13px;line-height:1.4;margin-bottom:6px;cursor:pointer;}
 .cm-pick small{display:block;color:var(--text3);font-size:11px;}
+/* ── Community refresh ── */
+.cm-top{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.cm-scope{flex:1;display:flex;position:relative;padding:4px;border-radius:99px;
+  background:linear-gradient(180deg,rgba(255,255,255,0.10),rgba(255,255,255,0.03)),rgba(30,30,32,0.6);
+  border:0.5px solid rgba(255,255,255,0.14);box-shadow:inset 0 1px 0 rgba(255,255,255,0.15),0 6px 18px rgba(0,0,0,0.35);}
+.cm-scope-btn{flex:1;position:relative;z-index:1;border:none;background:transparent;color:rgba(255,255,255,0.75);font-family:inherit;font-size:13px;font-weight:600;padding:9px 0;border-radius:99px;cursor:pointer;transition:color .2s;}
+.cm-scope-btn.active{color:#000;}
+.cm-scope-pill{position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);border-radius:99px;background:var(--pink);box-shadow:0 2px 12px var(--pink-glow);transition:transform .28s cubic-bezier(.3,.7,.2,1);}
+.cm-scope.following .cm-scope-pill{transform:translateX(100%);}
+.cm-inbox-btn{width:44px;height:44px;background:linear-gradient(180deg,rgba(255,255,255,0.10),rgba(255,255,255,0.03)),rgba(30,30,32,0.6);border:0.5px solid rgba(255,255,255,0.14);box-shadow:inset 0 1px 0 rgba(255,255,255,0.15),0 6px 18px rgba(0,0,0,0.35);}
+.cm-composer{background:var(--bg3);border:0.5px solid var(--border);border-radius:22px;padding:14px;margin-bottom:16px;}
+.cm-composer-row{display:flex;align-items:center;gap:12px;cursor:pointer;}
+.cm-composer-ph{flex:1;background:var(--bg4);border:0.5px solid var(--border);border-radius:99px;padding:11px 16px;color:var(--text3);font-size:14px;}
+.cm-composer-chips{display:flex;gap:8px;margin-top:12px;}
+.cm-qchip{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--bg4);border:0.5px solid var(--border);border-radius:12px;padding:9px 0;color:var(--text2);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;}
+.cm-qchip:active{transform:scale(.97);}
+.cm-post{background:var(--bg3);border:0.5px solid var(--border);border-radius:22px;padding:16px;margin-bottom:14px;box-shadow:0 8px 24px rgba(0,0,0,0.25);}
+.cm-head{margin-bottom:12px;}
+.cm-ring{padding:2px;border-radius:50%;background:conic-gradient(from 200deg,var(--pink),#BF5AF2,#FF375F,var(--pink));flex-shrink:0;}
+.cm-ring .cm-avatar{border:2px solid var(--bg3);width:38px;height:38px;}
+.cm-name{font-size:15px;font-weight:700;letter-spacing:-0.01em;}
+.cm-time{font-size:12px;}
+.cm-kind{color:var(--pink);font-weight:600;}
+.cm-follow{background:transparent;color:var(--pink);border:1px solid var(--pink-border);padding:6px 13px;font-size:12px;}
+.cm-follow:active{background:var(--pink-dim);}
+.cm-del{display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;padding:0;color:var(--text3);}
+.cm-del svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.cm-del:active{background:var(--bg4);color:var(--red);}
+.cm-body{font-size:15px;line-height:1.5;margin-bottom:12px;}
+.cm-photo{width:calc(100% + 32px);max-width:none;margin:0 -16px 12px;border-radius:0;max-height:520px;}
+.cm-attach{border-radius:16px;padding:14px;margin-bottom:12px;border:0.5px solid var(--border);background:var(--bg4);}
+.cm-attach-wo{background:linear-gradient(135deg,var(--pink-dim),rgba(191,90,242,0.08)),var(--bg4);border-color:var(--pink-border);}
+.cm-attach-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;}
+.cm-attach-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--pink);}
+.cm-attach-prog{font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
+.cm-attach-title{font-size:17px;font-weight:700;letter-spacing:-0.01em;}
+.cm-attach-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0;}
+.cm-attach-stats div{background:rgba(0,0,0,0.28);border-radius:10px;padding:7px 4px;text-align:center;}
+.cm-attach-stats b{display:block;font-size:15px;font-weight:700;}
+.cm-attach-stats span{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;}
+.cm-attach-row{border-top:0.5px solid rgba(255,255,255,0.06);padding:6px 0;}
+.cm-attach-row:first-of-type{border-top:none;}
+.cm-attach-pr{display:flex;align-items:center;gap:14px;background:radial-gradient(circle at 15% 50%,rgba(255,214,10,0.18),transparent 60%),var(--bg4);border-color:rgba(255,214,10,0.25);}
+.cm-pr-trophy{font-size:42px;line-height:1;filter:drop-shadow(0 4px 12px rgba(255,214,10,0.35));}
+.cm-attach-pr .cm-attach-badge{color:#FFD60A;}
+.cm-pr-weight{font-size:30px;}
+.cm-actions{gap:4px;border-top:none;padding-top:0;margin:0 -6px;}
+.cm-act{font-size:14px;font-weight:600;padding:7px 10px;}
+.cm-act svg{width:21px;height:21px;}
+.cm-act:active{background:var(--bg4);}
+.cm-act.liked{color:#FF375F;}
+.cm-act.liked svg{fill:#FF375F;stroke:#FF375F;}
+.cm-comments{border-top:0.5px solid var(--border);margin-top:6px;padding-top:12px;}
+.cm-comment-bubble{border-radius:16px;border-top-left-radius:6px;padding:9px 12px;}
+.cm-comment-form{background:var(--bg4);border:0.5px solid var(--border);border-radius:99px;padding:4px 4px 4px 6px;}
+.cm-comment-form .cm-input{background:transparent;border:none;padding:8px 10px;}
+.cm-send-ic{flex-shrink:0;width:34px;height:34px;border-radius:50%;border:none;background:var(--pink);display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.cm-send-ic svg{width:16px;height:16px;fill:none;stroke:#000;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+.cm-empty-ic{font-size:40px;margin-bottom:8px;}
+.cm-empty b{color:var(--text);font-size:15px;display:block;margin-bottom:4px;}
+.cm-skel{background:var(--bg3);border:0.5px solid var(--border);border-radius:22px;padding:16px;margin-bottom:14px;}
+.cm-skel i{display:block;border-radius:8px;background:linear-gradient(90deg,var(--bg4) 0%,var(--bg5) 50%,var(--bg4) 100%);background-size:200% 100%;animation:cmShimmer 1.3s linear infinite;}
+@keyframes cmShimmer{from{background-position:200% 0;}to{background-position:-200% 0;}}
+.cm-sheet{border-radius:28px 28px 0 0;padding-top:10px;}
+.cm-sheet::before{content:'';display:block;width:36px;height:4px;border-radius:99px;background:var(--border2);margin:0 auto 14px;}
+.cm-textarea{border-radius:16px;font-size:16px;min-height:110px;padding:14px;}
+.cm-chip{border-radius:12px;font-weight:600;}
+.cm-prof{position:relative;padding-top:6px;}
+.cm-prof::before{content:'';position:absolute;left:-16px;right:-16px;top:-24px;height:90px;background:linear-gradient(135deg,var(--pink-dim),rgba(191,90,242,0.14),rgba(255,55,95,0.08));z-index:0;}
+.cm-prof > *{position:relative;z-index:1;}
+.cm-prof .cm-avatar.lg{width:84px;height:84px;font-size:32px;border:3px solid var(--bg3);box-shadow:0 0 0 2px var(--pink);}
+.cm-prof-stats{gap:0;background:var(--bg4);border-radius:16px;padding:10px 0;margin:12px 0 14px;}
+.cm-prof-stats > div{flex:1;}
+.cm-mini{border-radius:16px;}
+.cm-dm-head{background:rgba(10,10,10,0.75);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);}
+.cm-thread{padding:12px 4px;border-radius:14px;}
+.cm-thread:active{background:var(--bg3);}
+.cm-msg{border-radius:20px;border-bottom-left-radius:6px;padding:10px 14px;}
+.cm-msg.mine{background:linear-gradient(135deg,var(--pink),#5AD8FF);border-bottom-right-radius:6px;}
+.cm-dm-bar textarea{border-radius:22px;}
 /* ── LANTIK Hybrid program ── */
 .hy-day-title{font-size:13px;font-weight:600;color:var(--text2);margin:2px 2px 10px;}
 .hy-slot{background:var(--bg3);border:0.5px solid var(--pink-border);border-radius:var(--radius-lg);padding:14px;margin-bottom:10px;cursor:pointer;}
@@ -2067,9 +2147,9 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
     <textarea class="cm-textarea" id="cmText" maxlength="1000" placeholder="Share a win, a workout, or a question…" oninput="cmUpdateCount()"></textarea>
     <div class="cm-count" id="cmCount">0 / 1000</div>
     <div class="cm-chips">
-      <button class="cm-chip" id="cmChipPhoto" onclick="document.getElementById('cmPhotoInput').click()">Photo</button>
-      <button class="cm-chip" id="cmChipWorkout" onclick="cmPickAttachment('workout')">Workout</button>
-      <button class="cm-chip" id="cmChipPR" onclick="cmPickAttachment('pr')">PR</button>
+      <button class="cm-chip" id="cmChipPhoto" onclick="document.getElementById('cmPhotoInput').click()">📷 Photo</button>
+      <button class="cm-chip" id="cmChipWorkout" onclick="cmPickAttachment('workout')">🏋️ Workout</button>
+      <button class="cm-chip" id="cmChipPR" onclick="cmPickAttachment('pr')">🏆 PR</button>
     </div>
     <input type="file" id="cmPhotoInput" accept="image/*" style="display:none;" onchange="cmPhotoChosen(this)">
     <div id="cmPicker"></div>
@@ -10340,6 +10420,8 @@ const CM_PAGE_SIZE = 15;
 const CM_HEART = '<svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21.2l7.8-7.7 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
 const CM_BUBBLE = '<svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5z"/></svg>';
 let cmState = { posts: [], next: null, status: 'idle', loadedAt: 0, busy: false, comments: {}, open: {}, scope: 'all' };
+const CM_TRASH = '<svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>';
+const CM_SEND = '<svg viewBox="0 0 24 24"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>';
 const CM_MAIL = '<svg viewBox="0 0 24 24"><path d="M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/><path d="M3.5 6.5 12 13l8.5-6.5"/></svg>';
 let cmDraft = { photo: null, attach: null, options: null, sending: false };
 
@@ -10388,6 +10470,21 @@ function cmAvatarHTML(o, small) {
     : initial;
   return `<div class="cm-avatar${small ? ' sm' : ''}">${inner}</div>`;
 }
+function cmMyAvatarHTML() {
+  let pic = '', name = 'M';
+  try { pic = localStorage.getItem(PROFILE_PIC_KEY) || ''; } catch(e) {}
+  try { name = ((load(SETTINGS_KEY) || {}).name || 'M'); } catch(e) {}
+  const initial = cmEsc((String(name).trim().charAt(0) || 'M').toUpperCase());
+  const ok = /^data:image\/(png|jpe?g|webp|gif);base64,/i.test(pic);
+  return `<div class="cm-avatar">${ok ? `<img src="${cmEsc(pic)}" alt="">` : initial}</div>`;
+}
+// Quick buttons on the composer card: open the post sheet already set up for a photo, workout or PR.
+function cmQuick(kind) {
+  cmOpenCompose();
+  if(document.getElementById('cmComposeOverlay').style.display !== 'flex') return;
+  if(kind === 'photo') document.getElementById('cmPhotoInput').click();
+  else cmPickAttachment(kind);
+}
 
 function cmSetsText(ex) {
   const sets = Array.isArray(ex && ex.sets) ? ex.sets : [];
@@ -10403,24 +10500,28 @@ function cmAttachHTML(type, payload) {
   if(!payload || typeof payload !== 'object') return '';
   if(type === 'workout') {
     const exs = Array.isArray(payload.exercises) ? payload.exercises.slice(0, 12) : [];
-    const meta = [
-      payload.program ? cmEsc(payload.program) : '',
-      cmNum(payload.sets) ? `${cmNum(payload.sets)} sets` : '',
-      cmNum(payload.volume) ? `${cmNum(payload.volume).toLocaleString()} lbs lifted` : ''
-    ].filter(Boolean).join(' · ');
-    return `<div class="cm-attach">
-      <div class="cm-attach-tag">Workout</div>
+    const nEx = Array.isArray(payload.exercises) ? payload.exercises.length : 0;
+    const vol = cmNum(payload.volume);
+    return `<div class="cm-attach cm-attach-wo">
+      <div class="cm-attach-top"><span class="cm-attach-badge">🏋️ Workout</span>${payload.program ? `<span class="cm-attach-prog">${cmEsc(payload.program)}</span>` : ''}</div>
       <div class="cm-attach-title">${cmEsc(payload.day || 'Workout')}</div>
-      ${meta ? `<div class="cm-time" style="margin-bottom:8px;">${meta}</div>` : ''}
+      <div class="cm-attach-stats">
+        <div><b>${nEx}</b><span>exercises</span></div>
+        <div><b>${cmNum(payload.sets) || '—'}</b><span>sets</span></div>
+        <div><b>${vol ? (vol >= 10000 ? (Math.round(vol / 100) / 10) + 'k' : vol.toLocaleString()) : '—'}</b><span>lbs lifted</span></div>
+      </div>
       ${exs.map(ex => `<div class="cm-attach-row"><span>${cmEsc(ex && ex.name)}</span><span>${cmEsc(cmSetsText(ex))}</span></div>`).join('')}
     </div>`;
   }
   if(type === 'pr') {
-    return `<div class="cm-attach">
-      <div class="cm-attach-tag">Personal record</div>
-      <div class="cm-attach-title">${cmEsc(payload.exercise || 'Lift')}</div>
-      <div class="cm-pr-weight">${cmNum(payload.weight)}<span style="font-size:13px;color:var(--text3);margin-left:4px;">lbs</span></div>
-      ${payload.date ? `<div class="cm-time" style="margin-top:6px;">${cmEsc(payload.date)}</div>` : ''}
+    return `<div class="cm-attach cm-attach-pr">
+      <div class="cm-pr-trophy">🏆</div>
+      <div style="min-width:0;">
+        <div class="cm-attach-badge">New personal record</div>
+        <div class="cm-attach-title">${cmEsc(payload.exercise || 'Lift')}</div>
+        <div class="cm-pr-weight">${cmNum(payload.weight)}<span style="font-size:13px;color:var(--text3);margin-left:4px;">lbs</span></div>
+        ${payload.date ? `<div class="cm-time" style="margin-top:2px;">${cmEsc(payload.date)}</div>` : ''}
+      </div>
     </div>`;
   }
   return '';
@@ -10451,7 +10552,7 @@ function cmCommentsHTML(id) {
     ${inner}
     <div class="cm-comment-form">
       <input class="cm-input" id="cm-ci-${id}" maxlength="500" placeholder="Add a comment…" aria-label="Add a comment" onkeydown="if(event.key==='Enter'){event.preventDefault();cmSendComment('${id}');}">
-      <button class="cm-send" onclick="cmSendComment('${id}')">Send</button>
+      <button class="cm-send-ic" onclick="cmSendComment('${id}')" aria-label="Send comment">${CM_SEND}</button>
     </div>
   </div>`;
 }
@@ -10460,13 +10561,13 @@ function cmPostHTML(p) {
   const id = cmSafeId(p && p.id);
   if(!id) return '';
   const name = cmEsc(p.author_name || 'Member');
-  return `<div class="cm-post" id="cm-post-${id}">
+  return `<article class="cm-post" id="cm-post-${id}">
     <div class="cm-head">
       <button class="cm-who" onclick="cmOpenProfile('${cmSafeId(p.user_id)}')" aria-label="Open ${name}'s profile">
-        ${cmAvatarHTML(p)}
-        <div style="min-width:0;"><div class="cm-name">${name}</div><div class="cm-time">${cmEsc(cmTimeAgo(p.created_at))}</div></div>
+        <div class="cm-ring">${cmAvatarHTML(p)}</div>
+        <div style="min-width:0;"><div class="cm-name">${name}</div><div class="cm-time">${cmEsc(cmTimeAgo(p.created_at))}${p.type === 'workout' ? ' · <span class="cm-kind">shared a workout</span>' : p.type === 'pr' ? ' · <span class="cm-kind">hit a PR</span>' : ''}</div></div>
       </button>
-      ${p.mine ? `<button class="cm-del" onclick="cmDeletePost('${id}')">Delete</button>` : (p.following ? '' : `<button class="cm-follow" onclick="cmToggleFollow('${cmSafeId(p.user_id)}')">Follow</button>`)}
+      ${p.mine ? `<button class="cm-del" onclick="cmDeletePost('${id}')" aria-label="Delete post">${CM_TRASH}</button>` : (p.following ? '' : `<button class="cm-follow" onclick="cmToggleFollow('${cmSafeId(p.user_id)}')">+ Follow</button>`)}
     </div>
     ${p.body ? `<div class="cm-body">${cmEsc(p.body)}</div>` : ''}
     ${cmAttachHTML(p.type, p.payload)}
@@ -10476,7 +10577,7 @@ function cmPostHTML(p) {
       <button class="cm-act" onclick="cmToggleComments('${id}')" aria-label="Comments">${CM_BUBBLE}<span>${cmNum(p.comment_count)}</span></button>
     </div>
     ${cmState.open[id] ? cmCommentsHTML(id) : ''}
-  </div>`;
+  </article>`;
 }
 
 function cmDraw() {
@@ -10484,18 +10585,26 @@ function cmDraw() {
   if(!root) return;
   const following = cmState.scope === 'following';
   let html = `<div class="cm-top">
-      <div class="seg-toggle"><button class="seg-btn${following ? '' : ' active'}" onclick="cmSetScope('all')">Main Feed</button><button class="seg-btn${following ? ' active' : ''}" onclick="cmSetScope('following')">Following</button></div>
+      <div class="cm-scope${following ? ' following' : ''}"><span class="cm-scope-pill"></span><button class="cm-scope-btn${following ? '' : ' active'}" onclick="cmSetScope('all')">Main Feed</button><button class="cm-scope-btn${following ? ' active' : ''}" onclick="cmSetScope('following')">Following</button></div>
       <button class="cm-inbox-btn" onclick="cmOpenInbox()" aria-label="Messages">${CM_MAIL}<span class="nav-dot" id="cmInboxDot" style="display:${cmDm.unread ? 'block' : 'none'};">${cmDm.unread > 99 ? '99+' : cmNum(cmDm.unread)}</span></button>
     </div>
-    <button class="cm-compose-btn" onclick="cmOpenCompose()">＋ Share a post, photo, workout or PR</button>`;
+    <div class="cm-composer">
+      <div class="cm-composer-row" onclick="cmOpenCompose()">${cmMyAvatarHTML()}<div class="cm-composer-ph">What did you crush today?</div></div>
+      <div class="cm-composer-chips">
+        <button class="cm-qchip" onclick="cmQuick('photo')">📷 Photo</button>
+        <button class="cm-qchip" onclick="cmQuick('workout')">🏋️ Workout</button>
+        <button class="cm-qchip" onclick="cmQuick('pr')">🏆 PR</button>
+      </div>
+    </div>`;
   if(cmState.status === 'loading') {
-    html += `<div class="cm-empty">Loading the feed…</div>`;
+    const skel = `<div class="cm-skel"><div style="display:flex;gap:10px;align-items:center;margin-bottom:14px;"><i style="width:40px;height:40px;border-radius:50%;"></i><div style="flex:1;"><i style="width:40%;height:12px;margin-bottom:6px;"></i><i style="width:25%;height:10px;"></i></div></div><i style="width:90%;height:12px;margin-bottom:8px;"></i><i style="width:70%;height:12px;margin-bottom:14px;"></i><i style="width:100%;height:120px;border-radius:14px;"></i></div>`;
+    html += skel + skel;
   } else if(cmState.status === 'error') {
-    html += `<div class="cm-empty">The community feed isn't available right now.<br><br><button class="cm-chip" onclick="cmLoadFeed(true)">Try again</button></div>`;
+    html += `<div class="cm-empty"><div class="cm-empty-ic">📡</div><b>Can't reach the community</b>Check your connection and try again.<br><br><button class="cm-chip" onclick="cmLoadFeed(true)">Try again</button></div>`;
   } else if(!cmState.posts.length) {
     html += following
-      ? `<div class="cm-empty">Posts from people you follow show up here.<br>Tap someone's name or picture on a post to see their profile and follow them.</div>`
-      : `<div class="cm-empty">No posts yet.<br>Be the first to share something.</div>`;
+      ? `<div class="cm-empty"><div class="cm-empty-ic">👥</div><b>Follow people to fill this feed</b>Tap someone's name or picture on a post to see their profile and follow them.</div>`
+      : `<div class="cm-empty"><div class="cm-empty-ic">💬</div><b>No posts yet</b>Be the first to share something.</div>`;
   } else {
     html += cmState.posts.map(cmPostHTML).join('');
     if(cmState.next) html += `<button class="ghost-btn" onclick="cmLoadFeed(false)">Load more</button>`;
@@ -10539,7 +10648,12 @@ function cmSetScope(scope) {
 }
 
 // ── Following and profiles ──
-function cmSheet(html) { document.getElementById('cmSheet').innerHTML = html; document.getElementById('cmSheetOverlay').style.display = 'flex'; }
+function cmSheet(html, toTop) {
+  const ov = document.getElementById('cmSheetOverlay'), sh = document.getElementById('cmSheet');
+  const wasOpen = ov.style.display === 'flex';
+  sh.innerHTML = html; ov.style.display = 'flex';
+  if(!wasOpen || toTop) sh.scrollTop = 0;
+}
 function cmSheetClose() { document.getElementById('cmSheetOverlay').style.display = 'none'; cmProfileOpen = null; }
 let cmProfileOpen = null;
 
@@ -10579,13 +10693,15 @@ function cmMiniPostHTML(p) {
 async function cmOpenProfile(uid) {
   uid = cmSafeId(uid); if(!uid) return;
   cmProfileOpen = uid;
-  if(document.getElementById('cmSheetOverlay').style.display !== 'flex') cmSheet(`<div class="cm-empty">Loading…</div>`);
+  const freshOpen = document.getElementById('cmSheetOverlay').style.display !== 'flex' || window._cmProfLoading;
+  if(document.getElementById('cmSheetOverlay').style.display !== 'flex') { window._cmProfLoading = true; cmSheet(`<div class="cm-empty">Loading…</div>`); }
   const [r, posts] = await Promise.all([cmApi(`/community/profile?user_id=${uid}`), cmApi(`/community/feed?limit=10&user=${uid}`)]);
   if(cmProfileOpen !== uid) return;
   if(!r.ok || !r.data) { cmSheet(`<div class="cm-empty">This profile could not be loaded.</div><button class="ghost-btn" onclick="cmSheetClose()">Close</button>`); return; }
   const pr = r.data; window._cmProf = pr;
   const name = cmEsc(pr.name || 'Member'), list = posts.ok && posts.data && Array.isArray(posts.data.posts) ? posts.data.posts : [];
   const safeName = cmEsc(String(pr.name || 'Member').replace(/['"\\]/g, ''));
+  window._cmProfLoading = false;
   cmSheet(`<div class="cm-prof">
       ${cmAvatarHTML({ user_id: uid, author_name: pr.name, has_avatar: pr.has_avatar }).replace('cm-avatar', 'cm-avatar lg')}
       <div class="cm-prof-name">${name}</div>
@@ -10598,7 +10714,7 @@ async function cmOpenProfile(uid) {
     </div>
     ${pr.blocked ? '' : (list.length ? list.map(cmMiniPostHTML).join('') : `<div class="cm-empty" style="padding:18px 0;">No posts yet.</div>`)}
     ${pr.is_me ? '' : `<button class="cm-link" style="display:block;margin:14px auto 4px;color:var(--text3);font-size:12px;" onclick="cmToggleBlock('${uid}','${safeName}')">${pr.blocked ? 'Unblock' : 'Block'} ${name}</button>`}
-    <button class="ghost-btn" style="margin-top:10px;" onclick="cmSheetClose()">Close</button>`);
+    <button class="ghost-btn" style="margin-top:10px;" onclick="cmSheetClose()">Close</button>`, freshOpen);
 }
 
 // ── Direct messages ──
