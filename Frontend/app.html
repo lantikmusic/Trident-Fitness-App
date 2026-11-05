@@ -1094,7 +1094,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .cm-del svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
 .cm-del:active{background:var(--bg4);color:var(--red);}
 .cm-body{font-size:15px;line-height:1.5;margin-bottom:12px;}
-.cm-photo{width:calc(100% + 32px);max-width:none;margin:0 -16px 12px;border-radius:0;max-height:520px;}
+.cm-photo{width:100%;max-width:100%;height:auto;max-height:380px;object-fit:cover;margin:0 0 12px;border-radius:16px;border:0.5px solid var(--border);}
+.cm-mini .cm-photo{max-height:220px;margin:8px 0 0;}
 .cm-attach{border-radius:16px;padding:14px;margin-bottom:12px;border:0.5px solid var(--border);background:var(--bg4);}
 .cm-attach-wo{background:linear-gradient(135deg,var(--pink-dim),rgba(191,90,242,0.08)),var(--bg4);border-color:var(--pink-border);}
 .cm-attach-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;}
