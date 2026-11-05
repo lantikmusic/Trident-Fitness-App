@@ -149,7 +149,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .tag-green{background:rgba(48,209,88,0.12);color:var(--green);border:0.5px solid rgba(48,209,88,0.25);}
 .tag-red{background:rgba(255,69,58,0.12);color:var(--red);border:0.5px solid rgba(255,69,58,0.25);}
 .divider{border:none;border-top:0.5px solid var(--border);margin:16px 0;}
-.toast{position:fixed;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 20px);left:50%;transform:translateX(-50%) translateY(120px);opacity:0;background:var(--pink);color:#000;font-family:inherit;font-size:13px;font-weight:600;padding:10px 24px;border-radius:99px;transition:transform .3s cubic-bezier(.34,1.56,.64,1), opacity .3s ease;pointer-events:none;z-index:200;white-space:nowrap;}
+.toast{position:fixed;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 20px);left:50%;transform:translateX(-50%) translateY(120px);opacity:0;background:var(--pink);color:#000;font-family:inherit;font-size:13px;font-weight:600;padding:10px 24px;border-radius:99px;transition:transform .3s cubic-bezier(.34,1.56,.64,1), opacity .3s ease;pointer-events:none;z-index:1000;white-space:nowrap;}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
 /* ════════════════════════════════
    SETTINGS SHEET
@@ -12292,7 +12292,33 @@ function cmBuildWorkoutPayload(prog, day, week, log) {
   };
 }
 
+// LANTIK sessions with logged lifting sets, newest first (same payload as the session summary's Share button).
+function cmHybridWorkoutOptions() {
+  const out = [];
+  try {
+    const sessions = (typeof hyState !== 'undefined' && hyState && hyState.sessions) || {};
+    Object.keys(sessions).forEach(sid => {
+      const sess = sessions[sid];
+      if(!sess || sess.status === 'skipped' || sess.restDay) return;
+      const w = hyWorkout(sess.workoutId);
+      if(!w) return;
+      const t = hyTotals(w, sess);
+      if(!t.exercises.length) return;
+      const vol = t.volume ? ` · ${t.volume >= 10000 ? (Math.round(t.volume / 100) / 10) + 'k' : t.volume.toLocaleString()} lbs` : '';
+      out.push({
+        label: w.name,
+        sub: `${hyDateLabel(sess.date)} · ${t.sets} sets${vol}${sess.status === 'completed' ? '' : ' · not finished'}`,
+        payload: { program: 'LANTIK Hybrid Athlete', day: String(w.name).slice(0, 80), week: sess.blockWeek || 1, volume: t.volume, sets: t.sets,
+          exercises: t.exercises.slice(0, 12).map(e => ({ name: String(e.name).slice(0, 60), sets: e.sets.slice(0, 8) })) },
+        sort: String(sess.date || sid.slice(0, 10)) + sid
+      });
+    });
+  } catch(e) { console.warn('LANTIK workouts unavailable for sharing:', e); }
+  return out.sort((a, b) => a.sort < b.sort ? 1 : -1);
+}
+
 function cmWorkoutOptions() {
+  const hybrid = cmHybridWorkoutOptions();
   const out = [];
   const logs = (workoutState && workoutState.logs) || {};
   Object.keys(logs).forEach(key => {
@@ -12305,7 +12331,10 @@ function cmWorkoutOptions() {
     const payload = cmBuildWorkoutPayload(prog, day, week, logs[key]);
     if(payload) out.push({ label: `${day.name}`, sub: `${prog.name} · Week ${week + 1}`, payload, sort: week * 100 + dayIdx });
   });
-  return out.sort((a, b) => b.sort - a.sort).slice(0, 10);
+  out.sort((a, b) => b.sort - a.sort);
+  // The program in use comes first
+  const hyFirst = (() => { try { return hyActive(); } catch(e) { return false; } })();
+  return (hyFirst ? hybrid.concat(out) : out.concat(hybrid)).slice(0, 10);
 }
 
 function cmPROptions() {
