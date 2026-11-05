@@ -312,6 +312,31 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .addf-food-add{width:28px;height:28px;border-radius:50%;background:var(--pink);border:none;color:#000;font-size:18px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1;}
 /* Meal panel Add Food button */
 .add-food-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:var(--radius-lg);border:1.5px dashed var(--pink-border);background:var(--pink-dim);font-family:inherit;font-size:14px;font-weight:600;color:var(--pink);cursor:pointer;transition:all .18s;margin-top:12px;}
+.saved-meals-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px;margin-top:8px;border-radius:var(--radius-lg);border:0.5px solid var(--border2);background:var(--bg4);font-family:inherit;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;}
+.food-log-save{font-size:11px;font-weight:600;color:var(--pink);background:transparent;border:none;cursor:pointer;font-family:inherit;padding:0;margin-right:14px;}
+.sm-sheet{max-height:86vh;overflow-y:auto;}
+.sm-input{width:100%;background:var(--bg4);border:1.5px solid var(--pink-border);border-radius:var(--radius-lg);padding:13px 14px;font-size:16px;font-weight:600;font-family:inherit;color:var(--text);outline:none;margin-bottom:14px;}
+.sm-pick{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--bg4);border-radius:var(--radius);margin-bottom:6px;cursor:pointer;}
+.sm-pick input{width:18px;height:18px;accent-color:var(--pink);flex-shrink:0;}
+.sm-pick-name{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sm-pick-sub{font-size:11px;color:var(--text3);}
+.sm-total{display:flex;justify-content:space-between;font-size:12px;color:var(--text3);margin:10px 2px 16px;}
+.sm-total b{color:var(--text);}
+.sm-card{background:var(--bg4);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:14px;margin-bottom:10px;}
+.sm-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;cursor:pointer;}
+.sm-card-name{font-size:15px;font-weight:700;letter-spacing:-0.01em;}
+.sm-card-sub{font-size:11px;color:var(--text3);margin-top:3px;}
+.sm-card-cal{font-size:15px;font-weight:700;color:var(--pink);white-space:nowrap;}
+.sm-items{margin-top:10px;border-top:0.5px solid var(--border);padding-top:8px;}
+.sm-item{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0;font-size:12px;}
+.sm-item-name{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.sm-item-sub{font-size:11px;color:var(--text3);}
+.sm-item-del{background:transparent;border:none;color:var(--text3);font-size:14px;cursor:pointer;padding:4px 6px;font-family:inherit;}
+.sm-actions{display:flex;gap:8px;margin-top:12px;}
+.sm-add{flex:1;padding:11px;border-radius:var(--radius);border:none;background:var(--pink);font-family:inherit;font-size:14px;font-weight:700;color:#000;cursor:pointer;}
+.sm-mini{padding:11px 12px;border-radius:var(--radius);border:0.5px solid var(--border2);background:transparent;font-family:inherit;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;}
+.sm-mini.danger{color:var(--red);border-color:rgba(255,69,58,.35);}
+.sm-empty{font-size:13px;color:var(--text3);text-align:center;padding:18px 8px 24px;line-height:1.5;}
 .add-food-btn:hover{background:rgba(var(--pink-border),0.2);border-style:solid;}
 /* Meal macro summary row */
 .meal-macro-row{display:flex;gap:6px;margin-bottom:10px;}
@@ -1447,6 +1472,7 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Add Food
       </button>
+      <button class="saved-meals-btn" onclick="openSavedMeals()">🍽️ Saved Meals</button>
     </div>
     <!-- Activity -->
     <div class="activity-panel">
@@ -2269,7 +2295,8 @@ const FOODLIB_KEY = 'trident_foodlib_v1';
 const PR_KEY = 'trident_prs_v1';
 const PROGRESS_PHOTOS_KEY = 'trident_progress_photos_v1';
 const PROFILE_PIC_KEY = 'trident_profile_pic_v1';
-const GYM_DAYS_KEY = 'trident_gym_days_v1'; // every date a gym workout was logged, kept for good
+const GYM_DAYS_KEY = 'trident_gym_days_v1';
+const SAVED_MEALS_KEY = 'trident_saved_meals_v1'; // { updatedAt, meals:[{ id, name, items:[{name,protein,carbs,fat,cal}] }] } // every date a gym workout was logged, kept for good
 
 const load = k => { try { const r=localStorage.getItem(k); return r?JSON.parse(r):null; } catch{return null;} };
 const save = (k,v) => localStorage.setItem(k, JSON.stringify(v));
@@ -2324,7 +2351,7 @@ async function loadFromCloud() {
     showToast('Syncing your data…', 1500);
 
     // Load all data in parallel
-    const [settings, goals, progress, workout, prs, foodlib, steps, sleep, photos, macros] = await Promise.all([
+    const [settings, goals, progress, workout, prs, foodlib, steps, sleep, photos, macros, savedMeals] = await Promise.all([
       cloudGet('/user/settings'),
       cloudGet('/user/goals'),
       cloudGet('/progress'),
@@ -2335,7 +2362,11 @@ async function loadFromCloud() {
       cloudGet('/sleep'),
       cloudGet('/photos'),
       cloudGet('/macros'),
+      cloudGet('/meals'),
     ]);
+
+    // Apply saved meals (newer list wins)
+    try { smAdoptCloud(savedMeals); } catch(e) {}
 
     // Apply settings
     if(settings && Object.keys(settings).length > 0) {
@@ -3444,13 +3475,13 @@ function renderFoodLog() {
   el.innerHTML = `
     <div class="food-log-header">
       <div class="food-log-title">Logged Items</div>
-      <button class="food-log-clear" onclick="clearFoodLog()">Clear all</button>
+      <div><button class="food-log-save" onclick="openSaveMeal()">＋ Save as meal</button><button class="food-log-clear" onclick="clearFoodLog()">Clear all</button></div>
     </div>
     ${items.map((it,i) => `
       <div class="food-log-item">
         <div class="food-log-item-left">
-          <div class="food-log-item-name">${it.name}</div>
-          <div class="food-log-item-time">${it.time}</div>
+          <div class="food-log-item-name">${cmEsc(it.name)}</div>
+          <div class="food-log-item-time">${cmEsc(it.time || '')}</div>
           <div class="food-log-item-macros">
             <span class="food-log-macro" style="color:var(--pink);font-weight:700;">${it.cal} kcal</span>
             <span class="food-log-macro">P: <strong>${it.protein}g</strong></span>
@@ -3467,6 +3498,154 @@ function renderFoodLog() {
       </div>
       <div class="food-log-total-val">${totalCal} kcal</div>
     </div>`;
+}
+
+// ══════════════════════════════════════
+// SAVED MEALS — a named set of foods, added to any meal in one tap
+// ══════════════════════════════════════
+function smNum(v) { const n = Number(v); return isFinite(n) && n >= 0 ? Math.round(n * 10) / 10 : 0; }
+function smClean(raw) {
+  // Always returns { updatedAt, meals } with only well-formed meals and items.
+  const src = (raw && typeof raw === 'object') ? raw : {};
+  const meals = (Array.isArray(src.meals) ? src.meals : []).slice(0, 60).map(m => {
+    if(!m || typeof m !== 'object') return null;
+    const items = (Array.isArray(m.items) ? m.items : []).slice(0, 40).map(it => (it && typeof it === 'object') ? {
+      name: String(it.name || 'Food').slice(0, 80), protein: smNum(it.protein), carbs: smNum(it.carbs), fat: smNum(it.fat),
+      cal: Math.round(smNum(it.cal != null ? it.cal : (smNum(it.protein) * 4 + smNum(it.carbs) * 4 + smNum(it.fat) * 9)))
+    } : null).filter(Boolean);
+    const name = String(m.name || '').trim().slice(0, 40);
+    if(!name || !items.length) return null;
+    const id = String(m.id || '').replace(/[^A-Za-z0-9_-]/g, '').slice(0, 40) || ('m' + Date.now() + Math.random().toString(36).slice(2, 6));
+    return { id, name, items };
+  }).filter(Boolean);
+  return { updatedAt: Number(src.updatedAt) || 0, meals };
+}
+function smLoad() { try { return smClean(load(SAVED_MEALS_KEY)); } catch(e) { return { updatedAt: 0, meals: [] }; } }
+function smStore(data, sync) {
+  data.updatedAt = Date.now();
+  try { save(SAVED_MEALS_KEY, data); } catch(e) {}
+  if(sync !== false && isLoggedIn()) cloudPost('/meals', data);
+}
+// Account copy: the newer list wins; if this phone's is newer, it is sent up.
+function smAdoptCloud(remote) {
+  if(!remote || typeof remote !== 'object' || !Array.isArray(remote.meals)) return;
+  const local = smLoad(), r = smClean(remote);
+  if(r.updatedAt > local.updatedAt) { try { save(SAVED_MEALS_KEY, r); } catch(e) {} }
+  else if(local.updatedAt > r.updatedAt && local.meals.length && isLoggedIn()) cloudPost('/meals', local);
+}
+function smTotals(items) {
+  const t = items.reduce((a, it) => ({ cal: a.cal + (it.cal || 0), p: a.p + (it.protein || 0), c: a.c + (it.carbs || 0), f: a.f + (it.fat || 0) }), { cal: 0, p: 0, c: 0, f: 0 });
+  return { cal: Math.round(t.cal), p: Math.round(t.p), c: Math.round(t.c), f: Math.round(t.f) };
+}
+
+// ── Save the current meal's items as a named meal ──
+function openSaveMeal() {
+  const items = (macroData[cur].meals[curMeal].items || []);
+  if(!items.length) { showToast('Log some food first'); return; }
+  document.getElementById('saveMealName').value = '';
+  document.getElementById('saveMealName').placeholder = 'e.g. My ' + MEAL_LABELS[curMeal];
+  document.getElementById('saveMealItems').innerHTML = items.map((it, i) => `
+    <label class="sm-pick"><input type="checkbox" data-i="${i}" checked onchange="saveMealTotals()">
+      <div style="min-width:0;flex:1;"><div class="sm-pick-name">${cmEsc(it.name)}</div>
+      <div class="sm-pick-sub">${Math.round(it.cal || 0)} kcal · P ${smNum(it.protein)}g · C ${smNum(it.carbs)}g · F ${smNum(it.fat)}g</div></div>
+    </label>`).join('');
+  saveMealTotals();
+  document.getElementById('saveMealOverlay').style.display = 'flex';
+}
+function closeSaveMeal() { document.getElementById('saveMealOverlay').style.display = 'none'; }
+function saveMealPicked() {
+  const items = macroData[cur].meals[curMeal].items || [];
+  return Array.from(document.querySelectorAll('#saveMealItems input[type=checkbox]'))
+    .filter(cb => cb.checked).map(cb => items[+cb.dataset.i]).filter(Boolean);
+}
+function saveMealTotals() {
+  const picked = saveMealPicked(), t = smTotals(picked);
+  document.getElementById('saveMealTotal').innerHTML = `<span>${picked.length} item${picked.length === 1 ? '' : 's'}</span><span><b>${t.cal.toLocaleString()} kcal</b> · P ${t.p}g · C ${t.c}g · F ${t.f}g</span>`;
+}
+function confirmSaveMeal() {
+  const input = document.getElementById('saveMealName');
+  const name = (input.value.trim() || input.placeholder.replace(/^e\.g\. /, '')).slice(0, 40);
+  const picked = saveMealPicked();
+  if(!picked.length) { showToast('Pick at least one item'); return; }
+  const data = smLoad();
+  const items = picked.map(it => ({ name: String(it.name || 'Food').slice(0, 80), protein: smNum(it.protein), carbs: smNum(it.carbs), fat: smNum(it.fat), cal: Math.round(smNum(it.cal)) }));
+  const same = data.meals.findIndex(m => m.name.toLowerCase() === name.toLowerCase());
+  if(same >= 0) {
+    if(!confirm(`You already have a meal called "${name}". Replace it?`)) return;
+    data.meals[same].items = items;
+  } else {
+    data.meals.unshift({ id: 'm' + Date.now() + Math.random().toString(36).slice(2, 6), name, items });
+  }
+  smStore(data);
+  closeSaveMeal();
+  showToast(`✓ Saved "${name}"`);
+}
+
+// ── List, add, rename, edit, delete ──
+let _smOpen = null; // id of the meal whose items are shown
+function openSavedMeals() { _smOpen = null; renderSavedMeals(); document.getElementById('savedMealsOverlay').style.display = 'flex'; }
+function closeSavedMeals() { document.getElementById('savedMealsOverlay').style.display = 'none'; }
+function renderSavedMeals() {
+  const data = smLoad();
+  document.getElementById('savedMealsSub').textContent = `Tap Add to put every item into ${MEAL_LABELS[curMeal]} · ${DAYS[cur]}`;
+  const el = document.getElementById('savedMealsList');
+  if(!data.meals.length) {
+    el.innerHTML = `<div class="sm-empty">No saved meals yet.<br>Log the foods you eat often, then tap <b style="color:var(--pink)">＋ Save as meal</b> above the items.</div>`;
+    return;
+  }
+  el.innerHTML = data.meals.map(m => {
+    const t = smTotals(m.items), open = _smOpen === m.id, id = cmEsc(m.id);
+    return `<div class="sm-card">
+      <div class="sm-card-top" onclick="smToggle('${id}')">
+        <div style="min-width:0;"><div class="sm-card-name">${cmEsc(m.name)}</div>
+          <div class="sm-card-sub">${m.items.length} item${m.items.length === 1 ? '' : 's'} · P ${t.p}g · C ${t.c}g · F ${t.f}g · ${open ? 'hide items ▴' : 'show items ▾'}</div></div>
+        <div class="sm-card-cal">${t.cal.toLocaleString()} kcal</div>
+      </div>
+      ${open ? `<div class="sm-items">${m.items.map((it, i) => `<div class="sm-item">
+          <div style="min-width:0;"><div class="sm-item-name">${cmEsc(it.name)}</div><div class="sm-item-sub">${it.cal} kcal · P ${it.protein}g · C ${it.carbs}g · F ${it.fat}g</div></div>
+          <button class="sm-item-del" onclick="smRemoveItem('${id}',${i})" aria-label="Remove item">✕</button></div>`).join('')}</div>` : ''}
+      <div class="sm-actions">
+        <button class="sm-add" onclick="addSavedMeal('${id}')">Add to ${MEAL_LABELS[curMeal]}</button>
+        ${open ? `<button class="sm-mini" onclick="smRename('${id}')">Rename</button><button class="sm-mini danger" onclick="smDelete('${id}')">Delete</button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+function smToggle(id) { _smOpen = _smOpen === id ? null : id; renderSavedMeals(); }
+function smRename(id) {
+  const data = smLoad(), m = data.meals.find(x => x.id === id); if(!m) return;
+  const name = (prompt('Meal name', m.name) || '').trim().slice(0, 40);
+  if(!name || name === m.name) return;
+  m.name = name; smStore(data); renderSavedMeals();
+}
+function smDelete(id) {
+  const data = smLoad(), m = data.meals.find(x => x.id === id); if(!m) return;
+  if(!confirm(`Delete "${m.name}"? Food already logged stays logged.`)) return;
+  data.meals = data.meals.filter(x => x.id !== id); _smOpen = null;
+  smStore(data); renderSavedMeals(); showToast('Meal deleted');
+}
+function smRemoveItem(id, idx) {
+  const data = smLoad(), m = data.meals.find(x => x.id === id); if(!m || !m.items[idx]) return;
+  if(m.items.length === 1) { smDelete(id); return; }
+  m.items.splice(idx, 1); smStore(data); renderSavedMeals();
+}
+// Puts every item of the saved meal into the meal being viewed, each saved to the account.
+function addSavedMeal(id) {
+  const m = smLoad().meals.find(x => x.id === id); if(!m) return;
+  const meal = macroData[cur].meals[curMeal];
+  if(!Array.isArray(meal.items)) meal.items = [];
+  const time = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  m.items.forEach(it => {
+    meal.items.push({ name: it.name, protein: it.protein, carbs: it.carbs, fat: it.fat, cal: it.cal, time, _synced: true });
+    cloudPost('/macros', { date: macroSlotDate(cur), day_index: cur, meal: curMeal, food_name: it.name, calories: it.cal, protein: it.protein, carbs: it.carbs, fat: it.fat });
+  });
+  meal.protein = Math.round(meal.items.reduce((s, it) => s + (it.protein || 0), 0) * 10) / 10;
+  meal.carbs   = Math.round(meal.items.reduce((s, it) => s + (it.carbs || 0), 0) * 10) / 10;
+  meal.fat     = Math.round(meal.items.reduce((s, it) => s + (it.fat || 0), 0) * 10) / 10;
+  save(MACRO_KEY, macroData);
+  closeSavedMeals();
+  loadMealInputs(); renderFoodLog(); renderMealTabCals(); renderHero(); renderMacroStats();
+  showToast(`✓ ${m.name} added to ${MEAL_LABELS[curMeal]} (${m.items.length} item${m.items.length === 1 ? '' : 's'})`);
 }
 
 // ══════════════════════════════════════
@@ -7393,7 +7572,7 @@ function closeResetConfirm() {
 }
 function executeResetAll() {
   // USDA_KEY_STORAGE and GEMINI_KEY_STORAGE are intentionally excluded — keys are preserved
-  [MACRO_KEY, WORKOUT_KEY, PROGRESS_KEY, GOALS_KEY, FOODLIB_KEY, PR_KEY, EX_PHOTO_KEY, SETTINGS_KEY, GYM_DAYS_KEY].forEach(k => localStorage.removeItem(k));
+  [MACRO_KEY, WORKOUT_KEY, PROGRESS_KEY, GOALS_KEY, FOODLIB_KEY, PR_KEY, EX_PHOTO_KEY, SETTINGS_KEY, GYM_DAYS_KEY, SAVED_MEALS_KEY].forEach(k => localStorage.removeItem(k));
   localStorage.removeItem(ONBOARDING_KEY);
   location.reload();
 }
@@ -11193,6 +11372,29 @@ document.addEventListener('visibilitychange', () => {
 });
 window._macroDay = new Date().toDateString(); window._macroTodayIdx = getTodayIdx();
 </script>
+<!-- Saved meals: save sheet -->
+<div id="saveMealOverlay" class="log-weight-overlay" style="display:none;" onclick="if(event.target===this)closeSaveMeal()">
+  <div class="log-weight-sheet sm-sheet">
+    <div class="log-weight-handle"></div>
+    <div class="log-weight-title">Save as Meal</div>
+    <div class="log-weight-sub">Name it, then add it any day in one tap</div>
+    <input id="saveMealName" class="sm-input" type="text" maxlength="40" placeholder="e.g. My Breakfast" autocomplete="off">
+    <div id="saveMealItems"></div>
+    <div class="sm-total" id="saveMealTotal"></div>
+    <button class="log-weight-btn" onclick="confirmSaveMeal()">Save Meal</button>
+    <button class="log-weight-cancel" onclick="closeSaveMeal()">Cancel</button>
+  </div>
+</div>
+<!-- Saved meals: list sheet -->
+<div id="savedMealsOverlay" class="log-weight-overlay" style="display:none;" onclick="if(event.target===this)closeSavedMeals()">
+  <div class="log-weight-sheet sm-sheet">
+    <div class="log-weight-handle"></div>
+    <div class="log-weight-title">Saved Meals</div>
+    <div class="log-weight-sub" id="savedMealsSub"></div>
+    <div id="savedMealsList"></div>
+    <button class="log-weight-cancel" onclick="closeSavedMeals()">Close</button>
+  </div>
+</div>
 <!-- Log Weight Popup -->
 <div id="logWeightOverlay" class="log-weight-overlay" style="display:none;" onclick="if(event.target===this)closeLogWeight()">
   <div class="log-weight-sheet">

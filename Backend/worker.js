@@ -111,6 +111,8 @@ export default {
     // ── Food Library ──
     if (path === '/foodlib'       && request.method === 'GET')  return getFoodLib(request, env.DB);
     if (path === '/foodlib'       && request.method === 'POST') return saveFoodLib(request, env.DB);
+    if (path === '/meals'         && request.method === 'GET')  return getSavedMeals(request, env.DB);
+    if (path === '/meals'         && request.method === 'POST') return saveSavedMeals(request, env.DB);
 
     // ── Steps ──
     if (path === '/steps'         && request.method === 'GET')  return getSteps(request, env.DB);
@@ -662,6 +664,30 @@ async function saveFoodLib(request, DB) {
   await DB.prepare(`INSERT INTO user_blobs (user_id, blob_key, data_json, updated_at) VALUES (?, ?, ?, datetime('now'))
     ON CONFLICT(user_id, blob_key) DO UPDATE SET data_json = excluded.data_json, updated_at = excluded.updated_at`)
     .bind(session.user_id, 'foodlib', JSON.stringify(data)).run();
+  return json({ success: true });
+}
+
+// ══════════════════════════════════════════════════════
+// SAVED MEALS — { updatedAt, meals: [{ id, name, items: [...] }] }
+// ══════════════════════════════════════════════════════
+async function getSavedMeals(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+  const row = await DB.prepare('SELECT data_json FROM user_blobs WHERE user_id = ? AND blob_key = ?').bind(session.user_id, 'saved_meals').first();
+  return json(row ? JSON.parse(row.data_json) : { updatedAt: 0, meals: [] });
+}
+
+async function saveSavedMeals(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+  const text = await request.text();
+  if (text.length > 200000) return error('Too much data', 413);
+  let data;
+  try { data = JSON.parse(text); } catch (e) { return error('Invalid data', 400); }
+  if (!data || typeof data !== 'object' || !Array.isArray(data.meals) || data.meals.length > 60) return error('Invalid data', 400);
+  await DB.prepare(`INSERT INTO user_blobs (user_id, blob_key, data_json, updated_at) VALUES (?, ?, ?, datetime('now'))
+    ON CONFLICT(user_id, blob_key) DO UPDATE SET data_json = excluded.data_json, updated_at = excluded.updated_at`)
+    .bind(session.user_id, 'saved_meals', JSON.stringify({ updatedAt: Number(data.updatedAt) || 0, meals: data.meals })).run();
   return json({ success: true });
 }
 
