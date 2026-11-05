@@ -1409,6 +1409,106 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
 .hy-seg button:disabled,.hy-check:disabled,.rest-btn:disabled{opacity:.45;cursor:default;}
 .hy-edit-btns{display:flex;gap:4px;}
 .hy-edit-btns button{width:32px;height:32px;border-radius:8px;border:0.5px solid var(--border2);background:var(--bg4);color:var(--text2);font-family:inherit;font-size:13px;cursor:pointer;}
+/* ══ Workout tab refresh: same look as Macros (scoped to the tab; rest timer included) ══ */
+#page-workout{--wo-card:radial-gradient(120% 80% at 100% 0%,var(--pink-dim),transparent 60%),var(--bg3);--wo-line:rgba(255,255,255,.09);
+  --wo-glass:linear-gradient(180deg,rgba(255,255,255,.11),rgba(255,255,255,.04));--wo-glass-hi:inset 0 1px 0 rgba(255,255,255,.1);}
+/* cards */
+#page-workout .wo-preview-program-card,#page-workout .wo-preview-day-card,#page-workout .hy-card,#page-workout .hy-slot,#page-workout .hy-section,
+#page-workout .exercise-card,#page-workout .prog-card,#page-workout .rest-day-card{border-radius:var(--radius-xl);border:0.5px solid var(--wo-line);background:var(--bg3);}
+#page-workout .wo-preview-program-card{background:var(--wo-card);padding:18px;}
+#page-workout .wo-preview-program-card::after{display:none;}
+#page-workout .wo-preview-prog-eyebrow,#page-workout .wo-preview-day-eyebrow{font-size:11px;letter-spacing:.08em;}
+#page-workout .wo-preview-prog-name{font-size:22px;letter-spacing:-0.03em;line-height:1.2;}
+#page-workout .wo-preview-prog-stats{gap:8px;}
+#page-workout .wo-preview-prog-stat{flex:1;border-radius:14px;padding:10px 8px;}
+#page-workout .wo-preview-prog-stat-val{font-size:17px;}
+#page-workout .wo-preview-day-card{background:var(--wo-card);padding:18px;}
+#page-workout .wo-preview-ex-row{border-radius:14px;padding:11px 12px;}
+#page-workout .wo-preview-ex-num{width:24px;height:24px;font-size:11px;}
+#page-workout .wo-preview-rest-card{border-radius:16px;}
+#page-workout .wo-start-btn{border-radius:18px;font-size:16px;}
+#page-workout .wo-change-prog-btn{border-radius:16px;border:0.5px solid rgba(255,255,255,.13);background:var(--wo-glass);box-shadow:var(--wo-glass-hi);color:var(--text2);font-weight:600;}
+/* settings rows on the program card */
+#page-workout .hy-block{border-radius:14px;padding:12px 14px;background:var(--wo-glass);border:0.5px solid rgba(255,255,255,.12);box-shadow:var(--wo-glass-hi);font-size:13px;}
+#page-workout .hy-block-edit{font-size:12px;font-weight:700;}
+/* day strip (LANTIK) — matches Macros */
+#page-workout .workout-day-tabs.wo-days{display:flex;gap:2px;overflow:visible;padding:4px;margin:14px 0 16px;border-radius:20px;background:var(--wo-glass),var(--bg3);border:0.5px solid rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.06);}
+#page-workout .wo-days .wday-tab{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 0 8px;border:0;border-radius:16px;background:transparent;color:var(--text3);-webkit-tap-highlight-color:transparent;}
+#page-workout .wo-days .dn-d{font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;}
+#page-workout .wo-days .dn-n{font-size:16px;font-weight:700;color:var(--text);letter-spacing:-0.02em;line-height:1.15;}
+#page-workout .wo-days .wday-tab.today:not(.active) .dn-n,#page-workout .wo-days .wday-tab.today:not(.active) .dn-d{color:var(--pink);}
+#page-workout .wo-days .wday-tab.active{background:var(--pink);color:rgba(0,0,0,.6);box-shadow:0 4px 16px var(--pink-glow);}
+#page-workout .wo-days .wday-tab.active .dn-n{color:#000;}
+/* day tabs on other programs (named days, scrolls sideways) */
+#page-workout .workout-day-tabs:not(.wo-days){gap:4px;padding:4px;border-radius:18px;background:var(--wo-glass),var(--bg3);border:0.5px solid rgba(255,255,255,.1);}
+#page-workout .workout-day-tabs:not(.wo-days) .wday-tab{border:0;border-radius:14px;padding:8px 14px;font-weight:600;}
+#page-workout .workout-day-tabs:not(.wo-days) .wday-tab.active{box-shadow:0 4px 14px var(--pink-glow);}
+#page-workout .week-selector{padding:4px;border-radius:99px;background:var(--wo-glass),var(--bg3);border:0.5px solid rgba(255,255,255,.1);}
+#page-workout .week-sel-btn{width:36px;height:36px;border:0;background:rgba(255,255,255,.07);}
+/* day title + sessions */
+#page-workout .hy-day-title{font-size:17px;font-weight:700;letter-spacing:-0.02em;color:var(--text);margin:0 2px 10px;}
+#page-workout .hy-slot{padding:16px;transition:transform .12s;-webkit-tap-highlight-color:transparent;}
+#page-workout .hy-slot:active{transform:scale(.985);}
+#page-workout .hy-slot-name{font-size:17px;}
+#page-workout .hy-slot-meta{font-size:12px;margin-top:4px;}
+#page-workout .hy-tag{font-size:10px;letter-spacing:.09em;}
+#page-workout .hy-chip{padding:4px 10px;font-weight:700;}
+#page-workout .hy-bar{height:6px;background:var(--bg5);margin-top:12px;}
+#page-workout .hy-card{padding:16px;}
+#page-workout .hy-card-title{font-size:17px;letter-spacing:-0.02em;}
+#page-workout .hy-hist{padding:11px 0;font-size:14px;}
+#page-workout .hy-hist>span:first-child{font-weight:500;}
+/* session screen */
+#page-workout .hy-back{padding:7px 14px 7px 11px;border-radius:99px;background:var(--wo-glass);border:0.5px solid rgba(255,255,255,.12);box-shadow:var(--wo-glass-hi);font-size:13px;margin-bottom:12px;}
+#page-workout .hy-head{padding:16px;border-radius:var(--radius-xl);border:0.5px solid var(--wo-line);background:var(--wo-card);margin-bottom:12px;}
+#page-workout .hy-title{font-size:24px;}
+#page-workout .hy-overall .hy-bar{height:8px;margin-top:14px;}
+#page-workout .hy-banner{border-radius:14px;padding:12px 14px;}
+#page-workout .hy-section{margin-bottom:12px;}
+#page-workout .hy-section-head{padding:15px 16px;}
+#page-workout .hy-section-title{font-size:12px;}
+#page-workout .hy-section-body{padding:0 12px 12px;}
+#page-workout .hy-ex{border-radius:16px;border:0.5px solid var(--wo-line);margin-bottom:8px;}
+#page-workout .hy-ex.open{border-color:var(--pink-border);box-shadow:0 0 0 3px var(--pink-dim);}
+#page-workout .hy-ex.done{border-color:rgba(48,209,88,.3);}
+#page-workout .hy-ex-head{padding:12px 13px;}
+#page-workout .hy-ex-name{font-size:15px;}
+#page-workout .hy-check{width:30px;height:30px;border-radius:50%;}
+#page-workout .hy-dot{width:26px;height:26px;}
+#page-workout .swap-btn,#page-workout .ex-progress-btn{border-radius:99px;background:rgba(255,255,255,.05);border:0.5px solid rgba(255,255,255,.1);}
+#page-workout .hy-last{padding:9px 11px;border-radius:12px;background:var(--pink-dim);}
+#page-workout .set-row{border-radius:14px;padding:9px 10px;}
+#page-workout .hy-sets .set-row{background:var(--bg3);}
+#page-workout .rest-btn{border-radius:12px;padding:8px 13px;font-size:12px;font-weight:700;box-shadow:0 2px 12px var(--pink-glow);}
+#page-workout .rest-btn.done{box-shadow:none;}
+#page-workout .add-set-btn{border-radius:12px;padding:10px;}
+#page-workout .hy-input{border-radius:14px;}
+#page-workout .hy-actions button,#page-workout .hy-adjust button{background:var(--wo-glass);border:0.5px solid rgba(255,255,255,.12);box-shadow:var(--wo-glass-hi);color:var(--text);font-weight:600;padding:9px 14px;}
+#page-workout .hy-rpe{gap:5px;}
+#page-workout .hy-rpe button,#page-workout .hy-seg button{border-radius:12px;background:rgba(255,255,255,.05);border:0.5px solid rgba(255,255,255,.1);}
+#page-workout .hy-rpe button.on,#page-workout .hy-seg button.on{background:var(--pink);border-color:var(--pink);color:#000;box-shadow:0 2px 12px var(--pink-glow);}
+#page-workout .finish-workout-btn{border-radius:18px;padding:16px;}
+/* other programs: program picker + exercise cards */
+#page-workout .prog-card{padding:16px;transition:transform .12s;}
+#page-workout .prog-card:active{transform:scale(.98);}
+#page-workout .prog-card.selected{border-color:var(--pink-border);background:var(--wo-card);}
+#page-workout .prog-card::before{display:none;}
+#page-workout .prog-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:var(--pink-dim);color:var(--pink);margin-bottom:10px;}
+#page-workout .prog-icon svg{width:22px;height:22px;}
+#page-workout .prog-name{font-size:15px;line-height:1.25;}
+#page-workout .prog-desc{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;}
+#page-workout .exercise-card{margin-bottom:10px;}
+#page-workout .exercise-card.active-ex{border-color:var(--pink-border);box-shadow:0 0 0 3px var(--pink-dim);}
+/* rest timer */
+.rest-timer-card{border-radius:30px;border:0.5px solid rgba(255,255,255,.12);background:radial-gradient(120% 70% at 50% 0%,var(--pink-dim),transparent 65%),var(--bg3);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 20px 60px rgba(0,0,0,.6),0 0 60px var(--pink-glow);}
+.rest-preset{border-radius:12px;padding:8px 2px;background:rgba(255,255,255,.04);border:0.5px solid rgba(255,255,255,.1);}
+.rest-adjust-btn{background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.04));border:0.5px solid rgba(255,255,255,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.12);color:var(--text);}
+.rtc-bg{stroke:var(--bg5);}
+.rest-log-section{border-radius:16px;}
+.rest-log-input{border-radius:12px;padding:10px 4px;}
+.rest-log-save{border-radius:14px;padding:12px;box-shadow:0 4px 16px var(--pink-glow);}
+.rest-timer-skip{background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.03));border:0.5px solid rgba(255,255,255,.12);padding:11px 20px;}
+
 </style>
 <script>/* No zooming: block iOS pinch-zoom (double-tap and tap-in-a-box zoom are stopped by the viewport + touch-action) */try{['gesturestart','gesturechange','gestureend'].forEach(function(t){document.addEventListener(t,function(e){e.preventDefault();},{passive:false});});}catch(e){}</script>
 </head>
@@ -10118,7 +10218,7 @@ function hyWeekHTML() {
   const iso = hyISO(hyDayDate(dayIdx));
   const tabs = HY_DAYS.map((d, i) => {
     const date = hyDayDate(i);
-    return `<button class="wday-tab${i === dayIdx ? ' active' : ''}" onclick="hyPickDay(${i})">${d.slice(0, 3)} ${date.getDate()}${i === today ? ' •' : ''}</button>`;
+    return `<button class="wday-tab${i === dayIdx ? ' active' : ''}${i === today ? ' today' : ''}" onclick="hyPickDay(${i})" aria-label="${d}${i === today ? ' (today)' : ''}"><span class="dn-d">${d.slice(0, 3)}</span><span class="dn-n">${date.getDate()}</span></button>`;
   }).join('');
   const slots = hyDaySlots(dayIdx).map(slot => {
     const sess = hyState.sessions[hySid(dayIdx, slot.key)] || null;
@@ -10164,7 +10264,7 @@ function hyWeekHTML() {
       </button>
       ${status !== 'normal' ? `<div class="hy-block-tip">${hyEsc(HY_STATUS[status].tip)}</div>` : ''}
     </div>
-    <div class="workout-day-tabs">${tabs}</div>
+    <div class="workout-day-tabs wo-days">${tabs}</div>
     <div class="hy-day-title">${HY_DAYS[dayIdx]} · ${hyEsc(hyDateLabel(iso).replace(/^\w+, /, ''))}${dayIdx === today ? ' · Today' : ''}</div>
     ${slots}
     ${dayIdx === 5 ? `<div class="hy-banner">Saturday stays free of lifting before Sunday's games.</div>` : ''}
