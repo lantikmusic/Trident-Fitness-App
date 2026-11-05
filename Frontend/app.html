@@ -731,6 +731,39 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 ════════════════════════════════ */
 .progress-stat-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
 .pr-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:0.5px solid var(--border);}
+/* ── Muscle growth chart (Progress tab) ── */
+.mg-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:2px;}
+.mg-sub{font-size:12px;color:var(--text3);margin-bottom:12px;line-height:1.4;}
+.mg-hero{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:rgba(48,209,88,.08);border:0.5px solid rgba(48,209,88,.22);margin-bottom:14px;}
+.mg-hero-num{font-size:30px;font-weight:800;letter-spacing:-0.03em;color:var(--text);line-height:1;}
+.mg-hero-txt{font-size:13px;color:var(--text2);line-height:1.35;}
+.mg-hero-txt b{color:var(--text);font-weight:600;}
+.mg-legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-bottom:8px;font-size:11px;color:var(--text3);}
+.mg-legend span{display:inline-flex;align-items:center;gap:5px;}
+.mg-legend i{width:8px;height:8px;border-radius:2px;display:inline-block;}
+.mg-rows{display:flex;flex-direction:column;}
+.mg-row{display:grid;grid-template-columns:82px 1fr 58px;align-items:center;gap:10px;width:100%;padding:9px 0;border:0;border-bottom:0.5px solid var(--border);background:none;font-family:inherit;color:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.mg-row:last-child{border-bottom:0;}
+.mg-name{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mg-track{position:relative;height:10px;border-radius:4px;background:rgba(255,255,255,.05);}
+.mg-track.div::after{content:'';position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:rgba(255,255,255,.18);}
+.mg-bar{position:absolute;top:0;bottom:0;border-radius:4px;transition:width .5s ease;}
+.mg-val{font-size:12px;font-weight:600;color:var(--text2);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;}
+.mg-val .mg-ar{font-size:11px;margin-right:2px;}
+.mg-grow .mg-bar{background:#30D158;} .mg-grow .mg-ar{color:#30D158;}
+.mg-hold .mg-bar{background:#8E8E93;} .mg-hold .mg-ar{color:#8E8E93;}
+.mg-slip .mg-bar{background:#FF9F0A;} .mg-slip .mg-ar{color:#FF9F0A;}
+.mg-idle .mg-bar{background:rgba(142,142,147,.45);} .mg-idle .mg-name,.mg-early .mg-name{color:var(--text2);}
+.mg-idle .mg-val,.mg-early .mg-val{color:var(--text3);font-weight:500;}
+.mg-detail{padding:2px 0 12px;border-bottom:0.5px solid var(--border);font-size:12px;color:var(--text3);line-height:1.5;}
+.mg-detail-status{font-weight:600;color:var(--text2);margin-bottom:6px;}
+.mg-ex{display:flex;justify-content:space-between;gap:10px;padding:3px 0;}
+.mg-ex span:first-child{color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.mg-ex span:last-child{white-space:nowrap;font-variant-numeric:tabular-nums;}
+.mg-none{font-size:12px;color:var(--text3);margin-top:10px;}
+.mg-empty{text-align:center;padding:18px 8px 8px;color:var(--text3);font-size:13px;line-height:1.5;}
+.mg-empty div{font-size:28px;margin-bottom:6px;}
+.mg-foot{font-size:11px;color:var(--text3);margin-top:12px;line-height:1.45;}
 .pr-row:last-child{border-bottom:none;}
 .pr-ex-name{font-size:13px;font-weight:600;flex:1;min-width:0;padding-right:8px;}
 .pr-ex-name span{display:block;font-size:10px;font-weight:500;color:var(--text3);margin-top:2px;}
@@ -1902,6 +1935,12 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
   <div class="container">
     <div style="height:14px;"></div>
     <div class="progress-stat-row" id="progressStats"></div>
+    <!-- Muscle growth -->
+    <div class="panel" style="margin-bottom:12px;" id="muscleGrowthPanel">
+      <div class="mg-head"><div class="panel-title" style="margin:0;">Muscle Growth 💪</div></div>
+      <div class="mg-sub">Based on how your lifts have progressed over the last 8 weeks</div>
+      <div id="muscleGrowth"></div>
+    </div>
     <!-- Log weight -->
     <div class="panel" style="margin-bottom:12px;">
       <div class="panel-title">Log Today</div>
@@ -6503,7 +6542,211 @@ function saveProgress(){
   renderProgress();showToast('Progress saved!');
 }
 
+// ══════════════════════════════════════
+// MUSCLE GROWTH (Progress tab)
+// Muscles whose lifts keep getting stronger, with regular training, are likely growing.
+// ══════════════════════════════════════
+const MG_GROUPS = ['Chest','Back','Shoulders','Biceps','Triceps','Quads','Hamstrings','Glutes','Calves','Core'];
+// Which muscles an exercise trains, from its name: [group, share] with 1 = main muscle.
+function mgMuscles(raw) {
+  const n = ' ' + String(raw || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim() + ' ';
+  const has = (...w) => w.some(x => n.includes(x));
+  if(has('warm up', 'warmup', ' neck ', 'jump', 'bound', 'sprint', 'clean ', 'snatch', 'carry', 'stretch', 'mobility')) return [];
+  if(has('calf', 'calves')) return [['Calves', 1]];
+  if(has('tricep')) return [['Triceps', 1]];
+  if(has('hip thrust', 'glute', 'kickback', 'pull through', 'abduct', 'clam', 'hydrant', 'donkey', 'side walk', 'lateral walk', 'monster walk')) return [['Glutes', 1], ['Hamstrings', .3]];
+  if(has('swing')) return [['Glutes', 1], ['Hamstrings', .5]];
+  if(has('nordic', 'leg curl', 'hamstring', 'ham curl', 'hyperextension', 'back extension')) return [['Hamstrings', 1], ['Glutes', .3]];
+  if(has('romanian', ' rdl ', 'stiff leg', 'good morning', 'single leg deadlift')) return [['Hamstrings', 1], ['Glutes', .5]];
+  if(has('deadlift')) return [['Hamstrings', .7], ['Glutes', .7], ['Back', .5]];
+  if(has('leg extension')) return [['Quads', 1]];
+  if(has('squat', 'leg press', 'lunge', 'step up', 'split')) return [['Quads', 1], ['Glutes', .5]];
+  if(has('pallof', 'plank', 'crunch', 'knee raise', 'leg raise', 'sit up', 'situp', 'rollout', 'woodchop', 'russian twist', 'dead bug', 'hollow', 'rotation', 'mountain climber', ' ab ', ' abs ', 'core', 'v up')) return [['Core', 1]];
+  if(has('face pull', 'rear delt', 'reverse fly', 'reverse cable', 'pull apart', 'ytw')) return [['Shoulders', 1], ['Back', .5]];
+  if(has('lateral raise', 'front raise', 'upright row', 'y raise')) return [['Shoulders', 1]];
+  if(has('landmine press')) return [['Shoulders', 1], ['Chest', .5], ['Triceps', .5]];
+  if(has('overhead press', 'shoulder press', 'military', 'push press', 'arnold', 'pike')) return [['Shoulders', 1], ['Triceps', .5]];
+  if(has('tricep', 'pressdown', 'pushdown', 'skull', 'close grip', 'overhead extension', 'kickback')) return [['Triceps', 1]];
+  if(has(' dip')) return [['Triceps', 1], ['Chest', .5]];
+  if(has('shrug')) return [['Back', 1]];
+  if(has('row', 'pull up', 'pullup', 'chin', 'pulldown', ' lat ', 'pullover')) return [['Back', 1], ['Biceps', .5]];
+  if(has('curl')) return [['Biceps', 1]];
+  if(has(' fly', 'flye', 'pec ', 'crossover')) return [['Chest', 1]];
+  if(has('bench', 'chest press', 'push up', 'pushup', 'floor press', 'incline', 'decline', 'chest')) return [['Chest', 1], ['Triceps', .5], ['Shoulders', .3]];
+  return [];
+}
+function mgTitle(id) { return String(id || '').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()); }
+// One exercise on one day: best estimated one-rep max for weighted sets, else most reps.
+function mgPoint(sets) {
+  let best = 0, bestR = 0, top = null, n = 0;
+  (sets || []).forEach(x => {
+    const w = parseFloat(x.w), r = parseFloat(x.r);
+    if(!(r > 0)) return;
+    n++;
+    if(w > 0) { const e = w * (1 + Math.min(r, 15) / 30); if(e > best) { best = e; top = { w, r }; } }
+    else if(r > bestR) bestR = r;
+  });
+  if(!n) return null;
+  return best > 0 ? { kind: 'w', perf: best, top, sets: n } : { kind: 'r', perf: bestR, top: { r: bestR }, sets: n };
+}
+// Every logged strength exercise: name -> [{t, dated, kind, perf, top, sets}], oldest first.
+function mgCollect() {
+  const out = {};
+  const push = (name, t, dated, sets) => {
+    const pt = mgPoint(sets);
+    if(!pt || !mgMuscles(name).length) return;
+    const k = name.toLowerCase().trim();
+    (out[k] = out[k] || { name, pts: [] }).pts.push(Object.assign({ t, dated }, pt));
+  };
+  // LANTIK sessions
+  try {
+    const sessions = (typeof hyState !== 'undefined' && hyState && hyState.sessions) || {};
+    Object.keys(sessions).forEach(sid => {
+      const sess = sessions[sid];
+      if(!sess || sess.restDay || !sess.ex) return;
+      const p = String(sess.date || sid.slice(0, 10)).split('-').map(Number);
+      const t = new Date(p[0], (p[1] || 1) - 1, p[2] || 1).getTime();
+      if(!Number.isFinite(t)) return;
+      const w = hyWorkout(sess.workoutId);
+      Object.keys(sess.ex).forEach(key => {
+        const dot = key.indexOf('.'), secKey = key.slice(0, dot), exId = key.slice(dot + 1);
+        if(secKey === 'primer') return;
+        const sec = w && (w.sections || []).find(x => x.key === secKey);
+        const def = sec && sec.items.find(x => x.id === exId);
+        if(def ? !(def.kind === 'strength' || def.kind === 'bodyweight') : secKey !== 'main') return;
+        const name = def ? hyExName(w.id, key, def) : mgTitle(exId);
+        push(name, t, true, (sess.ex[key].sets || []).filter(x => x && x.done).map(x => ({ w: x.w, r: x.r })));
+      });
+    });
+  } catch(e) { console.warn('Muscle growth: LANTIK data skipped', e); }
+  // Other programs (logged by program week and day)
+  try {
+    Object.keys(workoutState.logs || {}).forEach(lk => {
+      const m = lk.match(/^(.*)_w(\d+)_d(\d+)$/);
+      const prog = m && getProgram(m[1]);
+      const day = prog && prog.days && prog.days[Number(m[3])];
+      if(!day || !day.exercises) return;
+      const t = Number(m[2]) * 7 + Number(m[3]);
+      Object.keys(workoutState.logs[lk] || {}).forEach(ei => {
+        const ex = day.exercises[Number(ei)];
+        const sets = workoutState.logs[lk][ei];
+        if(!ex || !Array.isArray(sets)) return;
+        push(ex.name, t, false, sets.filter(x => x && (x.weight || x.reps)).map(x => ({ w: x.weight, r: x.reps })));
+      });
+    });
+  } catch(e) { console.warn('Muscle growth: program logs skipped', e); }
+  Object.values(out).forEach(x => x.pts.sort((a, b) => (a.dated - b.dated) || (a.t - b.t)));
+  return out;
+}
+function mgAnalyze() {
+  const DAY = 86400000, now = Date.now(), WINDOW = 56 * DAY, CAP = 0.15;
+  const exs = mgCollect();
+  const maxWeek = Math.max(0, ...Object.values(exs).flatMap(x => x.pts.filter(p => !p.dated).map(p => Math.floor(p.t / 7))));
+  const groups = {};
+  MG_GROUPS.forEach(g => groups[g] = { name: g, wSum: 0, cSum: 0, sets: 0, last: 0, logged: false, undated: false, exs: [] });
+  Object.values(exs).forEach(x => {
+    const pts = x.pts.filter(p => p.dated ? now - p.t <= WINDOW : true);
+    if(!pts.length) return;
+    // Compare like with like (weighted sets vs reps-only): the kind with 2+ sessions, latest kind first.
+    const last = pts[pts.length - 1];
+    const byKind = k => pts.filter(p => p.kind === k);
+    const kind = byKind(last.kind).length >= 2 ? last.kind : (byKind(last.kind === 'w' ? 'r' : 'w').length >= 2 ? (last.kind === 'w' ? 'r' : 'w') : last.kind);
+    const same = byKind(kind);
+    const first = same[0], latest = same[same.length - 1];
+    const change = same.length >= 2 && first.perf > 0 ? Math.max(-CAP, Math.min(CAP, (latest.perf - first.perf) / first.perf)) : null;
+    // working sets per week over the last 4 weeks
+    const recent = pts.filter(p => p.dated ? now - p.t <= 28 * DAY : Math.floor(p.t / 7) > maxWeek - 4);
+    const undatedWeeks = new Set(recent.filter(p => !p.dated).map(p => Math.floor(p.t / 7))).size;
+    const sets = recent.filter(p => p.dated).reduce((a, p) => a + p.sets, 0) / 4
+      + (undatedWeeks ? recent.filter(p => !p.dated).reduce((a, p) => a + p.sets, 0) / undatedWeeks : 0);
+    const info = { name: x.name, first, latest, change, sessions: same.length };
+    mgMuscles(x.name).forEach(([g, share]) => {
+      const G = groups[g];
+      G.logged = true;
+      G.sets += sets * share;
+      if(last.dated) G.last = Math.max(G.last, last.t); else G.undated = true;
+      if(change !== null) { G.wSum += share; G.cSum += share * change; }
+      G.exs.push(Object.assign({ share }, info));
+    });
+  });
+  const list = Object.values(groups).map(G => {
+    const score = G.wSum ? G.cSum / G.wSum : null;
+    let status;
+    if(!G.logged) status = 'none';
+    else if(!G.undated && G.last && now - G.last > 21 * DAY) status = 'idle';
+    else if(score === null) status = 'early';
+    else if(score >= 0.015) status = 'grow';
+    else if(score <= -0.015) status = 'slip';
+    else status = 'hold';
+    G.exs.sort((a, b) => (b.share - a.share) || ((b.change || 0) - (a.change || 0)));
+    return { name: G.name, score, status, sets: G.sets, last: G.last, exs: G.exs };
+  });
+  const rank = { grow: 0, hold: 1, slip: 2, idle: 3, early: 4, none: 5 };
+  list.sort((a, b) => (rank[a.status] - rank[b.status]) || ((b.score || 0) - (a.score || 0)) || (MG_GROUPS.indexOf(a.name) - MG_GROUPS.indexOf(b.name)));
+  return list;
+}
+function mgToggle(name) {
+  window._mgOpen = window._mgOpen === name ? null : name;
+  renderMuscleGrowth();
+}
+function mgTop(p) {
+  if(!p || !p.top) return '—';
+  return p.kind === 'w' ? `${Math.round(p.top.w * 10) / 10}×${p.top.r}` : `${p.top.r} reps`;
+}
+function renderMuscleGrowth() {
+  const el = document.getElementById('muscleGrowth');
+  if(!el) return;
+  let list;
+  try { list = mgAnalyze(); } catch(e) { console.warn('Muscle growth skipped:', e); el.innerHTML = ''; return; }
+  const shown = list.filter(g => g.status !== 'none');
+  if(!shown.length) {
+    el.innerHTML = `<div class="mg-empty"><div>📈</div>Log weights and reps in a couple of workouts and this chart will show which muscles are growing.</div>`;
+    return;
+  }
+  const growing = list.filter(g => g.status === 'grow');
+  const scored = shown.filter(g => g.score !== null && (g.status === 'grow' || g.status === 'hold' || g.status === 'slip' || g.status === 'idle'));
+  const anyNeg = scored.some(g => g.score < 0);
+  const maxAbs = Math.max(0.05, ...scored.map(g => Math.abs(g.score)));
+  const pct = v => { const r = Math.round(v * 100); return (r > 0 ? '+' : r < 0 ? '−' : '') + Math.abs(r) + '%'; };
+  const label = { grow: 'Likely growing', hold: 'Holding steady', slip: 'Slipping', idle: 'Not trained in 3+ weeks', early: 'Needs one more session to compare' };
+  const arrow = { grow: '↑', hold: '→', slip: '↓' };
+  const open = window._mgOpen;
+  const rows = shown.map(g => {
+    let bar = '';
+    if(g.score !== null && g.status !== 'early') {
+      const w = Math.max(2, Math.abs(g.score) / maxAbs * (anyNeg ? 50 : 100));
+      const pos = anyNeg ? (g.score >= 0 ? `left:50%;` : `right:50%;`) : 'left:0;';
+      bar = `<div class="mg-bar" style="${pos}width:${w}%"></div>`;
+    }
+    const val = g.status === 'early' ? 'New' : g.status === 'idle' ? 'Idle' : `<span class="mg-ar" aria-hidden="true">${arrow[g.status]}</span>${pct(g.score)}`;
+    const safe = cmEsc(g.name);
+    let detail = '';
+    if(open === g.name) {
+      const exRows = g.exs.slice(0, 5).map(x => `<div class="mg-ex"><span>${cmEsc(x.name)}</span><span>${x.change === null ? mgTop(x.latest) : `${mgTop(x.first)} → ${mgTop(x.latest)}`}</span></div>`).join('');
+      const lastTxt = g.last ? ' · last trained ' + new Date(g.last).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
+      detail = `<div class="mg-detail"><div class="mg-detail-status">${label[g.status]} · about ${Math.round(g.sets)} working sets/week${lastTxt}</div>${exRows}</div>`;
+    }
+    return `<button class="mg-row mg-${g.status}" aria-expanded="${open === g.name}" onclick="mgToggle('${safe}')">
+        <span class="mg-name">${safe}</span>
+        <span class="mg-track${anyNeg ? ' div' : ''}">${bar}</span>
+        <span class="mg-val">${val}</span>
+      </button>${detail}`;
+  }).join('');
+  const none = list.filter(g => g.status === 'none').map(g => g.name);
+  const top = growing[0];
+  el.innerHTML = `
+    <div class="mg-hero">
+      <div class="mg-hero-num">${growing.length}</div>
+      <div class="mg-hero-txt">${growing.length === 1 ? 'muscle group' : 'muscle groups'} likely growing${top ? `<br>Biggest gains: <b>${cmEsc(top.name)}</b> (${pct(top.score)} strength)` : '<br>Keep adding weight or reps to see growth here'}</div>
+    </div>
+    <div class="mg-legend"><span><i style="background:#30D158"></i>↑ Growing</span><span><i style="background:#8E8E93"></i>→ Holding</span><span><i style="background:#FF9F0A"></i>↓ Slipping</span></div>
+    <div class="mg-rows">${rows}</div>
+    ${none.length ? `<div class="mg-none">Not trained yet: ${none.map(cmEsc).join(', ')}</div>` : ''}
+    <div class="mg-foot">Strength change since your first session in the window. Tap a muscle to see the lifts behind it. Lifts that keep going up with steady training are the best sign a muscle is growing.</div>`;
+}
+
 function renderProgress(){
+  try { renderMuscleGrowth(); } catch(e) { console.warn('Muscle growth skipped:', e); }
   const weights=progressData.filter(e=>e.weight).map(e=>e.weight);
   const latest=weights[0],prev=weights[1];
   const change=latest&&prev?Math.round((latest-prev)*10)/10:null;
