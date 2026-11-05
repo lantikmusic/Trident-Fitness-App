@@ -100,15 +100,22 @@ body {
 .welcome-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 .welcome-title {
-  font-size: 42px;
-  font-weight: 800;
-  letter-spacing: -0.04em;
+  font-size: clamp(28px, 9vw, 40px);
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: .01em;
   line-height: 1;
   text-align: center;
+  white-space: nowrap;
   margin-bottom: 14px;
 }
 
-.welcome-title span { color: var(--pink); }
+.welcome-title span { color: var(--pink); margin-left: .28em; }
+
+/* The same TRIDENT FITNESS wordmark as the app's Home header */
+.tf-mark { font-weight: 900; font-style: italic; letter-spacing: .01em; white-space: nowrap; }
+.tf-mark span { color: var(--pink); margin-left: .28em; }
+@media (max-width: 360px) { .auth-title .tf-mark { font-size: .84em; } }
 
 .welcome-sub {
   font-size: 16px;
@@ -407,7 +414,7 @@ body {
       <img src="Icons/icon-512.png" alt="Trident Fitness">
     </div>
 
-    <div class="welcome-title">Trident<br><span>Fitness</span></div>
+    <div class="welcome-title" aria-label="Trident Fitness">TRIDENT<span>FITNESS</span></div>
     <div class="welcome-sub">Your personal fitness & nutrition companion built for results</div>
 
     <div class="welcome-pills">
@@ -440,7 +447,7 @@ body {
 
     <div class="auth-header">
       <div class="auth-eyebrow">Welcome Back</div>
-      <div class="auth-title">Log in to<br>Trident Fitness</div>
+      <div class="auth-title">Log in to<br><span class="tf-mark">TRIDENT<span>FITNESS</span></span></div>
       <div class="auth-sub">Continue your fitness journey</div>
     </div>
 
@@ -506,7 +513,7 @@ body {
 
     <div class="auth-header">
       <div class="auth-eyebrow">Get Started</div>
-      <div class="auth-title">Create your<br>Trident account</div>
+      <div class="auth-title">Create your<br><span class="tf-mark">TRIDENT<span>FITNESS</span></span> account</div>
       <div class="auth-sub">Start your fitness journey today</div>
     </div>
 

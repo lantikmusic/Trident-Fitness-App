@@ -1120,7 +1120,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 }
 .splash-logo img{width:100%;height:100%;object-fit:cover;display:block;}
 @keyframes splashPulse{0%,100%{box-shadow:0 0 28px rgba(50,252,253,0.12);}50%{box-shadow:0 0 52px rgba(50,252,253,0.32);}}
-.splash-name{font-size:26px;font-weight:700;letter-spacing:-0.03em;color:#fff;margin-bottom:6px;}
+.splash-name{font-size:28px;font-weight:900;font-style:italic;letter-spacing:.01em;line-height:1;color:#fff;margin-bottom:10px;white-space:nowrap;}
+.splash-name span{margin-left:.28em;color:var(--pink);}
 .splash-tagline{font-size:12px;font-weight:500;color:rgba(255,255,255,0.35);letter-spacing:.12em;text-transform:uppercase;}
 .splash-bar{width:48px;height:2px;background:rgba(50,252,253,0.2);border-radius:99px;margin-top:40px;overflow:hidden;}
 .splash-bar-fill{height:100%;background:var(--pink);border-radius:99px;animation:splashLoad 2.2s ease-in-out forwards;}
@@ -1518,7 +1519,7 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
   <div class="splash-logo">
     <img src="Icons/icon-512.png" alt="Trident Fitness">
   </div>
-  <div class="splash-name">Trident Fitness</div>
+  <div class="splash-name" aria-label="Trident Fitness">TRIDENT<span>FITNESS</span></div>
   <div class="splash-tagline">Train. Track. Transform.</div>
   <div class="splash-bar"><div class="splash-bar-fill"></div></div>
 </div>
