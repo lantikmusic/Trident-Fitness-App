@@ -500,6 +500,108 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .wl{font-size:10px;font-weight:500;color:var(--text3);margin-top:3px;text-transform:uppercase;letter-spacing:.05em;}
 .surplus-c{color:var(--red);}
 .deficit-c{color:var(--pink);}
+/* ══ Macros tab refresh (scoped to the tab) ══ */
+#page-macros .day-nav-wrap{padding-top:14px;}
+#page-macros .day-nav{gap:2px;padding:4px;border-radius:20px;background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02)),var(--bg3);border:0.5px solid rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.06);}
+#page-macros .day-btn{display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 0 8px;border-radius:16px;color:var(--text3);-webkit-tap-highlight-color:transparent;}
+#page-macros .day-btn .dn-d{font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;}
+#page-macros .day-btn .dn-n{font-size:16px;font-weight:700;color:var(--text);letter-spacing:-0.02em;line-height:1.15;}
+#page-macros .day-btn.today:not(.active) .dn-n,#page-macros .day-btn.today:not(.active) .dn-d{color:var(--pink);}
+#page-macros .day-btn.active{background:var(--pink);color:rgba(0,0,0,.6);box-shadow:0 4px 16px var(--pink-glow);}
+#page-macros .day-btn.active .dn-n{color:#000;}
+#page-macros .day-btn.logged:not(.active)::after{bottom:3px;width:4px;height:4px;}
+
+.mx-sum{position:relative;overflow:hidden;border-radius:var(--radius-xl);padding:18px 18px 16px;margin-bottom:12px;
+  background:radial-gradient(120% 80% at 100% 0%,var(--pink-dim),transparent 60%),var(--bg3);border:0.5px solid rgba(255,255,255,.09);}
+.mx-sum-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;}
+.mx-eyebrow{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mx-left{flex-shrink:0;font-size:12px;font-weight:700;color:var(--pink);background:var(--pink-dim);border:0.5px solid var(--pink-border);padding:4px 10px;border-radius:99px;}
+.mx-left.over{color:var(--red);background:rgba(255,69,58,.1);border-color:rgba(255,69,58,.3);}
+.mx-sum-body{display:flex;align-items:center;gap:18px;margin-bottom:16px;}
+.mx-ring{position:relative;width:130px;height:130px;flex-shrink:0;}
+.mx-ring svg{width:130px;height:130px;transform:rotate(-90deg);}
+.mx-ring svg circle{transition:stroke-dashoffset .6s ease;}
+.mx-ring-c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.mx-ring-num{font-size:28px;font-weight:800;letter-spacing:-0.04em;line-height:1;}
+.mx-ring-lbl{font-size:11px;color:var(--text3);margin-top:4px;}
+.mx-kpis{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px;}
+.mx-kpi{padding-bottom:10px;border-bottom:0.5px solid var(--border);}
+.mx-kpi:last-child{border-bottom:0;padding-bottom:0;}
+.mx-kpi-lbl{font-size:10px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);margin-bottom:2px;}
+.mx-kpi-val{font-size:19px;font-weight:700;letter-spacing:-0.03em;font-variant-numeric:tabular-nums;}
+.mx-kpi-val span{font-size:11px;font-weight:500;color:var(--text3);margin-left:3px;letter-spacing:0;}
+.mx-kpi-val.surplus{color:var(--red);} .mx-kpi-val.deficit{color:var(--pink);}
+.mx-bars{display:flex;flex-direction:column;gap:11px;padding-top:14px;border-top:0.5px solid var(--border);}
+.mx-bar-top{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:6px;}
+.mx-bar-name{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;}
+.mx-bar-name i{width:8px;height:8px;border-radius:50%;}
+.mx-bar-val{font-size:12px;color:var(--text3);font-variant-numeric:tabular-nums;white-space:nowrap;}
+.mx-bar-val b{color:var(--text);font-weight:700;font-size:13px;} .mx-bar-val b.over{color:var(--red);}
+.mx-bar-val em{font-style:normal;margin-left:8px;color:var(--text3);opacity:.75;}
+.mx-bar-track{height:8px;border-radius:99px;background:var(--bg5);overflow:hidden;}
+.mx-bar-fill{height:100%;border-radius:99px;min-width:0;transition:width .6s ease;}
+
+#page-macros .meal-tabs{gap:4px;padding:4px;margin-bottom:12px;border-radius:20px;background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02)),var(--bg3);border:0.5px solid rgba(255,255,255,.1);}
+#page-macros .meal-tab{border:0;border-radius:16px;padding:9px 4px 8px;color:var(--text3);-webkit-tap-highlight-color:transparent;}
+#page-macros .meal-tab .meal-icon{margin-bottom:3px;}
+#page-macros .meal-tab.active{color:var(--text);background:linear-gradient(180deg,rgba(255,255,255,.13),rgba(255,255,255,.05));box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 4px 14px rgba(0,0,0,.35);border:0;}
+#page-macros .meal-tab.active .meal-icon{color:var(--pink);}
+#page-macros .meal-tab.active .meal-cals{color:var(--pink);opacity:1;}
+
+#page-macros .meal-panel{border-radius:var(--radius-xl);padding:16px;border:0.5px solid rgba(255,255,255,.09);margin-bottom:12px;}
+#page-macros .meal-panel-header{margin-bottom:12px;}
+#page-macros .meal-panel-title{font-size:20px;font-weight:700;letter-spacing:-0.025em;}
+#page-macros .meal-cal-badge{font-size:13px;padding:4px 11px;border:0.5px solid var(--pink-border);}
+#page-macros .meal-macro-row{gap:8px;margin-bottom:4px;}
+#page-macros .meal-macro-pill{flex-direction:column;gap:1px;padding:9px 6px;border-radius:14px;background:var(--bg4);font-size:16px;font-weight:700;position:relative;}
+#page-macros .meal-macro-pill i{position:absolute;top:0;left:22%;right:22%;height:3px;border-radius:0 0 3px 3px;}
+#page-macros .meal-macro-pill.mx-p i{background:#FF9F0A;} #page-macros .meal-macro-pill.mx-c i{background:#30D158;} #page-macros .meal-macro-pill.mx-f i{background:#BF5AF2;}
+#page-macros .mmp-lbl{font-size:10px;letter-spacing:.06em;}
+#page-macros .meal-macro-pill b{font-weight:700;font-variant-numeric:tabular-nums;}
+#page-macros .food-log{margin-top:14px;}
+#page-macros .food-log-header{margin-bottom:6px;}
+#page-macros .food-log-empty{font-style:normal;font-size:13px;padding:18px 0 10px;}
+.mx-empty-ic{font-size:26px;margin-bottom:6px;opacity:.85;}
+.mx-items{border-radius:14px;overflow:hidden;background:var(--bg4);}
+#page-macros .food-log-item{margin:0;border-radius:0;background:transparent;padding:11px 10px 11px 14px;gap:10px;border-bottom:0.5px solid var(--border);}
+#page-macros .food-log-item:last-child{border-bottom:0;}
+#page-macros .food-log-item-name{font-size:14px;}
+.mx-item-sub{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin-top:4px;font-size:11px;color:var(--text3);font-variant-numeric:tabular-nums;}
+.mx-time{color:var(--text3);opacity:.8;}
+.mx-m{display:inline-flex;align-items:center;gap:4px;font-weight:500;color:var(--text2);}
+.mx-m::before{content:'';width:5px;height:5px;border-radius:50%;}
+.mx-m.p::before{background:#FF9F0A;} .mx-m.c::before{background:#30D158;} .mx-m.f::before{background:#BF5AF2;}
+.mx-item-cal{flex-shrink:0;text-align:right;font-size:15px;font-weight:700;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;}
+.mx-item-cal span{display:block;font-size:10px;font-weight:500;color:var(--text3);letter-spacing:0;}
+#page-macros .food-log-item-del{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.06);padding:0;}
+#page-macros .food-log-total{margin-top:8px;border-radius:14px;padding:11px 14px;}
+.mx-actions{display:grid;grid-template-columns:1.5fr 1fr;gap:8px;margin-top:14px;}
+#page-macros .add-food-btn{margin:0;padding:13px 10px;border:0;border-radius:16px;background:var(--pink);color:#000;font-weight:700;font-size:15px;box-shadow:0 4px 18px var(--pink-glow);}
+#page-macros .add-food-btn:active{transform:scale(.98);filter:brightness(.92);}
+#page-macros .saved-meals-btn{margin:0;padding:13px 8px;border-radius:16px;font-weight:600;font-size:14px;color:var(--text);background:linear-gradient(180deg,rgba(255,255,255,.11),rgba(255,255,255,.04));border:0.5px solid rgba(255,255,255,.13);box-shadow:inset 0 1px 0 rgba(255,255,255,.1);white-space:nowrap;}
+
+#page-macros .activity-panel{border-radius:var(--radius-xl);border:0.5px solid rgba(255,255,255,.09);padding:16px;margin-bottom:20px;}
+#page-macros .activity-panel::before{display:none;}
+#page-macros .activity-title{display:flex;align-items:center;gap:8px;font-size:17px;font-weight:700;letter-spacing:-0.02em;text-transform:none;color:var(--text);}
+.mx-act-ic{width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:15px;background:rgba(255,159,10,.14);}
+.mx-act-fields{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:10px;}
+.mx-act-fields .field{min-width:0;}
+.mx-act-fields .iw{min-width:0;}
+#page-macros .act-stats{margin-top:12px;}
+#page-macros .act-stat{background:var(--bg4);border:0;border-radius:14px;}
+#page-macros .act-stat-val{font-size:20px;font-weight:700;letter-spacing:-0.03em;color:var(--text);}
+#page-macros .act-stat-lbl{color:var(--text3);opacity:1;}
+
+#page-macros .week-panel{border-radius:var(--radius-xl);border:0.5px solid rgba(255,255,255,.09);}
+#page-macros .bar{border-radius:5px 5px 2px 2px;width:40%;}
+#page-macros .bar.in{background:var(--pink);opacity:.92;}
+#page-macros .wlabel.active{color:var(--pink);}
+#page-macros .wt{border-radius:14px;}
+.mx-chart-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;}
+.mx-chart-key{display:flex;gap:12px;font-size:11px;color:var(--text3);}
+.mx-chart-key span{display:inline-flex;align-items:center;gap:5px;}
+.mx-chart-key i{width:7px;height:7px;border-radius:50%;}
+@media(max-width:360px){.mx-ring,.mx-ring svg{width:112px;height:112px;}.mx-ring-num{font-size:24px;}.mx-sum-body{gap:14px;}.mx-bar-val em{display:none;}}
 /* Food Library */
 .food-lib-btn{display:flex;align-items:center;gap:8px;width:100%;padding:10px 14px;border-radius:var(--radius);border:0.5px dashed var(--pink-border);background:transparent;cursor:pointer;font-family:inherit;font-size:13px;color:var(--pink);margin-bottom:10px;transition:all .15s;}
 .food-lib-btn:hover{background:var(--pink-dim);}
@@ -1589,55 +1691,44 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
   </div>
   <div class="container">
     <div style="height:14px;"></div>
-    <div class="balance-hero" id="balanceHero">
-      <div>
-        <div class="b-eyebrow">Today's Balance</div>
-        <div class="b-num" id="bNum">—</div>
-        <div class="b-sub" id="bSub">log your meals</div>
-      </div>
-      <div class="ring-wrap">
-        <svg viewBox="0 0 76 76">
-          <circle class="ring-bg" cx="38" cy="38" r="32"/>
-          <circle class="ring-fg" id="ringFg" cx="38" cy="38" r="32" stroke="#32FCFD" stroke-dasharray="201.06" stroke-dashoffset="201.06"/>
-        </svg>
-      </div>
+    <!-- Day summary: calorie ring vs goal, eaten / burned / net, macro bars -->
+    <div class="mx-sum" id="balanceHero">
+      <div id="mxSumTop"></div>
+      <div class="mx-bars" id="statsGrid"></div>
     </div>
-    <div class="stats-grid" id="statsGrid"></div>
     <!-- Meal tabs -->
-    <div class="meal-tabs">
+    <div class="meal-tabs" role="tablist" aria-label="Meal">
       <button class="meal-tab active" onclick="switchMeal('breakfast')"><span class="meal-icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></span>Breakfast<div class="meal-cals" id="tab-cals-breakfast">0 kcal</div></button>
       <button class="meal-tab" onclick="switchMeal('lunch')"><span class="meal-icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M12 2a5 5 0 0 1 5 5 5 5 0 0 1-.1 1A4 4 0 1 1 13 17H7a5 5 0 0 1 0-10 5 5 0 0 1 5-5z"/></svg></span>Lunch<div class="meal-cals" id="tab-cals-lunch">0 kcal</div></button>
       <button class="meal-tab" onclick="switchMeal('dinner')"><span class="meal-icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>Dinner<div class="meal-cals" id="tab-cals-dinner">0 kcal</div></button>
     </div>
     <!-- Meal panel -->
     <div class="meal-panel" id="mealPanel">
-      <!-- Meal header row -->
       <div class="meal-panel-header">
         <div class="meal-panel-title" id="mealPanelTitle">Breakfast</div>
         <div class="meal-cal-badge" id="mealCalBadge">0 kcal</div>
       </div>
-      <!-- Macro summary row for this meal -->
       <div class="meal-macro-row" id="mealMacroRow">
-        <div class="meal-macro-pill"><span id="meal-p-display">0</span>g <span class="mmp-lbl">P</span></div>
-        <div class="meal-macro-pill"><span id="meal-c-display">0</span>g <span class="mmp-lbl">C</span></div>
-        <div class="meal-macro-pill"><span id="meal-f-display">0</span>g <span class="mmp-lbl">F</span></div>
+        <div class="meal-macro-pill mx-p"><i></i><b><span id="meal-p-display">0</span>g</b><span class="mmp-lbl">Protein</span></div>
+        <div class="meal-macro-pill mx-c"><i></i><b><span id="meal-c-display">0</span>g</b><span class="mmp-lbl">Carbs</span></div>
+        <div class="meal-macro-pill mx-f"><i></i><b><span id="meal-f-display">0</span>g</b><span class="mmp-lbl">Fat</span></div>
       </div>
-      <!-- Food log for this meal -->
       <div class="food-log" id="foodLog"></div>
-      <!-- Add Food button -->
-      <button class="add-food-btn" onclick="openAddFood()">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Add Food
-      </button>
-      <button class="saved-meals-btn" onclick="openSavedMeals()">🍽️ Saved Meals</button>
+      <div class="mx-actions">
+        <button class="add-food-btn" onclick="openAddFood()">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Food
+        </button>
+        <button class="saved-meals-btn" onclick="openSavedMeals()">🍽️ Saved Meals</button>
+      </div>
     </div>
     <!-- Activity -->
     <div class="activity-panel">
       <div class="activity-header">
-        <div class="activity-title">Activity</div>
+        <div class="activity-title"><span class="mx-act-ic" aria-hidden="true">🔥</span>Activity</div>
         <div class="activity-autosave" id="actSaveStatus"><span class="autosave-dot"></span><span id="actSaveText">updates automatically</span></div>
       </div>
-      <div class="two-col">
+      <div class="mx-act-fields">
         <div class="field"><label>Calories burned</label><div class="iw"><input type="number" id="f-burned" placeholder="0" min="0" oninput="onActivityInput()"><span class="unit">kcal</span></div></div>
         <div class="field"><label>Notes</label><div class="iw"><input type="text" id="f-notes" placeholder="e.g. 45 min run" oninput="onActivityInput()"></div></div>
       </div>
@@ -1659,7 +1750,7 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
     </div>
     <!-- Line chart -->
     <div class="week-panel">
-      <div class="panel-title">Surplus / Deficit</div>
+      <div class="mx-chart-head"><div class="panel-title" style="margin:0;">Daily Net</div><div class="mx-chart-key"><span><i style="background:#FF453A"></i>Surplus</span><span><i style="background:var(--pink)"></i>Deficit</span></div></div>
       <div style="position:relative;width:100%;height:160px;"><canvas id="lineChart"></canvas></div>
     </div>
     <!-- Barcode Scanner Modal -->
@@ -2832,7 +2923,8 @@ function loadMealInputs(){const m=macroData[cur].meals[curMeal];renderFoodLog();
 function saveMealInputs(){const meal=macroData[cur].meals[curMeal];if(!meal.items)meal.items=[];}
 function onMacroInput(){renderMealMacroPills();renderMealTabCals();renderHero();renderMacroStats();}
 function updateMealCalDisplay(){const cal=calcMealCal(macroData[cur].meals[curMeal]);document.getElementById('m-cal-display').textContent=Math.round(cal).toLocaleString();document.getElementById('mealCalBadge').textContent=`${Math.round(cal).toLocaleString()} kcal`;}
-function renderMealTabCals(){MEALS.forEach(m=>{const cal=calcMealCal(macroData[cur].meals[m]);document.getElementById(`tab-cals-${m}`).textContent=`${Math.round(cal).toLocaleString()} kcal`;});}
+function mealShownCal(meal){const items=(meal&&meal.items)||[];return items.length?items.reduce((s,it)=>s+(Number(it.cal)||0),0):calcMealCal(meal);}
+function renderMealTabCals(){MEALS.forEach(m=>{const cal=mealShownCal(macroData[cur].meals[m]);document.getElementById(`tab-cals-${m}`).textContent=`${Math.round(cal).toLocaleString()} kcal`;});}
 function saveDay(){
   saveMealInputs();
   // If macros exceed sum of logged items, create a manual entry for the difference
@@ -2885,33 +2977,72 @@ function updateActivityStats(){
   else{lbl.textContent='net balance';v.style.color='var(--pink)';}
 }
 
+// Macro colors match the Home card: protein orange, carbs green, fat purple
+function mxColor(k) { return { protein: '#FF9F0A', carbs: '#30D158', fat: '#BF5AF2' }[k] || '#8E8E93'; }
+function mxGoals() {
+  const g = load(GOALS_KEY) || {};
+  return { cal: Number(g.cal) || 2000, protein: Number(g.protein) || 150, carbs: Number(g.carbs) || 200, fat: Number(g.fat) || 65 };
+}
+function mxDayLabel(i) {
+  const d = new Date(macroSlotDate(i) + 'T12:00:00');
+  const s = d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+  return i === getTodayIdx() ? 'Today · ' + s : s;
+}
 function renderHero(){
-  const t=dayTotals(macroData[cur]),net=t.cal-t.burned;
-  const hero=document.getElementById('balanceHero'),num=document.getElementById('bNum'),sub=document.getElementById('bSub'),ring=document.getElementById('ringFg');
-  if(t.cal===0&&t.burned===0){hero.className='balance-hero';num.className='b-num';num.innerHTML='—';sub.className='b-sub';sub.textContent='log your meals';ring.style.strokeDashoffset=CIRC;ring.style.stroke=getAccentColor();return;}
-  const pct=Math.min(Math.abs(net)/Math.max(t.cal,1),1),offset=CIRC*(1-pct);
-  if(net>0){hero.className='balance-hero surplus';num.className='b-num surplus';num.innerHTML=`+${Math.round(net).toLocaleString()}<span class="b-unit">kcal</span>`;sub.className='b-sub surplus';sub.textContent='caloric surplus';ring.style.strokeDashoffset=offset;ring.style.stroke='#FF453A';}
-  else if(net<0){hero.className='balance-hero deficit';num.className='b-num deficit';num.innerHTML=`${Math.round(net).toLocaleString()}<span class="b-unit">kcal</span>`;sub.className='b-sub deficit';sub.textContent='caloric deficit';ring.style.strokeDashoffset=offset;ring.style.stroke=getAccentColor();}
-  else{hero.className='balance-hero';num.className='b-num deficit';num.innerHTML=`0<span class="b-unit">kcal</span>`;sub.className='b-sub';sub.textContent='perfectly balanced';ring.style.strokeDashoffset=0;ring.style.stroke=getAccentColor();}
+  const el = document.getElementById('mxSumTop');
+  if(!el) return;
+  const t = dayTotals(macroData[cur]), goals = mxGoals(), net = t.cal - t.burned;
+  const over = t.cal > goals.cal, left = Math.round(goals.cal - t.cal);
+  const R = 54, SW = 11, C = 2 * Math.PI * R, pct = Math.min(t.cal / goals.cal, 1);
+  const color = over ? 'var(--red)' : getAccentColor();
+  const empty = t.cal === 0 && t.burned === 0;
+  const netTxt = empty ? '—' : (net > 0 ? '+' : net < 0 ? '−' : '') + Math.abs(Math.round(net)).toLocaleString();
+  const netLbl = empty ? 'Net' : net > 0 ? 'Net · surplus' : net < 0 ? 'Net · deficit' : 'Net · balanced';
+  const netCls = empty ? '' : net > 0 ? ' surplus' : ' deficit';
+  el.innerHTML = `
+    <div class="mx-sum-head">
+      <div class="mx-eyebrow">${mxDayLabel(cur)}</div>
+      <div class="mx-left${over ? ' over' : ''}">${over ? Math.abs(left).toLocaleString() + ' kcal over' : left.toLocaleString() + ' kcal left'}</div>
+    </div>
+    <div class="mx-sum-body">
+      <div class="mx-ring">
+        <svg viewBox="0 0 130 130" aria-hidden="true">
+          <circle cx="65" cy="65" r="${R}" fill="none" stroke="var(--bg5)" stroke-width="${SW}"/>
+          <circle cx="65" cy="65" r="${R}" fill="none" stroke="${color}" stroke-width="${SW}" stroke-linecap="round"
+            stroke-dasharray="${C.toFixed(2)}" stroke-dashoffset="${(C * (1 - pct)).toFixed(2)}"${pct === 0 ? ' opacity="0"' : ''}/>
+        </svg>
+        <div class="mx-ring-c"><div class="mx-ring-num">${Math.round(t.cal).toLocaleString()}</div><div class="mx-ring-lbl">of ${goals.cal.toLocaleString()} kcal</div></div>
+      </div>
+      <div class="mx-kpis">
+        <div class="mx-kpi"><div class="mx-kpi-lbl">Eaten</div><div class="mx-kpi-val">${Math.round(t.cal).toLocaleString()}<span>kcal</span></div></div>
+        <div class="mx-kpi"><div class="mx-kpi-lbl">Burned</div><div class="mx-kpi-val">${Math.round(t.burned).toLocaleString()}<span>kcal</span></div></div>
+        <div class="mx-kpi"><div class="mx-kpi-lbl">${netLbl}</div><div class="mx-kpi-val${netCls}">${netTxt}<span>kcal</span></div></div>
+      </div>
+    </div>`;
 }
 
 function renderDayNav(){
+  const today=getTodayIdx();
   document.getElementById('dayNav').innerHTML=DAYS.map((d,i)=>{
     const tot=dayTotals(macroData[i]),logged=tot.cal>0||tot.burned>0;
-    return`<button class="day-btn${i===cur?' active':''}${logged&&i!==cur?' logged':''}" onclick="swDay(${i})">${d}</button>`;
+    let num='';try{num=Number(macroSlotDate(i).slice(8,10));}catch(e){}
+    return`<button class="day-btn${i===cur?' active':''}${logged&&i!==cur?' logged':''}${i===today?' today':''}" onclick="swDay(${i})" aria-label="${d}${i===today?' (today)':''}"><span class="dn-d">${d}</span><span class="dn-n">${num}</span></button>`;
   }).join('');
 }
 function swDay(i){saveMealInputs();cur=i;curMeal='breakfast';document.querySelectorAll('.meal-tab').forEach((t,j)=>t.classList.toggle('active',j===0));document.getElementById('mealPanelTitle').textContent='Breakfast';document.getElementById('f-burned').value=macroData[cur].burned||'';document.getElementById('f-notes').value=macroData[cur].notes||'';loadMealInputs();renderMacros();}
 
 function renderMacroStats(){
-  const t=dayTotals(macroData[cur]);
-  document.getElementById('statsGrid').innerHTML=[
-    [Math.round(t.cal).toLocaleString(),'Consumed'],
-    [Math.round(t.burned).toLocaleString(),'Burned'],
-    [Math.round(t.protein)+'g','Protein'],
-    [Math.round(t.carbs)+'g','Carbs'],
-    [Math.round(t.fat)+'g','Fat']
-  ].map(([v,l])=>`<div class="stat-card"><div class="sv">${v}</div><div class="sl">${l}</div></div>`).join('');
+  const el=document.getElementById('statsGrid');
+  if(!el) return;
+  const t=dayTotals(macroData[cur]), goals=mxGoals();
+  el.innerHTML=[['Protein','protein'],['Carbs','carbs'],['Fat','fat']].map(([name,k])=>{
+    const val=Math.round(t[k]), goal=goals[k], over=val>goal, pct=goal>0?Math.min(100,val/goal*100):0;
+    const rest=over?`${val-goal}g over`:`${goal-val}g left`;
+    return `<div class="mx-bar">
+      <div class="mx-bar-top"><span class="mx-bar-name"><i style="background:${mxColor(k)}"></i>${name}</span><span class="mx-bar-val"><b${over?' class="over"':''}>${val}</b> / ${goal}g<em>${rest}</em></span></div>
+      <div class="mx-bar-track"><div class="mx-bar-fill" style="width:${pct.toFixed(1)}%;background:${mxColor(k)}"></div></div>
+    </div>`;
+  }).join('');
 }
 
 function renderWeekBars(containerId='wbars', labelId='wlabels'){
@@ -3615,6 +3746,8 @@ function renderMealMacroPills() {
   if(pEl) pEl.textContent = p;
   if(cEl) cEl.textContent = c;
   if(fEl) fEl.textContent = f;
+  const badge = document.getElementById('mealCalBadge');
+  if(badge) badge.textContent = `${Math.round(mealShownCal(meal)).toLocaleString()} kcal`;
 }
 
 function renderFoodLog() {
@@ -3626,40 +3759,38 @@ function renderFoodLog() {
   renderMealMacroPills();
 
   if(items.length === 0) {
-    el.innerHTML = `<div class="food-log-empty">No items logged yet — tap Add Food below</div>`;
+    el.innerHTML = `<div class="food-log-empty"><div class="mx-empty-ic">🍽️</div>Nothing logged for ${MEAL_LABELS[curMeal].toLowerCase()} yet</div>`;
     return;
   }
 
-  const totalCal = items.reduce((s,it)=>s+(it.cal||0),0);
+  const n = v => cmEsc(String(Math.round((Number(v) || 0) * 10) / 10));
+  const totalCal = Math.round(items.reduce((s,it)=>s+(Number(it.cal)||0),0));
   const totalP   = Math.round(items.reduce((s,it)=>s+(it.protein||0),0)*10)/10;
   const totalC   = Math.round(items.reduce((s,it)=>s+(it.carbs||0),0)*10)/10;
   const totalF   = Math.round(items.reduce((s,it)=>s+(it.fat||0),0)*10)/10;
 
   el.innerHTML = `
     <div class="food-log-header">
-      <div class="food-log-title">Logged Items</div>
+      <div class="food-log-title">${items.length} ${items.length === 1 ? 'item' : 'items'}</div>
       <div><button class="food-log-save" onclick="openSaveMeal()">＋ Save as meal</button><button class="food-log-clear" onclick="clearFoodLog()">Clear all</button></div>
     </div>
+    <div class="mx-items">
     ${items.map((it,i) => `
       <div class="food-log-item">
         <div class="food-log-item-left">
           <div class="food-log-item-name">${cmEsc(it.name)}</div>
-          <div class="food-log-item-time">${cmEsc(it.time || '')}</div>
-          <div class="food-log-item-macros">
-            <span class="food-log-macro" style="color:var(--pink);font-weight:700;">${it.cal} kcal</span>
-            <span class="food-log-macro">P: <strong>${it.protein}g</strong></span>
-            <span class="food-log-macro">C: <strong>${it.carbs}g</strong></span>
-            <span class="food-log-macro">F: <strong>${it.fat}g</strong></span>
-          </div>
+          <div class="mx-item-sub">${it.time ? `<span class="mx-time">${cmEsc(it.time)}</span>` : ''}<span class="mx-m p">P ${n(it.protein)}g</span><span class="mx-m c">C ${n(it.carbs)}g</span><span class="mx-m f">F ${n(it.fat)}g</span></div>
         </div>
-        <button class="food-log-item-del" onclick="deleteFoodItem(${i})">✕</button>
+        <div class="mx-item-cal">${n(it.cal)}<span>kcal</span></div>
+        <button class="food-log-item-del" aria-label="Remove ${cmEsc(it.name)}" onclick="deleteFoodItem(${i})"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
       </div>`).join('')}
+    </div>
     <div class="food-log-total">
       <div>
-        <div class="food-log-total-label">Meal Total</div>
-        <div class="food-log-total-macros">P: ${totalP}g · C: ${totalC}g · F: ${totalF}g</div>
+        <div class="food-log-total-label">${MEAL_LABELS[curMeal]} total</div>
+        <div class="food-log-total-macros">P ${totalP}g · C ${totalC}g · F ${totalF}g</div>
       </div>
-      <div class="food-log-total-val">${totalCal} kcal</div>
+      <div class="food-log-total-val">${totalCal.toLocaleString()} kcal</div>
     </div>`;
 }
 
