@@ -155,31 +155,22 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
    SETTINGS SHEET
 ════════════════════════════════ */
 .settings-btn{
-  position:fixed;top:calc(env(safe-area-inset-top) + 12px);right:max(16px, env(safe-area-inset-right) + 12px);
-  z-index:90;width:36px;height:36px;border-radius:10px;
-  background:var(--pink);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  border:none;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;transition:all .2s;
-  box-shadow:0 2px 16px var(--pink-glow);
+  position:fixed;top:calc(env(safe-area-inset-top) + 8px);right:max(16px, env(safe-area-inset-right) + 12px);
+  z-index:90;width:44px;height:44px;border-radius:50%;padding:0;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text);
+  background:linear-gradient(180deg,rgba(255,255,255,.13),rgba(255,255,255,.05)),rgba(28,28,30,.55);
+  border:0.5px solid rgba(255,255,255,.14);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 6px 18px rgba(0,0,0,.35);
+  backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%);
+  -webkit-tap-highlight-color:transparent;transition:transform .12s,filter .15s;
 }
-.settings-btn:hover{filter:brightness(1.15);transform:scale(1.05);}
-/* Home top bar: round glass buttons around a centred wordmark (the corner settings button hides on Home) */
-body[data-page="dashboard"] .settings-btn{display:none;}
+.settings-btn:active{transform:scale(.93);filter:brightness(1.2);}
+/* Home top bar: centred wordmark; the settings button above lines up with its right side */
 .page-header.home-header{padding-top:calc(env(safe-area-inset-top) + 8px);}
-.home-bar{display:grid;grid-template-columns:46px 1fr 46px;align-items:center;gap:8px;margin:0 -4px 18px;}
-.home-bar-btn{width:46px;height:46px;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;color:var(--text);font-size:22px;font-family:inherit;
-  background:linear-gradient(180deg,rgba(255,255,255,.13),rgba(255,255,255,.05));border:0.5px solid rgba(255,255,255,.14);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 6px 18px rgba(0,0,0,.35);backdrop-filter:blur(18px) saturate(160%);-webkit-backdrop-filter:blur(18px) saturate(160%);
-  -webkit-tap-highlight-color:transparent;transition:transform .12s,filter .15s;}
-.home-bar-btn:active{transform:scale(.93);filter:brightness(1.2);}
-.home-bar-btn img{display:block;}
+.home-bar{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;gap:8px;height:44px;margin:0 -4px 16px;}
 .home-wordmark{text-align:center;font-size:20px;font-weight:900;letter-spacing:.01em;line-height:1;color:var(--text);white-space:nowrap;font-style:italic;}
 .home-wordmark span{margin-left:.28em;color:var(--pink);}
 @media(max-width:350px){.home-wordmark{font-size:17px;}}
-.settings-btn:active{transform:scale(0.95);}
-.settings-btn svg{stroke:#000;}
 .settings-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0);z-index:300;transition:background .3s;}
 .settings-overlay.open{background:rgba(0,0,0,0.6);}
 .settings-sheet{position:fixed;bottom:0;left:0;right:0;background:var(--bg3);border-radius:24px 24px 0 0;border-top:0.5px solid var(--border2);padding:0 0 calc(40px + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .38s cubic-bezier(.32,0,.15,1);z-index:301;max-height:88vh;overflow-y:auto;}
@@ -1454,13 +1445,14 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
 <div class="page active" id="page-dashboard">
   <div class="page-header home-header">
     <div class="home-bar">
-      <button class="home-bar-btn profile-pic-display" onclick="openProfilePic()" aria-label="Profile photo">👤</button>
+      <span aria-hidden="true"></span>
       <div class="home-wordmark" aria-label="Trident Fitness">TRIDENT<span>FITNESS</span></div>
-      <button class="home-bar-btn" onclick="openSettings()" aria-label="Settings">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="9" cy="6" r="2.4" fill="var(--bg)"/><circle cx="15" cy="12" r="2.4" fill="var(--bg)"/><circle cx="9" cy="18" r="2.4" fill="var(--bg)"/></svg>
-      </button>
+      <span aria-hidden="true"></span>
     </div>
-    <div class="page-title" id="dash-greeting" style="margin:0;">Good afternoon</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+      <div class="page-title" id="dash-greeting" style="margin:0;">Good afternoon</div>
+      <div class="profile-pic-display" onclick="openProfilePic()" style="width:72px;height:72px;flex-shrink:0;border-radius:50%;background:var(--bg4);border:0.5px solid var(--border2);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:32px;cursor:pointer;">👤</div>
+    </div>
     <div class="page-sub" id="dash-date"></div>
   </div>
   <div class="container">
@@ -2242,14 +2234,7 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
 
 <!-- Settings Gear Button (always visible) -->
 <button class="settings-btn" onclick="openSettings()" aria-label="Settings">
-  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <line x1="4" y1="6" x2="20" y2="6"/>
-    <line x1="4" y1="12" x2="20" y2="12"/>
-    <line x1="4" y1="18" x2="20" y2="18"/>
-    <circle cx="9" cy="6" r="2.5" fill="#000" stroke="none"/>
-    <circle cx="15" cy="12" r="2.5" fill="#000" stroke="none"/>
-    <circle cx="9" cy="18" r="2.5" fill="#000" stroke="none"/>
-  </svg>
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="9" cy="6" r="2.4" fill="var(--bg)"/><circle cx="15" cy="12" r="2.4" fill="var(--bg)"/><circle cx="9" cy="18" r="2.4" fill="var(--bg)"/></svg>
 </button>
 
 <!-- Settings Sheet -->
@@ -8109,9 +8094,6 @@ function applyAccentColor(hex, rgb) {
   const rtCard = document.querySelector('.rest-timer-card');
   if(rtCard) rtCard.style.boxShadow = `0 0 60px rgba(${rgb},0.25)`;
 
-  // Refresh settings button color
-  const sBtn = document.querySelector('.settings-btn');
-  if(sBtn) { sBtn.style.background = hex; sBtn.style.boxShadow = `0 2px 16px rgba(${rgb},0.4)`; }
 
   // Re-render pages that have hardcoded chart/ring colors
   renderDashboard();
