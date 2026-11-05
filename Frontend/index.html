@@ -388,6 +388,14 @@ body {
 .ob-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
 .ob-footer { margin-top: auto; display: flex; flex-direction: column; gap: 10px; }
+/* Username step */
+.un-iw .un-at { padding-left: 16px; font-size: 17px; font-weight: 700; color: var(--pink); }
+.un-iw input { padding-left: 4px; font-size: 17px; font-weight: 600; }
+.un-status { font-size: 12px; color: var(--text3); margin-top: 8px; min-height: 16px; line-height: 1.4; }
+.un-status.good { color: #30D158; }
+.un-status.bad { color: #FF453A; }
+.un-skip { background: none; border: none; color: var(--text3); font-family: inherit; font-size: 13px; font-weight: 600; padding: 8px; cursor: pointer; }
+.pink-btn:disabled { opacity: .45; cursor: default; }
 .ob-skip { text-align: center; font-size: 13px; color: var(--text3); cursor: pointer; padding: 8px; }
 .ob-skip:active { color: var(--pink); }
 
@@ -596,11 +604,12 @@ body {
       <div class="ob-progress-dot" id="dot-1"></div>
       <div class="ob-progress-dot" id="dot-2"></div>
       <div class="ob-progress-dot" id="dot-3"></div>
+      <div class="ob-progress-dot" id="dot-4"></div>
     </div>
 
     <!-- Step 0: Goal Focus -->
     <div class="ob-step active" id="ob-step-0">
-      <div class="ob-step-eyebrow">Step 1 of 4</div>
+      <div class="ob-step-eyebrow">Step 1 of 5</div>
       <div class="ob-step-title">What's your main goal?</div>
       <div class="ob-step-sub">We'll personalise your calorie and macro targets around this.</div>
 
@@ -634,7 +643,7 @@ body {
 
     <!-- Step 1: Personal Stats -->
     <div class="ob-step" id="ob-step-1">
-      <div class="ob-step-eyebrow">Step 2 of 4</div>
+      <div class="ob-step-eyebrow">Step 2 of 5</div>
       <div class="ob-step-title">Your stats</div>
       <div class="ob-step-sub">Used to calculate your personal calorie and macro targets.</div>
 
@@ -698,7 +707,7 @@ body {
 
     <!-- Step 2: Activity Level -->
     <div class="ob-step" id="ob-step-2">
-      <div class="ob-step-eyebrow">Step 3 of 4</div>
+      <div class="ob-step-eyebrow">Step 3 of 5</div>
       <div class="ob-step-title">How active are you?</div>
       <div class="ob-step-sub">Be honest — this affects your daily calorie target.</div>
 
@@ -755,8 +764,24 @@ body {
       </div>
     </div>
 
-    <!-- Step 3: All Done -->
+    <!-- Step 3: Username -->
     <div class="ob-step" id="ob-step-3">
+      <div class="ob-step-eyebrow">Step 4 of 5</div>
+      <div class="ob-step-title">Pick a username</div>
+      <div class="ob-step-sub">Friends find you in the Community tab by searching it, like <b style="color:var(--text);">@LANTIK</b>. You can change it any time in Settings.</div>
+      <div class="field">
+        <label for="ob-username">Username</label>
+        <div class="iw un-iw"><span class="un-at">@</span><input type="text" id="ob-username" maxlength="20" placeholder="yourname" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" oninput="obUsernameInput()" onkeydown="if(event.key==='Enter')obUsernameContinue()"></div>
+        <div class="un-status" id="ob-username-status" aria-live="polite">3–20 characters: letters, numbers, periods and underscores</div>
+      </div>
+      <div class="ob-footer">
+        <button class="pink-btn" id="ob-username-btn" disabled onclick="obUsernameContinue()">Continue</button>
+        <button class="un-skip" onclick="obNext()">Skip for now</button>
+      </div>
+    </div>
+
+    <!-- Step 4: All Done -->
+    <div class="ob-step" id="ob-step-4">
       <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:20px; padding: 20px 0;">
         <div style="width:80px;height:80px;border-radius:50%;background:var(--pink-dim);border:0.5px solid var(--pink-border);display:flex;align-items:center;justify-content:center;font-size:36px;box-shadow:0 0 40px rgba(50,252,253,0.15);">🎉</div>
         <div>
@@ -792,7 +817,7 @@ let obData = {
   name: ''
 };
 let obStep = 0;
-const OB_STEPS = 4;
+const OB_STEPS = 5;
 
 // ══════════════════════════════════════
 // CLOUDFLARE WORKER URL
@@ -1050,7 +1075,83 @@ function obNext() {
     document.getElementById(`dot-${obStep}`).classList.add('active');
   }
 
-  if(obStep === 3) buildSummary();
+  if(obStep === 3) obUsernameEnter();
+  if(obStep === 4) buildSummary();
+}
+
+// ── Username step ──
+const obUn = { value: '', ok: false, timer: null, seq: 0, started: false };
+// Same rules as the server (it checks again)
+function unProblem(u) {
+  if(!u) return '';
+  if(u.length < 3) return 'Use at least 3 characters';
+  if(u.length > 20) return 'Use 20 characters or fewer';
+  if(!/^[A-Za-z0-9._]+$/.test(u)) return 'Use only letters, numbers, periods and underscores';
+  if(u.startsWith('.') || u.endsWith('.')) return "Can't start or end with a period";
+  if(u.includes('..')) return "Can't have two periods in a row";
+  return '';
+}
+function obUnStatus(msg, kind) {
+  const el = document.getElementById('ob-username-status');
+  el.textContent = msg;
+  el.className = 'un-status' + (kind ? ' ' + kind : '');
+}
+function obUnButton() { document.getElementById('ob-username-btn').disabled = !obUn.ok; }
+function obUsernameEnter() {
+  const inp = document.getElementById('ob-username');
+  if(!obUn.started && !inp.value) {
+    // Suggest one from their name, e.g. "Logan Eiselt" -> "logan.eiselt"
+    const base = String(currentUser?.name || obData.name || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9 ]/g, '').trim().split(/\s+/).filter(Boolean).join('.').slice(0, 20).replace(/\.+$/, '');
+    if(base.length >= 3) { inp.value = base; obUsernameInput(); }
+  }
+  obUn.started = true;
+  setTimeout(() => inp.focus(), 250);
+}
+function obUsernameInput() {
+  const inp = document.getElementById('ob-username');
+  const v = inp.value.replace(/^@+/, '').replace(/\s+/g, '');
+  if(v !== inp.value) inp.value = v;
+  obUn.value = v; obUn.ok = false; obUnButton();
+  clearTimeout(obUn.timer);
+  const seq = ++obUn.seq;
+  if(!v) { obUnStatus('3–20 characters: letters, numbers, periods and underscores', ''); return; }
+  const problem = unProblem(v);
+  if(problem) { obUnStatus(problem, 'bad'); return; }
+  obUnStatus('Checking…', '');
+  obUn.timer = setTimeout(async () => {
+    try {
+      const { ok, data } = await api('/username/check?u=' + encodeURIComponent(v));
+      if(seq !== obUn.seq) return;
+      if(!ok) { obUnStatus("Couldn't check right now — you can skip and set it later in Settings", 'bad'); return; }
+      if(data.available) { obUn.ok = true; obUnStatus('✓ @' + v + ' is available', 'good'); }
+      else obUnStatus(data.reason || 'That username is taken', 'bad');
+      obUnButton();
+    } catch(e) {
+      if(seq === obUn.seq) obUnStatus("Couldn't check right now — check your connection or skip for now", 'bad');
+    }
+  }, 350);
+}
+async function obUsernameContinue() {
+  if(!obUn.ok) return;
+  const btn = document.getElementById('ob-username-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div>';
+  try {
+    const { ok, data } = await api('/username', 'POST', { username: obUn.value });
+    if(ok) {
+      obData.username = data.username;
+      try { localStorage.setItem('trident_username_v1', data.username); } catch(e) {}
+      obNext();
+    } else {
+      obUn.ok = false;
+      obUnStatus(data.error || "That username couldn't be saved", 'bad');
+    }
+  } catch(e) {
+    obUnStatus('Connection error — try again or skip for now', 'bad');
+  } finally {
+    btn.innerHTML = 'Continue';
+    obUnButton();
+  }
 }
 
 function buildSummary() {
@@ -1068,6 +1169,7 @@ function buildSummary() {
   const rows = [
     ['Goal', focusLabels[obData.focus] || 'Not set'],
     ['Activity', activityLabels[obData.activity] || 'Moderate'],
+    obData.username   ? ['Username', '@' + obData.username] : null,
     obData.weight     ? ['Current Weight', `${obData.weight} lbs`]  : null,
     obData.goalWeight ? ['Goal Weight',    `${obData.goalWeight} lbs`] : null,
   ].filter(Boolean);

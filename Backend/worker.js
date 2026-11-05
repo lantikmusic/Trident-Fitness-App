@@ -140,6 +140,12 @@ export default {
     if (path === '/community/profile'         && request.method === 'GET')  return community(communityProfile, request, env.DB);
     if (path === '/community/follow'          && request.method === 'POST') return community(communityToggleFollow, request, env.DB, env, ctx);
     if (path === '/community/block'           && request.method === 'POST') return community(communityToggleBlock, request, env.DB);
+    if (path === '/community/search'          && request.method === 'GET')  return community(communitySearch, request, env.DB);
+
+    // ── Usernames (@handle used to find friends) ──
+    if (path === '/username'                  && request.method === 'GET')  return community(getUsername, request, env.DB);
+    if (path === '/username'                  && request.method === 'POST') return community(setUsername, request, env.DB);
+    if (path === '/username/check'            && request.method === 'GET')  return community(checkUsername, request, env.DB);
 
     // ── Direct messages ──
     if (path === '/dm/threads'                && request.method === 'GET')  return community(dmThreads, request, env.DB);
@@ -314,7 +320,7 @@ async function handleLogout(request, DB) {
 async function handleMe(request, DB) {
   const session = await validateSession(request, DB);
   if (!session) return error('Unauthorized', 401);
-  return json({ user: { id: session.user_id, email: session.email, name: session.name } });
+  return json({ user: { id: session.user_id, email: session.email, name: session.name, username: await usernameOf(DB, session.user_id) } });
 }
 
 // ══════════════════════════════════════════════════════
@@ -841,8 +847,9 @@ async function communityFeed(request, DB) {
 
   const list = rows.results || [];
   const page = list.slice(0, limit);
+  const names = await usernamesFor(DB, page.map(r => r.user_id));
   return json({
-    posts: page.map(r => communityPostOut(r, session.user_id)),
+    posts: page.map(r => Object.assign(communityPostOut(r, session.user_id), { author_username: names[r.user_id] || null })),
     next: list.length > limit ? page[page.length - 1].created_at : null
   });
 }
@@ -1028,6 +1035,117 @@ async function communityDeleteComment(request, DB) {
 }
 
 // ── Follows, profiles and blocking ──
+// ══════════════════════════════════════════════════════
+// USERNAMES — a unique @handle per account, used to find friends
+// ══════════════════════════════════════════════════════
+// Stored as typed (e.g. "LANTIK"); unique ignoring case.
+const USERNAME_RESERVED = new Set(['admin', 'administrator', 'support', 'help', 'trident', 'tridentfitness', 'trident_fitness',
+  'trident.fitness', 'official', 'moderator', 'mod', 'staff', 'team', 'system', 'root', 'null', 'undefined', 'me', 'you',
+  'settings', 'login', 'signup', 'api', 'everyone', 'anonymous', 'member']);
+
+function usernameClean(raw) {
+  return typeof raw === 'string' ? raw.trim().replace(/^@+/, '') : '';
+}
+
+// Why a username can't be used ('' when it's fine).
+function usernameProblem(u) {
+  if (!u) return 'Choose a username';
+  if (u.length < 3) return 'Use at least 3 characters';
+  if (u.length > 20) return 'Use 20 characters or fewer';
+  if (!/^[A-Za-z0-9._]+$/.test(u)) return 'Use only letters, numbers, periods and underscores';
+  if (u.startsWith('.') || u.endsWith('.')) return "Can't start or end with a period";
+  if (u.includes('..')) return "Can't have two periods in a row";
+  if (USERNAME_RESERVED.has(u.toLowerCase())) return 'That username is reserved';
+  return '';
+}
+
+// The username of one account, or null (also null if usernames aren't set up yet).
+async function usernameOf(DB, userId) {
+  try {
+    const row = await DB.prepare('SELECT username FROM usernames WHERE user_id = ?').bind(userId).first();
+    return row ? row.username : null;
+  } catch (e) { return null; }
+}
+
+// { user_id: username } for several accounts; never fails the caller.
+async function usernamesFor(DB, ids) {
+  const out = {};
+  const unique = [...new Set(ids.filter(id => COMMUNITY_ID.test(String(id || ''))))].slice(0, 50);
+  if (!unique.length) return out;
+  try {
+    const rows = await DB.prepare(`SELECT user_id, username FROM usernames WHERE user_id IN (${unique.map(() => '?').join(',')})`).bind(...unique).all();
+    (rows.results || []).forEach(r => { out[r.user_id] = r.username; });
+  } catch (e) {}
+  return out;
+}
+
+async function getUsername(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+  return json({ username: await usernameOf(DB, session.user_id) });
+}
+
+async function checkUsername(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+  const u = usernameClean(new URL(request.url).searchParams.get('u'));
+  const problem = usernameProblem(u);
+  if (problem) return json({ username: u, valid: false, available: false, reason: problem });
+  const row = await DB.prepare('SELECT user_id FROM usernames WHERE username_lower = ?').bind(u.toLowerCase()).first();
+  const mine = !!row && row.user_id === session.user_id;
+  return json({ username: u, valid: true, available: !row || mine, mine, reason: row && !mine ? 'That username is taken' : '' });
+}
+
+async function setUsername(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+  let data;
+  try { data = await request.json(); } catch (e) { return error('Invalid request'); }
+  const u = usernameClean(data && data.username);
+  const problem = usernameProblem(u);
+  if (problem) return error(problem);
+  const lower = u.toLowerCase();
+  const taken = await DB.prepare('SELECT user_id FROM usernames WHERE username_lower = ?').bind(lower).first();
+  if (taken && taken.user_id !== session.user_id) return error('That username is taken', 409);
+  try {
+    await DB.prepare(
+      `INSERT INTO usernames (user_id, username, username_lower, updated_at) VALUES (?, ?, ?, ?)
+       ON CONFLICT(user_id) DO UPDATE SET username = excluded.username, username_lower = excluded.username_lower, updated_at = excluded.updated_at`
+    ).bind(session.user_id, u, lower, new Date().toISOString()).run();
+  } catch (e) {
+    // Someone claimed it a moment ago (the unique index on username_lower)
+    if (/UNIQUE/i.test(String(e && e.message))) return error('That username is taken', 409);
+    throw e;
+  }
+  return json({ success: true, username: u });
+}
+
+// Find members by username (prefix, ignoring case and a leading @). Blocked either way are left out.
+async function communitySearch(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+  const q = usernameClean(new URL(request.url).searchParams.get('q')).toLowerCase();
+  if (!q || q.length > 20 || !/^[a-z0-9._]+$/.test(q)) return json({ results: [] });
+  const like = q.replace(/[\\%_]/g, m => '\\' + m) + '%';
+  const rows = await DB.prepare(
+    `SELECT n.user_id, n.username, ${COMMUNITY_AUTHOR} AS name,
+       EXISTS(SELECT 1 FROM user_blobs b WHERE b.user_id = n.user_id AND b.blob_key = 'profile_pic') AS has_avatar,
+       EXISTS(SELECT 1 FROM community_follows f WHERE f.follower_id = ?1 AND f.followee_id = n.user_id) AS is_following
+     FROM usernames n
+     JOIN users u ON u.id = n.user_id
+     LEFT JOIN user_settings s ON s.user_id = n.user_id
+     WHERE n.username_lower LIKE ?2 ESCAPE '\\'
+       AND n.user_id NOT IN (SELECT blocked_id FROM dm_blocks WHERE blocker_id = ?1)
+       AND n.user_id NOT IN (SELECT blocker_id FROM dm_blocks WHERE blocked_id = ?1)
+     ORDER BY (n.username_lower = ?3) DESC, length(n.username_lower), n.username_lower
+     LIMIT 20`
+  ).bind(session.user_id, like, q).all();
+  return json({ results: (rows.results || []).map(r => ({
+    user_id: r.user_id, username: r.username, name: r.name, has_avatar: !!r.has_avatar,
+    is_following: !!r.is_following, is_me: r.user_id === session.user_id
+  })) });
+}
+
 async function communityUserRow(DB, userId) {
   return DB.prepare(
     `SELECT u.id, ${COMMUNITY_AUTHOR} AS name,
@@ -1061,7 +1179,7 @@ async function communityProfile(request, DB) {
        EXISTS(SELECT 1 FROM dm_blocks WHERE blocker_id = ?2 AND blocked_id = ?1) AS blocked`
   ).bind(userId, me).first();
   return json({
-    user_id: user.id, name: user.name, has_avatar: !!user.has_avatar, is_me: user.id === me,
+    user_id: user.id, name: user.name, username: await usernameOf(DB, user.id), has_avatar: !!user.has_avatar, is_me: user.id === me,
     followers: stats.followers || 0, following: stats.following || 0, posts: stats.posts || 0,
     is_following: !!stats.is_following, follows_you: !!stats.follows_you, blocked: !!stats.blocked
   });

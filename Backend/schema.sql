@@ -197,3 +197,12 @@ CREATE TABLE IF NOT EXISTS push_subscriptions (
   updated_at TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_push_user ON push_subscriptions(user_id);
+
+-- ── Usernames (@handle used to find friends; unique ignoring case) ──
+CREATE TABLE IF NOT EXISTS usernames (
+  user_id TEXT PRIMARY KEY,
+  username TEXT NOT NULL,
+  username_lower TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_usernames_lower ON usernames(username_lower);

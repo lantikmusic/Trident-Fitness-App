@@ -1303,6 +1303,37 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .cm-msg{border-radius:20px;border-bottom-left-radius:6px;padding:10px 14px;}
 .cm-msg.mine{background:linear-gradient(135deg,var(--pink),#5AD8FF);border-bottom-right-radius:6px;}
 .cm-dm-bar textarea{border-radius:22px;}
+/* ── Usernames: Settings row, Community search ── */
+.settings-row.un-row{flex-direction:column;align-items:stretch;gap:8px;}
+.un-row-top{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.un-field{display:flex;align-items:center;background:var(--bg3);border:0.5px solid var(--border);border-radius:8px;padding:0 0 0 9px;width:150px;flex-shrink:0;}
+.un-field:focus-within{border-color:var(--pink);}
+.un-field span{color:var(--pink);font-weight:700;font-size:14px;}
+.un-field input{flex:1;min-width:0;background:transparent;border:none;outline:none;padding:6px 8px 6px 2px;font-family:inherit;font-size:16px;font-weight:600;color:var(--text);}
+.un-row-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.un-status{font-size:11px;color:var(--text3);line-height:1.35;min-width:0;}
+.un-status.good{color:var(--green);} .un-status.bad{color:var(--red);}
+.un-save{flex-shrink:0;padding:6px 16px;border-radius:99px;border:none;background:var(--pink);color:#000;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;}
+.un-save:disabled{opacity:.35;cursor:default;}
+.cm-handle{color:var(--text3);font-size:12px;}
+.cm-time .cm-handle{font-size:inherit;}
+.cm-prof-handle{font-size:14px;font-weight:600;color:var(--pink);margin-top:3px;}
+.cm-un-card{display:flex;align-items:center;gap:12px;padding:14px;margin-bottom:12px;border-radius:var(--radius-xl);background:radial-gradient(120% 90% at 0% 0%,var(--pink-dim),transparent 60%),var(--bg3);border:0.5px solid var(--pink-border);}
+.cm-un-card b{display:block;font-size:14px;} .cm-un-card span{display:block;font-size:12px;color:var(--text3);margin-top:2px;}
+.cm-un-ic{width:38px;height:38px;flex-shrink:0;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--pink-dim);color:var(--pink);font-size:18px;font-weight:800;}
+.cm-search-box{display:flex;align-items:center;gap:2px;padding:0 14px;border-radius:14px;background:var(--bg4);border:0.5px solid var(--border2);margin-bottom:12px;}
+.cm-search-box:focus-within{border-color:var(--pink);}
+.cm-search-box span{color:var(--pink);font-weight:800;font-size:17px;}
+.cm-search-box input{flex:1;min-width:0;background:transparent;border:none;outline:none;padding:13px 4px;font-family:inherit;font-size:16px;font-weight:600;color:var(--text);}
+.cm-search-hint{font-size:13px;color:var(--text3);text-align:center;padding:16px 4px;line-height:1.5;}
+.cm-search-hint b{color:var(--text2);}
+.cm-search-row{display:flex;align-items:center;gap:10px;padding:10px 2px;border-bottom:0.5px solid var(--border);}
+.cm-search-row:last-child{border-bottom:0;}
+.cm-search-who{flex:1;min-width:0;display:flex;align-items:center;gap:10px;background:none;border:none;padding:0;color:inherit;font-family:inherit;text-align:left;cursor:pointer;}
+.cm-search-who .cm-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cm-search-me{display:block;width:100%;margin-top:10px;font-size:12px;color:var(--text3);text-align:center;background:none;border:none;font-family:inherit;padding:4px;}
+.cm-search-me b{color:var(--pink);}
+.cm-search-me.link{color:var(--pink);font-weight:600;cursor:pointer;}
 /* ── LANTIK Hybrid program ── */
 .hy-day-title{font-size:13px;font-weight:600;color:var(--text2);margin:2px 2px 10px;}
 .hy-slot{background:var(--bg3);border:0.5px solid var(--pink-border);border-radius:var(--radius-lg);padding:14px;margin-bottom:10px;cursor:pointer;}
@@ -2462,6 +2493,13 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
     <div class="settings-row">
       <div><div class="settings-row-label">Name</div></div>
       <input class="settings-input" id="set-name" type="text" placeholder="Your name" oninput="saveSettings()">
+    </div>
+    <div class="settings-row un-row">
+      <div class="un-row-top">
+        <div><div class="settings-row-label">Username</div><div class="settings-row-sub">Friends search this in Community</div></div>
+        <div class="un-field"><span>@</span><input id="set-username" type="text" maxlength="20" placeholder="username" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" oninput="unSetInput()" onkeydown="if(event.key==='Enter')unSetSave()"></div>
+      </div>
+      <div class="un-row-foot"><span class="un-status" id="set-username-status" aria-live="polite"></span><button class="un-save" id="set-username-save" disabled onclick="unSetSave()">Save</button></div>
     </div>
     <div class="settings-row">
       <div><div class="settings-row-label">Age</div></div>
@@ -8224,6 +8262,7 @@ function saveUSDAKey() {
 
 function openSettings() {
   loadSettingsInputs();
+  try { unSettingsFill(); } catch(e) {}
   pushRefreshUI();
   renderSettingsProgPicker();
   const overlay = document.getElementById('settingsOverlay');
@@ -11278,7 +11317,7 @@ function cmPostHTML(p) {
     <div class="cm-head">
       <button class="cm-who" onclick="cmOpenProfile('${cmSafeId(p.user_id)}')" aria-label="Open ${name}'s profile">
         <div class="cm-ring">${cmAvatarHTML(p)}</div>
-        <div style="min-width:0;"><div class="cm-name">${name}</div><div class="cm-time">${cmEsc(cmTimeAgo(p.created_at))}${p.type === 'workout' ? ' · <span class="cm-kind">shared a workout</span>' : p.type === 'pr' ? ' · <span class="cm-kind">hit a PR</span>' : ''}</div></div>
+        <div style="min-width:0;"><div class="cm-name">${name}</div><div class="cm-time">${p.author_username ? `<span class="cm-handle">@${cmEsc(p.author_username)}</span> · ` : ''}${cmEsc(cmTimeAgo(p.created_at))}${p.type === 'workout' ? ' · <span class="cm-kind">shared a workout</span>' : p.type === 'pr' ? ' · <span class="cm-kind">hit a PR</span>' : ''}</div></div>
       </button>
       ${p.mine ? `<button class="cm-del" onclick="cmDeletePost('${id}')" aria-label="Delete post">${CM_TRASH}</button>` : (p.following ? '' : `<button class="cm-follow" onclick="cmToggleFollow('${cmSafeId(p.user_id)}')">+ Follow</button>`)}
     </div>
@@ -11299,8 +11338,14 @@ function cmDraw() {
   const following = cmState.scope === 'following';
   let html = `<div class="cm-top">
       <div class="cm-scope${following ? ' following' : ''}"><span class="cm-scope-pill"></span><button class="cm-scope-btn${following ? '' : ' active'}" onclick="cmSetScope('all')">Main Feed</button><button class="cm-scope-btn${following ? ' active' : ''}" onclick="cmSetScope('following')">Following</button></div>
+      <button class="cm-inbox-btn" onclick="cmOpenSearch()" aria-label="Find friends">${cmSearchIcon()}</button>
       <button class="cm-inbox-btn" onclick="cmOpenInbox()" aria-label="Messages">${CM_MAIL}<span class="nav-dot" id="cmInboxDot" style="display:${cmDm.unread ? 'block' : 'none'};">${cmDm.unread > 99 ? '99+' : cmNum(cmDm.unread)}</span></button>
     </div>
+    ${unGet() || !window._unKnown ? '' : `<div class="cm-un-card">
+      <div class="cm-un-ic">@</div>
+      <div style="flex:1;min-width:0;"><b>Choose a username</b><span>So friends can find and follow you</span></div>
+      <button class="cm-follow" onclick="unOpenInSettings()">Choose</button>
+    </div>`}
     <div class="cm-composer">
       <div class="cm-composer-row" onclick="cmOpenCompose()">${cmMyAvatarHTML()}<div class="cm-composer-ph">What did you crush today?</div></div>
       <div class="cm-composer-chips">
@@ -11347,6 +11392,8 @@ function renderCommunity() {
     return;
   }
   cmDraw();
+  // Learn whether this account has a username (shows the "Choose a username" card if not)
+  unRefresh().then(changed => { if(changed && currentPage === 'community') cmDraw(); });
   if(cmState.status === 'idle' || cmState.status === 'error' || Date.now() - cmState.loadedAt > 30000) cmLoadFeed(true);
   cmRefreshUnread();
 }
@@ -11418,6 +11465,7 @@ async function cmOpenProfile(uid) {
   cmSheet(`<div class="cm-prof">
       ${cmAvatarHTML({ user_id: uid, author_name: pr.name, has_avatar: pr.has_avatar }).replace('cm-avatar', 'cm-avatar lg')}
       <div class="cm-prof-name">${name}</div>
+      ${pr.username ? `<div class="cm-prof-handle">@${cmEsc(pr.username)}</div>` : ''}
       ${pr.follows_you && !pr.is_me ? `<div class="cm-tag">Follows you</div>` : ''}
       <div class="cm-prof-stats"><div><b>${cmNum(pr.posts)}</b>posts</div><div><b>${cmNum(pr.followers)}</b>followers</div><div><b>${cmNum(pr.following)}</b>following</div></div>
       ${pr.is_me ? '' : pr.blocked ? `<div class="hy-muted" style="margin-bottom:10px;">You blocked ${name}.</div>` : `<div class="cm-prof-btns">
@@ -11428,6 +11476,154 @@ async function cmOpenProfile(uid) {
     ${pr.blocked ? '' : (list.length ? list.map(cmMiniPostHTML).join('') : `<div class="cm-empty" style="padding:18px 0;">No posts yet.</div>`)}
     ${pr.is_me ? '' : `<button class="cm-link" style="display:block;margin:14px auto 4px;color:var(--text3);font-size:12px;" onclick="cmToggleBlock('${uid}','${safeName}')">${pr.blocked ? 'Unblock' : 'Block'} ${name}</button>`}
     <button class="ghost-btn" style="margin-top:10px;" onclick="cmSheetClose()">Close</button>`, freshOpen);
+}
+
+// ══════════════════════════════════════
+// USERNAMES — @handle friends search for in Community; set at sign-up, changed in Settings
+// ══════════════════════════════════════
+function cmSearchIcon() { return '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>'; }
+function unGet() { try { return localStorage.getItem('trident_username_v1') || ''; } catch(e) { return ''; } }
+function unSetLocal(u) { try { if(u) localStorage.setItem('trident_username_v1', u); else localStorage.removeItem('trident_username_v1'); } catch(e) {} }
+// Same rules as the server (it checks again)
+function unProblem(u) {
+  if(!u) return '';
+  if(u.length < 3) return 'Use at least 3 characters';
+  if(u.length > 20) return 'Use 20 characters or fewer';
+  if(!/^[A-Za-z0-9._]+$/.test(u)) return 'Use only letters, numbers, periods and underscores';
+  if(u.startsWith('.') || u.endsWith('.')) return "Can't start or end with a period";
+  if(u.includes('..')) return "Can't have two periods in a row";
+  return '';
+}
+// Asks the account for its username; resolves true if what we knew changed.
+async function unRefresh() {
+  if(!isLoggedIn()) return false;
+  try {
+    const r = await cmApi('/username');
+    if(!r.ok || !r.data || !('username' in r.data)) return false;
+    const before = unGet(), knew = !!window._unKnown;
+    unSetLocal(r.data.username || '');
+    window._unKnown = true;
+    return before !== (r.data.username || '') || !knew;
+  } catch(e) { return false; }
+}
+
+// ── Settings row ──
+function unSetStatus(msg, kind) {
+  const el = document.getElementById('set-username-status');
+  if(el) { el.textContent = msg; el.className = 'un-status' + (kind ? ' ' + kind : ''); }
+}
+function unSettingsFill() {
+  const inp = document.getElementById('set-username'), btn = document.getElementById('set-username-save');
+  if(!inp) return;
+  window._unSet = { seq: 0, timer: null, ok: false, dirty: false };
+  btn.disabled = true;
+  if(!isLoggedIn()) { inp.value = ''; inp.disabled = true; unSetStatus('Sign in to choose a username', ''); return; }
+  inp.disabled = false;
+  inp.value = unGet();
+  unSetStatus(unGet() ? 'Friends can find you as @' + unGet() : 'Pick one so friends can find you', '');
+  unRefresh().then(() => {
+    if(window._unSet.dirty) return;
+    inp.value = unGet();
+    unSetStatus(unGet() ? 'Friends can find you as @' + unGet() : 'Pick one so friends can find you', '');
+  });
+}
+function unSetInput() {
+  const inp = document.getElementById('set-username'), btn = document.getElementById('set-username-save');
+  const st = window._unSet || (window._unSet = { seq: 0, timer: null, ok: false, dirty: false });
+  const v = inp.value.replace(/^@+/, '').replace(/\s+/g, '');
+  if(v !== inp.value) inp.value = v;
+  st.dirty = true; st.ok = false; btn.disabled = true;
+  clearTimeout(st.timer);
+  const seq = ++st.seq;
+  if(!v) { unSetStatus('Pick one so friends can find you', ''); return; }
+  if(v === unGet()) { unSetStatus('This is your username', ''); return; }
+  const problem = unProblem(v);
+  if(problem) { unSetStatus(problem, 'bad'); return; }
+  unSetStatus('Checking…', '');
+  st.timer = setTimeout(async () => {
+    const r = await cmApi('/username/check?u=' + encodeURIComponent(v));
+    if(seq !== st.seq) return;
+    if(!r.ok || !r.data) { unSetStatus("Couldn't check right now — try again", 'bad'); return; }
+    if(r.data.available) { st.ok = true; btn.disabled = false; unSetStatus('✓ @' + v + ' is available', 'good'); }
+    else unSetStatus(r.data.reason || 'That username is taken', 'bad');
+  }, 350);
+}
+async function unSetSave() {
+  const st = window._unSet, inp = document.getElementById('set-username'), btn = document.getElementById('set-username-save');
+  if(!st || !st.ok) return;
+  btn.disabled = true; btn.textContent = 'Saving…';
+  const r = await cmApi('/username', 'POST', { username: inp.value });
+  btn.textContent = 'Save';
+  if(r.ok && r.data && r.data.username) {
+    unSetLocal(r.data.username); window._unKnown = true;
+    st.ok = false; st.dirty = false; inp.value = r.data.username;
+    unSetStatus('✓ Saved — friends can find you as @' + r.data.username, 'good');
+    showToast('Username saved: @' + r.data.username);
+    if(currentPage === 'community') cmDraw();
+  } else {
+    st.ok = false;
+    unSetStatus((r.data && r.data.error) || "That username couldn't be saved — try again", 'bad');
+  }
+}
+function unOpenInSettings() {
+  openSettings();
+  setTimeout(() => { const inp = document.getElementById('set-username'); if(inp) { inp.scrollIntoView({ block: 'center' }); inp.focus(); } }, 420);
+}
+
+// ── Find friends (Community) ──
+function cmOpenSearch() {
+  window._cmSearch = { seq: 0, timer: null, results: [], q: '' };
+  cmSheet(`<div class="cm-sheet-title">Find friends</div>
+    <div class="cm-search-box"><span>@</span><input id="cmSearchInput" type="text" maxlength="21" placeholder="Search usernames" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" oninput="cmSearchInput()"></div>
+    <div id="cmSearchResults"><div class="cm-search-hint">Type a friend's username, like <b>@LANTIK</b></div></div>
+    ${unGet() ? `<div class="cm-search-me">Your username is <b>@${cmEsc(unGet())}</b></div>` : `<button class="cm-search-me link" onclick="cmSheetClose();unOpenInSettings()">You don't have a username yet — choose one</button>`}
+    <button class="ghost-btn" style="margin-top:12px;" onclick="cmSheetClose()">Close</button>`, true);
+  setTimeout(() => { const i = document.getElementById('cmSearchInput'); if(i) i.focus(); }, 150);
+}
+function cmSearchInput() {
+  const st = window._cmSearch; const inp = document.getElementById('cmSearchInput');
+  if(!st || !inp) return;
+  if(/^\s*@/.test(inp.value)) inp.value = inp.value.replace(/^\s*@+/, '');
+  const q = inp.value.trim();
+  st.q = q; clearTimeout(st.timer);
+  const seq = ++st.seq;
+  const box = document.getElementById('cmSearchResults');
+  if(!q) { box.innerHTML = `<div class="cm-search-hint">Type a friend's username, like <b>@LANTIK</b></div>`; return; }
+  if(!/^[A-Za-z0-9._]{1,20}$/.test(q)) { box.innerHTML = `<div class="cm-search-hint">Usernames only use letters, numbers, periods and underscores</div>`; return; }
+  box.innerHTML = `<div class="cm-search-hint">Searching…</div>`;
+  st.timer = setTimeout(async () => {
+    const r = await cmApi('/community/search?q=' + encodeURIComponent(q));
+    if(seq !== st.seq) return;
+    if(!r.ok || !r.data || !Array.isArray(r.data.results)) { box.innerHTML = `<div class="cm-search-hint">Search isn't available right now — try again soon</div>`; return; }
+    st.results = r.data.results;
+    cmSearchDraw();
+  }, 300);
+}
+function cmSearchDraw() {
+  const st = window._cmSearch, box = document.getElementById('cmSearchResults');
+  if(!st || !box) return;
+  if(!st.results.length) { box.innerHTML = `<div class="cm-search-hint">No one found for <b>@${cmEsc(st.q)}</b></div>`; return; }
+  box.innerHTML = st.results.map(u => {
+    const uid = cmSafeId(u.user_id); if(!uid) return '';
+    return `<div class="cm-search-row">
+      <button class="cm-search-who" onclick="cmOpenProfile('${uid}')">
+        ${cmAvatarHTML({ user_id: uid, author_name: u.name, has_avatar: u.has_avatar })}
+        <div style="min-width:0;"><div class="cm-name">${cmEsc(u.name || 'Member')}</div><div class="cm-handle">@${cmEsc(u.username)}</div></div>
+      </button>
+      ${u.is_me ? `<span class="cm-tag" style="margin:0;">You</span>` : `<button class="cm-follow${u.is_following ? ' on' : ''}" onclick="cmSearchFollow('${uid}')">${u.is_following ? 'Following' : '+ Follow'}</button>`}
+    </div>`;
+  }).join('');
+}
+async function cmSearchFollow(uid) {
+  uid = cmSafeId(uid); if(!uid) return;
+  const r = await cmApi('/community/follow', 'POST', { user_id: uid });
+  if(!r.ok || !r.data) { showToast((r.data && r.data.error) || 'Could not update — try again'); return; }
+  const st = window._cmSearch;
+  if(st) st.results.forEach(u => { if(u.user_id === uid) u.is_following = !!r.data.following; });
+  cmState.posts.forEach(p => { if(p.user_id === uid) p.following = !!r.data.following; });
+  cmSearchDraw();
+  showToast(r.data.following ? 'Following' : 'Unfollowed');
+  if(cmState.scope === 'following') cmLoadFeed(true);
 }
 
 // ── Direct messages ──
@@ -12034,6 +12230,7 @@ async function handleLogout() {
   try { await Promise.race([pushForgetDevice(), new Promise(r => setTimeout(r, 3000))]); } catch(e) {}
   await cloudPost('/auth/logout', {});
   localStorage.removeItem('trident_session_token');
+  try { localStorage.removeItem('trident_username_v1'); } catch(e) {}
   showToast('Signed out — see you soon!');
   setTimeout(() => window.location.href = 'index.html', 1200);
 }
