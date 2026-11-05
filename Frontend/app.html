@@ -795,6 +795,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .dmc-row-name{font-size:12px;font-weight:600;}
 .dmc-row-val{font-size:11px;color:var(--text3);}
 .dmc-row-val b{color:var(--text);font-weight:600;}
+.dpr{background:var(--bg3);border:0.5px solid var(--pink-border);border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:12px;cursor:pointer;}
+.dpr-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;}
+.dpr-eyebrow{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--pink);}
+.dpr-count{font-size:11px;color:var(--text3);}
+.dpr-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:0.5px solid var(--border);}
+.dpr-row:first-of-type{border-top:none;}
+.dpr-icon{font-size:18px;flex-shrink:0;}
+.dpr-name{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.dpr-when{font-size:11px;color:var(--text3);margin-top:1px;}
+.dpr-wt{margin-left:auto;text-align:right;flex-shrink:0;}
+.dpr-wt-val{font-size:16px;font-weight:700;letter-spacing:-0.02em;}
+.dpr-wt-val span{font-size:10px;font-weight:500;color:var(--text3);margin-left:2px;}
+.dpr-gain{font-size:10px;font-weight:700;color:var(--green);}
+.dpr-empty{font-size:12px;color:var(--text3);padding:4px 0 2px;}
 .gyc{background:var(--bg3);border:0.5px solid var(--pink-border);border-radius:var(--radius-lg);padding:14px 16px;margin-bottom:12px;cursor:pointer;}
 .gyc-eyebrow{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--pink);margin-bottom:4px;}
 .gyc-top{display:flex;align-items:flex-end;gap:8px;}
@@ -1302,13 +1316,15 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
   </div>
   <div class="container">
     <div style="height:16px;"></div>
-    <!-- Goal Progress -->
+    <!-- Today's workout preview -->
+    <div class="section-head" style="margin-top:0;"><div class="section-title">Today's Workout</div></div>
+    <div id="dashWorkout"></div>
+    <!-- Today's macros (+ goal progress when a goal is set) -->
     <div id="dashGoalProgress"></div>
     <!-- Gym days this year -->
     <div id="gymYearCard"></div>
-    <!-- Today's workout preview -->
-    <div class="section-head"><div class="section-title">Today's Workout</div></div>
-    <div id="dashWorkout"></div>
+    <!-- Recent PRs -->
+    <div id="dashPRs"></div>
     <!-- Weekly net -->
     <div class="section-head" style="margin-top:8px;"><div class="section-title">This Week</div><div class="section-sub" id="dashWeekNet"></div></div>
     <div class="week-panel">
@@ -5189,7 +5205,7 @@ function checkExercisePR(ex, sets) {
     const prevBest = prData[exKey]?.weight || 0;
     if(sessionMax > prevBest) {
       newPRs.push({name:ex.name, weight:sessionMax, prev:prevBest});
-      prData[exKey] = {weight:sessionMax, date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}), ts:Date.now()};
+      prData[exKey] = {weight:sessionMax, date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}), ts:Date.now(), name:ex.name, prev:prevBest};
     }
   }
   return newPRs;
@@ -5235,7 +5251,7 @@ function finishWorkout() {
       const prevBest = prData[exKey]?.weight || 0;
       if(sessionMax > prevBest) {
         sessionPRs.push({name:ex.name, weight:sessionMax, prev:prevBest});
-        prData[exKey] = {weight:sessionMax, date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}), ts:Date.now()};
+        prData[exKey] = {weight:sessionMax, date:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}), ts:Date.now(), name:ex.name, prev:prevBest};
       }
     }
   });
@@ -6742,6 +6758,46 @@ function dashMacroCardHTML() {
 }
 
 // ══════════════════════════════════════
+// RECENT PRs (home screen)
+// ══════════════════════════════════════
+function prDisplayName(key, pr) {
+  if(pr && pr.name) return String(pr.name);
+  return String(key).split('_').filter(Boolean).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') || 'Lift';
+}
+function prWhen(ts, date) {
+  if(!ts) return String(date || '');
+  const d = new Date(ts), now = new Date();
+  const days = Math.round((new Date(now.getFullYear(), now.getMonth(), now.getDate()) - new Date(d.getFullYear(), d.getMonth(), d.getDate())) / 86400000);
+  if(days <= 0) return 'Today';
+  if(days === 1) return 'Yesterday';
+  if(days < 7) return `${days} days ago`;
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+function renderDashPRs() {
+  const el = document.getElementById('dashPRs');
+  if(!el) return;
+  let prData = {};
+  try { prData = load(PR_KEY) || {}; } catch(e) {}
+  const list = Object.keys(prData).map(k => ({ key: k, pr: prData[k] }))
+    .filter(x => x.pr && Number(x.pr.weight) > 0)
+    .sort((a, b) => (Number(b.pr.ts) || 0) - (Number(a.pr.ts) || 0));
+  const weekAgo = Date.now() - 7 * 86400000;
+  const thisWeek = list.filter(x => (Number(x.pr.ts) || 0) >= weekAgo).length;
+  const rows = list.slice(0, 4).map(x => {
+    const gain = Number(x.pr.prev) > 0 ? Math.round((Number(x.pr.weight) - Number(x.pr.prev)) * 10) / 10 : 0;
+    return `<div class="dpr-row">
+      <div class="dpr-icon">🏆</div>
+      <div style="min-width:0;"><div class="dpr-name">${cmEsc(prDisplayName(x.key, x.pr))}</div><div class="dpr-when">${cmEsc(prWhen(Number(x.pr.ts) || 0, x.pr.date))}</div></div>
+      <div class="dpr-wt"><div class="dpr-wt-val">${cmEsc(x.pr.weight)}<span>lbs</span></div>${gain > 0 ? `<div class="dpr-gain">+${gain} lbs</div>` : ''}</div>
+    </div>`;
+  }).join('');
+  el.innerHTML = `<div class="dpr" onclick="navTo('progress')">
+    <div class="dpr-head"><div class="dpr-eyebrow">Recent PRs</div><div class="dpr-count">${list.length ? `${thisWeek} this week · ${list.length} total` : ''}</div></div>
+    ${rows || '<div class="dpr-empty">No PRs yet — hit a new best weight on a lift and it shows up here 🏆</div>'}
+  </div>`;
+}
+
+// ══════════════════════════════════════
 // GYM DAYS THIS YEAR
 // ══════════════════════════════════════
 // The record is kept separately from the program, so it survives program changes and the
@@ -6875,6 +6931,8 @@ function renderDashboard(){
 
   // Gym days this year
   renderGymYear();
+  // Recent PRs
+  try { renderDashPRs(); } catch(e) {}
 
   // Today's workout
   const dashWo=document.getElementById('dashWorkout');
@@ -9887,7 +9945,7 @@ function hyCheckPR(workout, key, sess) {
   const exKey = e.name.toLowerCase().replace(/[^a-z0-9]/g, '_');
   const prev = (prData[exKey] && prData[exKey].weight) || 0;
   if(best <= prev) return null;
-  prData[exKey] = { weight: best, date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }), ts: Date.now() };
+  prData[exKey] = { weight: best, date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }), ts: Date.now(), name: e.name, prev };
   try { save(PR_KEY, prData); } catch(err) {}
   if(isLoggedIn()) cloudPost('/prs', prData);
   return { name: e.name, weight: best, prev };
@@ -10106,7 +10164,7 @@ function hyFinish() {
     const prev = (prData[exKey] && prData[exKey].weight) || 0;
     if(best > prev) {
       prs.push({ name: e.name, weight: best, prev });
-      prData[exKey] = { weight: best, date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }), ts: Date.now() };
+      prData[exKey] = { weight: best, date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }), ts: Date.now(), name: e.name, prev };
     }
   });
   if(prs.length) { try { save(PR_KEY, prData); } catch(e) {} if(isLoggedIn()) cloudPost('/prs', prData); }
