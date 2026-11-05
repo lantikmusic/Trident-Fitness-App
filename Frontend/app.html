@@ -2554,6 +2554,10 @@ async function loadFromCloud() {
       if(goals.deficit_per_day) g.deficitPerDay = goals.deficit_per_day;
       if(goals.weeks)           g.weeks = goals.weeks;
       if(goals.current_weight)  { g.currentWeight = goals.current_weight; g.startWeight = goals.current_weight; }
+      if(!g.startDate && goals.updated_at) {
+        const t = Date.parse(String(goals.updated_at).replace(' ', 'T') + 'Z');
+        if(Number.isFinite(t)) g.startDate = new Date(t).toISOString();
+      }
       if(goals.goal_weight)     g.goalWeight = goals.goal_weight;
       save(GOALS_KEY, g);
       goalsData = g;
@@ -6576,6 +6580,41 @@ function goalLatestWeight() {
   try { scan(load(CHECKIN_KEY)); } catch(e) {}
   return best;
 }
+// Weeks to the goal weight: from the logged pace, else the calorie plan, else the goal's timeline.
+function goalWeeksLeft(g, lbsLeft, dir, reached) {
+  if(reached) return { val: '0', lbl: 'weeks left' };
+  const DAY = 86400000, now = Date.now();
+  const start = Date.parse(g.startDate || '') || 0;
+  // 1. Pace: trend of weights logged since the goal started (last 8 weeks), 3+ entries over 7+ days
+  try {
+    const pts = [];
+    const add = list => (list || []).forEach(e => {
+      const w = Number(e && e.weight), t = wtEntryTime(e);
+      if(w > 0 && t && t >= Math.max(start - DAY, now - 56 * DAY) && t <= now + DAY) pts.push([t / DAY, w]);
+    });
+    add(progressData); add(load(CHECKIN_KEY));
+    if(pts.length >= 3 && dir !== 0) {
+      const xs = pts.map(p => p[0]), span = Math.max(...xs) - Math.min(...xs);
+      if(span >= 7) {
+        const mx = xs.reduce((a, b) => a + b, 0) / pts.length, my = pts.reduce((a, p) => a + p[1], 0) / pts.length;
+        const slope = pts.reduce((a, p) => a + (p[0] - mx) * (p[1] - my), 0) / pts.reduce((a, p) => a + (p[0] - mx) ** 2, 0);
+        const perWeek = slope * 7 * dir;                       // lbs per week toward the goal
+        if(perWeek >= 0.1) return { val: String(Math.min(104, Math.ceil(lbsLeft / perWeek))), lbl: 'weeks at your pace' };
+      }
+    }
+  } catch(e) {}
+  // 2. Calorie plan (fat loss / muscle gain)
+  const weekly = Math.abs((g.deficitPerDay || 0) * 7);
+  if(weekly > 0) return { val: String(Math.ceil((lbsLeft * 3500) / weekly)), lbl: 'weeks left' };
+  // 3. Goal timeline
+  const weeks = Number(g.weeks) || 0;
+  if(weeks > 0) {
+    const elapsed = start ? Math.floor((now - start) / (7 * DAY)) : 0;
+    const left = Math.max(0, weeks - elapsed);
+    return left > 0 ? { val: String(left), lbl: 'weeks left' } : { val: '0', lbl: 'past target date' };
+  }
+  return { val: '—', lbl: 'weeks left' };
+}
 // The account keeps weights logged through it; entries only on this phone are kept and sent up.
 function wtMergeCloud(server, local, serverFull) {
   const key = e => wtEntryISO(e) + '|' + (Number(e.weight) || 0) + '|' + (Number(e.bf) || 0);
@@ -7104,7 +7143,11 @@ function saveGoals() {
   goalsData.currentWeight = parseFloat(document.getElementById('goalCurrentWeight').value) || 0;
   goalsData.activity    = document.getElementById('goalActivity').value;
   goalsData.weeks       = parseInt(document.getElementById('goalTimeline').value) || 8;
-  goalsData.startDate   = goalsData.startDate || new Date().toISOString();
+  // The goal's clock restarts only when the goal itself changes (not when macros are tweaked)
+  const prevGoal = load(GOALS_KEY) || {};
+  const goalChanged = prevGoal.focus !== goalsData.focus || Number(prevGoal.goalWeight) !== Number(goalsData.goalWeight)
+    || Number(prevGoal.startWeight || prevGoal.currentWeight) !== Number(goalsData.currentWeight) || Number(prevGoal.weeks) !== Number(goalsData.weeks);
+  if(goalChanged || !goalsData.startDate) goalsData.startDate = new Date().toISOString();
   if(goalsData.currentWeight) goalsData.startWeight = goalsData.currentWeight;
   save(GOALS_KEY, goalsData);
   // Cloud sync
@@ -7386,8 +7429,8 @@ function renderDashboard(){
     // Calories needed to reach goal
     const calLeft = Math.round(lbsLeft * 3500);
     // Weekly deficit
-    const weeklyDeficit = Math.abs((g.deficitPerDay || 0) * 7);
-    const weeksLeft = weeklyDeficit > 0 ? Math.ceil((lbsLeft * 3500) / weeklyDeficit) : '—';
+    let wl = { val: '—', lbl: 'weeks left' };
+    try { wl = goalWeeksLeft(g, lbsLeft, dir, reached); if(wl.val === '1') wl.lbl = wl.lbl.replace('weeks', 'week'); } catch(e) {}
     // On track from last check-in
     const lastCheckin = checkins[0];
     const onTrack = lastCheckin && lastCheckin.calories ? lastCheckin.onTrack : undefined;
@@ -7403,7 +7446,7 @@ function renderDashboard(){
       <div class="gpc-grid">
         <div class="gpc-stat"><div class="gpc-stat-val" style="color:var(--pink)">${moved ? (moved > 0 ? '+' : '−') + Math.abs(moved) : '—'}</div><div class="gpc-stat-lbl">lbs changed</div></div>
         <div class="gpc-stat"><div class="gpc-stat-val">${calLeft.toLocaleString()}</div><div class="gpc-stat-lbl">kcal to goal</div></div>
-        <div class="gpc-stat"><div class="gpc-stat-val">${weeksLeft}</div><div class="gpc-stat-lbl">weeks left</div></div>
+        <div class="gpc-stat"><div class="gpc-stat-val">${wl.val}</div><div class="gpc-stat-lbl">${wl.lbl}</div></div>
       </div>
       <div class="gpc-progress-label"><span>Start: ${startWt} lbs</span><span>Now: ${r1(latestWt)} lbs</span><span>Goal: ${targetWt} lbs</span></div>
       <div class="on-track-bar"><div class="on-track-fill" style="width:${pct}%"></div></div>
