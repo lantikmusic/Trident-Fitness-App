@@ -742,7 +742,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .mg-radar .grid{fill:none;stroke:rgba(255,255,255,.08);stroke-width:1;}
 .mg-radar .spoke{stroke:rgba(255,255,255,.07);stroke-width:1;}
 .mg-radar .ring-lbl{fill:var(--text3);font-size:9px;font-family:inherit;}
-.mg-radar .area{fill:rgba(48,209,88,.16);stroke:#30D158;stroke-width:2;stroke-linejoin:round;}
+.mg-radar .wedge{fill-opacity:.5;stroke:var(--bg3);stroke-width:1.5;stroke-linejoin:round;}
+.mg-radar .outline{fill:none;stroke:rgba(255,255,255,.55);stroke-width:1.5;stroke-linejoin:round;}
 .mg-radar.anim .shape{animation:mgGrow .7s cubic-bezier(.2,.8,.2,1) both;transform-origin:180px 150px;}
 @keyframes mgGrow{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
 .mg-radar .pt{stroke:var(--bg3);stroke-width:2;}
@@ -752,20 +753,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .mg-radar .hit{fill:transparent;cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .mg-legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-bottom:8px;font-size:11px;color:var(--text3);}
 .mg-legend span{display:inline-flex;align-items:center;gap:5px;}
-.mg-legend i{width:8px;height:8px;border-radius:2px;display:inline-block;}
+.mg-legend b{font-weight:700;}
 .mg-rows{display:flex;flex-direction:column;}
-.mg-row{display:grid;grid-template-columns:82px 1fr 58px;align-items:center;gap:10px;width:100%;padding:9px 0;border:0;border-bottom:0.5px solid var(--border);background:none;font-family:inherit;color:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.mg-row{display:grid;grid-template-columns:100px 1fr 54px;align-items:center;gap:10px;width:100%;padding:9px 0;border:0;border-bottom:0.5px solid var(--border);background:none;font-family:inherit;color:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .mg-row:last-child{border-bottom:0;}
-.mg-name{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mg-name{display:flex;align-items:center;gap:7px;min-width:0;font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
 .mg-track{position:relative;height:10px;border-radius:4px;background:rgba(255,255,255,.05);}
 .mg-track.div::after{content:'';position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:rgba(255,255,255,.18);}
 .mg-bar{position:absolute;top:0;bottom:0;border-radius:4px;transition:width .5s ease;}
 .mg-val{font-size:12px;font-weight:600;color:var(--text2);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;}
 .mg-val .mg-ar{font-size:11px;margin-right:2px;}
-.mg-grow .mg-bar{background:#30D158;} .mg-grow .mg-ar{color:#30D158;}
-.mg-hold .mg-bar{background:#8E8E93;} .mg-hold .mg-ar{color:#8E8E93;}
-.mg-slip .mg-bar{background:#FF9F0A;} .mg-slip .mg-ar{color:#FF9F0A;}
-.mg-idle .mg-bar{background:rgba(142,142,147,.45);} .mg-idle .mg-name,.mg-early .mg-name{color:var(--text2);}
+.mg-grow .mg-ar{color:#30D158;} .mg-hold .mg-ar{color:#8E8E93;} .mg-slip .mg-ar{color:#FF9F0A;}
+.mg-idle .mg-bar{opacity:.4;} .mg-idle .mg-dot,.mg-early .mg-dot{opacity:.5;} .mg-idle .mg-name,.mg-early .mg-name{color:var(--text2);}
 .mg-idle .mg-val,.mg-early .mg-val{color:var(--text3);font-weight:500;}
 .mg-detail{padding:2px 0 12px;border-bottom:0.5px solid var(--border);font-size:12px;color:var(--text3);line-height:1.5;}
 .mg-detail-status{font-weight:600;color:var(--text2);margin-bottom:6px;}
@@ -6699,6 +6699,10 @@ function mgAnalyze() {
 }
 // Radar order: upper body down the right side, legs at the bottom, back and glutes on the left.
 const MG_RADAR_ORDER = ['Chest','Shoulders','Triceps','Biceps','Core','Calves','Quads','Hamstrings','Glutes','Back'];
+// One color per muscle, checked for colorblind safety between radar neighbours (wrapping Back→Chest).
+// Kept clear of the green/grey/orange used for the growing/holding/slipping arrows.
+const MG_COLORS = { Chest: '#FF453A', Shoulders: '#63E6BE', Triceps: '#B45309', Biceps: '#5E5CE6', Core: '#FF7AB8',
+  Calves: '#A2E635', Quads: '#199e70', Hamstrings: '#BF5AF2', Glutes: '#FFD60A', Back: '#64D2FF' };
 function mgRadarSVG(list, animate) {
   const by = {}; list.forEach(g => by[g.name] = g);
   const cx = 180, cy = 150, R = 102, N = MG_RADAR_ORDER.length;
@@ -6708,7 +6712,6 @@ function mgRadarSVG(list, animate) {
   const ang = i => (-90 + i * 360 / N) * Math.PI / 180;
   const at = (i, r) => [cx + r * Math.cos(ang(i)), cy + r * Math.sin(ang(i))];
   const f = n => Math.round(n * 10) / 10;
-  const color = { grow: '#30D158', hold: '#8E8E93', slip: '#FF9F0A' };
   const pct = v => { const r = Math.round(v * 100); return (r > 0 ? '+' : r < 0 ? '−' : '') + Math.abs(r) + '%'; };
   let grid = '';
   [1/3, 2/3, 1].forEach((k, j) => {
@@ -6719,10 +6722,16 @@ function mgRadarSVG(list, animate) {
   });
   const spokes = MG_RADAR_ORDER.map((_, i) => { const [x, y] = at(i, R); return `<line class="spoke" x1="${cx}" y1="${cy}" x2="${f(x)}" y2="${f(y)}"/>`; }).join('');
   const pts = MG_RADAR_ORDER.map((n, i) => at(i, Math.max(2, val(by[n]) / max * R)));
-  const area = `<polygon class="area" points="${pts.map(p => p.map(f).join(',')).join(' ')}"/>`;
+  // Each muscle fills its own slice of the shape, halfway to its neighbours.
+  const mid = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+  const area = MG_RADAR_ORDER.map((n, i) => {
+    const prev = pts[(i + N - 1) % N], next = pts[(i + 1) % N];
+    const poly = [[cx, cy], mid(prev, pts[i]), pts[i], mid(pts[i], next)];
+    return `<polygon class="wedge" fill="${MG_COLORS[n]}" points="${poly.map(p => p.map(f).join(',')).join(' ')}"/>`;
+  }).join('') + `<polygon class="outline" points="${pts.map(p => p.map(f).join(',')).join(' ')}"/>`;
   const dots = MG_RADAR_ORDER.map((n, i) => {
-    const g = by[n], c = g && color[g.status];
-    return c ? `<circle class="pt" cx="${f(pts[i][0])}" cy="${f(pts[i][1])}" r="4.5" fill="${c}"/>` : '';
+    const g = by[n];
+    return g && ['grow', 'hold', 'slip'].includes(g.status) ? `<circle class="pt" cx="${f(pts[i][0])}" cy="${f(pts[i][1])}" r="4.5" fill="${MG_COLORS[n]}"/>` : '';
   }).join('');
   const labels = MG_RADAR_ORDER.map((n, i) => {
     const g = by[n], [x, y] = at(i, R + 14), c = Math.cos(ang(i));
@@ -6770,7 +6779,7 @@ function renderMuscleGrowth(animate) {
     if(g.score !== null && g.status !== 'early') {
       const w = Math.max(2, Math.abs(g.score) / maxAbs * (anyNeg ? 50 : 100));
       const pos = anyNeg ? (g.score >= 0 ? `left:50%;` : `right:50%;`) : 'left:0;';
-      bar = `<div class="mg-bar" style="${pos}width:${w}%"></div>`;
+      bar = `<div class="mg-bar" style="${pos}width:${w}%;background:${MG_COLORS[g.name] || '#8E8E93'}"></div>`;
     }
     const val = g.status === 'early' ? 'New' : g.status === 'idle' ? 'Idle' : `<span class="mg-ar" aria-hidden="true">${arrow[g.status]}</span>${pct(g.score)}`;
     const safe = cmEsc(g.name);
@@ -6781,7 +6790,7 @@ function renderMuscleGrowth(animate) {
       detail = `<div class="mg-detail"><div class="mg-detail-status">${label[g.status]} · about ${Math.round(g.sets)} working sets/week${lastTxt}</div>${exRows}</div>`;
     }
     return `<button class="mg-row mg-${g.status}" aria-expanded="${open === g.name}" onclick="mgToggle('${safe}')">
-        <span class="mg-name">${safe}</span>
+        <span class="mg-name"><i class="mg-dot" style="background:${MG_COLORS[g.name] || '#8E8E93'}"></i>${safe}</span>
         <span class="mg-track${anyNeg ? ' div' : ''}">${bar}</span>
         <span class="mg-val">${val}</span>
       </button>${detail}`;
@@ -6794,7 +6803,7 @@ function renderMuscleGrowth(animate) {
       <div class="mg-hero-txt">${growing.length === 1 ? 'muscle group' : 'muscle groups'} likely growing${top ? `<br>Biggest gains: <b>${cmEsc(top.name)}</b> (${pct(top.score)} strength)` : '<br>Keep adding weight or reps to see growth here'}</div>
     </div>
     ${mgRadarSVG(list, animate)}
-    <div class="mg-legend"><span><i style="background:#30D158"></i>↑ Growing</span><span><i style="background:#8E8E93"></i>→ Holding</span><span><i style="background:#FF9F0A"></i>↓ Slipping</span></div>
+    <div class="mg-legend"><span><b style="color:#30D158">↑</b> Growing</span><span><b style="color:#8E8E93">→</b> Holding</span><span><b style="color:#FF9F0A">↓</b> Slipping</span></div>
     <div class="mg-rows">${rows}</div>
     ${none.length ? `<div class="mg-none">Not trained yet: ${none.map(cmEsc).join(', ')}</div>` : ''}
     <div class="mg-foot">Strength change since your first session in the window. Tap a muscle on the chart or list to see the lifts behind it. Lifts that keep going up with steady training are the best sign a muscle is growing.</div>`;
