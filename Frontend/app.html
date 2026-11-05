@@ -755,18 +755,18 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .dmc{background:var(--bg3);border:0.5px solid var(--pink-border);border-radius:var(--radius-lg);padding:16px;margin-bottom:12px;cursor:pointer;}
 .dmc-eyebrow{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--pink);margin-bottom:10px;display:flex;justify-content:space-between;}
 .dmc-eyebrow span{color:var(--text3);font-weight:500;letter-spacing:.04em;text-transform:none;}
-.dmc-body{display:flex;align-items:center;gap:16px;}
+.dmc-body{display:flex;align-items:center;justify-content:center;gap:24px;}
 .dmc-ring{position:relative;width:112px;height:112px;flex-shrink:0;}
 .dmc-ring svg{width:112px;height:112px;transform:rotate(-90deg);}
 .dmc-ring circle{transition:stroke-dashoffset .5s ease;}
 .dmc-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 .dmc-cal{font-size:24px;font-weight:700;letter-spacing:-0.04em;line-height:1;}
 .dmc-cal-lbl{font-size:10px;color:var(--text3);margin-top:3px;}
-.dmc-rows{flex:1;min-width:0;display:flex;flex-direction:column;gap:9px;}
+.dmc-rows{flex:0 1 auto;min-width:0;display:flex;flex-direction:column;gap:9px;}
 .dmc-row{display:flex;align-items:center;gap:10px;}
 .dmc-mini{position:relative;width:34px;height:34px;flex-shrink:0;}
 .dmc-mini svg{width:34px;height:34px;transform:rotate(-90deg);}
-.dmc-mini-pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:var(--text2);}
+.dmc-mini-pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;line-height:1;color:var(--text2);}
 .dmc-row-name{font-size:12px;font-weight:600;}
 .dmc-row-val{font-size:11px;color:var(--text3);}
 .dmc-row-val b{color:var(--text);font-weight:600;}
@@ -6540,15 +6540,15 @@ function dashMacroCardHTML() {
   const calOver = t.cal > calGoal;
   const left = Math.round(calGoal - t.cal);
   const rows = [
-    { name: 'Protein', val: t.protein, goal: g.protein || 150 },
-    { name: 'Carbs',   val: t.carbs,   goal: g.carbs   || 200 },
-    { name: 'Fat',     val: t.fat,     goal: g.fat     || 65 },
+    { name: 'Protein', val: t.protein, goal: g.protein || 150, color: '#FF9F0A' }, // orange
+    { name: 'Carbs',   val: t.carbs,   goal: g.carbs   || 200, color: '#30D158' }, // green
+    { name: 'Fat',     val: t.fat,     goal: g.fat     || 65,  color: '#BF5AF2' }, // purple
   ].map(m => {
     const over = m.val > m.goal;
     const pct = m.goal > 0 ? Math.round(m.val / m.goal * 100) : 0;
     return `<div class="dmc-row">
-      <div class="dmc-mini"><svg viewBox="0 0 34 34">${ring(14, 4, m.val, m.goal, over ? 'var(--red)' : 'var(--pink)')}</svg><div class="dmc-mini-pct">${pct}%</div></div>
-      <div style="min-width:0;"><div class="dmc-row-name">${m.name}</div><div class="dmc-row-val"><b>${Math.round(m.val)}</b> / ${m.goal}g</div></div>
+      <div class="dmc-mini"><svg viewBox="0 0 34 34">${ring(14, 4, m.val, m.goal, m.color)}</svg><div class="dmc-mini-pct"${over ? ' style="color:var(--red)"' : ''}>${pct}%</div></div>
+      <div style="min-width:0;"><div class="dmc-row-name" style="color:${m.color}">${m.name}</div><div class="dmc-row-val"><b${over ? ' style="color:var(--red)"' : ''}>${Math.round(m.val)}</b> / ${m.goal}g</div></div>
     </div>`;
   }).join('');
   return `<div class="dmc" onclick="navTo('macros')">
