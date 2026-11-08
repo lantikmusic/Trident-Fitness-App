@@ -1385,6 +1385,44 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .cm-mention-who span{font-size:12px;color:var(--text3);}
 .cm-mention-row em{font-style:normal;font-size:11px;font-weight:600;color:var(--pink);}
 .cm-mention-hint{padding:12px;font-size:13px;color:var(--text3);}
+/* Profile page */
+#page-community.cm-prof-mode .cm-page-head,#page-community.cm-prof-mode .container>div:first-child{display:none;}
+#page-community.cm-prof-mode .container{padding-top:0;}
+#page-community.cm-prof-mode .cm-post .cm-follow{display:none;}
+.cmp-bar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:10px;margin:0 -16px 6px;padding:calc(env(safe-area-inset-top) + 8px) 64px 10px 12px;
+  background:linear-gradient(180deg,rgba(0,0,0,.82),rgba(0,0,0,.55));backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%);border-bottom:0.5px solid rgba(255,255,255,.07);}
+.cmp-back{flex-shrink:0;width:40px;height:40px;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center;color:var(--text);cursor:pointer;
+  background:linear-gradient(180deg,rgba(255,255,255,.13),rgba(255,255,255,.05)),rgba(28,28,30,.55);border:0.5px solid rgba(255,255,255,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.14);-webkit-tap-highlight-color:transparent;}
+.cmp-back:active{transform:scale(.92);}
+.cmp-bar-title{flex:1;min-width:0;font-size:17px;font-weight:800;letter-spacing:-0.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cmp-head{padding:10px 2px 4px;}
+.cmp-top{display:flex;align-items:center;gap:18px;}
+.cmp-ring{padding:3px;}
+.cmp-av{width:86px !important;height:86px !important;font-size:32px !important;border:3px solid var(--bg);}
+.cmp-stats{flex:1;display:flex;justify-content:space-around;text-align:center;}
+.cmp-stats div{display:flex;flex-direction:column;}
+.cmp-stats b{font-size:19px;font-weight:800;letter-spacing:-0.02em;}
+.cmp-stats span{font-size:12px;color:var(--text3);}
+.cmp-name{font-size:17px;font-weight:700;letter-spacing:-0.01em;margin-top:12px;word-break:break-word;}
+.cmp-handle{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:14px;font-weight:600;color:var(--pink);margin-top:2px;min-height:4px;}
+.cmp-follows{font-size:11px;font-weight:600;color:var(--text2);background:var(--bg4);border-radius:6px;padding:2px 7px;}
+.cmp-btns{display:flex;gap:8px;margin-top:14px;}
+.cmp-btn{flex:1;height:38px;border-radius:12px;font-family:inherit;font-size:14px;font-weight:700;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent;
+  background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.04)),var(--bg3);border:0.5px solid rgba(255,255,255,.12);}
+.cmp-btn.primary{background:var(--pink);border-color:var(--pink);color:#000;box-shadow:0 4px 14px var(--pink-glow);}
+.cmp-btn.icon{flex:0 0 42px;display:flex;align-items:center;justify-content:center;padding:0;}
+.cmp-btn.icon.on{border-color:var(--pink-border);color:var(--pink);}
+.cmp-btn:active{transform:scale(.97);}
+.cmp-menu{margin-top:8px;border-radius:14px;overflow:hidden;background:var(--bg3);border:0.5px solid var(--border2);}
+.cmp-menu button{display:block;width:100%;padding:13px 14px;background:none;border:0;text-align:left;font-family:inherit;font-size:14px;font-weight:600;color:var(--red);cursor:pointer;}
+.cmp-tabs{display:flex;justify-content:center;margin:18px -16px 14px;border-bottom:0.5px solid var(--border);}
+.cmp-tabs span{display:flex;align-items:center;gap:6px;padding:0 4px 10px;font-size:13px;font-weight:700;color:var(--text);border-bottom:2px solid var(--pink);margin-bottom:-0.5px;}
+.cmp-tabs svg,.cmp-empty-ic svg{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.cmp-tabs svg{width:15px;height:15px;}
+.cmp-empty{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;padding:30px 20px;color:var(--text3);font-size:13px;}
+.cmp-empty b{color:var(--text);font-size:16px;}
+.cmp-empty-ic{width:56px;height:56px;border-radius:50%;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;margin-bottom:8px;color:var(--text2);}
+.cmp-empty-ic svg{width:24px;height:24px;}
 .cm-untag{margin-left:auto;align-self:center;background:none;border:0.5px solid var(--border2);border-radius:99px;padding:6px 12px;color:var(--text3);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;}
 .cm-pick{display:block;width:100%;text-align:left;background:var(--bg4);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 12px;color:var(--text);font-family:inherit;font-size:13px;line-height:1.4;margin-bottom:6px;cursor:pointer;}
 .cm-pick small{display:block;color:var(--text3);font-size:11px;}
@@ -3187,6 +3225,7 @@ function showWorkoutScreen(screen) {
 }
 
 function navTo(page) {
+  if(page === 'community' && currentPage === 'community' && window._cmProfView) { cmProfileExit(); return; }
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+page).classList.add('active');
@@ -11875,7 +11914,9 @@ document.addEventListener('visibilitychange', () => {
 const CM_PAGE_SIZE = 15;
 const CM_HEART = '<svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21.2l7.8-7.7 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>';
 const CM_BUBBLE = '<svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5z"/></svg>';
-let cmState = { posts: [], next: null, status: 'idle', loadedAt: 0, busy: false, comments: {}, open: {}, scope: 'all' };
+let cmState = { posts: [], next: null, status: 'idle', loadedAt: 0, busy: false, comments: {}, open: {}, scope: 'all', view: 'feed' };
+// Profile page (shown in the Community tab in place of the feed)
+let cmProf = { uid: null, data: null, posts: [], next: null, loading: false, stack: [], feedScroll: 0, menu: false };
 const CM_TRASH = '<svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>';
 const CM_SEND = '<svg viewBox="0 0 24 24"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>';
 const CM_MAIL = '<svg viewBox="0 0 24 24"><path d="M14.5 8.5V5.8A1.8 1.8 0 0 0 12.7 4H4.8A1.8 1.8 0 0 0 3 5.8v5.4A1.8 1.8 0 0 0 4.8 13H6v2.8L9 13"/><path d="M11.3 8.5h7.9A1.8 1.8 0 0 1 21 10.3v5.4a1.8 1.8 0 0 1-1.8 1.8H18v2.8l-3.4-2.8h-3.3a1.8 1.8 0 0 1-1.8-1.8v-5.4a1.8 1.8 0 0 1 1.8-1.8z"/></svg>';  // two chat bubbles
@@ -11886,7 +11927,10 @@ function cmEsc(v) {
 }
 function cmNum(v) { const n = Number(v); return Number.isFinite(n) ? n : 0; }
 function cmSafeId(v) { const id = String(v == null ? '' : v); return /^[A-Za-z0-9-]{1,64}$/.test(id) ? id : ''; }
-function cmFindPost(id) { return cmState.posts.find(p => p.id === id) || null; }
+function cmFindPost(id) {
+  if(cmState.view === 'profile') { const pp = cmProf.posts.find(p => p.id === id); if(pp) return pp; }
+  return cmState.posts.find(p => p.id === id) || null;
+}
 
 function cmTimeAgo(iso) {
   const t = Date.parse(iso);
@@ -12128,6 +12172,10 @@ function cmPostHTML(p) {
 function cmDraw() {
   const root = document.getElementById('cmRoot');
   if(!root) return;
+  const pg = document.getElementById('page-community');
+  window._cmProfView = cmState.view === 'profile';
+  if(pg) pg.classList.toggle('cm-prof-mode', window._cmProfView);
+  if(cmState.view === 'profile') { root.innerHTML = cmProfilePageHTML(); return; }
   const following = cmState.scope === 'following';
   cmDrawHeadActions();
   let html = `<div class="cm-top">
@@ -12206,7 +12254,7 @@ function cmSheet(html, toTop) {
   sh.innerHTML = html; ov.style.display = 'flex';
   if(!wasOpen || toTop) sh.scrollTop = 0;
 }
-function cmSheetClose() { document.getElementById('cmSheetOverlay').style.display = 'none'; cmProfileOpen = null; }
+function cmSheetClose() { document.getElementById('cmSheetOverlay').style.display = 'none'; }
 let cmProfileOpen = null;
 
 async function cmToggleFollow(uid) {
@@ -12215,7 +12263,8 @@ async function cmToggleFollow(uid) {
   if(!r.ok || !r.data) { showToast((r.data && r.data.error) || 'Could not update — try again'); return; }
   cmState.posts.forEach(p => { if(p.user_id === uid) p.following = !!r.data.following; });
   if(cmState.scope === 'following') cmLoadFeed(true); else cmDraw();
-  if(cmProfileOpen === uid) cmOpenProfile(uid);
+  cmProf.posts.forEach(p => { if(p.user_id === uid) p.following = !!r.data.following; });
+  if(cmProfileOpen === uid) cmProfileRefresh(uid, false);
   showToast(r.data.following ? 'Following' : 'Unfollowed');
 }
 
@@ -12228,46 +12277,143 @@ async function cmToggleBlock(uid, name) {
   showToast(r.data.blocked ? 'Blocked' : 'Unblocked');
   cmLoadFeed(true);
   if(cmDm.with === uid) cmLoadThread(true);
-  cmOpenProfile(uid);
+  if(cmProfileOpen === uid) cmProfileRefresh(uid, true); else cmOpenProfile(uid);
 }
 
-function cmMiniPostHTML(p) {
-  const id = cmSafeId(p && p.id);
-  if(!id) return '';
-  return `<div class="cm-mini">
-    <div class="cm-time" style="margin:0 0 4px;">${cmEsc(cmTimeAgo(p.created_at))} · ${cmNum(p.like_count)} likes · ${cmNum(p.comment_count)} comments</div>
-    ${p.body ? `<div class="cm-body" style="margin-bottom:6px;">${cmEsc(p.body)}</div>` : ''}
-    ${cmAttachHTML(p.type, p.payload)}
-    ${p.has_photo ? `<img class="cm-photo" src="${WORKER_URL}/community/photo/${id}" alt="" loading="lazy">` : ''}
-  </div>`;
-}
+// ── Profile page (Instagram-style: full page in the Community tab, back arrow returns) ──
+function cmBackSvg() { return '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>'; }
+function cmDotsSvg() { return '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>'; }
 
-async function cmOpenProfile(uid) {
+async function cmOpenProfile(uid, opts) {
   uid = cmSafeId(uid); if(!uid) return;
+  opts = opts || {};
+  // Clear anything on top: sheets (search, activity) and messages
+  if(document.getElementById('cmSheetOverlay').style.display === 'flex') cmSheetClose();
+  const dm = document.getElementById('cmDm');
+  if(dm && dm.style.display !== 'none' && typeof cmCloseDm === 'function') cmCloseDm();
+  if(currentPage !== 'community') navTo('community');
+
+  if(cmState.view !== 'profile') {
+    cmProf.stack = [];
+    cmProf.feedScroll = window.scrollY || 0;
+  } else if(cmProf.uid && cmProf.uid !== uid && !opts.back) {
+    cmProf.stack.push(cmProf.uid);   // profile → another profile: back returns here
+  }
+  const same = cmProf.uid === uid && cmState.view === 'profile';
+  cmState.view = 'profile';
   cmProfileOpen = uid;
-  const freshOpen = document.getElementById('cmSheetOverlay').style.display !== 'flex' || window._cmProfLoading;
-  if(document.getElementById('cmSheetOverlay').style.display !== 'flex') { window._cmProfLoading = true; cmSheet(`<div class="cm-empty">Loading…</div>`); }
-  const [r, posts] = await Promise.all([cmApi(`/community/profile?user_id=${uid}`), cmApi(`/community/feed?limit=10&user=${uid}`)]);
-  if(cmProfileOpen !== uid) return;
-  if(!r.ok || !r.data) { cmSheet(`<div class="cm-empty">This profile could not be loaded.</div><button class="ghost-btn" onclick="cmSheetClose()">Close</button>`); return; }
-  const pr = r.data; window._cmProf = pr;
-  const name = cmEsc(pr.name || 'Member'), list = posts.ok && posts.data && Array.isArray(posts.data.posts) ? posts.data.posts : [];
+  cmProf.menu = false;
+  if(!same) { cmProf.uid = uid; cmProf.data = null; cmProf.posts = []; cmProf.next = null; }
+  cmProf.loading = true;
+  cmDraw();
+  if(!same) window.scrollTo(0, 0);
+
+  const [r, posts] = await Promise.all([cmApi(`/community/profile?user_id=${uid}`), cmApi(`/community/feed?limit=15&user=${uid}`)]);
+  if(cmProf.uid !== uid || cmState.view !== 'profile') return;
+  cmProf.loading = false;
+  if(!r.ok || !r.data) { cmProf.data = { error: true }; cmDraw(); return; }
+  cmProf.data = r.data;
+  window._cmProf = r.data;
+  if(posts.ok && posts.data && Array.isArray(posts.data.posts)) {
+    cmProf.posts = posts.data.posts;
+    cmProf.next = posts.data.next || null;
+  }
+  cmDraw();
+}
+
+// Back arrow: previous profile, or the feed where you left it.
+function cmProfileBack() {
+  const prev = cmProf.stack.pop();
+  if(prev) { cmOpenProfile(prev, { back: true }); return; }
+  cmProfileExit();
+}
+function cmProfileExit(keepScroll) {
+  if(cmState.view !== 'profile') return;
+  cmState.view = 'feed';
+  cmProfileOpen = null;
+  cmProf.uid = null; cmProf.stack = []; cmProf.menu = false;
+  cmDraw();
+  if(!keepScroll) window.scrollTo(0, cmProf.feedScroll || 0);
+}
+
+// Re-reads the profile numbers (after follow / block) without the loading flash.
+async function cmProfileRefresh(uid, withPosts) {
+  if(cmState.view !== 'profile' || cmProf.uid !== uid) return;
+  const [r, posts] = await Promise.all([
+    cmApi(`/community/profile?user_id=${uid}`),
+    withPosts ? cmApi(`/community/feed?limit=15&user=${uid}`) : Promise.resolve(null)
+  ]);
+  if(cmProf.uid !== uid || cmState.view !== 'profile') return;
+  if(r.ok && r.data) { cmProf.data = r.data; window._cmProf = r.data; }
+  if(posts) {
+    cmProf.posts = posts.ok && posts.data && Array.isArray(posts.data.posts) ? posts.data.posts : [];
+    cmProf.next = posts.ok && posts.data ? posts.data.next || null : null;
+  }
+  cmDraw();
+}
+
+async function cmProfileMore() {
+  if(!cmProf.next || cmProf.loading) return;
+  const uid = cmProf.uid;
+  cmProf.loading = true; cmDraw();
+  const r = await cmApi(`/community/feed?limit=15&user=${uid}&before=${encodeURIComponent(cmProf.next)}`);
+  cmProf.loading = false;
+  if(cmProf.uid !== uid) return;
+  if(r.ok && r.data && Array.isArray(r.data.posts)) {
+    const have = new Set(cmProf.posts.map(p => p.id));
+    cmProf.posts = cmProf.posts.concat(r.data.posts.filter(p => !have.has(p.id)));
+    cmProf.next = r.data.next || null;
+  }
+  cmDraw();
+}
+
+function cmProfileMenu() { cmProf.menu = !cmProf.menu; cmDraw(); }
+
+function cmProfilePageHTML() {
+  const pr = cmProf.data, uid = cmProf.uid;
+  const title = pr && !pr.error ? (pr.username ? '@' + cmEsc(pr.username) : cmEsc(pr.name || 'Member')) : '';
+  const bar = `<div class="cmp-bar"><button class="cmp-back" onclick="cmProfileBack()" aria-label="Back">${cmBackSvg()}</button><div class="cmp-bar-title">${title}</div></div>`;
+  if(!pr) return bar + `<div class="cm-empty" style="padding-top:40px;">Loading…</div>`;
+  if(pr.error) return bar + `<div class="cm-empty" style="padding-top:40px;">This profile could not be loaded.</div><button class="ghost-btn" onclick="cmOpenProfile('${uid}')">Try again</button>`;
+
+  const name = cmEsc(pr.name || 'Member');
   const safeName = cmEsc(String(pr.name || 'Member').replace(/['"\\]/g, ''));
-  window._cmProfLoading = false;
-  cmSheet(`<div class="cm-prof">
-      ${cmAvatarHTML({ user_id: uid, author_name: pr.name, has_avatar: pr.has_avatar }).replace('cm-avatar', 'cm-avatar lg')}
-      <div class="cm-prof-name">${name}</div>
-      ${pr.username ? `<div class="cm-prof-handle">@${cmEsc(pr.username)}</div>` : ''}
-      ${pr.follows_you && !pr.is_me ? `<div class="cm-tag">Follows you</div>` : ''}
-      <div class="cm-prof-stats"><div><b>${cmNum(pr.posts)}</b>posts</div><div><b>${cmNum(pr.followers)}</b>followers</div><div><b>${cmNum(pr.following)}</b>following</div></div>
-      ${pr.is_me ? '' : pr.blocked ? `<div class="hy-muted" style="margin-bottom:10px;">You blocked ${name}.</div>` : `<div class="cm-prof-btns">
-        <button class="${pr.is_following ? 'ghost-btn' : 'pink-btn'}" onclick="cmToggleFollow('${uid}')">${pr.is_following ? 'Following ✓' : 'Follow'}</button>
-        <button class="ghost-btn" onclick="cmSheetClose();cmOpenThread('${uid}')">Message</button>
-      </div>`}
+  const avatar = cmAvatarHTML({ user_id: uid, author_name: pr.name, has_avatar: pr.has_avatar }).replace('cm-avatar', 'cm-avatar cmp-av');
+  let buttons;
+  if(pr.is_me) {
+    buttons = `<button class="cmp-btn" onclick="openSettings()">Edit profile</button>`;
+  } else if(pr.blocked) {
+    buttons = `<button class="cmp-btn" onclick="cmToggleBlock('${uid}','${safeName}')">Unblock</button>`;
+  } else {
+    buttons = `<button class="cmp-btn${pr.is_following ? '' : ' primary'}" onclick="cmToggleFollow('${uid}')">${pr.is_following ? 'Following' : (pr.follows_you ? 'Follow back' : 'Follow')}</button>
+      <button class="cmp-btn" onclick="cmOpenThread('${uid}')">Message</button>
+      <button class="cmp-btn icon${cmProf.menu ? ' on' : ''}" onclick="cmProfileMenu()" aria-label="More">${cmDotsSvg()}</button>`;
+  }
+  const menu = (!pr.is_me && !pr.blocked && cmProf.menu)
+    ? `<div class="cmp-menu"><button onclick="cmProf.menu=false;cmToggleBlock('${uid}','${safeName}')">Block ${name}</button></div>` : '';
+
+  let postsHTML;
+  if(pr.blocked) postsHTML = `<div class="cm-empty" style="padding:24px 0;">You blocked ${name}. Unblock to see their posts.</div>`;
+  else if(!cmProf.posts.length) postsHTML = cmProf.loading ? `<div class="cm-empty" style="padding:24px 0;">Loading posts…</div>` : `<div class="cmp-empty"><div class="cmp-empty-ic">${CM_BUBBLE}</div><b>No posts yet</b><span>${pr.is_me ? 'Your posts will show up here.' : `When ${name} posts, you'll see it here.`}</span></div>`;
+  else postsHTML = cmProf.posts.map(cmPostHTML).join('')
+    + (cmProf.next ? `<button class="ghost-btn" style="margin:4px 0 16px;" onclick="cmProfileMore()">${cmProf.loading ? 'Loading…' : 'Load more posts'}</button>` : '');
+
+  return bar + `<div class="cmp-head">
+      <div class="cmp-top">
+        <div class="cm-ring cmp-ring">${avatar}</div>
+        <div class="cmp-stats">
+          <div><b>${cmNum(pr.posts)}</b><span>${pr.posts === 1 ? 'post' : 'posts'}</span></div>
+          <div><b>${cmNum(pr.followers)}</b><span>${pr.followers === 1 ? 'follower' : 'followers'}</span></div>
+          <div><b>${cmNum(pr.following)}</b><span>following</span></div>
+        </div>
+      </div>
+      <div class="cmp-name">${name}</div>
+      <div class="cmp-handle">${pr.username ? '@' + cmEsc(pr.username) : ''}${pr.follows_you && !pr.is_me ? `<span class="cmp-follows">Follows you</span>` : ''}</div>
+      <div class="cmp-btns">${buttons}</div>
+      ${menu}
     </div>
-    ${pr.blocked ? '' : (list.length ? list.map(cmMiniPostHTML).join('') : `<div class="cm-empty" style="padding:18px 0;">No posts yet.</div>`)}
-    ${pr.is_me ? '' : `<button class="cm-link" style="display:block;margin:14px auto 4px;color:var(--text3);font-size:12px;" onclick="cmToggleBlock('${uid}','${safeName}')">${pr.blocked ? 'Unblock' : 'Block'} ${name}</button>`}
-    <button class="ghost-btn" style="margin-top:10px;" onclick="cmSheetClose()">Close</button>`, freshOpen);
+    <div class="cmp-tabs"><span>${CM_BUBBLE}Posts</span></div>
+    ${postsHTML}`;
 }
 
 // ══════════════════════════════════════
@@ -12454,6 +12600,7 @@ async function cmToggleCommentLike(postId, commentId) {
 async function cmOpenPostById(id) {
   id = cmSafeId(id); if(!id) return;
   if(currentPage !== 'community') navTo('community');
+  if(cmState.view === 'profile') cmProfileExit(true);
   if(!cmFindPost(id)) {
     const r = await cmApi('/community/post?id=' + encodeURIComponent(id));
     if(!r.ok || !r.data || !r.data.post) { showToast(r.status === 404 ? 'That post was deleted' : 'Could not open that post'); return; }
@@ -12904,6 +13051,7 @@ async function cmDeletePost(id) {
   const r = await cmApi('/community/posts/delete', 'POST', { id });
   if(!r.ok) { if(r.status !== 401) showToast((r.data && r.data.error) || 'Could not delete that post'); return; }
   cmState.posts = cmState.posts.filter(p => p.id !== id);
+  if(cmProf.posts.some(p => p.id === id)) { cmProf.posts = cmProf.posts.filter(p => p.id !== id); if(cmProf.data && cmProf.data.posts) cmProf.data.posts--; }
   delete cmState.comments[id];
   delete cmState.open[id];
   cmDraw();
