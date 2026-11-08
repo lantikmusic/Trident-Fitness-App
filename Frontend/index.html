@@ -976,8 +976,51 @@ async function handleSignup() {
 }
 
 const GOOGLE_CLIENT_ID = '341176626662-7cf89bets0asup40ht1kl3m7engnik5a.apps.googleusercontent.com';
+// iPhone app only (public value, no secret). The website never uses it.
+const GOOGLE_IOS_CLIENT_ID = '341176626662-9h4sssdfbee142dphjhan1nh1fbs61hc.apps.googleusercontent.com';
+
+// True only inside the iPhone app (Capacitor). On the website this is false and the web flow runs as before.
+function isNativeApp() {
+  try { return !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === 'function' && window.Capacitor.isNativePlatform()); }
+  catch(e) { return false; }
+}
+// Calls the native SocialLogin plugin through Capacitor's built-in bridge (this page has no bundler).
+function nativeSocialLogin(method, options) {
+  const cap = window.Capacitor;
+  const plugin = cap && cap.Plugins && cap.Plugins.SocialLogin;
+  if(plugin && typeof plugin[method] === 'function') return plugin[method](options);
+  if(cap && typeof cap.nativePromise === 'function') return cap.nativePromise('SocialLogin', method, options);
+  return Promise.reject(new Error('Google sign-in is not available in this version of the app'));
+}
+let nativeGoogleReady = null;
+// iPhone app: Google's native sign-in sheet (Google's iOS SDK), then the same server check as the website.
+async function handleNativeGoogleAuth() {
+  if(window._nativeGoogleBusy) return;
+  window._nativeGoogleBusy = true;
+  try {
+    if(!nativeGoogleReady) {
+      nativeGoogleReady = nativeSocialLogin('initialize', {
+        google: { iOSClientId: GOOGLE_IOS_CLIENT_ID, iOSServerClientId: GOOGLE_CLIENT_ID, mode: 'online' }
+      }).catch(e => { nativeGoogleReady = null; throw e; });
+    }
+    await nativeGoogleReady;
+    const res = await nativeSocialLogin('login', { provider: 'google', options: {} });
+    const idToken = res && res.result && res.result.idToken;
+    if(!idToken) { showToast('Google sign-in failed — please try again'); return; }
+    await handleGoogleCredential({ credential: idToken });
+  } catch(e) {
+    const code = (e && e.code) || '';
+    const msg = String((e && e.message) || e || '');
+    if(code === 'USER_CANCELLED' || /cancel/i.test(msg)) return; // closed the Google sheet
+    console.warn('Native Google sign-in failed:', code, msg);
+    showToast('Google sign-in failed — please try again');
+  } finally {
+    window._nativeGoogleBusy = false;
+  }
+}
 
 function handleGoogleAuth() {
+  if(isNativeApp()) { handleNativeGoogleAuth(); return; }
   google.accounts.id.initialize({
     client_id: GOOGLE_CLIENT_ID,
     callback: handleGoogleCredential,

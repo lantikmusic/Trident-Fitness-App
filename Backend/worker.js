@@ -80,7 +80,7 @@ export default {
     // ── Auth Routes ──
     if (path === '/auth/signup' && request.method === 'POST') return handleSignup(request, env.DB);
     if (path === '/auth/login'  && request.method === 'POST') return handleLogin(request, env.DB);
-    if (path === '/auth/google' && request.method === 'POST') return handleGoogleAuth(request, env.DB);
+    if (path === '/auth/google' && request.method === 'POST') return handleGoogleAuth(request, env.DB, env);
     if (path === '/auth/logout' && request.method === 'POST') return handleLogout(request, env.DB);
     if (path === '/auth/me'     && request.method === 'GET')  return handleMe(request, env.DB);
 
@@ -187,24 +187,75 @@ export default {
 // AUTH HANDLERS
 // ══════════════════════════════════════════════════════
 
-async function handleGoogleAuth(request, DB) {
+// ── Google ID token check (website and iPhone app) ──
+// Our OAuth client IDs. These are public values (no secrets): the website's web client and the iOS app's client.
+const GOOGLE_CLIENT_IDS = [
+  '341176626662-7cf89bets0asup40ht1kl3m7engnik5a.apps.googleusercontent.com', // web (Netlify site); also the iOS app's server client ID
+  '341176626662-9h4sssdfbee142dphjhan1nh1fbs61hc.apps.googleusercontent.com'  // iOS app (com.tridentfitness.app)
+];
+const GOOGLE_ISSUERS = ['accounts.google.com', 'https://accounts.google.com'];
+const GOOGLE_JWKS_URL = 'https://www.googleapis.com/oauth2/v3/certs';
+let googleJwks = null; // { keys, expires } kept while this worker instance is alive
+
+function b64urlBytes(str) {
+  const b64 = String(str).replace(/-/g, '+').replace(/_/g, '/');
+  const bin = atob(b64 + '='.repeat((4 - b64.length % 4) % 4));
+  return Uint8Array.from(bin, c => c.charCodeAt(0));
+}
+function b64urlJson(str) { return JSON.parse(new TextDecoder().decode(b64urlBytes(str))); }
+
+// Google's public signing keys, cached for as long as Google says (refetched once if a key id is unknown).
+async function googleSigningKeys(env, force) {
+  if (!force && googleJwks && googleJwks.expires > Date.now()) return googleJwks.keys;
+  const url = (env && env.GOOGLE_JWKS_TEST_URL) || GOOGLE_JWKS_URL; // test override for local checks only
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Could not load Google keys');
+  const body = await res.json();
+  const m = /max-age=(\d+)/.exec(res.headers.get('Cache-Control') || '');
+  const ttl = Math.min(Math.max(m ? Number(m[1]) : 3600, 300), 86400) * 1000;
+  googleJwks = { keys: Array.isArray(body.keys) ? body.keys : [], expires: Date.now() + ttl };
+  return googleJwks.keys;
+}
+
+// Returns the token's claims only if Google signed it for one of our apps, it hasn't expired,
+// and Google has verified the email. Throws otherwise.
+async function verifyGoogleIdToken(idToken, env) {
+  const parts = String(idToken || '').split('.');
+  if (parts.length !== 3) throw new Error('Malformed token');
+  const header = b64urlJson(parts[0]);
+  const payload = b64urlJson(parts[1]);
+  if (header.alg !== 'RS256' || !header.kid) throw new Error('Unexpected token type');
+
+  let jwk = (await googleSigningKeys(env)).find(k => k.kid === header.kid);
+  if (!jwk) jwk = (await googleSigningKeys(env, true)).find(k => k.kid === header.kid); // Google rotated its keys
+  if (!jwk) throw new Error('Unknown signing key');
+  const key = await crypto.subtle.importKey('jwk', { kty: jwk.kty, n: jwk.n, e: jwk.e, alg: 'RS256', ext: true },
+    { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['verify']);
+  const signed = new TextEncoder().encode(parts[0] + '.' + parts[1]);
+  const ok = await crypto.subtle.verify('RSASSA-PKCS1-v1_5', key, b64urlBytes(parts[2]), signed);
+  if (!ok) throw new Error('Bad signature');
+
+  const now = Math.floor(Date.now() / 1000), skew = 60;
+  if (!GOOGLE_ISSUERS.includes(payload.iss)) throw new Error('Wrong issuer');
+  const aud = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
+  if (!aud.some(a => GOOGLE_CLIENT_IDS.includes(a))) throw new Error('Wrong audience');
+  if (payload.azp && !GOOGLE_CLIENT_IDS.includes(payload.azp)) throw new Error('Wrong client');
+  if (typeof payload.exp !== 'number' || payload.exp < now - skew) throw new Error('Token expired');
+  if (typeof payload.iat === 'number' && payload.iat > now + skew) throw new Error('Token issued in the future');
+  if (!payload.sub) throw new Error('No account id');
+  if (payload.email_verified !== true && payload.email_verified !== 'true') throw new Error('Email not verified by Google');
+  return payload;
+}
+
+async function handleGoogleAuth(request, DB, env) {
   try {
     const { credential } = await request.json();
     if(!credential) return error('Google credential required');
 
-    // Decode the JWT from Google (verify signature with Google's public keys)
-    const parts = credential.split('.');
-    if(parts.length !== 3) return error('Invalid Google credential');
-
-    // Decode payload
-    const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
-
-    // Verify it's for our app
-    const GOOGLE_CLIENT_ID = '341176626662-7cf89bets0asup40ht1kl3m7engnik5a.apps.googleusercontent.com';
-    if(payload.aud !== GOOGLE_CLIENT_ID) return error('Invalid Google token', 401);
-
-    // Check token expiry
-    if(payload.exp < Math.floor(Date.now() / 1000)) return error('Google token expired', 401);
+    // Check Google's signature, issuer, audience (our web or iOS client) and expiry before trusting anything in it
+    let payload;
+    try { payload = await verifyGoogleIdToken(credential, env); }
+    catch (e) { console.warn('Google token rejected:', e.message); return error('Invalid Google sign-in. Please try again.', 401); }
 
     const googleId  = payload.sub;
     const email     = payload.email?.toLowerCase();
