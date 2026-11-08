@@ -1218,6 +1218,50 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .tc-bar.empty{background:var(--bg5);opacity:1;}
 .tc-bar-labels{display:flex;gap:4px;margin-top:4px;}
 .tc-bar-lbl{flex:1;text-align:center;font-size:9px;color:var(--text3);font-weight:500;}
+/* ── Apple Health card (iPhone app only) ── */
+.ah-refresh{display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;border:0.5px solid var(--border2);background:var(--bg3);color:var(--text2);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.ah-refresh.spin svg{animation:ahSpin .8s linear infinite;}
+@keyframes ahSpin{to{transform:rotate(360deg);}}
+.ah-card{position:relative;overflow:hidden;background:radial-gradient(120% 90% at 100% 0%,rgba(50,252,253,0.07) 0%,transparent 55%),var(--bg3);border-color:var(--pink-border);}
+.ah-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;}
+.ah-badge{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--pink);}
+.ah-badge svg{width:14px;height:14px;}
+.ah-meta{font-size:11px;color:var(--text3);white-space:nowrap;}
+.ah-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:14px;}
+.ah-tile{min-width:0;background:var(--bg4);border:0.5px solid var(--border);border-radius:16px;padding:12px 10px 10px;}
+.ah-tile-ic{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:8px;}
+.ah-tile-ic svg{width:15px;height:15px;}
+.ah-tile-val{font-size:20px;font-weight:700;letter-spacing:-0.03em;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ah-tile-val small{font-size:11px;font-weight:600;color:var(--text3);margin-left:2px;letter-spacing:0;}
+.ah-tile-lbl{font-size:10.5px;color:var(--text3);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ah-prog{height:4px;border-radius:99px;background:var(--bg5);margin-top:8px;overflow:hidden;}
+.ah-prog i{display:block;height:100%;border-radius:99px;background:var(--pink);}
+.ah-sleep{background:var(--bg4);border:0.5px solid var(--border);border-radius:16px;padding:14px;margin-bottom:14px;}
+.ah-sleep-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px;}
+.ah-sleep-big{font-size:26px;font-weight:700;letter-spacing:-0.035em;line-height:1;}
+.ah-sleep-big small{font-size:12px;font-weight:600;color:var(--text3);margin-left:4px;letter-spacing:0;}
+.ah-sleep-sub{font-size:11px;color:var(--text3);text-align:right;}
+.ah-stagebar{display:flex;height:10px;border-radius:99px;overflow:hidden;background:var(--bg5);gap:2px;}
+.ah-stagebar i{display:block;height:100%;min-width:3px;}
+.ah-legend{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:10px;}
+.ah-leg{min-width:0;}
+.ah-leg-top{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;}
+.ah-leg-top i{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.ah-leg-val{font-size:13px;font-weight:600;margin-top:2px;white-space:nowrap;}
+.ah-note{font-size:11.5px;line-height:1.45;color:var(--text3);margin-top:8px;}
+.ah-empty{text-align:center;padding:6px 4px 2px;}
+.ah-empty-ic{width:52px;height:52px;border-radius:16px;margin:0 auto 12px;display:flex;align-items:center;justify-content:center;background:rgba(50,252,253,0.08);border:0.5px solid var(--pink-border);color:var(--pink);}
+.ah-empty-ic svg{width:26px;height:26px;}
+.ah-empty > b{display:block;font-size:16px;font-weight:700;margin-bottom:6px;}
+.ah-empty p b{color:var(--text);font-weight:600;}
+.ah-empty p{font-size:13px;line-height:1.5;color:var(--text2);margin:0 auto 14px;max-width:320px;}
+.ah-lock{display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;color:var(--text3);margin-top:10px;}
+.ah-lock svg{width:12px;height:12px;}
+.ah-skel{height:64px;border-radius:14px;background:linear-gradient(90deg,var(--bg4) 0%,var(--bg5) 50%,var(--bg4) 100%);background-size:200% 100%;animation:cmShimmer 1.3s linear infinite;}
+.ah-sleep-big{white-space:nowrap;}
+@media(max-width:360px){.ah-tile{padding:10px 8px 9px;}.ah-tile-val{font-size:18px;}.ah-tile-lbl{font-size:9.5px;}.ah-sleep{padding:12px;}.ah-sleep-big{font-size:22px;}.ah-sleep-sub{font-size:10px;}.ah-leg-val{font-size:12px;}}
+.ah-set-help{font-size:11.5px;line-height:1.5;color:var(--text3);padding:2px 4px 0;}
+.ah-set-help b{color:var(--text2);font-weight:600;}
 /* Sleep quality picker */
 .sleep-quality-row{display:flex;gap:6px;}
 .sq-btn{flex:1;font-size:20px;padding:8px 4px;background:var(--bg4);border:0.5px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all .15s;line-height:1;}
@@ -2021,6 +2065,17 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
       </div>
       <div class="wbars" id="dashBars"></div>
       <div class="wlabels" id="dashDayLabels"></div>
+    </div>
+
+    <!-- ══ APPLE HEALTH (iPhone app only; stays hidden on the website) ══ -->
+    <div id="ahSection" style="display:none;">
+      <div class="section-head" style="margin-top:8px;">
+        <div class="section-title">Apple Health</div>
+        <button class="ah-refresh" id="ahRefreshBtn" style="display:none;" onclick="ahLoad(true)" aria-label="Refresh Apple Health">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg>
+        </button>
+      </div>
+      <div class="tracker-card ah-card" id="ahCard"></div>
     </div>
 
     <!-- ══ STEPS CARD ══ -->
@@ -2876,6 +2931,15 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
       <div class="settings-row-right"><button class="push-btn" id="pushBtn" style="display:none;" onclick="pushToggle()">Turn on</button></div>
     </div>
     <button class="ghost-btn" id="pushTestBtn" style="display:none;margin-top:4px;" onclick="pushSendTest()">Send a test notification</button>
+  </div>
+
+  <div class="settings-section" id="ahSettings" style="display:none;">
+    <div class="settings-section-label">Apple Health</div>
+    <div class="settings-row">
+      <div style="min-width:0;padding-right:10px;"><div class="settings-row-label">Apple Health</div><div class="settings-row-sub" id="ahSetStatus">Steps, calories and sleep · read-only</div></div>
+      <div class="settings-row-right"><button class="push-btn" id="ahSetBtn" onclick="ahSettingsButton()">Connect</button></div>
+    </div>
+    <div class="ah-set-help">Read-only: Trident never changes your Health data, and it stays on this iPhone (it isn't sent to Trident's servers). To change what Trident can read, open the <b>Health</b> app → tap your picture → <b>Apps</b> → <b>Trident Fitness</b>.</div>
   </div>
 
   <div class="settings-section">
@@ -8824,6 +8888,7 @@ function openSettings() {
   loadSettingsInputs();
   try { unSettingsFill(); } catch(e) {}
   pushRefreshUI();
+  try { ahRenderSettings(); } catch(e) {}
   renderSettingsProgPicker();
   const overlay = document.getElementById('settingsOverlay');
   const sheet = document.getElementById('settingsSheet');
@@ -13566,6 +13631,290 @@ function cmShareLastWorkout() {
 }
 
 // ══════════════════════════════════════
+// APPLE HEALTH — iPhone app only, read-only (steps, active + resting calories, sleep).
+// Health numbers are read fresh from Apple Health and kept in memory only: they are never saved
+// in this app's storage and never sent to Trident's server or anywhere else (no cloudPost in this section).
+// ══════════════════════════════════════
+const AH_READ = ['steps', 'calories', 'basalCalories', 'sleep'];   // 'calories' = active energy
+const AH_ASKED_KEY = 'trident_health_asked_v1';                    // only remembers that Connect was tapped (no health data)
+const AH_STAGE = {                                                 // Apple Health's sleep stage colors
+  awake: { label: 'Awake', color: '#FF7A59' },
+  rem:   { label: 'REM',   color: '#64D2FF' },
+  core:  { label: 'Core',  color: '#0A84FF' },
+  deep:  { label: 'Deep',  color: '#5E5CE6' }
+};
+let ahState = { status: 'off', data: null, loadedAt: 0, connecting: false, loading: false };
+
+// True only inside the iPhone app. On the website (and Android) the Apple Health section never appears.
+function ahIsNativeIOS() {
+  try {
+    const c = window.Capacitor;
+    return !!(c && typeof c.isNativePlatform === 'function' && c.isNativePlatform() &&
+      typeof c.getPlatform === 'function' && c.getPlatform() === 'ios');
+  } catch(e) { return false; }
+}
+// Calls the native Health plugin through Capacitor's built-in bridge (this page has no bundler).
+function ahCall(method, options) {
+  const cap = window.Capacitor;
+  const plugin = cap && cap.Plugins && cap.Plugins.Health;
+  if(plugin && typeof plugin[method] === 'function') return plugin[method](options || {});
+  if(cap && typeof cap.nativePromise === 'function') return cap.nativePromise('Health', method, options || {});
+  return Promise.reject(new Error('Apple Health is not available in this version of the app'));
+}
+const ahSafe = p => Promise.resolve(p).then(v => ({ ok: true, v }), e => ({ ok: false, e }));
+function ahAsked() { try { return localStorage.getItem(AH_ASKED_KEY) === '1'; } catch(e) { return false; } }
+function ahSetAsked() { try { localStorage.setItem(AH_ASKED_KEY, '1'); } catch(e) {} }
+function ahDayStart(d) { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; }
+function ahDayKey(d) { const x = new Date(d); return x.getFullYear() + '-' + (x.getMonth() + 1) + '-' + x.getDate(); }
+function ahNum(v) { const n = Number(v); return isFinite(n) ? n : 0; }
+function ahDur(min) {
+  const m = Math.round(ahNum(min)), h = Math.floor(m / 60), r = m % 60;
+  return h ? `${h}h ${String(r).padStart(2, '0')}m` : `${r}m`;
+}
+
+async function ahInit() {
+  if(!ahIsNativeIOS()) return;
+  document.getElementById('ahSection').style.display = '';
+  document.getElementById('ahSettings').style.display = '';
+  ahState.status = 'checking'; ahRender();
+  try {
+    const av = await ahCall('isAvailable');
+    if(!av || !av.available) { ahState.status = 'unavailable'; ahRender(); return; }
+  } catch(e) { ahState.status = 'unavailable'; ahRender(); return; }
+  let asked = ahAsked();
+  if(!asked) {
+    // "readAuthorized" means iOS already showed its permission screen for that type (iOS never says what was chosen)
+    const st = await ahSafe(ahCall('checkAuthorization', { read: AH_READ, write: [] }));
+    if(st.ok && st.v && Array.isArray(st.v.readAuthorized) && st.v.readAuthorized.length) { asked = true; ahSetAsked(); }
+  }
+  if(!asked) { ahState.status = 'connect'; ahRender(); return; }
+  ahLoad();
+}
+
+// Shows Apple's permission screen (read-only: nothing is requested for writing).
+async function ahConnect() {
+  if(ahState.connecting || !ahIsNativeIOS()) return;
+  ahState.connecting = true; ahRender();
+  const r = await ahSafe(ahCall('requestAuthorization', { read: AH_READ, write: [] }));
+  ahState.connecting = false;
+  if(!r.ok) { ahRender(); showToast("Couldn't open Apple Health permissions. Please try again."); return; }
+  ahSetAsked();
+  await ahLoad(true);
+}
+
+// Adds up samples from one source only (the one with the most), so iPhone + Apple Watch aren't counted twice.
+function ahOneSourceSum(samples) {
+  const by = {};
+  (samples || []).forEach(s => { const k = s.sourceId || s.sourceName || '?'; by[k] = (by[k] || 0) + ahNum(s.value); });
+  const totals = Object.values(by);
+  return totals.length ? Math.max(...totals) : null;
+}
+// Minutes covered by a set of time ranges, without counting overlaps twice.
+function ahUnionMinutes(ranges) {
+  const list = ranges.map(r => [new Date(r.startDate).getTime(), new Date(r.endDate).getTime()])
+    .filter(([a, b]) => isFinite(a) && isFinite(b) && b > a).sort((x, y) => x[0] - y[0]);
+  let total = 0, cs = null, ce = null;
+  list.forEach(([a, b]) => {
+    if(cs === null || a > ce) { if(cs !== null) total += ce - cs; cs = a; ce = b; }
+    else if(b > ce) ce = b;
+  });
+  if(cs !== null) total += ce - cs;
+  return total / 60000;
+}
+// Last night's sleep: picks the source with stage data (e.g. Apple Watch), else the one with the most sleep.
+function ahSleepSummary(samples) {
+  const list = (samples || []).filter(s => s && s.startDate && s.endDate);
+  if(!list.length) return null;
+  const by = {};
+  list.forEach(s => { const k = s.sourceId || s.sourceName || '?'; (by[k] = by[k] || []).push(s); });
+  const stageOf = s => s.sleepState === 'light' ? 'core' : s.sleepState;
+  const score = arr => {
+    const staged = ahUnionMinutes(arr.filter(s => ['rem', 'core', 'deep'].includes(stageOf(s))));
+    const asleep = ahUnionMinutes(arr.filter(s => ['rem', 'core', 'deep', 'asleep'].includes(stageOf(s))));
+    return staged * 1e6 + asleep;
+  };
+  const best = Object.values(by).sort((a, b) => score(b) - score(a))[0];
+  const mins = st => ahUnionMinutes(best.filter(s => stageOf(s) === st));
+  const out = { rem: mins('rem'), core: mins('core'), deep: mins('deep'), awake: mins('awake'), plain: mins('asleep') };
+  out.hasStages = out.rem + out.core + out.deep > 0;
+  out.asleep = out.rem + out.core + out.deep + out.plain;
+  out.inBed = ahUnionMinutes(list.filter(s => s.sleepState === 'inBed'));   // time in bed from any source
+  if(out.asleep <= 0 && out.inBed <= 0) return null;
+  const times = list.map(s => [new Date(s.startDate), new Date(s.endDate)]);
+  out.from = new Date(Math.min(...times.map(t => t[0])));
+  out.to = new Date(Math.max(...times.map(t => t[1])));
+  return out;
+}
+
+// Reads today's numbers and last night's sleep. Nothing is stored or uploaded.
+async function ahLoad(force) {
+  if(!ahIsNativeIOS() || ahState.loading) return;
+  ahState.loading = true;
+  if(!ahState.data) ahState.status = 'loading';
+  ahRender();
+  const now = new Date(), today = ahDayStart(now);
+  const weekStart = new Date(today); weekStart.setDate(weekStart.getDate() - 6);
+  // "Last night" = 6 pm yesterday to 6 pm today (or now, if earlier)
+  const sleepFrom = new Date(today); sleepFrom.setDate(sleepFrom.getDate() - 1); sleepFrom.setHours(18, 0, 0, 0);
+  const sleepTo = new Date(today); sleepTo.setHours(18, 0, 0, 0);
+  const sleepEnd = now < sleepTo ? now : sleepTo;
+  const [stepsR, activeR, basalR, sleepR] = await Promise.all([
+    ahSafe(ahCall('queryAggregated', { dataType: 'steps', startDate: weekStart.toISOString(), endDate: now.toISOString(), bucket: 'day', aggregation: 'sum' })),
+    ahSafe(ahCall('queryAggregated', { dataType: 'calories', startDate: today.toISOString(), endDate: now.toISOString(), bucket: 'day', aggregation: 'sum' })),
+    ahSafe(ahCall('readSamples', { dataType: 'basalCalories', startDate: today.toISOString(), endDate: now.toISOString(), limit: 5000, ascending: true })),
+    ahSafe(ahCall('readSamples', { dataType: 'sleep', startDate: sleepFrom.toISOString(), endDate: sleepEnd.toISOString(), limit: 3000, ascending: true }))
+  ]);
+  ahState.loading = false;
+  if(!stepsR.ok && !activeR.ok && !basalR.ok && !sleepR.ok) {
+    console.warn('Apple Health read failed:', stepsR.e);
+    if(!ahState.data) ahState.status = 'error';
+    else if(force) showToast("Couldn't refresh Apple Health right now");
+    ahRender();
+    return;
+  }
+  const week = [];
+  const byDay = {};
+  if(stepsR.ok) ((stepsR.v && stepsR.v.samples) || []).forEach(b => { const k = ahDayKey(b.startDate); byDay[k] = (byDay[k] || 0) + ahNum(b.value); });
+  for(let i = 6; i >= 0; i--) { const d = new Date(today); d.setDate(d.getDate() - i); week.push({ d, v: Math.round(byDay[ahDayKey(d)] || 0) }); }
+  const sumOf = r => r.ok ? ((r.v && r.v.samples) || []).reduce((t, b) => t + ahNum(b.value), 0) : null;
+  ahState.data = {
+    steps: stepsR.ok ? week[6].v : null,
+    week: stepsR.ok ? week : null,
+    active: sumOf(activeR),
+    resting: basalR.ok ? ahOneSourceSum(basalR.v && basalR.v.samples) : null,
+    sleep: sleepR.ok ? ahSleepSummary(sleepR.v && sleepR.v.samples) : null
+  };
+  ahState.loadedAt = Date.now();
+  ahState.status = 'ready';
+  ahRender();
+  if(force) showToast('Apple Health updated');
+}
+
+const AH_IC = {
+  heart: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-9.6-9.3C.9 8.2 3 4.5 6.6 4.1c2-.2 3.9.8 5.4 2.6 1.5-1.8 3.4-2.8 5.4-2.6 3.6.4 5.7 4.1 4.2 7.6C19.5 16.4 12 21 12 21z"/></svg>',
+  steps: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.6 2.5c1.9 0 3 2 3 4.6 0 2.3-.9 4.4-1.3 5.6H5.7c-.4-1.3-1.1-3.2-1.1-5.3 0-2.8 1.9-4.9 4-4.9zM5.8 14.2h4.6v1.6c0 1.6-1 2.8-2.4 2.8s-2.3-1.1-2.3-2.6l.1-1.8zM15.4 6.5c2.1 0 4 2.1 4 4.9 0 2.1-.7 4-1.1 5.3h-4.6c-.4-1.2-1.3-3.3-1.3-5.6 0-2.6 1.1-4.6 3-4.6zM13.6 18.2h4.6l.1 1.8c0 1.5-.9 2.6-2.3 2.6s-2.4-1.2-2.4-2.8v-1.6z"/></svg>',
+  flame: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.6 2.2c.5 3-1 4.6-2.4 6.2-1.3 1.5-2.6 3-2.4 5.4.1 1.1.6 2 1.3 2.6-.1-1.6.6-2.9 1.8-3.9.3 1.5 1.3 2.4 2.4 3.2 1 .7 1.6 1.6 1.6 2.9 1.9-.8 3.3-2.6 3.3-5.1 0-3.9-3-6.4-3.7-9.4-.2-.7-.1-1.3.1-1.9zM12 23c-3.9 0-7-2.8-7-6.6 0-2.4 1.1-4.2 2.6-5.8-.2 2.6 1 4.1 2.5 4.6-.3-2.6 1.6-4.4 3.1-6 .5 2.9 2.6 4.3 3.6 6.5.4.9.6 1.8.6 2.7C17.4 20.4 15 23 12 23z" opacity=".9"/></svg>',
+  rest: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.7 14.6A8.6 8.6 0 0 1 9.4 3.3a.6.6 0 0 0-.8-.7A9.8 9.8 0 1 0 21.4 15.4a.6.6 0 0 0-.7-.8z"/></svg>',
+  lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>'
+};
+const AH_LOCK_LINE = `<div class="ah-lock">${AH_IC.lock}Read-only · stays on this iPhone</div>`;
+
+function ahTile(icon, color, value, unit, label, extra) {
+  const val = value === null || value === undefined ? '—' : Math.round(value).toLocaleString();
+  return `<div class="ah-tile"><div class="ah-tile-ic" style="background:${color}22;color:${color};">${icon}</div>
+    <div class="ah-tile-val">${val}${value === null || value === undefined || !unit ? '' : `<small>${unit}</small>`}</div>
+    <div class="ah-tile-lbl">${label}</div>${extra || ''}</div>`;
+}
+
+function ahCardHTML() {
+  const st = ahState.status;
+  if(st === 'checking' || st === 'loading') {
+    return `<div class="ah-head"><span class="ah-badge">${AH_IC.heart}Apple Health</span><span class="ah-meta">Reading…</span></div>
+      <div class="ah-tiles"><div class="ah-skel"></div><div class="ah-skel"></div><div class="ah-skel"></div></div><div class="ah-skel" style="height:84px;"></div>`;
+  }
+  if(st === 'unavailable') {
+    return `<div class="ah-empty"><div class="ah-empty-ic">${AH_IC.heart}</div><b>Apple Health isn't available</b>
+      <p>This device doesn't have the Health app, so there's nothing to show here. Your Steps and Sleep cards below still work as usual.</p></div>`;
+  }
+  if(st === 'connect') {
+    return `<div class="ah-empty"><div class="ah-empty-ic">${AH_IC.heart}</div><b>Connect Apple Health</b>
+      <p>See your steps, active and resting calories, and last night's sleep from Apple Health right here.</p>
+      <button class="pink-btn" onclick="ahConnect()" ${ahState.connecting ? 'disabled' : ''}>${ahState.connecting ? 'Opening Apple Health…' : 'Connect Apple Health'}</button>
+      ${AH_LOCK_LINE}</div>`;
+  }
+  if(st === 'error') {
+    return `<div class="ah-empty"><div class="ah-empty-ic">${AH_IC.heart}</div><b>Couldn't read Apple Health</b>
+      <p>Something went wrong reading your data. Please try again in a moment.</p>
+      <button class="ghost-btn" onclick="ahLoad(true)">Try again</button></div>`;
+  }
+  const d = ahState.data || {};
+  const noData = !d.steps && !d.active && !d.resting && !d.sleep;
+  if(noData) {
+    return `<div class="ah-empty"><div class="ah-empty-ic">${AH_IC.heart}</div><b>No Apple Health data yet</b>
+      <p>If you just connected, give it a moment. If Trident isn't allowed to read your data, open the <b>Health</b> app → tap your picture → <b>Apps</b> → <b>Trident Fitness</b> → <b>Turn On All</b>.</p>
+      <button class="ghost-btn" onclick="ahLoad(true)">Check again</button>${AH_LOCK_LINE}</div>`;
+  }
+  let goal = 10000;
+  try { goal = ahNum(getStepsSettings().goal) || 10000; } catch(e) {}
+  const pct = d.steps ? Math.min(100, Math.round(d.steps / goal * 100)) : 0;
+  const time = new Date(ahState.loadedAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  let html = `<div class="ah-head"><span class="ah-badge">${AH_IC.heart}Today</span><span class="ah-meta">Updated ${time}</span></div>
+    <div class="ah-tiles">
+      ${ahTile(AH_IC.steps, 'var(--pink)', d.steps, '', 'Steps', `<div class="ah-prog"><i style="width:${pct}%"></i></div>`)}
+      ${ahTile(AH_IC.flame, '#FF9F0A', d.active, '', 'Active kcal')}
+      ${ahTile(AH_IC.rest, '#BF5AF2', d.resting, '', 'Resting kcal')}
+    </div>`;
+  const s = d.sleep;
+  if(s) {
+    const parts = s.hasStages ? ['awake', 'rem', 'core', 'deep'] : [];
+    const total = parts.reduce((t, k) => t + s[k], 0) || 1;
+    const span = `${s.from.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })} – ${s.to.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
+    html += `<div class="ah-sleep"><div class="ah-sleep-top">
+        <div><div class="tc-eyebrow" style="color:#7D7AFF;">Last night</div>
+          <div class="ah-sleep-big">${s.asleep > 0 ? ahDur(s.asleep) : ahDur(s.inBed)}<small>${s.asleep > 0 ? 'asleep' : 'in bed'}</small></div></div>
+        <div class="ah-sleep-sub">${span}${s.asleep > 0 && s.inBed > 0 ? `<br>In bed ${ahDur(s.inBed)}` : ''}</div></div>`;
+    if(s.hasStages) {
+      html += `<div class="ah-stagebar">${parts.filter(k => s[k] > 0).map(k => `<i style="width:${(s[k] / total * 100).toFixed(1)}%;background:${AH_STAGE[k].color};"></i>`).join('')}</div>
+        <div class="ah-legend">${parts.map(k => `<div class="ah-leg"><div class="ah-leg-top"><i style="background:${AH_STAGE[k].color};"></i>${AH_STAGE[k].label}</div><div class="ah-leg-val">${ahDur(s[k])}</div></div>`).join('')}</div>`;
+    } else {
+      html += `<div class="ah-note">Sleep stages (REM, Core, Deep) need an Apple Watch or a sleep tracker that saves to Apple Health.</div>`;
+    }
+    html += `</div>`;
+  } else {
+    html += `<div class="ah-sleep"><div class="tc-eyebrow" style="color:#7D7AFF;">Last night</div>
+      <div class="ah-note" style="margin-top:4px;">No sleep recorded in Apple Health for last night. Wearing an Apple Watch to bed, or setting a Sleep Focus schedule, records it automatically.</div></div>`;
+  }
+  if(d.resting === null || d.resting === 0) {
+    html += `<div class="ah-note" style="margin:-6px 2px 12px;">Resting calories usually come from an Apple Watch.</div>`;
+  }
+  if(d.week) {
+    const max = Math.max(goal, ...d.week.map(w => w.v)) || 1;
+    html += `<div class="tc-chart-label">Steps · last 7 days</div>
+      <div class="tc-bars">${d.week.map((w, i) => `<div class="tc-bar-wrap" style="height:100%;justify-content:flex-end;"><div class="tc-bar${w.v ? '' : ' empty'}${i === 6 ? ' today' : ''}" style="height:${w.v ? Math.max(6, Math.round(w.v / max * 100)) : 6}%;"></div></div>`).join('')}</div>
+      <div class="tc-bar-labels">${d.week.map(w => `<div class="tc-bar-lbl">${w.d.toLocaleDateString('en-US', { weekday: 'narrow' })}</div>`).join('')}</div>`;
+  }
+  return html + AH_LOCK_LINE;
+}
+
+function ahRender() {
+  const card = document.getElementById('ahCard');
+  if(card) card.innerHTML = ahCardHTML();
+  const btn = document.getElementById('ahRefreshBtn');
+  if(btn) {
+    btn.style.display = (ahState.status === 'ready' || ahState.status === 'error') ? '' : 'none';
+    btn.classList.toggle('spin', !!ahState.loading);
+  }
+  ahRenderSettings();
+}
+
+function ahRenderSettings() {
+  const status = document.getElementById('ahSetStatus'), btn = document.getElementById('ahSetBtn');
+  if(!status || !btn) return;
+  const st = ahState.status;
+  btn.style.display = st === 'unavailable' || st === 'checking' ? 'none' : '';
+  btn.disabled = !!(ahState.connecting || ahState.loading);
+  btn.classList.toggle('off', st !== 'connect');
+  if(st === 'connect') { status.textContent = 'Not connected · steps, calories and sleep (read-only)'; btn.textContent = ahState.connecting ? 'Opening…' : 'Connect'; }
+  else if(st === 'unavailable') status.textContent = "Apple Health isn't available on this device";
+  else if(st === 'checking') status.textContent = 'Checking…';
+  else {
+    status.textContent = ahState.loadedAt
+      ? 'Connected · updated ' + new Date(ahState.loadedAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+      : 'Connected · read-only';
+    btn.textContent = ahState.loading ? 'Reading…' : 'Refresh';
+  }
+}
+function ahSettingsButton() {
+  if(ahState.status === 'connect') ahConnect();
+  else ahLoad(true);
+}
+// Coming back to the app: refresh the numbers (at most once a minute).
+document.addEventListener('visibilitychange', () => {
+  if(document.hidden || !ahIsNativeIOS() || ahState.status !== 'ready') return;
+  if(Date.now() - ahState.loadedAt > 60000) ahLoad();
+});
+
+// ══════════════════════════════════════
 // WHAT'S NEW — a one-time pop-up on the Home screen after each update.
 // To announce an update: add a new entry at the TOP of this list with a new id and the next version number.
 // Everyone sees the newest entry once; brand-new accounts skip it.
@@ -13650,6 +13999,8 @@ try {
     localStorage.setItem(ONBOARDING_KEY, '1');
   }
   try { const v = wnList()[0].version; if(v) document.getElementById('appVersionLabel').textContent = ' · Version ' + v; } catch(e) {}
+  // Apple Health card + Settings row (iPhone app only; does nothing on the website)
+  try { ahInit(); } catch(e) { console.warn('Apple Health unavailable:', e); }
   // After the splash, show what changed in this update (once)
   setTimeout(() => { window._wnReady = true; wnMaybeShow(); }, 2800);
 } catch(e) {
