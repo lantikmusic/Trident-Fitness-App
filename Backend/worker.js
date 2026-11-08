@@ -1316,10 +1316,12 @@ function usernameProblem(u) {
 }
 
 // The username of one account, or null (also null if usernames aren't set up yet).
+// Accounts that never picked one are given one from their name the first time it's needed.
 async function usernameOf(DB, userId) {
   try {
     const row = await DB.prepare('SELECT username FROM usernames WHERE user_id = ?').bind(userId).first();
-    return row ? row.username : null;
+    if (row) return row.username;
+    return await usernameAssign(DB, userId);
   } catch (e) { return null; }
 }
 
@@ -1331,8 +1333,41 @@ async function usernamesFor(DB, ids) {
   try {
     const rows = await DB.prepare(`SELECT user_id, username FROM usernames WHERE user_id IN (${unique.map(() => '?').join(',')})`).bind(...unique).all();
     (rows.results || []).forEach(r => { out[r.user_id] = r.username; });
+    for (const id of unique) {
+      if (!out[id]) { const u = await usernameAssign(DB, id); if (u) out[id] = u; }
+    }
   } catch (e) {}
   return out;
+}
+
+// "Logan Eiselt" -> "logan.eiselt" (falls back to "athlete" when the name gives nothing usable).
+function usernameBase(name) {
+  const parts = String(name || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+  const base = parts.join('.').slice(0, 16).replace(/\.+$/, '');
+  return base.length >= 3 && !usernameProblem(base) ? base : 'athlete';
+}
+
+// Gives an account without a username one based on its name, adding numbers if it's taken.
+// Returns the username, or null if the account doesn't exist or nothing could be saved.
+async function usernameAssign(DB, userId) {
+  try {
+    const user = await communityUserRow(DB, userId);
+    if (!user) return null;
+    const base = usernameBase(user.name);
+    for (let i = 0; i < 8; i++) {
+      const digits = i === 0 ? '' : String(Math.floor(Math.random() * Math.pow(10, Math.min(i + 1, 4)))).padStart(2, '0');
+      const u = base + digits;
+      if (usernameProblem(u)) continue;
+      const res = await DB.prepare(
+        'INSERT INTO usernames (user_id, username, username_lower, updated_at) VALUES (?, ?, ?, ?) ON CONFLICT DO NOTHING'
+      ).bind(userId, u, u.toLowerCase(), new Date().toISOString()).run();
+      if (res && res.meta && res.meta.changes) return u;
+      // Nothing saved: either the name is taken, or this account got a username a moment ago.
+      const now = await DB.prepare('SELECT username FROM usernames WHERE user_id = ?').bind(userId).first();
+      if (now) return now.username;
+    }
+  } catch (e) {}
+  return null;
 }
 
 async function getUsername(request, DB) {
