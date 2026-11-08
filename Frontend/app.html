@@ -1554,7 +1554,32 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 /* ── Community header buttons, comment likes, activity list ── */
 .cm-page-head{position:relative;}
 /* Trident logo centred in the space above the Community title */
-.cm-brand{position:absolute;left:50%;top:calc(env(safe-area-inset-top) + 4px);height:46px;width:auto;transform:translateX(-50%);display:block;pointer-events:none;filter:drop-shadow(0 0 8px rgba(50,252,253,0.25));}
+.cm-brand{position:absolute;left:50%;top:calc(env(safe-area-inset-top) + 2px);height:58px;width:auto;transform:translateX(-50%);display:block;pointer-events:none;filter:drop-shadow(0 0 8px rgba(50,252,253,0.25));}
+#page-community .cm-page-head{padding-top:calc(env(safe-area-inset-top) + 64px);}
+/* Post card that expands in place */
+#page-community.cm-prof-mode #cmTopArea,#page-community.cm-prof-mode #cmComposer,#page-community.cm-prof-mode .cm-ptr{display:none!important;}
+.cm-composer:not(.open) .cm-open-only,.cm-composer:not(.open) .cm-composer-text{display:none;}
+.cm-composer.open{border-color:var(--pink-border);}
+.cm-composer.open .cm-composer-ph{display:none;}
+.cm-composer.open .cm-composer-row{align-items:flex-start;cursor:default;}
+.cm-composer-text{flex:1;min-width:0;display:block;height:88px;min-height:88px;background:var(--bg4);border:0.5px solid var(--border);border-radius:16px;padding:11px 14px;color:var(--text);font-family:inherit;font-size:16px;line-height:1.45;outline:none;resize:none;}
+.cm-composer-text:focus{border-color:var(--pink-border);}
+.cm-composer.open .cm-composer-chips{gap:6px;}
+.cm-composer.open .cm-qchip{gap:4px;font-size:11.5px;min-width:0;white-space:nowrap;}
+@media(max-width:374px){.cm-composer.open .cm-qi{display:none;}}
+.cm-qchip.on{border-color:var(--pink);color:var(--pink);}
+#cmPicker:not(:empty),#cmAttachPreview:not(:empty){margin-top:10px;}
+.cm-composer-actions{display:flex;gap:8px;margin-top:12px;}
+.cm-cbtn{flex:1;padding:12px;border-radius:14px;border:0.5px solid var(--border2);background:transparent;color:var(--text2);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;}
+.cm-cbtn.primary{background:var(--pink);border-color:var(--pink);color:#000;}
+.cm-cbtn:disabled{opacity:.6;}
+/* Pull down at the top of the feed to refresh */
+.cm-ptr{height:0;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:height .25s ease;}
+.cm-ptr.pulling{transition:none;}
+.cm-ptr-spin{width:26px;height:26px;border-radius:50%;border:2.5px solid rgba(50,252,253,0.18);border-top-color:var(--pink);opacity:0;}
+.cm-ptr.ready .cm-ptr-spin,.cm-ptr.loading .cm-ptr-spin{opacity:1;}
+.cm-ptr.loading .cm-ptr-spin{animation:cmPtrSpin .7s linear infinite;}
+@keyframes cmPtrSpin{to{transform:rotate(360deg);}}
 .cm-head-actions{position:absolute;right:20px;bottom:0;display:flex;gap:8px;}
 @media(max-width:374px){#page-community .page-title{font-size:28px;}.cm-head-actions{gap:5px;}.cm-head-actions .cm-inbox-btn{width:36px;height:36px;}.cm-head-actions .cm-inbox-btn svg{width:18px;height:18px;}}
 .cm-head-actions .cm-inbox-btn{position:relative;}
@@ -2701,29 +2726,33 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
   </div>
   <div class="container">
     <div style="height:14px;"></div>
+    <div class="cm-ptr" id="cmPtr" aria-hidden="true"><div class="cm-ptr-spin"></div></div>
+    <div id="cmTopArea"></div>
+    <div class="cm-composer" id="cmComposer" style="display:none;">
+      <div class="cm-composer-row" onclick="cmOpenCompose()">
+        <button class="cm-me-av" id="cmComposerAv" onclick="event.stopPropagation();cmOpenMyProfile()" aria-label="My profile"></button>
+        <div class="cm-composer-ph">What did you crush today?</div>
+        <textarea class="cm-composer-text" id="cmText" rows="1" maxlength="1000" placeholder="Share a win, a workout, or a question… Type @ to tag a friend" oninput="cmUpdateCount();cmGrowText();cmMentionInput()" onclick="event.stopPropagation();cmMentionInput()" onblur="setTimeout(cmMentionHide,200)"></textarea>
+      </div>
+      <div id="cmMention" class="cm-mention-box" style="display:none;"></div>
+      <div class="cm-count cm-open-only" id="cmCount">0 / 1000</div>
+      <div class="cm-composer-chips">
+        <button class="cm-qchip" id="cmChipPhoto" onclick="cmQuick('photo')"><span class="cm-qi">📷</span>Photo</button>
+        <button class="cm-qchip" id="cmChipWorkout" onclick="cmQuick('workout')"><span class="cm-qi">🏋️</span>Workout</button>
+        <button class="cm-qchip" id="cmChipPR" onclick="cmQuick('pr')"><span class="cm-qi">🏆</span>PR</button>
+        <button class="cm-qchip cm-open-only" id="cmChipTag" onpointerdown="event.preventDefault()" onclick="cmTagChip()"><span class="cm-qi">👥</span>Tag</button>
+      </div>
+      <input type="file" id="cmPhotoInput" accept="image/*" style="display:none;" onchange="cmPhotoChosen(this)">
+      <div id="cmPicker" class="cm-open-only"></div>
+      <div id="cmAttachPreview" class="cm-open-only"></div>
+      <div class="cm-composer-actions cm-open-only">
+        <button class="cm-cbtn" onclick="cmCancelCompose()">Cancel</button>
+        <button class="cm-cbtn primary" id="cmPostBtn" onclick="cmSubmitPost()">Post</button>
+      </div>
+    </div>
     <div id="cmRoot"></div>
   </div>
 </div>
-<div class="cm-overlay" id="cmComposeOverlay" onclick="if(event.target===this)cmCloseCompose()">
-  <div class="cm-sheet">
-    <div class="cm-sheet-title">New post</div>
-    <textarea class="cm-textarea" id="cmText" maxlength="1000" placeholder="Share a win, a workout, or a question… Type @ to tag a friend" oninput="cmUpdateCount();cmMentionInput()" onclick="cmMentionInput()" onblur="setTimeout(cmMentionHide,200)"></textarea>
-    <div id="cmMention" class="cm-mention-box" style="display:none;"></div>
-    <div class="cm-count" id="cmCount">0 / 1000</div>
-    <div class="cm-chips">
-      <button class="cm-chip" id="cmChipPhoto" onclick="document.getElementById('cmPhotoInput').click()">📷 Photo</button>
-      <button class="cm-chip" id="cmChipWorkout" onclick="cmPickAttachment('workout')">🏋️ Workout</button>
-      <button class="cm-chip" id="cmChipPR" onclick="cmPickAttachment('pr')">🏆 PR</button>
-      <button class="cm-chip" id="cmChipTag" onpointerdown="event.preventDefault()" onclick="cmTagChip()">👥 Tag</button>
-    </div>
-    <input type="file" id="cmPhotoInput" accept="image/*" style="display:none;" onchange="cmPhotoChosen(this)">
-    <div id="cmPicker"></div>
-    <div id="cmAttachPreview"></div>
-    <button class="pink-btn" id="cmPostBtn" onclick="cmSubmitPost()">Post</button>
-    <button class="ghost-btn" onclick="cmCloseCompose()" style="margin-top:8px;">Cancel</button>
-  </div>
-</div>
-
 <div class="cm-overlay cm-overlay-top" id="cmSheetOverlay" onclick="if(event.target===this)cmSheetClose()">
   <div class="cm-sheet" id="cmSheet"></div>
 </div>
@@ -9191,7 +9220,7 @@ function sheetCloserFor(el) {
   const map = [
     ['#saveMealOverlay', () => closeSaveMeal()], ['#savedMealsOverlay', () => closeSavedMeals()],
     ['#logWeightOverlay', () => closeLogWeight()], ['#exProgressOverlay', () => closeExProgress()],
-    ['#cmComposeOverlay', () => cmCloseCompose()], ['#cmSheetOverlay', () => cmSheetClose()],
+    ['#cmSheetOverlay', () => cmSheetClose()],
     ['#hySheetOverlay', () => hySheetClose()], ['#settingsSheet', () => closeSettings()],
     ['#summarySheet', () => closeSummary()], ['#swapSheet', () => closeSwap()], ['#onboardingSheet', () => obClose()]
   ];
@@ -11990,10 +12019,10 @@ function cmMyAvatarHTML() {
   const ok = /^data:image\/(png|jpe?g|webp|gif);base64,/i.test(pic);
   return `<div class="cm-avatar">${ok ? `<img src="${cmEsc(pic)}" alt="">` : initial}</div>`;
 }
-// Quick buttons on the composer card: open the post sheet already set up for a photo, workout or PR.
+// Photo / Workout / PR buttons on the post card: open the card (if needed) and start that attachment.
 function cmQuick(kind) {
-  cmOpenCompose();
-  if(document.getElementById('cmComposeOverlay').style.display !== 'flex') return;
+  cmOpenCompose(null, true);
+  if(!cmComposeIsOpen()) return;
   if(kind === 'photo') document.getElementById('cmPhotoInput').click();
   else cmPickAttachment(kind);
 }
@@ -12190,7 +12219,7 @@ function cmDraw() {
   if(cmState.view === 'profile') { root.innerHTML = cmProfilePageHTML(); return; }
   const following = cmState.scope === 'following';
   cmDrawHeadActions();
-  let html = `<div class="cm-top">
+  let top = `<div class="cm-top">
       <div class="cm-scope${following ? ' following' : ''}"><span class="cm-scope-pill"></span><button class="cm-scope-btn${following ? '' : ' active'}" onclick="cmSetScope('all')">Main Feed</button><button class="cm-scope-btn${following ? ' active' : ''}" onclick="cmSetScope('following')">Following</button></div>
       <button class="cm-me-btn" onclick="cmOpenMyProfile()" aria-label="My profile"><span class="cm-ring">${cmMyAvatarHTML()}</span></button>
     </div>
@@ -12198,15 +12227,14 @@ function cmDraw() {
       <div class="cm-un-ic">@</div>
       <div style="flex:1;min-width:0;"><b>Choose a username</b><span>So friends can find and follow you</span></div>
       <button class="cm-follow" onclick="unOpenInSettings()">Choose</button>
-    </div>`}
-    <div class="cm-composer">
-      <div class="cm-composer-row" onclick="cmOpenCompose()"><button class="cm-me-av" onclick="event.stopPropagation();cmOpenMyProfile()" aria-label="My profile">${cmMyAvatarHTML()}</button><div class="cm-composer-ph">What did you crush today?</div></div>
-      <div class="cm-composer-chips">
-        <button class="cm-qchip" onclick="cmQuick('photo')">📷 Photo</button>
-        <button class="cm-qchip" onclick="cmQuick('workout')">🏋️ Workout</button>
-        <button class="cm-qchip" onclick="cmQuick('pr')">🏆 PR</button>
-      </div>
-    </div>`;
+    </div>`}`;
+  const topEl = document.getElementById('cmTopArea');
+  if(topEl) { topEl.innerHTML = top; topEl.style.display = ''; }
+  const comp = document.getElementById('cmComposer');
+  if(comp) comp.style.display = '';
+  const cav = document.getElementById('cmComposerAv');
+  if(cav) cav.innerHTML = cmMyAvatarHTML();
+  let html = '';
   if(cmState.status === 'loading') {
     const skel = `<div class="cm-skel"><div style="display:flex;gap:10px;align-items:center;margin-bottom:14px;"><i style="width:40px;height:40px;border-radius:50%;"></i><div style="flex:1;"><i style="width:40%;height:12px;margin-bottom:6px;"></i><i style="width:25%;height:10px;"></i></div></div><i style="width:90%;height:12px;margin-bottom:8px;"></i><i style="width:70%;height:12px;margin-bottom:14px;"></i><i style="width:100%;height:120px;border-radius:14px;"></i></div>`;
     html += skel + skel;
@@ -12242,6 +12270,7 @@ function renderCommunity() {
   if(!root) return;
   if(!isLoggedIn()) {
     root.innerHTML = `<div class="cm-empty">Sign in to see and share posts with the community.</div>`;
+    ['cmTopArea', 'cmComposer'].forEach(id => { const el = document.getElementById(id); if(el) el.style.display = 'none'; });
     return;
   }
   cmDraw();
@@ -13116,9 +13145,13 @@ async function cmDeletePost(id) {
 }
 
 // ── Composing a post ──
-function cmOpenCompose(attach) {
-  if(!isLoggedIn()) { showToast('Sign in to post'); return; }
-  cmDraft = { photo: null, attach: attach || null, options: null, sending: false };
+// The post card at the top of the feed expands in place (no pop-up), so the feed stays visible underneath.
+function cmComposeIsOpen() {
+  const box = document.getElementById('cmComposer');
+  return !!box && box.classList.contains('open');
+}
+function cmResetComposeFields() {
+  cmDraft = { photo: null, attach: null, options: null, sending: false };
   document.getElementById('cmText').value = '';
   document.getElementById('cmPhotoInput').value = '';
   cmMentionHide();
@@ -13126,12 +13159,115 @@ function cmOpenCompose(attach) {
   const btn = document.getElementById('cmPostBtn');
   btn.disabled = false; btn.textContent = 'Post';
   cmUpdateCount();
+  cmGrowText();
   cmDrawDraft();
-  document.getElementById('cmComposeOverlay').style.display = 'flex';
+}
+// attach: a workout/PR to share. noFocus: don't pop the keyboard (used by the Photo/Workout/PR buttons).
+function cmOpenCompose(attach, noFocus) {
+  if(!isLoggedIn()) { showToast('Sign in to post'); return; }
+  const box = document.getElementById('cmComposer');
+  if(!box) return;
+  if(window._cmProfView) cmProfileExit(true);
+  box.style.display = '';
+  if(!box.classList.contains('open')) { cmResetComposeFields(); box.classList.add('open'); }
+  if(attach) { cmDraft.attach = attach; cmDrawDraft(); }
+  const ta = document.getElementById('cmText');
+  if(!attach && !noFocus) { try { ta.focus({ preventScroll: true }); } catch(e) { ta.focus(); } }
+  cmGrowText();
+  const r = box.getBoundingClientRect();
+  if(r.top < 0 || r.top > window.innerHeight * 0.6) window.scrollTo({ top: Math.max(0, window.scrollY + r.top - 80), behavior: 'smooth' });
 }
 function cmCloseCompose() {
-  document.getElementById('cmComposeOverlay').style.display = 'none';
+  const box = document.getElementById('cmComposer');
+  if(!box) return;
+  const ta = document.getElementById('cmText');
+  if(ta && document.activeElement === ta) ta.blur();
+  box.classList.remove('open');
+  cmResetComposeFields();
 }
+// Cancel button: check first if something would be thrown away.
+function cmCancelCompose() {
+  if(cmDraft.sending) return;
+  const typed = document.getElementById('cmText').value.trim();
+  if((typed || cmDraft.photo || cmDraft.attach) && !confirm('Discard this post?')) return;
+  cmCloseCompose();
+}
+// The text box grows with what's typed (up to a point, then it scrolls).
+function cmGrowText() {
+  const ta = document.getElementById('cmText');
+  if(!ta) return;
+  ta.style.height = 'auto';
+  if(cmComposeIsOpen()) ta.style.height = Math.min(Math.max(ta.scrollHeight, 88), 260) + 'px';
+}
+// ── Pull down at the top of the feed to refresh ──
+const CM_PTR_TRIGGER = 64;
+let cmPtr = null, cmPtrBusy = false;
+function cmPtrSet(h) {
+  const el = document.getElementById('cmPtr');
+  if(!el) return;
+  el.style.height = h + 'px';
+  el.classList.toggle('ready', h >= CM_PTR_TRIGGER);
+  const spin = el.firstElementChild;
+  if(spin && !el.classList.contains('loading')) { spin.style.opacity = Math.min(1, h / CM_PTR_TRIGGER); spin.style.transform = `rotate(${Math.round(h * 4)}deg)`; }
+}
+async function cmPullRefresh() {
+  const el = document.getElementById('cmPtr');
+  if(!el || cmPtrBusy) return;
+  cmPtrBusy = true;
+  el.classList.remove('pulling');
+  el.classList.add('loading');
+  const spin = el.firstElementChild;
+  if(spin) { spin.style.opacity = ''; spin.style.transform = ''; }
+  el.style.height = '52px';
+  try {
+    await Promise.all([
+      cmLoadFeed(true),
+      (typeof cmRefreshUnread === 'function' ? cmRefreshUnread() : null),
+      new Promise(r => setTimeout(r, 600))
+    ].map(x => Promise.resolve(x).catch(() => {})));
+  } finally {
+    el.classList.remove('loading', 'ready');
+    el.style.height = '0px';
+    cmPtrBusy = false;
+  }
+}
+function cmPtrInit() {
+  const page = document.getElementById('page-community');
+  if(!page || page._ptr) return;
+  page._ptr = true;
+  page.addEventListener('touchstart', e => {
+    cmPtr = null;
+    if(cmPtrBusy || e.touches.length !== 1 || window._cmProfView || (window.scrollY || 0) > 0) return;
+    if(e.target.closest && e.target.closest('textarea,input,select,.cm-dm,.cm-overlay')) return;
+    cmPtr = { x: e.touches[0].clientX, y: e.touches[0].clientY, h: 0, active: false };
+  }, { passive: true });
+  page.addEventListener('touchmove', e => {
+    if(!cmPtr) return;
+    const dx = e.touches[0].clientX - cmPtr.x, dy = e.touches[0].clientY - cmPtr.y;
+    if(!cmPtr.active) {
+      if(dy < -4 || Math.abs(dx) > Math.abs(dy) + 4 || (window.scrollY || 0) > 0) { cmPtr = null; return; }
+      if(dy < 10) return;
+      cmPtr.active = true;
+      const el = document.getElementById('cmPtr');
+      if(el) el.classList.add('pulling');
+    }
+    if(e.cancelable) e.preventDefault(); // stop the page bouncing while pulling
+    cmPtr.h = Math.max(0, Math.min(96, (dy - 10) * 0.5));
+    cmPtrSet(cmPtr.h);
+  }, { passive: false });
+  const end = e => {
+    const st = cmPtr; cmPtr = null;
+    if(!st || !st.active) return;
+    const el = document.getElementById('cmPtr');
+    if(el) el.classList.remove('pulling');
+    if(e.type === 'touchend' && st.h >= CM_PTR_TRIGGER) cmPullRefresh();
+    else cmPtrSet(0);
+  };
+  page.addEventListener('touchend', end);
+  page.addEventListener('touchcancel', end);
+}
+try { cmPtrInit(); } catch(e) { console.warn('Pull to refresh unavailable:', e); }
+
 function cmUpdateCount() {
   document.getElementById('cmCount').textContent = document.getElementById('cmText').value.length + ' / 1000';
 }
