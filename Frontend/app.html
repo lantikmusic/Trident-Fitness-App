@@ -139,6 +139,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .field label{display:block;font-size:12px;font-weight:500;color:var(--text3);margin-bottom:6px;}
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 .three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;box-sizing:border-box;width:100%;}
+.three-col>*,.two-col>*{min-width:0;}
 .three-col .iw input{padding:8px 6px;font-size:14px;}
 .three-col .iw .unit{padding-right:8px;font-size:11px;}
 .section-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px;}
@@ -342,12 +343,102 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .ai-btn.primary{border:none;background:var(--pink);color:#000;}
 .ai-btn.ghost{flex:0 0 auto;padding:12px 16px;border:0.5px solid var(--border2);background:transparent;color:var(--text2);font-weight:600;}
 .ai-btn:disabled{opacity:.5;}
+.ai-btn{white-space:nowrap;}
+@media(max-width:350px){.ai-btn{font-size:13px;padding:12px 8px;}.ai-btn.ghost{padding:12px 10px;}}
 .ai-res-links{display:flex;justify-content:space-between;margin-top:12px;}
 .ai-res-links button{background:none;border:none;padding:6px 2px;font-family:inherit;font-size:12px;font-weight:600;color:var(--text3);cursor:pointer;}
 .ai-pre{margin:-6px 0 16px;}
 .ai-pre input{width:100%;box-sizing:border-box;padding:11px 12px;border-radius:12px;border:0.5px solid var(--border2);background:var(--bg3);color:var(--text);font-family:inherit;font-size:13px;}
 .ai-pre input:focus{outline:none;border-color:var(--pink);}
 .ai-tip{font-size:11px;color:var(--text3);margin-top:6px;line-height:1.4;}
+/* ══ Add Food screen (glass) ══ */
+#addFoodScreen{position:fixed;inset:0;z-index:150;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+  background:radial-gradient(130% 45% at 100% 0%,rgba(50,252,253,.10),transparent 60%),var(--bg);}
+#addFoodScreen *{box-sizing:border-box;}
+/* 16px text boxes stop iPhones zooming in when you tap them */
+#addFoodScreen input,#addFoodScreen textarea,#addFoodScreen select{font-size:16px !important;}
+.af-head{position:sticky;top:0;z-index:10;padding:calc(env(safe-area-inset-top) + 10px) 16px 12px;
+  background:linear-gradient(180deg,rgba(0,0,0,.78),rgba(0,0,0,.5));backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%);
+  border-bottom:0.5px solid rgba(255,255,255,.08);}
+.af-head-in{display:flex;align-items:center;justify-content:space-between;gap:12px;max-width:680px;margin:0 auto;}
+.af-eyebrow{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--pink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.af-title{font-size:28px;font-weight:800;letter-spacing:-0.03em;line-height:1.15;}
+.af-close{flex-shrink:0;width:40px;height:40px;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text);
+  background:linear-gradient(180deg,rgba(255,255,255,.13),rgba(255,255,255,.05)),rgba(28,28,30,.55);border:0.5px solid rgba(255,255,255,.14);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 6px 18px rgba(0,0,0,.35);-webkit-tap-highlight-color:transparent;transition:transform .12s;}
+.af-close:active{transform:scale(.92);}
+.af-body{max-width:680px;margin:0 auto;padding:16px 16px calc(env(safe-area-inset-bottom) + 32px);}
+.af-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px;}
+.af-tile,.af-card,.af-pill{background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02)),var(--bg3);border:0.5px solid rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.06);}
+.af-tile{min-width:0;border-radius:20px;padding:14px 6px 12px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:3px;font-family:inherit;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s,border-color .15s,background .15s;}
+.af-tile:active{transform:scale(.96);}
+.af-tile.active{border-color:var(--pink-border);background:linear-gradient(180deg,rgba(50,252,253,.16),rgba(50,252,253,.03)),var(--bg3);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 6px 20px rgba(50,252,253,.12);}
+.af-tile-ic{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;color:var(--pink);background:var(--pink-dim);border:0.5px solid var(--pink-border);margin-bottom:5px;}
+.af-tile.active .af-tile-ic{background:var(--pink);color:#000;border-color:var(--pink);box-shadow:0 4px 14px var(--pink-glow);}
+.af-tile-name{font-size:14px;font-weight:700;letter-spacing:-0.01em;}
+.af-tile-sub{font-size:11px;color:var(--text3);line-height:1.3;}
+.af-card{border-radius:var(--radius-xl);padding:16px;margin-bottom:12px;}
+.af-card-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:12px;}
+.af-card-title{font-size:18px;font-weight:700;letter-spacing:-0.02em;}
+.af-count{font-size:12px;font-weight:600;color:var(--text3);}
+.af-panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;}
+.af-panel-head>div{min-width:0;}
+.af-panel-title{font-size:18px;font-weight:700;letter-spacing:-0.02em;}
+.af-pill{flex-shrink:0;display:inline-flex;align-items:center;gap:4px;padding:8px 14px 8px 10px;border-radius:99px;font-family:inherit;font-size:13px;font-weight:600;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.af-pill:active{transform:scale(.96);}
+.af-search{flex:1;min-width:0;display:flex;align-items:center;gap:8px;height:46px;padding:0 12px;border-radius:14px;background:var(--bg4);border:0.5px solid rgba(255,255,255,.08);transition:border-color .15s;}
+.af-search:focus-within{border-color:var(--pink);}
+.af-search svg{color:var(--text3);flex-shrink:0;}
+.af-search input{flex:1;min-width:0;width:100%;height:100%;background:transparent;border:0;outline:none;padding:0;color:var(--text);font-family:inherit;}
+.af-search input::placeholder{color:var(--text3);}
+.af-search-row{display:flex;gap:8px;}
+.af-go{flex-shrink:0;padding:0 18px;border:0;border-radius:14px;background:var(--pink);color:#000;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;}
+.af-list{margin-top:6px;}
+.af-row{display:flex;align-items:center;gap:10px;padding:12px 2px;border-bottom:0.5px solid var(--border);}
+.af-row:last-child{border-bottom:0;}
+.af-row-main{flex:1;min-width:0;}
+.af-row-name{font-size:14px;font-weight:600;letter-spacing:-0.01em;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.af-row-mac{font-size:12px;color:var(--text3);margin-top:3px;}
+.af-row-mac b{font-weight:700;}
+.af-row-cal{flex-shrink:0;text-align:right;font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1;}
+.af-row-cal span{display:block;font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.04em;}
+.af-add{flex-shrink:0;width:34px;height:34px;border-radius:50%;border:0;padding:0;background:var(--pink);color:#000;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 12px var(--pink-glow);-webkit-tap-highlight-color:transparent;}
+.af-add:active{transform:scale(.92);}
+.af-badge{display:inline-block;vertical-align:1px;font-size:9px;font-weight:700;letter-spacing:.04em;padding:2px 5px;border-radius:5px;margin-left:6px;}
+.af-badge.usda{color:var(--green);background:rgba(48,209,88,.12);}
+.af-badge.off{color:var(--pink);background:var(--pink-dim);}
+.af-res{flex-direction:column;align-items:stretch;gap:10px;}
+.af-res-top{display:flex;align-items:center;gap:10px;}
+.af-res-bot{display:flex;align-items:center;gap:8px;}
+.af-srv{display:flex;align-items:center;gap:6px;height:38px;padding:0 4px 0 12px;border-radius:12px;background:var(--bg4);border:0.5px solid rgba(255,255,255,.08);}
+.af-srv label{font-size:12px;font-weight:600;color:var(--text3);}
+.af-srv input{width:56px;height:100%;background:transparent;border:0;outline:none;color:var(--text);font-family:inherit;font-weight:600;text-align:center;padding:0;}
+.af-res-add{flex:1;height:38px;border:0;border-radius:12px;background:var(--pink);color:#000;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;}
+.af-empty{text-align:center;padding:20px 8px 10px;font-size:13px;line-height:1.45;color:var(--text3);}
+.af-empty.err{color:var(--red);}
+.af-field{min-width:0;margin-bottom:12px;}
+.af-field label{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;}
+.af-field label i{width:7px;height:7px;border-radius:50%;}
+.af-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
+.af-fields .af-field{margin-bottom:0;}
+.af-input{width:100%;min-width:0;height:46px;padding:0 12px;border-radius:14px;background:var(--bg4);border:0.5px solid rgba(255,255,255,.08);color:var(--text);font-family:inherit;outline:none;transition:border-color .15s;}
+.af-input:focus{border-color:var(--pink);}
+.af-input::placeholder{color:var(--text3);}
+.af-primary{display:block;width:100%;margin-top:14px;padding:14px;border:0;border-radius:16px;background:var(--pink);color:#000;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 4px 18px var(--pink-glow);}
+.af-primary:active{transform:scale(.98);filter:brightness(.92);}
+/* AI Snap inside the glass screen */
+#addFoodScreen .ai-scan-panel{margin-bottom:12px;}
+#addFoodScreen .ai-viewfinder{border-radius:22px;border:0.5px solid rgba(255,255,255,.1);}
+#addFoodScreen .ai-snap-btn{border-radius:16px;font-weight:700;box-shadow:0 4px 18px var(--pink-glow);}
+#addFoodScreen .ai-upload-btn{border-radius:16px;color:var(--text);background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.03));border:0.5px solid rgba(255,255,255,.12);}
+#addFoodScreen .ai-pre input{height:46px;border-radius:14px;background:var(--bg4);border-color:rgba(255,255,255,.08);}
+#addFoodScreen .ai-result-photo{height:170px;border-radius:22px;}
+#addFoodScreen .ai-result-card{border-radius:var(--radius-xl);background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02)),var(--bg3);border:0.5px solid rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.06);}
+#addFoodScreen .ai-check,#addFoodScreen .ai-fix{border-radius:18px;background:var(--bg4);}
+#addFoodScreen .ai-fix textarea{background:var(--bg3);}
+#addFoodScreen .ai-btn{border-radius:14px;}
+#addFoodScreen .ai-btn.primary{box-shadow:0 4px 14px var(--pink-glow);}
+#addFoodScreen .ai-thinking{border-radius:var(--radius-xl);background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02)),var(--bg3);border:0.5px solid rgba(255,255,255,.1);margin-bottom:12px;}
 
 .addf-tile{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:18px 16px;background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--radius-lg);cursor:pointer;text-align:left;transition:all .18s;font-family:inherit;}
 .addf-tile:hover{border-color:var(--pink-border);background:var(--pink-dim);}
@@ -2024,51 +2115,53 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
     </div>
 
     <!-- ══ ADD FOOD SCREEN ══ -->
-    <div id="addFoodScreen" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:150;overflow-y:auto;padding-bottom:40px;">
+    <div id="addFoodScreen" style="display:none;">
       <!-- Header -->
-      <div style="position:sticky;top:0;background:rgba(0,0,0,0.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:0.5px solid var(--border);z-index:10;padding:calc(env(safe-area-inset-top)+52px) 20px 12px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;max-width:680px;margin:0 auto;">
-          <div>
-            <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--pink);margin-bottom:2px;" id="addFoodMealLabel">Adding to Breakfast</div>
-            <div style="font-size:20px;font-weight:700;letter-spacing:-0.02em;">Add Food</div>
+      <div class="af-head">
+        <div class="af-head-in">
+          <div style="min-width:0;">
+            <div class="af-eyebrow" id="addFoodMealLabel">Adding to Breakfast</div>
+            <div class="af-title">Add Food</div>
           </div>
-          <button onclick="closeAddFood()" style="width:32px;height:32px;border-radius:50%;background:var(--bg4);border:0.5px solid var(--border2);color:var(--text2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">✕</button>
+          <button class="af-close" onclick="closeAddFood()" aria-label="Close">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+          </button>
         </div>
       </div>
-      <div style="max-width:680px;margin:0 auto;padding:16px 16px 0;">
+      <div class="af-body">
         <!-- Option tiles -->
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px;">
-          <button class="addf-tile" onclick="openAddFoodSearch()">
-            <div class="addf-tile-icon">
-              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <div class="af-tiles">
+          <button class="af-tile" id="afTileSearch" onclick="openAddFoodSearch()">
+            <div class="af-tile-ic">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7.5"/><line x1="20.5" y1="20.5" x2="16.5" y2="16.5"/></svg>
             </div>
-            <div class="addf-tile-name">Search</div>
-            <div class="addf-tile-sub">USDA & Open Food Facts</div>
+            <div class="af-tile-name">Search</div>
+            <div class="af-tile-sub">Food database</div>
           </button>
-          <button class="addf-tile" onclick="openAddFoodScanner()">
-            <div class="addf-tile-icon">
-              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><circle cx="12" cy="14" r="3"/><path d="M16 3l-2 4H10L8 3"/></svg>
+          <button class="af-tile" id="afTileBarcode" onclick="openAddFoodScanner()">
+            <div class="af-tile-ic">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" y1="8" x2="7" y2="16"/><line x1="10.5" y1="8" x2="10.5" y2="16"/><line x1="14" y1="8" x2="14" y2="16"/><line x1="17" y1="8" x2="17" y2="16"/></svg>
             </div>
-            <div class="addf-tile-name">Barcode</div>
-            <div class="addf-tile-sub">Scan packaging</div>
+            <div class="af-tile-name">Barcode</div>
+            <div class="af-tile-sub">Scan packaging</div>
           </button>
-          <button class="addf-tile" onclick="openAIScanner()">
-            <div class="addf-tile-icon">
-              <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 8v4l3 3"/><circle cx="19" cy="5" r="3" fill="currentColor" stroke="none"/><path d="M17 5h4M19 3v4" stroke="currentColor" stroke-width="1.5"/></svg>
+          <button class="af-tile" id="afTileAI" onclick="openAIScanner()">
+            <div class="af-tile-ic">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3.5"/></svg>
             </div>
-            <div class="addf-tile-name">AI Snap</div>
-            <div class="addf-tile-sub">Photo → instant macros</div>
+            <div class="af-tile-name">AI Snap</div>
+            <div class="af-tile-sub">Photo → macros</div>
           </button>
         </div>
 
         <!-- AI Scanner panel -->
         <div id="aiScanPanel" class="ai-scan-panel">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div class="af-panel-head">
             <div>
-              <div style="font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--pink);margin-bottom:2px;">AI Food Recognition</div>
-              <div style="font-size:16px;font-weight:700;letter-spacing:-0.02em;">Point at your food</div>
+              <div class="af-eyebrow">AI Food Recognition</div>
+              <div class="af-panel-title">Point at your food</div>
             </div>
-            <button onclick="closeAIScanner()" style="padding:6px 14px;border-radius:99px;border:0.5px solid var(--border2);background:transparent;font-family:inherit;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;">Back</button>
+            <button class="af-pill" onclick="closeAIScanner()"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
           </div>
           <!-- Viewfinder -->
           <div class="ai-viewfinder" id="aiViewfinder">
@@ -2095,7 +2188,7 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
             <input type="file" accept="image/*" id="aiUploadInput" style="display:none;" onchange="aiAnalyseUpload(event)">
           </label>
           <div class="ai-pre" id="aiPre">
-            <input type="text" id="aiNoteInput" maxlength="300" placeholder="Add a note (optional) — e.g. 8 oz chicken, cooked in oil">
+            <input type="text" id="aiNoteInput" maxlength="300" placeholder="Optional note, e.g. 8 oz chicken">
             <div class="ai-tip">Tip: shoot at an angle and include a fork or your hand so it can judge portion size.</div>
           </div>
           <!-- AI thinking state -->
@@ -2144,28 +2237,40 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
           </div>
         </div>
         <!-- Search panel (shown when Search is tapped) -->
-        <div id="addFoodSearchPanel" style="display:none;">
-          <div style="display:flex;gap:8px;margin-bottom:12px;">
-            <div class="iw" style="flex:1;"><input type="text" id="addFoodInput" placeholder="e.g. Greek Yogurt, Big Mac…" style="font-size:15px;" onkeydown="if(event.key==='Enter')doAddFoodSearch()"></div>
-            <button onclick="doAddFoodSearch()" style="padding:0 16px;background:var(--pink);border:none;border-radius:10px;font-family:inherit;font-size:13px;font-weight:600;color:#000;cursor:pointer;white-space:nowrap;">Search</button>
+        <div id="addFoodSearchPanel" class="af-card" style="display:none;">
+          <div class="af-panel-head">
+            <div>
+              <div class="af-eyebrow">USDA &amp; Open Food Facts</div>
+              <div class="af-panel-title">Search foods</div>
+            </div>
+            <button class="af-pill" onclick="closeAddFoodSearch()"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
           </div>
-          <div id="addFoodResults"></div>
+          <div class="af-search-row">
+            <div class="af-search"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7.5"/><line x1="20.5" y1="20.5" x2="16.5" y2="16.5"/></svg><input type="text" id="addFoodInput" placeholder="e.g. Greek yogurt, Big Mac" enterkeyhint="search" onkeydown="if(event.key==='Enter')doAddFoodSearch()"></div>
+            <button class="af-go" onclick="doAddFoodSearch()">Search</button>
+          </div>
+          <div id="addFoodResults" class="af-list"></div>
         </div>
         <!-- Library panel -->
         <div id="addFoodLibPanel">
-          <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">My Library</div>
-          <div class="iw" style="margin-bottom:10px;"><input type="text" id="addFoodLibSearch" placeholder="Search library…" oninput="renderAddFoodLib()"></div>
-          <div id="addFoodLibList"></div>
-          <!-- Add custom food -->
-          <div style="margin-top:16px;padding-top:14px;border-top:0.5px solid var(--border);">
-            <div style="font-size:13px;font-weight:600;margin-bottom:10px;color:var(--text2);">+ Add Custom Food</div>
-            <div class="field"><label>Food name</label><div class="iw"><input type="text" id="af-newFoodName" placeholder="e.g. Greek Yogurt"></div></div>
-            <div class="three-col" style="margin-bottom:10px;">
-              <div class="field"><label>Protein (g)</label><div class="iw"><input type="number" id="af-newFoodProtein" placeholder="0" min="0"></div></div>
-              <div class="field"><label>Carbs (g)</label><div class="iw"><input type="number" id="af-newFoodCarbs" placeholder="0" min="0"></div></div>
-              <div class="field"><label>Fat (g)</label><div class="iw"><input type="number" id="af-newFoodFat" placeholder="0" min="0"></div></div>
+          <div class="af-card">
+            <div class="af-card-head">
+              <div class="af-card-title">My Library</div>
+              <div class="af-count" id="addFoodLibCount"></div>
             </div>
-            <button class="pink-btn" onclick="addCustomFoodFromSheet()">Save & Add to Meal</button>
+            <div class="af-search"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7.5"/><line x1="20.5" y1="20.5" x2="16.5" y2="16.5"/></svg><input type="text" id="addFoodLibSearch" placeholder="Search your foods" oninput="renderAddFoodLib()"></div>
+            <div id="addFoodLibList" class="af-list"></div>
+          </div>
+          <!-- Add custom food -->
+          <div class="af-card">
+            <div class="af-card-head"><div class="af-card-title">Custom Food</div></div>
+            <div class="af-field"><label for="af-newFoodName">Food name</label><input class="af-input" type="text" id="af-newFoodName" placeholder="e.g. Greek yogurt"></div>
+            <div class="af-fields">
+              <div class="af-field"><label for="af-newFoodProtein"><i style="background:#FF9F0A"></i>Protein</label><input class="af-input" type="number" inputmode="decimal" id="af-newFoodProtein" placeholder="0 g" min="0"></div>
+              <div class="af-field"><label for="af-newFoodCarbs"><i style="background:#30D158"></i>Carbs</label><input class="af-input" type="number" inputmode="decimal" id="af-newFoodCarbs" placeholder="0 g" min="0"></div>
+              <div class="af-field"><label for="af-newFoodFat"><i style="background:#BF5AF2"></i>Fat</label><input class="af-input" type="number" inputmode="decimal" id="af-newFoodFat" placeholder="0 g" min="0"></div>
+            </div>
+            <button class="af-primary" id="afCustomBtn" onclick="addCustomFoodFromSheet()">Save &amp; Add to Meal</button>
           </div>
         </div>
       </div>
@@ -4186,17 +4291,33 @@ function openAddFood() {
   const res = document.getElementById('addFoodResults');
   if(res) res.innerHTML = '';
   renderAddFoodLib();
-  document.getElementById('addFoodScreen').style.display = 'block';
+  // Start on the library, with the camera off
+  if(typeof stopAICamera === 'function') stopAICamera();
+  const ai = document.getElementById('aiScanPanel');
+  if(ai) ai.style.display = 'none';
+  afSetTile('');
+  const btn = document.getElementById('afCustomBtn');
+  if(btn) btn.textContent = `Save & Add to ${labels[curMeal] || 'Meal'}`;
+  const scr = document.getElementById('addFoodScreen');
+  scr.style.display = 'block';
+  scr.scrollTop = 0;
   window.scrollTo(0,0);
 }
 
 function closeAddFood() {
+  if(typeof stopAICamera === 'function') stopAICamera();
+  const ai = document.getElementById('aiScanPanel');
+  if(ai) ai.style.display = 'none';
   document.getElementById('addFoodScreen').style.display = 'none';
 }
 
 function openAddFoodSearch() {
+  if(typeof stopAICamera === 'function') stopAICamera();
+  const ai = document.getElementById('aiScanPanel');
+  if(ai) ai.style.display = 'none';
   document.getElementById('addFoodSearchPanel').style.display = 'block';
   document.getElementById('addFoodLibPanel').style.display = 'none';
+  afSetTile('search');
   setTimeout(() => document.getElementById('addFoodInput')?.focus(), 100);
 }
 
@@ -4209,13 +4330,14 @@ function closeAddFoodSearch() {
   document.getElementById('addFoodSearchPanel').style.display = 'none';
   document.getElementById('addFoodLibPanel').style.display = 'block';
   document.getElementById('addFoodResults').innerHTML = '';
+  afSetTile('');
 }
 
 async function doAddFoodSearch() {
   const query = document.getElementById('addFoodInput').value.trim();
   if(!query) return;
   const el = document.getElementById('addFoodResults');
-  el.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px;">Searching USDA &amp; Open Food Facts…</div>`;
+  el.innerHTML = `<div class="af-empty">Searching USDA &amp; Open Food Facts…</div>`;
   try {
     const [usda, off] = await Promise.allSettled([searchUSDA(query), searchOFF(query)]);
     console.log('Search results:', {usda, off});
@@ -4229,36 +4351,42 @@ async function doAddFoodSearch() {
     if(results.length === 0) {
       const usdaMsg = usda.status==='rejected' ? ` (USDA: ${usda.reason?.message || 'error'})` : '';
       const offMsg = off.status==='rejected' ? ` (OFF: ${off.reason?.message || 'error'})` : '';
-      el.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text3);font-size:13px;">No results found — try a different search${usdaMsg}${offMsg}</div>`;
+      el.innerHTML = `<div class="af-empty">No results found — try a different search${afEsc(usdaMsg + offMsg)}</div>`;
       return;
     }
+    window._afResults = results;
     el.innerHTML = results.map((f, ri) => {
-      const safe = f.name.replace(/'/g,"\\'").replace(/"/g,'&quot;');
-      const sourceBadge = f.source==='USDA'
-        ? '<span style="font-size:9px;font-weight:700;color:var(--green);background:rgba(48,209,88,0.1);padding:1px 5px;border-radius:4px;margin-left:5px;">USDA</span>'
-        : '<span style="font-size:9px;font-weight:700;color:var(--pink);background:var(--pink-dim);padding:1px 5px;border-radius:4px;margin-left:5px;">OFF</span>';
-      return `<div class="addf-food-row" style="flex-direction:column;align-items:stretch;gap:6px;">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <div style="flex:1;min-width:0;">
-            <div class="addf-food-name">${f.name}${sourceBadge}</div>
-            <div class="addf-food-macros">P: ${f.protein}g · C: ${f.carbs}g · F: ${f.fat}g${f.serving?' · '+f.serving:''}</div>
+      const badge = f.source==='USDA' ? '<span class="af-badge usda">USDA</span>' : '<span class="af-badge off">OFF</span>';
+      return `<div class="af-row af-res">
+        <div class="af-res-top">
+          <div class="af-row-main">
+            <div class="af-row-name">${afEsc(f.name)}${badge}</div>
+            <div class="af-row-mac">${afMacros(f.protein, f.carbs, f.fat, f.serving)}</div>
           </div>
-          <div class="addf-food-cal" id="sr-cal-${ri}">${f.cal}<br><span style="font-size:9px;color:var(--text3);">kcal</span></div>
+          <div class="af-row-cal" id="sr-cal-${ri}">${Math.round(f.cal)}<span>KCAL</span></div>
         </div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <label style="font-size:11px;color:var(--text3);white-space:nowrap;">Servings:</label>
-          <div class="iw" style="flex:0 0 80px;">
-            <input type="number" id="srv-${ri}" value="1" min="0.25" step="0.25" style="font-size:13px;padding:4px 6px;text-align:center;"
-              oninput="(function(){var s=parseFloat(this.value)||1;var el=document.getElementById('sr-cal-${ri}');if(el)el.innerHTML=Math.round(${f.cal}*s)+'<br><span style=\\'font-size:9px;color:var(--text3);\\'>kcal</span>'}).call(this)">
-          </div>
-          <button class="pink-btn" style="flex:1;padding:7px 0;font-size:13px;" onclick="(function(){var s=parseFloat(document.getElementById('srv-${ri}').value)||1;addFoodFromSearch('${safe}',${f.protein}*s,${f.carbs}*s,${f.fat}*s)})()">Add to ${MEAL_LABELS[curMeal]}</button>
+        <div class="af-res-bot">
+          <div class="af-srv"><label for="srv-${ri}">Servings</label><input type="number" inputmode="decimal" id="srv-${ri}" value="1" min="0.25" step="0.25" oninput="afServingInput(${ri}, this.value)"></div>
+          <button class="af-res-add" onclick="afAddSearchResult(${ri})">Add to ${MEAL_LABELS[curMeal] || 'meal'}</button>
         </div>
       </div>`;
     }).join('');
   } catch(e) {
     console.error('Search error:', e);
-    el.innerHTML = `<div style="text-align:center;padding:20px;color:var(--red);font-size:13px;">Search failed — check your internet connection and try again</div>`;
+    el.innerHTML = `<div class="af-empty err">Search failed — check your internet connection and try again</div>`;
   }
+}
+
+function afServingInput(ri, v) {
+  const f = (window._afResults || [])[ri]; if(!f) return;
+  const n = parseFloat(v) || 1;
+  const el = document.getElementById('sr-cal-' + ri);
+  if(el) el.innerHTML = `${Math.round(f.cal * n)}<span>KCAL</span>`;
+}
+function afAddSearchResult(ri) {
+  const f = (window._afResults || [])[ri]; if(!f) return;
+  const n = parseFloat(document.getElementById('srv-' + ri)?.value) || 1;
+  addFoodFromSearch(f.name, f.protein * n, f.carbs * n, f.fat * n);
 }
 
 function addFoodFromSearch(name, protein, carbs, fat) {
@@ -4267,25 +4395,45 @@ function addFoodFromSearch(name, protein, carbs, fat) {
   showToast(`${name} added!`);
 }
 
+function afEsc(v) {
+  return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function afNum(v) { const n = Math.round((Number(v) || 0) * 10) / 10; return n; }
+function afMacros(p, c, f, extra) {
+  return `<b style="color:#FF9F0A">P</b> ${afNum(p)}g · <b style="color:#30D158">C</b> ${afNum(c)}g · <b style="color:#BF5AF2">F</b> ${afNum(f)}g` + (extra ? ` · ${afEsc(extra)}` : '');
+}
+function afPlusSvg() {
+  return '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+}
+// Lights up the tile for the panel that's open ('search', 'ai' or '')
+function afSetTile(which) {
+  [['afTileSearch','search'],['afTileAI','ai']].forEach(([id, k]) => {
+    const el = document.getElementById(id);
+    if(el) el.classList.toggle('active', which === k);
+  });
+}
+
 function renderAddFoodLib() {
   const q = (document.getElementById('addFoodLibSearch')?.value || '').toLowerCase();
-  const filtered = foodLib.filter(f => f.name.toLowerCase().includes(q));
+  const filtered = foodLib.filter(f => String(f.name || '').toLowerCase().includes(q));
   const el = document.getElementById('addFoodLibList');
+  const count = document.getElementById('addFoodLibCount');
+  if(count) count.textContent = foodLib.length ? `${foodLib.length} ${foodLib.length === 1 ? 'food' : 'foods'}` : '';
   if(!el) return;
   if(filtered.length === 0) {
-    el.innerHTML = `<div style="color:var(--text3);font-size:13px;text-align:center;padding:12px;">No foods found</div>`;
+    el.innerHTML = `<div class="af-empty">${foodLib.length ? 'No foods match that search' : 'Foods you add will show up here so you can log them again in one tap.'}</div>`;
     return;
   }
-  el.innerHTML = filtered.map((f, i) => {
+  el.innerHTML = filtered.map(f => {
     const cal = Math.round(f.protein*4 + f.carbs*4 + f.fat*9);
     const idx = foodLib.indexOf(f);
-    return `<div class="addf-food-row">
-      <div style="flex:1;min-width:0;">
-        <div class="addf-food-name">${f.name}</div>
-        <div class="addf-food-macros">P: ${f.protein}g · C: ${f.carbs}g · F: ${f.fat}g</div>
+    return `<div class="af-row">
+      <div class="af-row-main">
+        <div class="af-row-name">${afEsc(f.name)}</div>
+        <div class="af-row-mac">${afMacros(f.protein, f.carbs, f.fat)}</div>
       </div>
-      <div class="addf-food-cal">${cal}<br><span style="font-size:9px;color:var(--text3);">kcal</span></div>
-      <button class="addf-food-add" onclick="addFoodFromLib(${idx})">+</button>
+      <div class="af-row-cal">${cal}<span>KCAL</span></div>
+      <button class="af-add" onclick="addFoodFromLib(${idx})" aria-label="Add ${afEsc(f.name)}">${afPlusSvg()}</button>
     </div>`;
   }).join('');
 }
@@ -9082,6 +9230,7 @@ let aiStream = null;
 let aiCapturedDataUrl = null;
 
 function openAIScanner() {
+  afSetTile('ai');
   document.getElementById('aiScanPanel').style.display = 'block';
   document.getElementById('addFoodLibPanel').style.display = 'none';
   document.getElementById('addFoodSearchPanel').style.display = 'none';
@@ -9105,6 +9254,7 @@ function closeAIScanner() {
   document.getElementById('aiResult').style.display = 'none';
   document.getElementById('aiThinking').style.display = 'none';
   renderAddFoodLib();
+  afSetTile('');
 }
 
 async function startAICamera() {
@@ -9503,9 +9653,9 @@ function aiRenderItems() {
         ${it.open ? `<div class="ai-item-edit">
           <div class="ai-edit-field amt"><label>${unit === 'oz' ? 'Oz' : 'Servings'}</label><div class="iw"><input type="number" inputmode="decimal" min="0" step="${unit === 'oz' ? '0.5' : '0.25'}" value="${it.amount}" oninput="aiAmountInput(${i}, this.value)"></div></div>
           <div class="ai-edit-field"><label>Cal</label><div class="iw"><input type="number" inputmode="decimal" min="0" id="aiE${i}calories" value="${Math.round(it.calories)}" oninput="aiMacroInput(${i}, 'calories', this.value)"></div></div>
-          <div class="ai-edit-field"><label>Protein</label><div class="iw"><input type="number" inputmode="decimal" min="0" id="aiE${i}protein" value="${aiR1(it.protein)}" oninput="aiMacroInput(${i}, 'protein', this.value)"></div></div>
-          <div class="ai-edit-field"><label>Carbs</label><div class="iw"><input type="number" inputmode="decimal" min="0" id="aiE${i}carbs" value="${aiR1(it.carbs)}" oninput="aiMacroInput(${i}, 'carbs', this.value)"></div></div>
-          <div class="ai-edit-field"><label>Fat</label><div class="iw"><input type="number" inputmode="decimal" min="0" id="aiE${i}fat" value="${aiR1(it.fat)}" oninput="aiMacroInput(${i}, 'fat', this.value)"></div></div>
+          <div class="ai-edit-field"><label style="color:#FF9F0A">P (g)</label><div class="iw"><input type="number" inputmode="decimal" min="0" id="aiE${i}protein" value="${aiR1(it.protein)}" oninput="aiMacroInput(${i}, 'protein', this.value)"></div></div>
+          <div class="ai-edit-field"><label style="color:#30D158">C (g)</label><div class="iw"><input type="number" inputmode="decimal" min="0" id="aiE${i}carbs" value="${aiR1(it.carbs)}" oninput="aiMacroInput(${i}, 'carbs', this.value)"></div></div>
+          <div class="ai-edit-field"><label style="color:#BF5AF2">F (g)</label><div class="iw"><input type="number" inputmode="decimal" min="0" id="aiE${i}fat" value="${aiR1(it.fat)}" oninput="aiMacroInput(${i}, 'fat', this.value)"></div></div>
         </div>` : ''}
       </div>
     </div>`;
