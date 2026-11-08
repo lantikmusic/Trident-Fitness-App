@@ -102,6 +102,32 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 @keyframes pageOutL{from{transform:none;}to{transform:translateX(-100%);}}
 @keyframes pageOutR{from{transform:none;}to{transform:translateX(100%);}}
 @media (prefers-reduced-motion: reduce){.page.page-in-r,.page.page-in-l,.page.page-out-l,.page.page-out-r{animation:none;}}
+/* ── "What's new" pop-up (shown once after an update) ── */
+.wn-overlay{position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;
+  padding:calc(env(safe-area-inset-top) + 20px) 16px calc(env(safe-area-inset-bottom) + 20px);
+  background:rgba(0,0,0,0.62);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);animation:wnFade .25s ease;}
+.wn-card{position:relative;width:100%;max-width:420px;max-height:100%;display:flex;flex-direction:column;border-radius:28px;padding:22px 18px 18px;
+  background:linear-gradient(180deg,rgba(255,255,255,0.10) 0%,rgba(255,255,255,0.03) 40%,rgba(255,255,255,0.02) 100%),rgba(24,24,26,0.92);
+  border:0.5px solid rgba(255,255,255,0.14);box-shadow:0 24px 60px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.16);
+  animation:wnRise .38s cubic-bezier(.22,.9,.3,1.1);}
+.wn-head{text-align:center;flex-shrink:0;}
+.wn-logo{height:52px;width:auto;display:block;margin:0 auto 8px;filter:drop-shadow(0 0 10px rgba(50,252,253,0.3));}
+.wn-eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--pink);}
+.wn-title{font-size:24px;font-weight:800;letter-spacing:-0.02em;margin-top:4px;}
+.wn-date{font-size:12px;color:var(--text3);margin-top:3px;}
+.wn-list{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;margin:16px -4px 0;padding:0 4px 18px;
+  -webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 26px),transparent);mask-image:linear-gradient(to bottom,#000 calc(100% - 26px),transparent);}
+.wn-item{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-top:0.5px solid rgba(255,255,255,0.07);}
+.wn-item:first-child{border-top:none;padding-top:2px;}
+.wn-ic{flex-shrink:0;width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:19px;
+  background:rgba(50,252,253,0.08);border:0.5px solid rgba(50,252,253,0.22);}
+.wn-txt{min-width:0;}
+.wn-txt b{display:block;font-size:14.5px;font-weight:700;margin-bottom:2px;}
+.wn-txt span{display:block;font-size:13px;line-height:1.45;color:var(--text2);}
+.wn-btn{flex-shrink:0;margin-top:14px;}
+@keyframes wnFade{from{opacity:0;}to{opacity:1;}}
+@keyframes wnRise{from{opacity:0;transform:translateY(24px) scale(.96);}to{opacity:1;transform:none;}}
+@media (prefers-reduced-motion: reduce){.wn-overlay,.wn-card{animation:none;}}
 /* ── Bottom Nav: floating "liquid glass" pill ── */
 .bottom-nav{
   position:fixed;left:12px;right:12px;max-width:560px;margin:0 auto;
@@ -3335,7 +3361,7 @@ function navTo(page) {
   navSlidePill(navEl);
   currentPage = page;
   document.body.dataset.page = page;
-  if(page==='dashboard') renderDashboard();
+  if(page==='dashboard') { renderDashboard(); if(window._wnReady) setTimeout(wnMaybeShow, 400); }
   if(page==='macros') renderMacros();
   if(page==='workout') renderWorkout();
   if(page==='progress') renderProgress();
@@ -13538,6 +13564,69 @@ function cmShareLastWorkout() {
   cmOpenCompose({ type: 'workout', payload });
 }
 
+// ══════════════════════════════════════
+// WHAT'S NEW — a one-time pop-up on the Home screen after each update.
+// To announce an update: add a new entry at the TOP of this list with a new id.
+// Everyone sees the newest entry once; brand-new accounts skip it.
+// ══════════════════════════════════════
+function wnList() {
+  return [
+    {
+      id: '2026-11-07',
+      date: 'November 7, 2026',
+      title: 'Fresh updates',
+      items: [
+        { ic: '📸', t: 'Smarter food scanner', d: 'Snap a photo of your meal and AI lists each food with its portion and macros. If something looks off, tap "No, fix it", say what you\'re eating, and it checks the photo again.' },
+        { ic: '🍔', t: 'Restaurant meals', d: 'Can\'t find something in food search? Tap Ask AI to look up meals from restaurants and chains like Urbane Cafe, Chick-fil-A and Taco Bell.' },
+        { ic: '🍽️', t: 'New Add Food screen', d: 'A cleaner glass design for searching, scanning barcodes and AI photos, and no more zooming in by accident.' },
+        { ic: '👥', t: 'Tag your gym partners', d: 'Type @ and a friend\'s username in a post to tag them. They\'ll get a notification, and you can remove a tag you\'re in.' },
+        { ic: '🙋', t: 'Full profile pages', d: 'Profiles now open as a full page with posts, a bio and their @username. Tap your photo at the top of Community to see yours and add a bio.' },
+        { ic: '✍️', t: 'Easier posting', d: 'The post box opens right in the feed, and you can pull down at the top of the feed to load new posts.' },
+        { ic: '✨', t: 'Smoother moves', d: 'Pages swipe and the tab highlight slides when you switch tabs.' }
+      ]
+    }
+  ];
+}
+const WN_SEEN_KEY = 'trident_whats_new_seen_v1';
+function wnEsc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+// Shows the newest update once, only on the Home screen and only after the splash.
+function wnMaybeShow() {
+  try {
+    const latest = wnList()[0];
+    if(!latest || !window._wnReady || !isLoggedIn()) return;
+    if(localStorage.getItem('trident_new_account')) {
+      localStorage.removeItem('trident_new_account');
+      localStorage.setItem(WN_SEEN_KEY, latest.id);
+      return;
+    }
+    if(localStorage.getItem(WN_SEEN_KEY) === latest.id) return;
+    if(currentPage !== 'dashboard' || document.getElementById('wnOverlay')) return;
+    localStorage.setItem(WN_SEEN_KEY, latest.id); // one time, even if the app is closed while it's open
+    wnOpen(latest);
+  } catch(e) { console.warn("What's new unavailable:", e); }
+}
+function wnOpen(entry) {
+  const el = document.createElement('div');
+  el.className = 'wn-overlay';
+  el.id = 'wnOverlay';
+  el.onclick = e => { if(e.target === el) wnClose(); };
+  el.innerHTML = `<div class="wn-card" role="dialog" aria-modal="true" aria-labelledby="wnTitle">
+      <div class="wn-head">
+        <img class="wn-logo" src="Icons/trident-mark.png" alt="">
+        <div class="wn-eyebrow">What's new</div>
+        <div class="wn-title" id="wnTitle">${wnEsc(entry.title || 'Fresh updates')}</div>
+        ${entry.date ? `<div class="wn-date">${wnEsc(entry.date)}</div>` : ''}
+      </div>
+      <div class="wn-list">${(entry.items || []).map(it => `<div class="wn-item"><div class="wn-ic">${wnEsc(it.ic)}</div><div class="wn-txt"><b>${wnEsc(it.t)}</b><span>${wnEsc(it.d)}</span></div></div>`).join('')}</div>
+      <button class="pink-btn wn-btn" onclick="wnClose()">Let's go</button>
+    </div>`;
+  document.body.appendChild(el);
+}
+function wnClose() {
+  const el = document.getElementById('wnOverlay');
+  if(el) el.remove();
+}
+
 // ── INIT ──
 try {
   renderDashboard();
@@ -13558,6 +13647,8 @@ try {
     // Logged in user — mark onboarding done, their data will load from cloud
     localStorage.setItem(ONBOARDING_KEY, '1');
   }
+  // After the splash, show what changed in this update (once)
+  setTimeout(() => { window._wnReady = true; wnMaybeShow(); }, 2800);
 } catch(e) {
   console.error('Init error:', e);
   if(window.__tfDiag) window.__tfDiag('init: ' + (e && e.message) + ' | ' + String(e && e.stack || '').split('\n').slice(0,3).join(' | '));

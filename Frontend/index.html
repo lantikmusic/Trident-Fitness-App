@@ -962,6 +962,8 @@ async function handleSignup() {
     saveToken(data.token);
     currentUser = data.user;
     obData.name = name;
+    // Brand-new account: the app skips its "What's new" pop-up (there's nothing new to them yet)
+    try { localStorage.setItem('trident_new_account', '1'); } catch(e) {}
     showToast('✓ Account created! Let\'s set up your profile.');
     setTimeout(() => showScreen('screen-onboarding'), 600);
 
