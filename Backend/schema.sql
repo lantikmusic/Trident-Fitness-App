@@ -238,3 +238,10 @@ CREATE TABLE IF NOT EXISTS community_post_tags (
   PRIMARY KEY (post_id, user_id)
 );
 CREATE INDEX IF NOT EXISTS idx_post_tags_user ON community_post_tags(user_id);
+
+-- Profile bio (short "about me" on your community profile)
+CREATE TABLE IF NOT EXISTS community_bios (
+  user_id TEXT PRIMARY KEY,
+  bio TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);

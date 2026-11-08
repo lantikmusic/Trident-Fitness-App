@@ -147,6 +147,7 @@ export default {
     if (path === '/community/profile'         && request.method === 'GET')  return community(communityProfile, request, env.DB);
     if (path === '/community/follow'          && request.method === 'POST') return community(communityToggleFollow, request, env.DB, env, ctx);
     if (path === '/community/block'           && request.method === 'POST') return community(communityToggleBlock, request, env.DB);
+    if (path === '/community/bio'             && request.method === 'POST') return community(communitySetBio, request, env.DB);
     if (path === '/community/search'          && request.method === 'GET')  return community(communitySearch, request, env.DB);
 
     // ── Usernames (@handle used to find friends) ──
@@ -1416,6 +1417,48 @@ async function communityTarget(request) {
   return typeof id === 'string' && COMMUNITY_ID.test(id) ? id : null;
 }
 
+// ── Bio: a short line about you, shown on your profile ──
+const BIO_MAX = 150;
+
+// Tidies a bio: no control characters, at most 4 lines, at most 150 characters.
+function bioClean(raw) {
+  return String(raw == null ? '' : raw)
+    .replace(/\r\n?/g, '\n')
+    .replace(/[\u0000-\u0009\u000B-\u001F\u007F]/g, '')
+    .split('\n').map(l => l.replace(/\s+$/, '')).join('\n')
+    .replace(/\n{2,}/g, '\n')
+    .trim()
+    .split('\n').slice(0, 4).join('\n');
+}
+
+async function bioOf(DB, userId) {
+  try {
+    const row = await DB.prepare('SELECT bio FROM community_bios WHERE user_id = ?').bind(userId).first();
+    return row ? row.bio : '';
+  } catch (e) {
+    return '';
+  }
+}
+
+async function communitySetBio(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+  let data;
+  try { data = await request.json(); } catch (e) { return error('Invalid request'); }
+  if (!data || typeof data.bio !== 'string') return error('Invalid request');
+  const bio = bioClean(data.bio);
+  if (bio.length > BIO_MAX) return error(`Bios are limited to ${BIO_MAX} characters`);
+  if (bio) {
+    await DB.prepare(
+      `INSERT INTO community_bios (user_id, bio, updated_at) VALUES (?, ?, ?)
+       ON CONFLICT(user_id) DO UPDATE SET bio = excluded.bio, updated_at = excluded.updated_at`
+    ).bind(session.user_id, bio, new Date().toISOString()).run();
+  } else {
+    await DB.prepare('DELETE FROM community_bios WHERE user_id = ?').bind(session.user_id).run();
+  }
+  return json({ success: true, bio });
+}
+
 async function communityProfile(request, DB) {
   const session = await validateSession(request, DB);
   if (!session) return error('Unauthorized', 401);
@@ -1435,6 +1478,7 @@ async function communityProfile(request, DB) {
   ).bind(userId, me).first();
   return json({
     user_id: user.id, name: user.name, username: await usernameOf(DB, user.id), has_avatar: !!user.has_avatar, is_me: user.id === me,
+    bio: stats.blocked ? '' : await bioOf(DB, user.id),
     followers: stats.followers || 0, following: stats.following || 0, posts: stats.posts || 0,
     is_following: !!stats.is_following, follows_you: !!stats.follows_you, blocked: !!stats.blocked
   });

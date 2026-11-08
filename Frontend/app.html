@@ -1406,6 +1406,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .cmp-name{font-size:17px;font-weight:700;letter-spacing:-0.01em;margin-top:12px;word-break:break-word;}
 .cmp-handle{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:14px;font-weight:600;color:var(--pink);margin-top:2px;min-height:4px;}
 .cmp-follows{font-size:11px;font-weight:600;color:var(--text2);background:var(--bg4);border-radius:6px;padding:2px 7px;}
+.cmp-bio{font-size:14px;line-height:1.45;color:var(--text);margin-top:8px;white-space:pre-wrap;word-break:break-word;}
+.cmp-addbio{display:inline-block;margin-top:8px;padding:0;background:none;border:0;font-family:inherit;font-size:13px;font-weight:600;color:var(--pink);cursor:pointer;}
+.cmp-edit-label{display:block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin:4px 0 8px;}
+.cmp-edit-link{display:block;width:100%;margin-top:12px;padding:10px 0;background:none;border:0;font-family:inherit;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;}
+.cm-me-btn{flex-shrink:0;padding:0;background:none;border:0;cursor:pointer;border-radius:50%;-webkit-tap-highlight-color:transparent;}
+.cm-me-btn .cm-ring{display:block;padding:2px;}
+.cm-me-btn .cm-avatar{width:38px;height:38px;border:2px solid var(--bg);}
+.cm-me-btn:active{transform:scale(.93);}
+.cm-me-av{flex-shrink:0;padding:0;background:none;border:0;cursor:pointer;border-radius:50%;}
 .cmp-btns{display:flex;gap:8px;margin-top:14px;}
 .cmp-btn{flex:1;height:38px;border-radius:12px;font-family:inherit;font-size:14px;font-weight:700;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent;
   background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.04)),var(--bg3);border:0.5px solid rgba(255,255,255,.12);}
@@ -12180,6 +12189,7 @@ function cmDraw() {
   cmDrawHeadActions();
   let html = `<div class="cm-top">
       <div class="cm-scope${following ? ' following' : ''}"><span class="cm-scope-pill"></span><button class="cm-scope-btn${following ? '' : ' active'}" onclick="cmSetScope('all')">Main Feed</button><button class="cm-scope-btn${following ? ' active' : ''}" onclick="cmSetScope('following')">Following</button></div>
+      <button class="cm-me-btn" onclick="cmOpenMyProfile()" aria-label="My profile"><span class="cm-ring">${cmMyAvatarHTML()}</span></button>
     </div>
     ${unGet() || !window._unKnown ? '' : `<div class="cm-un-card">
       <div class="cm-un-ic">@</div>
@@ -12187,7 +12197,7 @@ function cmDraw() {
       <button class="cm-follow" onclick="unOpenInSettings()">Choose</button>
     </div>`}
     <div class="cm-composer">
-      <div class="cm-composer-row" onclick="cmOpenCompose()">${cmMyAvatarHTML()}<div class="cm-composer-ph">What did you crush today?</div></div>
+      <div class="cm-composer-row" onclick="cmOpenCompose()"><button class="cm-me-av" onclick="event.stopPropagation();cmOpenMyProfile()" aria-label="My profile">${cmMyAvatarHTML()}</button><div class="cm-composer-ph">What did you crush today?</div></div>
       <div class="cm-composer-chips">
         <button class="cm-qchip" onclick="cmQuick('photo')">📷 Photo</button>
         <button class="cm-qchip" onclick="cmQuick('workout')">🏋️ Workout</button>
@@ -12321,6 +12331,49 @@ async function cmOpenProfile(uid, opts) {
   cmDraw();
 }
 
+// Your own profile, from the Community tab. Looks up your account id once.
+async function cmOpenMyProfile() {
+  if(!isLoggedIn()) { showToast('Sign in to see your profile'); return; }
+  if(!window._cmMeId) {
+    const r = await cmApi('/auth/me');
+    const id = r.ok && r.data && r.data.user ? cmSafeId(r.data.user.id) : '';
+    if(!id) { if(r.status !== 401) showToast('Could not open your profile — try again'); return; }
+    window._cmMeId = id;
+  }
+  cmOpenProfile(window._cmMeId);
+}
+
+// "Edit profile": bio here; photo, name and username live in Settings.
+function cmEditProfile() {
+  const pr = cmProf.data || {};
+  cmSheet(`<div class="cm-sheet-title">Edit profile</div>
+    <label class="cmp-edit-label" for="cmBioInput">Bio</label>
+    <textarea class="cm-textarea" id="cmBioInput" maxlength="150" rows="4" placeholder="Tell people about you, e.g. Hybrid athlete · Training for my first marathon 🏃" oninput="cmBioCount()"></textarea>
+    <div class="cm-count" id="cmBioCount">0 / 150</div>
+    <button class="pink-btn" id="cmBioSave" style="margin-top:12px;" onclick="cmSaveBio()">Save</button>
+    <button class="cmp-edit-link" onclick="cmSheetClose();openSettings()">Change your photo, name or username in Settings ›</button>
+    <button class="ghost-btn" style="margin-top:8px;" onclick="cmSheetClose()">Cancel</button>`, true);
+  const ta = document.getElementById('cmBioInput');
+  ta.value = pr.bio || '';
+  cmBioCount();
+}
+function cmBioCount() {
+  const ta = document.getElementById('cmBioInput'), c = document.getElementById('cmBioCount');
+  if(ta && c) c.textContent = ta.value.length + ' / 150';
+}
+async function cmSaveBio() {
+  const ta = document.getElementById('cmBioInput'), btn = document.getElementById('cmBioSave');
+  if(!ta || !btn || btn.disabled) return;
+  btn.disabled = true; btn.textContent = 'Saving…';
+  const r = await cmApi('/community/bio', 'POST', { bio: ta.value });
+  btn.disabled = false; btn.textContent = 'Save';
+  if(!r.ok || !r.data) { if(r.status !== 401) showToast((r.data && r.data.error) || 'Could not save your bio — try again'); return; }
+  if(cmProf.data) cmProf.data.bio = r.data.bio || '';
+  cmSheetClose();
+  cmDraw();
+  showToast(r.data.bio ? 'Bio saved' : 'Bio removed');
+}
+
 // Back arrow: previous profile, or the feed where you left it.
 function cmProfileBack() {
   const prev = cmProf.stack.pop();
@@ -12381,7 +12434,7 @@ function cmProfilePageHTML() {
   const avatar = cmAvatarHTML({ user_id: uid, author_name: pr.name, has_avatar: pr.has_avatar }).replace('cm-avatar', 'cm-avatar cmp-av');
   let buttons;
   if(pr.is_me) {
-    buttons = `<button class="cmp-btn" onclick="openSettings()">Edit profile</button>`;
+    buttons = `<button class="cmp-btn" onclick="cmEditProfile()">Edit profile</button>`;
   } else if(pr.blocked) {
     buttons = `<button class="cmp-btn" onclick="cmToggleBlock('${uid}','${safeName}')">Unblock</button>`;
   } else {
@@ -12409,6 +12462,7 @@ function cmProfilePageHTML() {
       </div>
       <div class="cmp-name">${name}</div>
       <div class="cmp-handle">${pr.username ? '@' + cmEsc(pr.username) : ''}${pr.follows_you && !pr.is_me ? `<span class="cmp-follows">Follows you</span>` : ''}</div>
+      ${pr.bio ? `<div class="cmp-bio">${cmEsc(pr.bio)}</div>` : (pr.is_me ? `<button class="cmp-addbio" onclick="cmEditProfile()">+ Add a bio</button>` : '')}
       <div class="cmp-btns">${buttons}</div>
       ${menu}
     </div>
