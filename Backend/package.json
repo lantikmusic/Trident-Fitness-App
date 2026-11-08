@@ -1,0 +1,8 @@
+{
+  "name": "trident-fitness-worker",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.6.0"
+  }
+}

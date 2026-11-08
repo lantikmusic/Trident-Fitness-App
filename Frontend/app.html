@@ -305,6 +305,49 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .ai-edit-field label{font-size:9px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;}
 .ai-edit-field .iw{box-sizing:border-box;}
 .ai-edit-field .iw input{font-size:11px;font-weight:600;text-align:center;padding:4px 3px;}
+/* AI Snap: list of foods, "Look right?" and correction box */
+.ai-res-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px;}
+.ai-res-head .ai-result-name{margin-bottom:0;}
+.ai-confidence.low{background:rgba(255,69,58,.15);color:#FF453A;}
+.ai-item{display:flex;gap:10px;align-items:flex-start;padding:11px 0;border-top:0.5px solid var(--border);transition:opacity .15s;}
+.ai-item.off{opacity:.45;}
+.ai-item.off .ai-item-name{text-decoration:line-through;}
+.ai-item-tick{flex:0 0 auto;width:24px;height:24px;margin-top:1px;border-radius:50%;border:1.5px solid var(--border2);background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;color:#000;}
+.ai-item-tick.on{background:var(--pink);border-color:var(--pink);}
+.ai-item-tick svg{width:13px;height:13px;}
+.ai-item-tick:not(.on) svg{display:none;}
+.ai-item-main{flex:1;min-width:0;}
+.ai-item-tap{cursor:pointer;}
+.ai-item-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+.ai-item-name{font-size:14px;font-weight:650;letter-spacing:-0.01em;}
+.ai-item-cal{font-size:13px;font-weight:700;white-space:nowrap;}
+.ai-item-sub{font-size:12px;color:var(--text2);margin-top:2px;}
+.ai-item-sub b{font-weight:600;}
+.ai-item-why{font-size:11px;color:var(--text3);margin-top:3px;line-height:1.4;}
+.ai-item-why .unsure{color:#FF9F0A;font-weight:600;}
+.ai-item-edit{margin-top:10px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;}
+.ai-item-edit .ai-edit-field{min-width:0;}
+.ai-item-edit .ai-edit-field .iw input{width:100%;min-width:0;box-sizing:border-box;font-size:13px;padding:6px 2px;}
+.ai-item-edit .ai-edit-field.amt label{color:var(--pink);}
+.ai-total{display:flex;justify-content:space-between;align-items:baseline;padding:12px 0 2px;border-top:0.5px solid var(--border2);font-size:13px;font-weight:700;}
+.ai-total span{font-size:12px;font-weight:600;color:var(--text2);}
+.ai-check,.ai-fix{margin-top:14px;padding:14px;border-radius:var(--radius-lg);background:var(--bg3);}
+.ai-check-q{font-size:15px;font-weight:700;letter-spacing:-0.01em;margin-bottom:10px;}
+.ai-fix .ai-check-q{margin-bottom:4px;}
+.ai-fix-sub{font-size:12px;color:var(--text3);margin-bottom:10px;line-height:1.4;}
+.ai-fix textarea{width:100%;box-sizing:border-box;resize:vertical;min-height:72px;padding:10px 12px;border-radius:12px;border:0.5px solid var(--border2);background:var(--bg4);color:var(--text);font-family:inherit;font-size:14px;line-height:1.4;margin-bottom:10px;}
+.ai-fix textarea:focus{outline:none;border-color:var(--pink);}
+.ai-check-btns{display:flex;gap:8px;}
+.ai-btn{flex:1;padding:12px;border-radius:var(--radius-lg);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;}
+.ai-btn.primary{border:none;background:var(--pink);color:#000;}
+.ai-btn.ghost{flex:0 0 auto;padding:12px 16px;border:0.5px solid var(--border2);background:transparent;color:var(--text2);font-weight:600;}
+.ai-btn:disabled{opacity:.5;}
+.ai-res-links{display:flex;justify-content:space-between;margin-top:12px;}
+.ai-res-links button{background:none;border:none;padding:6px 2px;font-family:inherit;font-size:12px;font-weight:600;color:var(--text3);cursor:pointer;}
+.ai-pre{margin:-6px 0 16px;}
+.ai-pre input{width:100%;box-sizing:border-box;padding:11px 12px;border-radius:12px;border:0.5px solid var(--border2);background:var(--bg3);color:var(--text);font-family:inherit;font-size:13px;}
+.ai-pre input:focus{outline:none;border-color:var(--pink);}
+.ai-tip{font-size:11px;color:var(--text3);margin-top:6px;line-height:1.4;}
 
 .addf-tile{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:18px 16px;background:var(--bg3);border:0.5px solid var(--border);border-radius:var(--radius-lg);cursor:pointer;text-align:left;transition:all .18s;font-family:inherit;}
 .addf-tile:hover{border-color:var(--pink-border);background:var(--pink-dim);}
@@ -2051,6 +2094,10 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
             Upload photo from library
             <input type="file" accept="image/*" id="aiUploadInput" style="display:none;" onchange="aiAnalyseUpload(event)">
           </label>
+          <div class="ai-pre" id="aiPre">
+            <input type="text" id="aiNoteInput" maxlength="300" placeholder="Add a note (optional) — e.g. 8 oz chicken, cooked in oil">
+            <div class="ai-tip">Tip: shoot at an angle and include a fork or your hand so it can judge portion size.</div>
+          </div>
           <!-- AI thinking state -->
           <div class="ai-thinking" id="aiThinking" style="display:none;">
             <div class="ai-thinking-dots">
@@ -2060,26 +2107,38 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
             </div>
             <div class="ai-thinking-label" id="aiThinkingLabel">Analysing your food…</div>
           </div>
-          <!-- AI result -->
+          <!-- AI result: one row per food it found -->
           <div id="aiResult" style="display:none;">
             <img id="aiResultPhoto" class="ai-result-photo" src="" alt="Food photo">
             <div class="ai-result-card">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+              <div class="ai-res-head">
                 <div class="ai-result-name" id="aiResultName"></div>
                 <span class="ai-confidence" id="aiResultConfidence"></span>
               </div>
               <div class="ai-result-desc" id="aiResultDesc"></div>
-              <!-- Editable macro fields so user can tweak before adding -->
-              <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Macros — tap to edit</div>
-              <div class="ai-edit-row">
-                <div class="ai-edit-field"><label>Calories</label><div class="iw"><input type="number" id="ai-cal" min="0"></div></div>
-                <div class="ai-edit-field"><label>Protein</label><div class="iw"><input type="number" id="ai-protein" min="0"><span class="unit">g</span></div></div>
-                <div class="ai-edit-field"><label>Carbs</label><div class="iw"><input type="number" id="ai-carbs" min="0"><span class="unit">g</span></div></div>
-                <div class="ai-edit-field"><label>Fat</label><div class="iw"><input type="number" id="ai-fat" min="0"><span class="unit">g</span></div></div>
+              <div id="aiItems"></div>
+              <div class="ai-total" id="aiTotal"></div>
+              <!-- "Look right?" check -->
+              <div class="ai-check" id="aiCheck">
+                <div class="ai-check-q">Look right?</div>
+                <div class="ai-check-btns">
+                  <button class="ai-btn ghost" onclick="aiFixOpen()">No, fix it</button>
+                  <button class="ai-btn primary" id="aiAddBtn" onclick="aiAddToMeal()">Yes, add to meal</button>
+                </div>
               </div>
-              <div style="display:flex;gap:8px;">
-                <button onclick="aiRetry()" style="flex:0 0 auto;padding:12px 16px;border-radius:var(--radius-lg);border:0.5px solid var(--border2);background:transparent;font-family:inherit;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;">Retake</button>
-                <button onclick="aiAddToMeal()" style="flex:1;padding:12px;border-radius:var(--radius-lg);border:none;background:var(--pink);font-family:inherit;font-size:14px;font-weight:700;color:#000;cursor:pointer;">Add to Meal</button>
+              <!-- Correction box -->
+              <div class="ai-fix" id="aiFix" style="display:none;">
+                <div class="ai-check-q">What's actually there?</div>
+                <div class="ai-fix-sub">Tell the AI what it got wrong. It will look at the same photo again with your note.</div>
+                <textarea id="aiFixInput" rows="3" maxlength="500" placeholder="e.g. It's brown rice, about 1 cup. The chicken is 8 oz and was cooked in olive oil."></textarea>
+                <div class="ai-check-btns">
+                  <button class="ai-btn ghost" onclick="aiFixCancel()">Cancel</button>
+                  <button class="ai-btn primary" onclick="aiFixSubmit()">Re-analyze photo</button>
+                </div>
+              </div>
+              <div class="ai-res-links">
+                <button onclick="aiRetry()">Retake photo</button>
+                <button id="aiAddOneBtn" onclick="aiAddAsOne()">Add as one entry</button>
               </div>
             </div>
           </div>
@@ -9029,6 +9088,13 @@ function openAIScanner() {
   document.getElementById('aiResult').style.display = 'none';
   document.getElementById('aiThinking').style.display = 'none';
   aiCapturedDataUrl = null;
+  window._aiScan = null;
+  const noteBox = document.getElementById('aiNoteInput');
+  if(noteBox) noteBox.value = '';
+  document.getElementById('aiViewfinder').style.display = 'block';
+  document.getElementById('aiSnapBtn').style.display = 'flex';
+  document.querySelector('.ai-upload-btn').style.display = 'flex';
+  aiShowPre(true);
   startAICamera();
 }
 
@@ -9077,7 +9143,13 @@ function aiSnap() {
   canvas.getContext('2d').drawImage(video, 0, 0);
   aiCapturedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
   stopAICamera();
-  analyseWithClaude(aiCapturedDataUrl);
+  aiStartScan(aiCapturedDataUrl);
+}
+
+function aiStartScan(dataUrl) {
+  const box = document.getElementById('aiNoteInput');
+  const note = box ? box.value.trim() : '';
+  analyseWithClaude(dataUrl, { note, notes: note ? [note] : [] });
 }
 
 function aiAnalyseUpload(event) {
@@ -9087,14 +9159,14 @@ function aiAnalyseUpload(event) {
   reader.onload = e => {
     aiCapturedDataUrl = e.target.result;
     stopAICamera();
-    analyseWithClaude(aiCapturedDataUrl);
+    aiStartScan(aiCapturedDataUrl);
   };
   reader.readAsDataURL(file);
   // Reset input so same file can be re-uploaded
   event.target.value = '';
 }
 
-async function analyseWithClaude(dataUrl) {
+async function analyseWithLogMeal(dataUrl) {
   document.getElementById('aiViewfinder').style.display = 'none';
   document.getElementById('aiSnapBtn').style.display = 'none';
   document.querySelector('.ai-upload-btn').style.display = 'none';
@@ -9115,6 +9187,7 @@ async function analyseWithClaude(dataUrl) {
     document.getElementById('aiViewfinder').style.display = 'block';
     document.getElementById('aiSnapBtn').style.display = 'flex';
     document.querySelector('.ai-upload-btn').style.display = 'flex';
+    aiShowPre(true);
     startAICamera();
   }
 
@@ -9255,7 +9328,11 @@ async function analyseWithClaude(dataUrl) {
       confidence_reason: foodName ? 'Identified by LogMeal AI' : 'Could not identify'
     };
 
-    showAIResult(result, dataUrl);
+    aiShowItems({
+      items: [{ name: result.name, portion: '', grams: 0, calories: result.calories, protein: result.protein,
+                carbs: result.carbs, fat: result.fat, assumption: '', confidence: foodName ? 'medium' : 'low' }],
+      notes: result.description, source: 'logmeal'
+    }, dataUrl);
 
   } catch(e) {
     resetScanner();
@@ -9264,36 +9341,251 @@ async function analyseWithClaude(dataUrl) {
   }
 }
 
-function showAIResult(result, photoUrl) {
-  document.getElementById('aiThinking').style.display = 'none';
+function aiShowPre(show) {
+  const pre = document.getElementById('aiPre');
+  if(pre) pre.style.display = show ? 'block' : 'none';
+}
 
-  // Photo preview
+// Shrinks big library photos before upload (Claude reads up to ~1568px anyway).
+function aiShrinkImage(dataUrl) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const max = 1568;
+        const scale = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+        if(scale === 1 && /^data:image\/jpeg/.test(dataUrl) && dataUrl.length < 2500000) return resolve(dataUrl);
+        const c = document.createElement('canvas');
+        c.width = Math.round(img.naturalWidth * scale);
+        c.height = Math.round(img.naturalHeight * scale);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        resolve(c.toDataURL('image/jpeg', 0.85));
+      } catch(e) { resolve(dataUrl); }
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
+}
+
+// Claude scan. opts.note = what the person typed, opts.fix = true when re-checking after "No, fix it".
+async function analyseWithClaude(dataUrl, opts) {
+  opts = opts || {};
+  const isFix = !!opts.fix;
+  document.getElementById('aiViewfinder').style.display = 'none';
+  document.getElementById('aiSnapBtn').style.display = 'none';
+  document.querySelector('.ai-upload-btn').style.display = 'none';
+  aiShowPre(false);
+  document.getElementById('aiResult').style.display = 'none';
+  document.getElementById('aiThinking').style.display = 'flex';
+
+  const labels = isFix
+    ? ['Re-checking with your note…','Adjusting portions…','Recalculating macros…']
+    : ['Analysing your food…','Identifying each food…','Estimating portions…','Calculating macros…'];
+  let li = 0;
+  const labelEl = document.getElementById('aiThinkingLabel');
+  if(labelEl) labelEl.textContent = labels[0];
+  const thinkInterval = setInterval(() => {
+    li = (li + 1) % labels.length;
+    if(labelEl) labelEl.textContent = labels[li];
+  }, 1800);
+
+  // Back to the previous result (fix failed) or the camera (first scan failed)
+  function giveUp(msg) {
+    clearInterval(thinkInterval);
+    document.getElementById('aiThinking').style.display = 'none';
+    if(isFix && window._aiScan) {
+      document.getElementById('aiResult').style.display = 'block';
+    } else {
+      document.getElementById('aiViewfinder').style.display = 'block';
+      document.getElementById('aiSnapBtn').style.display = 'flex';
+      document.querySelector('.ai-upload-btn').style.display = 'flex';
+      aiShowPre(true);
+      startAICamera();
+    }
+    if(msg) showToast('⚠ ' + msg, 3500);
+  }
+
+  let res, data;
+  try {
+    const photo = await aiShrinkImage(dataUrl);
+    const body = { image: photo, note: opts.note || '' };
+    if(isFix && window._aiScan) body.previous = window._aiScan.items.map(it => ({ name: it.name, portion: it.portion }));
+    res = await fetch(`${WORKER_URL}/food/scan`, { method: 'POST', headers: logMealHeaders(), body: JSON.stringify(body) });
+    data = await res.json().catch(() => ({}));
+    dataUrl = photo;
+  } catch(e) {
+    return giveUp(e && e.message === 'Sign in to scan food' ? e.message : 'No connection — try again');
+  }
+
+  // Claude isn't set up on the server: use LogMeal for a first scan
+  if(res.status === 503 || res.status === 404) {
+    clearInterval(thinkInterval);
+    if(!isFix) return analyseWithLogMeal(dataUrl);
+    giveUp('');
+    showToast('Re-analyzing isn’t available yet — tap a food to edit its numbers', 3500);
+    return;
+  }
+  if(!res.ok) return giveUp(data.error || `Scan failed (${res.status})`);
+
+  clearInterval(thinkInterval);
+  if(!Array.isArray(data.items) || !data.items.length) {
+    return giveUp(data.notes || 'No food found in that photo — try another one');
+  }
+  aiShowItems({ items: data.items, notes: data.notes || '', source: 'claude' }, dataUrl, opts.notes);
+}
+
+function aiNum(v) { const n = Number(v); return isFinite(n) && n > 0 ? n : 0; }
+function aiR1(v) { return Math.round(v * 10) / 10; }
+function aiEsc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// scan = { items, notes, source }. Keeps the photo and any notes typed so far for "No, fix it".
+function aiShowItems(scan, photoUrl, notesSoFar) {
+  document.getElementById('aiThinking').style.display = 'none';
+  const items = (scan.items || []).map(it => {
+    const base = { grams: aiNum(it.grams), calories: aiNum(it.calories), protein: aiNum(it.protein), carbs: aiNum(it.carbs), fat: aiNum(it.fat) };
+    return {
+      name: String(it.name || 'Food'), portion: String(it.portion || ''), basePortion: String(it.portion || ''),
+      assumption: String(it.assumption || ''), confidence: it.confidence || 'medium',
+      base, calories: base.calories, protein: base.protein, carbs: base.carbs, fat: base.fat,
+      amount: base.grams ? aiR1(base.grams / 28.35) : 1, on: true, open: false
+    };
+  });
+  window._aiScan = { items, notes: scan.notes || '', source: scan.source || 'claude', photo: photoUrl, notesSoFar: notesSoFar || [] };
+
   const photoEl = document.getElementById('aiResultPhoto');
   photoEl.src = photoUrl;
   photoEl.style.display = 'block';
 
-  document.getElementById('aiResultName').textContent = result.name || 'Food Item';
-  document.getElementById('aiResultDesc').textContent = result.description || '';
+  document.getElementById('aiResultName').textContent = items.length === 1 ? '1 food found' : `${items.length} foods found`;
+  const hint = 'Tap a food to change the amount. Untick anything that isn’t there.';
+  document.getElementById('aiResultDesc').textContent = scan.notes ? `${scan.notes} ${hint}` : hint;
 
-  // Confidence badge
   const confEl = document.getElementById('aiResultConfidence');
-  const isHigh = result.confidence === 'high';
-  confEl.textContent = isHigh ? '✓ High confidence' : '~ Estimate';
-  confEl.className = 'ai-confidence ' + (isHigh ? 'high' : 'med');
-  confEl.title = result.confidence_reason || '';
+  const anyLow = items.some(it => it.confidence === 'low');
+  const allHigh = items.every(it => it.confidence === 'high');
+  confEl.textContent = allHigh ? '✓ High confidence' : anyLow ? '~ Rough estimate' : '~ Estimate';
+  confEl.className = 'ai-confidence ' + (allHigh ? 'high' : anyLow ? 'low' : 'med');
 
-  // Fill editable macro fields
-  document.getElementById('ai-cal').value     = result.calories || 0;
-  document.getElementById('ai-protein').value = result.protein  || 0;
-  document.getElementById('ai-carbs').value   = result.carbs    || 0;
-  document.getElementById('ai-fat').value     = result.fat      || 0;
-
+  document.getElementById('aiCheck').style.display = 'block';
+  document.getElementById('aiFix').style.display = 'none';
+  document.getElementById('aiFixInput').value = '';
+  document.getElementById('aiAddOneBtn').style.display = items.length > 1 ? '' : 'none';
+  aiRenderItems();
   document.getElementById('aiResult').style.display = 'block';
-
-  // Scroll result into view
   setTimeout(() => {
     document.getElementById('aiResult').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, 100);
+}
+
+function aiTickSvg() { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'; }
+
+function aiItemSub(it) {
+  return (it.portion ? `${aiEsc(it.portion)} · ` : '') +
+    `<b style="color:#FF9F0A">P</b> ${aiR1(it.protein)}g · <b style="color:#30D158">C</b> ${aiR1(it.carbs)}g · <b style="color:#BF5AF2">F</b> ${aiR1(it.fat)}g`;
+}
+
+function aiRenderItems() {
+  const scan = window._aiScan; if(!scan) return;
+  const wrap = document.getElementById('aiItems');
+  wrap.innerHTML = scan.items.map((it, i) => {
+    const unit = it.base.grams ? 'oz' : 'servings';
+    const why = [it.confidence === 'low' ? '<span class="unsure">Not sure</span>' : '', aiEsc(it.assumption)].filter(Boolean).join(' · ');
+    return `<div class="ai-item${it.on ? '' : ' off'}" id="aiItem${i}">
+      <button class="ai-item-tick${it.on ? ' on' : ''}" onclick="aiToggleItem(${i})" aria-label="Include ${aiEsc(it.name)}">${aiTickSvg()}</button>
+      <div class="ai-item-main">
+        <div class="ai-item-tap" onclick="aiToggleEdit(${i})">
+          <div class="ai-item-top"><span class="ai-item-name">${aiEsc(it.name)}</span><span class="ai-item-cal" id="aiItemCal${i}">${Math.round(it.calories)} cal</span></div>
+          <div class="ai-item-sub" id="aiItemSub${i}">${aiItemSub(it)}</div>
+          ${why ? `<div class="ai-item-why">${why}</div>` : ''}
+        </div>
+        ${it.open ? `<div class="ai-item-edit">
+          <div class="ai-edit-field amt"><label>${unit === 'oz' ? 'Oz' : 'Servings'}</label><div class="iw"><input type="number" inputmode="decimal" min="0" step="${unit === 'oz' ? '0.5' : '0.25'}" value="${it.amount}" oninput="aiAmountInput(${i}, this.value)"></div></div>
+          <div class="ai-edit-field"><label>Cal</label><div class="iw"><input type="number" inputmode="decimal" min="0" id="aiE${i}calories" value="${Math.round(it.calories)}" oninput="aiMacroInput(${i}, 'calories', this.value)"></div></div>
+          <div class="ai-edit-field"><label>Protein</label><div class="iw"><input type="number" inputmode="decimal" min="0" id="aiE${i}protein" value="${aiR1(it.protein)}" oninput="aiMacroInput(${i}, 'protein', this.value)"></div></div>
+          <div class="ai-edit-field"><label>Carbs</label><div class="iw"><input type="number" inputmode="decimal" min="0" id="aiE${i}carbs" value="${aiR1(it.carbs)}" oninput="aiMacroInput(${i}, 'carbs', this.value)"></div></div>
+          <div class="ai-edit-field"><label>Fat</label><div class="iw"><input type="number" inputmode="decimal" min="0" id="aiE${i}fat" value="${aiR1(it.fat)}" oninput="aiMacroInput(${i}, 'fat', this.value)"></div></div>
+        </div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+  aiRenderTotal();
+}
+
+function aiRenderTotal() {
+  const scan = window._aiScan; if(!scan) return;
+  const on = scan.items.filter(it => it.on);
+  const t = on.reduce((a, it) => ({ cal: a.cal + it.calories, p: a.p + it.protein, c: a.c + it.carbs, f: a.f + it.fat }), { cal: 0, p: 0, c: 0, f: 0 });
+  document.getElementById('aiTotal').innerHTML =
+    `<div>Total · ${Math.round(t.cal)} cal</div><span>P ${Math.round(t.p)}g · C ${Math.round(t.c)}g · F ${Math.round(t.f)}g</span>`;
+  const addBtn = document.getElementById('aiAddBtn');
+  addBtn.disabled = !on.length;
+  addBtn.textContent = on.length > 1 ? `Yes, add ${on.length} foods` : 'Yes, add to meal';
+}
+
+function aiRefreshRow(i) {
+  const it = window._aiScan.items[i];
+  const cal = document.getElementById('aiItemCal' + i);
+  const sub = document.getElementById('aiItemSub' + i);
+  if(cal) cal.textContent = `${Math.round(it.calories)} cal`;
+  if(sub) sub.innerHTML = aiItemSub(it);
+  aiRenderTotal();
+}
+
+function aiToggleItem(i) {
+  const it = window._aiScan && window._aiScan.items[i]; if(!it) return;
+  it.on = !it.on;
+  aiRenderItems();
+}
+
+function aiToggleEdit(i) {
+  const it = window._aiScan && window._aiScan.items[i]; if(!it) return;
+  it.open = !it.open;
+  aiRenderItems();
+}
+
+// Changing the amount scales that food's macros from what the scan estimated.
+function aiAmountInput(i, v) {
+  const it = window._aiScan && window._aiScan.items[i]; if(!it) return;
+  const amt = aiNum(v);
+  it.amount = amt;
+  const factor = it.base.grams ? (amt * 28.35) / it.base.grams : amt;
+  ['calories','protein','carbs','fat'].forEach(k => {
+    it[k] = k === 'calories' ? Math.round(it.base[k] * factor) : aiR1(it.base[k] * factor);
+    const el = document.getElementById(`aiE${i}${k}`);
+    if(el) el.value = it[k];
+  });
+  if(it.base.grams) it.portion = `${amt} oz`;
+  else it.portion = amt === 1 ? it.basePortion : `${amt} × serving`;
+  aiRefreshRow(i);
+}
+
+function aiMacroInput(i, key, v) {
+  const it = window._aiScan && window._aiScan.items[i]; if(!it) return;
+  it[key] = aiNum(v);
+  aiRefreshRow(i);
+}
+
+function aiFixOpen() {
+  document.getElementById('aiCheck').style.display = 'none';
+  document.getElementById('aiFix').style.display = 'block';
+  const box = document.getElementById('aiFixInput');
+  setTimeout(() => { try { box.focus(); box.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch(e) {} }, 50);
+}
+
+function aiFixCancel() {
+  document.getElementById('aiFix').style.display = 'none';
+  document.getElementById('aiCheck').style.display = 'block';
+}
+
+function aiFixSubmit() {
+  const scan = window._aiScan; if(!scan) return;
+  const text = document.getElementById('aiFixInput').value.trim();
+  if(text.length < 3) { showToast('Type what’s actually in the photo'); return; }
+  // Keep earlier corrections too, so a second fix doesn't undo the first
+  const notes = scan.notesSoFar.concat([text]);
+  analyseWithClaude(scan.photo, { fix: true, note: notes.join('\n'), notes });
 }
 
 function aiRetry() {
@@ -9303,43 +9595,63 @@ function aiRetry() {
   document.getElementById('aiSnapBtn').style.display = 'flex';
   document.getElementById('aiSnapBtn').disabled = false;
   document.querySelector('.ai-upload-btn').style.display = 'flex';
+  aiShowPre(true);
   aiCapturedDataUrl = null;
+  window._aiScan = null;
   startAICamera();
 }
 
-function aiAddToMeal() {
-  const name    = document.getElementById('aiResultName').textContent || 'AI Food';
-  const cal     = parseFloat(document.getElementById('ai-cal').value)     || 0;
-  const protein = parseFloat(document.getElementById('ai-protein').value) || 0;
-  const carbs   = parseFloat(document.getElementById('ai-carbs').value)   || 0;
-  const fat     = parseFloat(document.getElementById('ai-fat').value)     || 0;
-
-  // Use the provided calories directly rather than recalculating,
-  // since AI estimates may not follow the exact formula
+function aiLogFood(name, cal, protein, carbs, fat) {
   const meal = macroData[cur].meals[curMeal];
   if(!meal.items) meal.items = [];
-  const now = new Date();
-  const time = now.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});
+  const time = new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});
   meal.items.push({ name, protein, carbs, fat, cal, time, source:'ai', _synced:true });
   cloudPost('/macros', {
     date: macroSlotDate(cur), day_index: cur, meal: curMeal,
     food_name: name, calories: cal, protein, carbs, fat
   });
-  // Recalculate meal totals from items
+  saveToFoodLib(name, protein, carbs, fat);
+}
+
+function aiFinishAdd(msg) {
+  const meal = macroData[cur].meals[curMeal];
   meal.protein = Math.round(meal.items.reduce((s,it)=>s+(it.protein||0),0)*10)/10;
   meal.carbs   = Math.round(meal.items.reduce((s,it)=>s+(it.carbs||0),0)*10)/10;
   meal.fat     = Math.round(meal.items.reduce((s,it)=>s+(it.fat||0),0)*10)/10;
   save(MACRO_KEY, macroData);
-  // Auto-save to library
-  saveToFoodLib(name, protein, carbs, fat);
   renderFoodLog();
   renderMealTabCals();
   renderHero();
   renderMacroStats();
-
+  window._aiScan = null;
   closeAIScanner();
   closeAddFood();
-  showToast(`✨ ${name} added!`);
+  showToast(msg);
+}
+
+// "Yes, add to meal": each ticked food becomes its own entry in the log.
+function aiAddToMeal() {
+  const scan = window._aiScan; if(!scan) return;
+  const on = scan.items.filter(it => it.on);
+  if(!on.length) { showToast('Tick at least one food'); return; }
+  on.forEach(it => {
+    const name = it.portion ? `${it.name} (${it.portion})` : it.name;
+    aiLogFood(name, Math.round(it.calories), aiR1(it.protein), aiR1(it.carbs), aiR1(it.fat));
+  });
+  aiFinishAdd(on.length === 1 ? `✨ ${on[0].name} added!` : `✨ ${on.length} foods added!`);
+}
+
+// One combined entry, e.g. "Chicken, rice & broccoli".
+function aiAddAsOne() {
+  const scan = window._aiScan; if(!scan) return;
+  const on = scan.items.filter(it => it.on);
+  if(!on.length) { showToast('Tick at least one food'); return; }
+  const names = on.map(it => it.name);
+  let name = names.length > 1 ? names.slice(0, -1).join(', ') + ' & ' + names[names.length - 1] : names[0];
+  if(name.length > 60) name = name.slice(0, 57) + '…';
+  const t = on.reduce((a, it) => ({ cal: a.cal + it.calories, p: a.p + it.protein, c: a.c + it.carbs, f: a.f + it.fat }), { cal: 0, p: 0, c: 0, f: 0 });
+  aiLogFood(name, Math.round(t.cal), aiR1(t.p), aiR1(t.c), aiR1(t.f));
+  aiFinishAdd(`✨ ${name} added!`);
 }
 
 // ══════════════════════════════════════

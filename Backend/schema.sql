@@ -221,3 +221,11 @@ CREATE TABLE IF NOT EXISTS community_activity_seen (
   seen_at TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_likes_user ON community_likes(user_id);
+
+-- AI food scans per person per day (caps the Claude bill)
+CREATE TABLE IF NOT EXISTS food_scan_usage (
+  user_id TEXT NOT NULL,
+  day TEXT NOT NULL,
+  count INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (user_id, day)
+);

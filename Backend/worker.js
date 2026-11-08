@@ -1,5 +1,6 @@
 // Trident Fitness - Cloudflare Worker
-// Handles: Auth (signup/login/sessions) + LogMeal API proxy
+// Handles: Auth (signup/login/sessions), app data, community, Claude food scan + LogMeal API proxy
+import Anthropic from '@anthropic-ai/sdk';
 
 // The LogMeal API token is a Cloudflare secret (env.LOGMEAL_TOKEN), set with:
 //   npx wrangler secret put LOGMEAL_TOKEN
@@ -167,6 +168,9 @@ export default {
 
     // ── Profile picture on its own (does not touch the other settings) ──
     if (path === '/user/profile-pic'          && request.method === 'POST') return community(saveProfilePic, request, env.DB);
+
+    // ── AI food scan (Claude) ──
+    if (path === '/food/scan'                 && request.method === 'POST') return handleFoodScan(request, env);
 
     // ── LogMeal Proxy Routes ──
     if (path.startsWith('/v2/')) return handleLogMealProxy(request, path + url.search, env);
@@ -1711,6 +1715,187 @@ async function communityAvatar(path, DB) {
   let dataUrl = null;
   try { dataUrl = row ? JSON.parse(row.data_json) : null; } catch (e) {}
   return communityImageResponse(dataUrl, 'public, max-age=300');
+}
+
+// ══════════════════════════════════════════════════════
+// AI FOOD SCAN (Claude)
+// ══════════════════════════════════════════════════════
+// The Claude API key is a Cloudflare secret (env.ANTHROPIC_API_KEY), set with:
+//   npx wrangler secret put ANTHROPIC_API_KEY
+// Without it, /food/scan answers 503 and the app falls back to LogMeal.
+
+const FOOD_SCAN_MODEL = 'claude-opus-5-5';
+const FOOD_SCAN_DAILY_LIMIT = 40;           // scans per person per day, to cap the bill
+const FOOD_SCAN_MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+const FOOD_SCAN_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
+const FOOD_SCAN_SYSTEM = `You estimate the nutrition of food in photos for a fitness tracking app. People use your numbers to log what they ate, so be realistic rather than cautious.
+
+List every distinct food or drink you can see as its own item (for example the chicken, the rice and the broccoli separately, not "chicken bowl"). A mixed dish that can't be separated, like a burrito or soup, is one item.
+
+Estimate the portion that is actually in the photo. Judge size from what is around the food: plate or bowl size (a dinner plate is usually 10-11 inches across), forks, spoons, hands, cups, cans and packaging, and how tall or thick the food is. Give the portion in everyday US units (oz, cups, tbsp, slices, pieces) and an estimated weight in grams.
+
+Calories and macros are for that portion as served (cooked weight unless the food is clearly raw). Keep calories consistent with the macros (about 4 kcal per gram of protein or carbs, 9 per gram of fat). Include cooking oil, butter, sauce or dressing only when you can see signs of it (a sheen, pooled oil, visible sauce), and list it as its own item when you do.
+
+In "assumption", say briefly what you assumed that the photo can't show, such as "cooked, skinless, no oil" or "regular soda, not diet". Use "confidence" to say how sure you are of the item and its amount.
+
+If the person adds a note, treat it as true: it overrides your read of the photo for what the food is, how much there is, hidden ingredients and how it was cooked. Use the photo for anything the note doesn't cover.
+
+Use "notes" for one short sentence the person should know (for example that you could not see inside a wrap), or an empty string. If there is no food or drink in the photo, return an empty items list and say so in notes.`;
+
+const FOOD_SCAN_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    items: {
+      type: 'array',
+      items: {
+        type: 'object',
+        additionalProperties: false,
+        properties: {
+          name:       { type: 'string', description: 'Short food name, e.g. "Grilled chicken breast"' },
+          portion:    { type: 'string', description: 'Amount in everyday US units, e.g. "~6 oz" or "1 cup"' },
+          grams:      { type: 'number', description: 'Estimated weight of the portion in grams' },
+          calories:   { type: 'number' },
+          protein_g:  { type: 'number' },
+          carbs_g:    { type: 'number' },
+          fat_g:      { type: 'number' },
+          assumption: { type: 'string', description: 'What was assumed that the photo cannot show' },
+          confidence: { type: 'string', enum: ['high', 'medium', 'low'] },
+        },
+        required: ['name', 'portion', 'grams', 'calories', 'protein_g', 'carbs_g', 'fat_g', 'assumption', 'confidence'],
+      },
+    },
+    notes: { type: 'string' },
+  },
+  required: ['items', 'notes'],
+};
+
+function foodScanText(v, max) {
+  return String(v == null ? '' : v).replace(/[\u0000-\u001f]+/g, ' ').trim().slice(0, max);
+}
+
+function foodScanNum(v, max) {
+  const n = Number(v);
+  if (!isFinite(n) || n < 0) return 0;
+  return Math.min(n, max);
+}
+
+// Counts today's scans for this person. Returns false once they're over the limit.
+// If the usage table is missing, scanning still works (just without the cap).
+async function foodScanAllowed(DB, userId) {
+  const day = new Date().toISOString().slice(0, 10);
+  try {
+    await DB.prepare(
+      'INSERT INTO food_scan_usage (user_id, day, count) VALUES (?, ?, 1) ON CONFLICT(user_id, day) DO UPDATE SET count = count + 1'
+    ).bind(userId, day).run();
+    const row = await DB.prepare('SELECT count FROM food_scan_usage WHERE user_id = ? AND day = ?').bind(userId, day).first();
+    return !row || row.count <= FOOD_SCAN_DAILY_LIMIT;
+  } catch (e) {
+    return true;
+  }
+}
+
+async function handleFoodScan(request, env) {
+  const session = await validateSession(request, env.DB);
+  if (!session) return error('Sign in to use food scanning', 401);
+  if (!env.ANTHROPIC_API_KEY) return error('Claude food scanning is not set up on the server', 503);
+
+  let body;
+  try { body = await request.json(); } catch (e) { return error('Invalid request', 400); }
+
+  // Photo arrives as a data URL ("data:image/jpeg;base64,...") or plain base64.
+  const raw = typeof body.image === 'string' ? body.image : '';
+  let mediaType = 'image/jpeg';
+  let data = raw;
+  const m = raw.match(/^data:([^;,]+);base64,/);
+  if (m) { mediaType = m[1].toLowerCase(); data = raw.slice(m[0].length); }
+  if (!data) return error('No photo received', 400);
+  if (!FOOD_SCAN_IMAGE_TYPES.includes(mediaType)) return error('Use a JPEG, PNG or WebP photo', 400);
+  if (data.length * 3 / 4 > FOOD_SCAN_MAX_IMAGE_BYTES) return error('Photo is too large', 413);
+
+  const note = foodScanText(body.note, 600);
+  const previous = Array.isArray(body.previous) ? body.previous.slice(0, 20).map(it => ({
+    name: foodScanText(it && it.name, 80),
+    portion: foodScanText(it && it.portion, 40),
+  })).filter(it => it.name) : [];
+
+  if (!(await foodScanAllowed(env.DB, session.user_id))) {
+    return error(`You've reached today's limit of ${FOOD_SCAN_DAILY_LIMIT} scans. Try again tomorrow.`, 429);
+  }
+
+  let text = 'What food is in this photo? Estimate each item and its macros.';
+  if (previous.length && note) {
+    text = 'You looked at this photo before and listed: ' +
+      previous.map(it => it.portion ? `${it.name} (${it.portion})` : it.name).join('; ') +
+      '.\nThe person says that is not right and added this note:\n"""' + note + '"""\n' +
+      'Look at the photo again with their correction and give the full corrected list.';
+  } else if (note) {
+    text += '\nThe person added this note:\n"""' + note + '"""';
+  }
+
+  const client = new Anthropic({
+    apiKey: env.ANTHROPIC_API_KEY,
+    baseURL: env.ANTHROPIC_BASE_URL || undefined, // only set when testing locally
+    maxRetries: 1,
+    timeout: 60 * 1000,
+  });
+
+  let response;
+  try {
+    response = await client.beta.messages.create({
+      model: FOOD_SCAN_MODEL,
+      max_tokens: 8000,
+      betas: ['server-side-fallback-2026-07-01'],
+      fallbacks: 'default',
+      system: FOOD_SCAN_SYSTEM,
+      output_config: { format: { type: 'json_schema', schema: FOOD_SCAN_SCHEMA } },
+      messages: [{
+        role: 'user',
+        content: [
+          { type: 'image', source: { type: 'base64', media_type: mediaType, data } },
+          { type: 'text', text },
+        ],
+      }],
+    });
+  } catch (e) {
+    if (e instanceof Anthropic.AuthenticationError || e instanceof Anthropic.PermissionDeniedError) {
+      console.error('Food scan: Claude API key rejected');
+      return error('Claude food scanning is not set up on the server', 503);
+    }
+    if (e instanceof Anthropic.RateLimitError) return error('The food scanner is busy. Try again in a minute.', 429);
+    if (e instanceof Anthropic.BadRequestError) {
+      console.error('Food scan bad request:', e.message);
+      return error('Could not read that photo. Try another one.', 400);
+    }
+    console.error('Food scan failed:', e && e.message);
+    return error('The food scanner is not responding. Try again.', 502);
+  }
+
+  if (response.stop_reason === 'refusal') return error('Could not analyze this photo. Try another one.', 422);
+  if (response.stop_reason === 'max_tokens') return error('The food scanner ran out of room. Try again.', 502);
+
+  let parsed = null;
+  for (const block of response.content || []) {
+    if (block.type === 'text') {
+      try { parsed = JSON.parse(block.text); } catch (e) {}
+    }
+  }
+  if (!parsed || !Array.isArray(parsed.items)) return error('The food scanner sent back something unreadable. Try again.', 502);
+
+  const items = parsed.items.slice(0, 20).map(it => ({
+    name: foodScanText(it.name, 80) || 'Food',
+    portion: foodScanText(it.portion, 40),
+    grams: Math.round(foodScanNum(it.grams, 5000)),
+    calories: Math.round(foodScanNum(it.calories, 10000)),
+    protein: Math.round(foodScanNum(it.protein_g, 1000) * 10) / 10,
+    carbs: Math.round(foodScanNum(it.carbs_g, 1000) * 10) / 10,
+    fat: Math.round(foodScanNum(it.fat_g, 1000) * 10) / 10,
+    assumption: foodScanText(it.assumption, 160),
+    confidence: ['high', 'medium', 'low'].includes(it.confidence) ? it.confidence : 'medium',
+  }));
+
+  return json({ items, notes: foodScanText(parsed.notes, 240), model: response.model || FOOD_SCAN_MODEL });
 }
 
 // ══════════════════════════════════════════════════════
