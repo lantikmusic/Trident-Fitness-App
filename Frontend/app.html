@@ -1375,6 +1375,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .cm-chips{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;}
 .cm-chip{background:var(--bg4);border:0.5px solid var(--border2);border-radius:99px;padding:8px 14px;color:var(--text2);font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;}
 .cm-chip.on{border-color:var(--pink);color:var(--pink);}
+.cm-mention{color:var(--pink);font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.cm-mention-box{margin-top:6px;border-radius:16px;background:var(--bg4);border:0.5px solid var(--pink-border);overflow:hidden;}
+.cm-mention-row{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;background:none;border:0;border-bottom:0.5px solid var(--border);color:var(--text);font-family:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.cm-mention-row:last-child{border-bottom:0;}
+.cm-mention-row:active{background:rgba(255,255,255,.05);}
+.cm-mention-who{flex:1;min-width:0;display:flex;flex-direction:column;}
+.cm-mention-who b{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cm-mention-who span{font-size:12px;color:var(--text3);}
+.cm-mention-row em{font-style:normal;font-size:11px;font-weight:600;color:var(--pink);}
+.cm-mention-hint{padding:12px;font-size:13px;color:var(--text3);}
 .cm-pick{display:block;width:100%;text-align:left;background:var(--bg4);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 12px;color:var(--text);font-family:inherit;font-size:13px;line-height:1.4;margin-bottom:6px;cursor:pointer;}
 .cm-pick small{display:block;color:var(--text3);font-size:11px;}
 /* ── Community refresh ── */
@@ -2646,12 +2656,14 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
 <div class="cm-overlay" id="cmComposeOverlay" onclick="if(event.target===this)cmCloseCompose()">
   <div class="cm-sheet">
     <div class="cm-sheet-title">New post</div>
-    <textarea class="cm-textarea" id="cmText" maxlength="1000" placeholder="Share a win, a workout, or a question…" oninput="cmUpdateCount()"></textarea>
+    <textarea class="cm-textarea" id="cmText" maxlength="1000" placeholder="Share a win, a workout, or a question… Type @ to tag a friend" oninput="cmUpdateCount();cmMentionInput()" onclick="cmMentionInput()" onblur="setTimeout(cmMentionHide,200)"></textarea>
+    <div id="cmMention" class="cm-mention-box" style="display:none;"></div>
     <div class="cm-count" id="cmCount">0 / 1000</div>
     <div class="cm-chips">
       <button class="cm-chip" id="cmChipPhoto" onclick="document.getElementById('cmPhotoInput').click()">📷 Photo</button>
       <button class="cm-chip" id="cmChipWorkout" onclick="cmPickAttachment('workout')">🏋️ Workout</button>
       <button class="cm-chip" id="cmChipPR" onclick="cmPickAttachment('pr')">🏆 PR</button>
+      <button class="cm-chip" id="cmChipTag" onpointerdown="event.preventDefault()" onclick="cmTagChip()">👥 Tag</button>
     </div>
     <input type="file" id="cmPhotoInput" accept="image/*" style="display:none;" onchange="cmPhotoChosen(this)">
     <div id="cmPicker"></div>
@@ -12001,6 +12013,93 @@ function cmCommentsHTML(id) {
   </div>`;
 }
 
+// Post text with tagged friends' @usernames as links to their profiles.
+// Only people the server actually tagged become links; other @words stay plain text.
+function cmBodyHTML(p) {
+  const html = cmEsc(p.body || '');
+  const tags = Array.isArray(p.tags) ? p.tags : [];
+  if(!tags.length) return html;
+  const byName = {};
+  tags.forEach(t => { const uid = cmSafeId(t && t.user_id); if(uid && t.username) byName[String(t.username).toLowerCase()] = uid; });
+  return html.replace(/(^|[^A-Za-z0-9._@])@([A-Za-z0-9._]{3,21})/g, (all, pre, raw) => {
+    const name = raw.replace(/\.+$/, '');
+    const uid = byName[name.toLowerCase()];
+    if(!uid) return all;
+    return `${pre}<span class="cm-mention" role="button" tabindex="0" onclick="event.stopPropagation();cmOpenProfile('${uid}')">@${name}</span>${raw.slice(name.length)}`;
+  });
+}
+
+// ── @ suggestions while writing a post ──
+// The @word right before the cursor, or null.
+function cmMentionToken() {
+  const ta = document.getElementById('cmText');
+  if(!ta || ta.selectionStart !== ta.selectionEnd) return null;
+  const before = ta.value.slice(0, ta.selectionStart);
+  const m = before.match(/(^|[^A-Za-z0-9._@])@([A-Za-z0-9._]{0,20})$/);
+  return m ? { q: m[2], start: ta.selectionStart - m[2].length - 1, end: ta.selectionStart } : null;
+}
+function cmMentionHide() {
+  const box = document.getElementById('cmMention');
+  if(box) { box.style.display = 'none'; box.innerHTML = ''; }
+  if(window._cmMention) window._cmMention.seq++;
+}
+function cmMentionInput() {
+  const st = window._cmMention = window._cmMention || { seq: 0, timer: null, results: [] };
+  const box = document.getElementById('cmMention');
+  const tok = cmMentionToken();
+  clearTimeout(st.timer);
+  if(!box || !tok) { cmMentionHide(); return; }
+  box.style.display = 'block';
+  if(!tok.q) { box.innerHTML = `<div class="cm-mention-hint">Type a friend's username to tag them</div>`; st.seq++; return; }
+  const seq = ++st.seq;
+  st.timer = setTimeout(async () => {
+    const r = await cmApi('/community/search?q=' + encodeURIComponent(tok.q));
+    if(seq !== st.seq) return;
+    const list = (r.ok && r.data && Array.isArray(r.data.results) ? r.data.results : [])
+      .filter(u => !u.is_me && cmSafeId(u.user_id) && u.username)
+      .sort((a, b) => (b.is_following ? 1 : 0) - (a.is_following ? 1 : 0))
+      .slice(0, 5);
+    st.results = list;
+    box.innerHTML = list.length
+      ? list.map((u, i) => `<button class="cm-mention-row" onpointerdown="event.preventDefault()" onclick="cmMentionPick(${i})">
+          ${cmAvatarHTML({ user_id: u.user_id, author_name: u.name, has_avatar: u.has_avatar }, true)}
+          <span class="cm-mention-who"><b>${cmEsc(u.name || 'Member')}</b><span>@${cmEsc(u.username)}</span></span>
+          ${u.is_following ? '<em>Following</em>' : ''}
+        </button>`).join('')
+      : `<div class="cm-mention-hint">No one found for <b>@${cmEsc(tok.q)}</b></div>`;
+  }, 250);
+}
+function cmMentionPick(i) {
+  const u = (window._cmMention && window._cmMention.results || [])[i];
+  const ta = document.getElementById('cmText');
+  const tok = cmMentionToken();
+  if(!u || !ta || !tok) { cmMentionHide(); return; }
+  const insert = '@' + u.username + ' ';
+  const v = ta.value;
+  ta.value = (v.slice(0, tok.start) + insert + v.slice(tok.end)).slice(0, 1000);
+  const pos = Math.min(tok.start + insert.length, ta.value.length);
+  ta.focus();
+  try { ta.setSelectionRange(pos, pos); } catch(e) {}
+  cmMentionHide();
+  cmUpdateCount();
+}
+// "👥 Tag" chip: starts an @ at the cursor and shows suggestions.
+function cmTagChip() {
+  const ta = document.getElementById('cmText');
+  if(!ta) return;
+  const v = ta.value;
+  let pos = typeof ta.selectionStart === 'number' && document.activeElement === ta ? ta.selectionStart : v.length;
+  const needSpace = pos > 0 && !/\s/.test(v.charAt(pos - 1));
+  const insert = (needSpace ? ' ' : '') + '@';
+  if(v.length + insert.length > 1000) return;
+  ta.value = v.slice(0, pos) + insert + v.slice(pos);
+  pos += insert.length;
+  ta.focus();
+  try { ta.setSelectionRange(pos, pos); } catch(e) {}
+  cmUpdateCount();
+  cmMentionInput();
+}
+
 function cmPostHTML(p) {
   const id = cmSafeId(p && p.id);
   if(!id) return '';
@@ -12013,7 +12112,7 @@ function cmPostHTML(p) {
       </button>
       ${p.mine ? `<button class="cm-del" onclick="cmDeletePost('${id}')" aria-label="Delete post">${CM_TRASH}</button>` : (p.following ? '' : `<button class="cm-follow" onclick="cmToggleFollow('${cmSafeId(p.user_id)}')">+ Follow</button>`)}
     </div>
-    ${p.body ? `<div class="cm-body">${cmEsc(p.body)}</div>` : ''}
+    ${p.body ? `<div class="cm-body">${cmBodyHTML(p)}</div>` : ''}
     ${cmAttachHTML(p.type, p.payload)}
     ${p.has_photo ? `<img class="cm-photo" src="${WORKER_URL}/community/photo/${id}" alt="Photo shared by ${name}" loading="lazy">` : ''}
     <div class="cm-actions">
@@ -12375,6 +12474,7 @@ function cmActivityText(it) {
     case 'like_comment': return `liked your comment${q}`;
     case 'also_commented': return `also commented on a post you commented on:${q}`;
     case 'follow': return 'started following you';
+    case 'tagged': return `tagged you in a post${q}`;
     default: return '';
   }
 }
@@ -12802,6 +12902,7 @@ function cmOpenCompose(attach) {
   cmDraft = { photo: null, attach: attach || null, options: null, sending: false };
   document.getElementById('cmText').value = '';
   document.getElementById('cmPhotoInput').value = '';
+  cmMentionHide();
   document.getElementById('cmPicker').innerHTML = '';
   const btn = document.getElementById('cmPostBtn');
   btn.disabled = false; btn.textContent = 'Post';

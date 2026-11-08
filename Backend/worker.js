@@ -130,7 +130,7 @@ export default {
 
     // ── Community ──
     if (path === '/community/feed'            && request.method === 'GET')  return community(communityFeed, request, env.DB);
-    if (path === '/community/posts'           && request.method === 'POST') return community(communityCreatePost, request, env.DB);
+    if (path === '/community/posts'           && request.method === 'POST') return community(communityCreatePost, request, env.DB, env, ctx);
     if (path === '/community/posts/delete'    && request.method === 'POST') return community(communityDeletePost, request, env.DB);
     if (path === '/community/like'            && request.method === 'POST') return community(communityToggleLike, request, env.DB, env, ctx);
     if (path === '/community/comments/like'   && request.method === 'POST') return community(communityToggleCommentLike, request, env.DB, env, ctx);
@@ -859,13 +859,73 @@ async function communityFeed(request, DB) {
   const list = rows.results || [];
   const page = list.slice(0, limit);
   const names = await usernamesFor(DB, page.map(r => r.user_id));
+  const tags = await tagsFor(DB, page.map(r => r.id));
   return json({
-    posts: page.map(r => Object.assign(communityPostOut(r, session.user_id), { author_username: names[r.user_id] || null })),
+    posts: page.map(r => Object.assign(communityPostOut(r, session.user_id), { author_username: names[r.user_id] || null, tags: tags[r.id] || [] })),
     next: list.length > limit ? page[page.length - 1].created_at : null
   });
 }
 
-async function communityCreatePost(request, DB) {
+// ── Tagging friends with @username ──
+const POST_TAG_MAX = 10;
+
+// "@mike", "@Mike." or "(@mike)" -> ['mike'] (lowercase, unique, at most 10)
+function mentionsIn(body) {
+  const out = [];
+  const re = /(^|[^A-Za-z0-9._@])@([A-Za-z0-9._]{3,21})/g;
+  let m;
+  while ((m = re.exec(String(body || ''))) && out.length < POST_TAG_MAX) {
+    const name = m[2].replace(/\.+$/, '').toLowerCase();
+    if (name.length >= 3 && name.length <= 20 && !out.includes(name)) out.push(name);
+  }
+  return out;
+}
+
+// Tagged people per post: { postId: [{ user_id, username }] }. Empty if the tags table is missing.
+async function tagsFor(DB, postIds) {
+  const out = {};
+  const ids = [...new Set(postIds.filter(id => COMMUNITY_ID.test(String(id || ''))))].slice(0, 50);
+  if (!ids.length) return out;
+  try {
+    const rows = await DB.prepare(
+      `SELECT t.post_id, t.user_id, n.username FROM community_post_tags t
+       JOIN usernames n ON n.user_id = t.user_id
+       WHERE t.post_id IN (${ids.map(() => '?').join(',')}) ORDER BY t.created_at`
+    ).bind(...ids).all();
+    (rows.results || []).forEach(r => { (out[r.post_id] = out[r.post_id] || []).push({ user_id: r.user_id, username: r.username }); });
+  } catch (e) {}
+  return out;
+}
+
+// Saves tags for the @usernames in a new post and notifies those friends.
+// Skips yourself and anyone either of you has blocked. Never fails the post itself.
+async function tagPostMentions(DB, env, ctx, postId, author, body) {
+  const names = mentionsIn(body);
+  if (!names.length) return;
+  try {
+    const rows = await DB.prepare(
+      `SELECT n.user_id FROM usernames n
+       WHERE n.username_lower IN (${names.map(() => '?').join(',')})
+         AND n.user_id <> ?
+         AND n.user_id NOT IN (SELECT blocked_id FROM dm_blocks WHERE blocker_id = ?)
+         AND n.user_id NOT IN (SELECT blocker_id FROM dm_blocks WHERE blocked_id = ?)`
+    ).bind(...names, author.id, author.id, author.id).all();
+    const users = (rows.results || []).map(r => r.user_id);
+    if (!users.length) return;
+    const now = new Date().toISOString();
+    await DB.batch(users.map(uid =>
+      DB.prepare('INSERT OR IGNORE INTO community_post_tags (post_id, user_id, created_at) VALUES (?, ?, ?)').bind(postId, uid, now)
+    ));
+    const snippet = String(body || '').replace(/\s+/g, ' ').trim().slice(0, 100);
+    users.forEach(uid => pushLater(ctx, env, DB, uid, {
+      title: `${author.name || 'Someone'} tagged you in a post`, body: snippet, tag: 'tag-' + postId, open: 'post:' + postId
+    }));
+  } catch (e) {
+    console.error('Tagging failed:', e && e.message);
+  }
+}
+
+async function communityCreatePost(request, DB, env, ctx) {
   const session = await validateSession(request, DB);
   if (!session) return error('Unauthorized', 401);
 
@@ -904,8 +964,14 @@ async function communityCreatePost(request, DB) {
     'INSERT INTO community_posts (id, user_id, type, body, payload_json, photo_data, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)'
   ).bind(id, session.user_id, type, body, payloadJson, photo, new Date().toISOString()).run();
 
+  if (body) {
+    const me = await communityUserRow(DB, session.user_id);
+    await tagPostMentions(DB, env, ctx, id, { id: session.user_id, name: me && me.name }, body);
+  }
   const row = await DB.prepare(`${COMMUNITY_POST_SELECT} WHERE p.id = ?2`).bind(session.user_id, id).first();
-  return json({ success: true, post: communityPostOut(row, session.user_id) });
+  const tags = await tagsFor(DB, [id]);
+  const names = await usernamesFor(DB, [session.user_id]);
+  return json({ success: true, post: Object.assign(communityPostOut(row, session.user_id), { tags: tags[id] || [], author_username: names[session.user_id] || null }) });
 }
 
 async function communityDeletePost(request, DB) {
@@ -922,6 +988,7 @@ async function communityDeletePost(request, DB) {
   if (post.user_id !== session.user_id) return error('You can only delete your own posts', 403);
 
   try { await DB.prepare('DELETE FROM community_comment_likes WHERE comment_id IN (SELECT id FROM community_comments WHERE post_id = ?)').bind(id).run(); } catch (e) {}
+  try { await DB.prepare('DELETE FROM community_post_tags WHERE post_id = ?').bind(id).run(); } catch (e) {}
   await DB.batch([
     DB.prepare('DELETE FROM community_likes WHERE post_id = ?').bind(id),
     DB.prepare('DELETE FROM community_comments WHERE post_id = ?').bind(id),
@@ -1116,12 +1183,15 @@ async function communityOnePost(request, DB) {
   ).bind(session.user_id, id).first();
   if (!row) return error('Post not found', 404);
   const names = await usernamesFor(DB, [row.user_id]);
-  return json({ post: Object.assign(communityPostOut(row, session.user_id), { author_username: names[row.user_id] || null }) });
+  const tags = await tagsFor(DB, [row.id]);
+  return json({ post: Object.assign(communityPostOut(row, session.user_id), { author_username: names[row.user_id] || null, tags: tags[row.id] || [] }) });
 }
 
 // Everything that happened to me, newest first. Each part has the same columns:
 // kind, actor_id, post_id, comment_id, snippet, created_at
+// Cloudflare's database allows at most 5 parts in one UNION, so the parts are split into two groups.
 const ACTIVITY_SQL = `
+  SELECT * FROM (
   SELECT 'like_post' AS kind, l.user_id AS actor_id, p.id AS post_id, NULL AS comment_id, p.body AS snippet, l.created_at
     FROM community_likes l JOIN community_posts p ON p.id = l.post_id
     WHERE p.user_id = ?1 AND l.user_id <> ?1
@@ -1133,14 +1203,21 @@ const ACTIVITY_SQL = `
   SELECT 'like_comment', cl.user_id, c.post_id, c.id, c.body, cl.created_at
     FROM community_comment_likes cl JOIN community_comments c ON c.id = cl.comment_id
     WHERE c.user_id = ?1 AND cl.user_id <> ?1
+  )
   UNION ALL
+  SELECT * FROM (
   SELECT 'also_commented', c.user_id, c.post_id, c.id, c.body, c.created_at
     FROM community_comments c JOIN community_posts p ON p.id = c.post_id
     WHERE p.user_id <> ?1 AND c.user_id <> ?1
       AND EXISTS (SELECT 1 FROM community_comments m WHERE m.post_id = c.post_id AND m.user_id = ?1 AND m.created_at < c.created_at)
   UNION ALL
   SELECT 'follow', f.follower_id, NULL, NULL, NULL, f.created_at
-    FROM community_follows f WHERE f.followee_id = ?1`;
+    FROM community_follows f WHERE f.followee_id = ?1
+  UNION ALL
+  SELECT 'tagged', p.user_id, p.id, NULL, p.body, t.created_at
+    FROM community_post_tags t JOIN community_posts p ON p.id = t.post_id
+    WHERE t.user_id = ?1 AND p.user_id <> ?1
+  )`;
 const ACTIVITY_NOT_BLOCKED = `actor_id NOT IN (SELECT blocked_id FROM dm_blocks WHERE blocker_id = ?1)
   AND actor_id NOT IN (SELECT blocker_id FROM dm_blocks WHERE blocked_id = ?1)`;
 

@@ -229,3 +229,12 @@ CREATE TABLE IF NOT EXISTS food_scan_usage (
   count INTEGER NOT NULL DEFAULT 0,
   PRIMARY KEY (user_id, day)
 );
+
+-- Friends tagged in a post with @username
+CREATE TABLE IF NOT EXISTS community_post_tags (
+  post_id TEXT NOT NULL,
+  user_id TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  PRIMARY KEY (post_id, user_id)
+);
+CREATE INDEX IF NOT EXISTS idx_post_tags_user ON community_post_tags(user_id);
