@@ -101,10 +101,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
   backdrop-filter:blur(22px) saturate(180%);-webkit-backdrop-filter:blur(22px) saturate(180%);
   border:0.5px solid rgba(255,255,255,0.16);
   box-shadow:0 12px 32px rgba(0,0,0,0.5),0 2px 6px rgba(0,0,0,0.3),inset 0 1px 0 rgba(255,255,255,0.22),inset 0 -1px 0 rgba(0,0,0,0.25);
-  z-index:100;
+  z-index:100;overflow:hidden;
 }
-.nav-item{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding:0;border:none;border-radius:28px;background:transparent;font-family:inherit;-webkit-tap-highlight-color:transparent;transition:background .25s ease,box-shadow .25s ease;}
-.nav-item.active{background:rgba(0,0,0,0.42);box-shadow:inset 0 1px 3px rgba(0,0,0,0.55),0 0.5px 0 rgba(255,255,255,0.07);}
+.nav-item{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;padding:0;border:none;border-radius:28px;background:transparent;font-family:inherit;-webkit-tap-highlight-color:transparent;z-index:1;}
+/* One highlight that slides to the tapped tab (the 5 tabs are equal width: 5px padding, 2px gaps) */
+.nav-pill{position:absolute;left:5px;top:5px;bottom:5px;width:calc((100% - 18px) / 5);border-radius:28px;pointer-events:none;
+  background:rgba(0,0,0,0.42);box-shadow:inset 0 1px 3px rgba(0,0,0,0.55),0 0.5px 0 rgba(255,255,255,0.07);
+  transform:translateX(calc(var(--nav-i, 0) * (100% + 2px)));transition:transform .4s cubic-bezier(.32,1.08,.48,1);}
+.bottom-nav.moving .nav-pill{animation:navPillSquish .42s ease;}
+@keyframes navPillSquish{0%{scale:1 1;}35%{scale:1.08 .92;}100%{scale:1 1;}}
+@media (prefers-reduced-motion: reduce){.nav-pill{transition:none;}.bottom-nav.moving .nav-pill{animation:none;}}
 .nav-item:active .nav-icon{transform:scale(0.92);}
 .nav-icon{width:24px;height:24px;display:flex;align-items:center;justify-content:center;transition:transform .15s;}
 .nav-icon svg{width:24px;height:24px;stroke:rgba(255,255,255,0.92);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:stroke .18s;}
@@ -2910,7 +2916,8 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
 </div>
 
 <!-- Bottom Nav -->
-<nav class="bottom-nav">
+<nav class="bottom-nav" id="bottomNav">
+  <span class="nav-pill" aria-hidden="true"></span>
   <!-- Home: house outline -->
   <button class="nav-item active" onclick="navTo('dashboard')" id="nav-dashboard">
     <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H15v-5h-6v5H4a1 1 0 01-1-1V9.5z"/></svg></span>
@@ -3265,13 +3272,30 @@ function showWorkoutScreen(screen) {
   if(hybridEl)   hybridEl.style.display   = screen === 'hybrid'   ? 'block' : 'none';
 }
 
+// Slides the tab highlight over to the chosen tab (with a little squish while it moves).
+function navSlidePill(navEl) {
+  try {
+    const bar = document.getElementById('bottomNav');
+    if(!bar || !navEl) return;
+    const i = Array.prototype.indexOf.call(bar.querySelectorAll('.nav-item'), navEl);
+    if(i < 0 || String(i) === bar.style.getPropertyValue('--nav-i')) return;
+    bar.style.setProperty('--nav-i', i);
+    bar.classList.remove('moving');
+    void bar.offsetWidth; // restart the squish
+    bar.classList.add('moving');
+    clearTimeout(bar._mv);
+    bar._mv = setTimeout(() => bar.classList.remove('moving'), 450);
+  } catch(e) {}
+}
 function navTo(page) {
   if(page === 'community' && currentPage === 'community' && window._cmProfView) { cmProfileExit(); return; }
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+page).classList.add('active');
   // Goals has no tab of its own: it sits inside the Progress tab
-  document.getElementById('nav-'+(page==='goals'?'progress':page)).classList.add('active');
+  const navEl = document.getElementById('nav-'+(page==='goals'?'progress':page));
+  navEl.classList.add('active');
+  navSlidePill(navEl);
   currentPage = page;
   document.body.dataset.page = page;
   if(page==='dashboard') renderDashboard();
