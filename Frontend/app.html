@@ -1247,6 +1247,39 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .ah-act-total span{font-size:11px;font-weight:600;color:var(--text3);margin-left:3px;}
 .ah-act-split{display:flex;align-items:center;gap:5px;font-size:10.5px;color:var(--text3);margin-top:3px;white-space:nowrap;}
 .ah-act-split i{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.ah-daynav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:-4px 0 12px;}
+.ah-daynav button{width:34px;height:34px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:50%;border:0.5px solid var(--border2);background:var(--bg4);color:var(--text);font-size:20px;line-height:1;cursor:pointer;-webkit-tap-highlight-color:transparent;font-family:inherit;}
+.ah-daynav button:disabled{opacity:.3;}
+.ah-daynav-lbl{flex:1;min-width:0;text-align:center;font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ah-daynav-lbl span{display:block;font-size:10.5px;font-weight:500;color:var(--text3);margin-top:1px;}
+.tc-bar-wrap.ah-tap{cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.tc-bar-lbl.sel{color:var(--pink);font-weight:700;}
+.ah-tl-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin-top:12px;padding:10px;border-radius:12px;border:0.5px solid var(--pink-border);background:rgba(50,252,253,0.06);color:var(--pink);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;}
+.ah-hist-btn{display:inline-flex;align-items:center;gap:3px;margin-top:6px;padding:0;border:none;background:none;color:var(--pink);font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;}
+/* Sleep timeline + history sheet */
+.ah-sh-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px;}
+.ah-sh-title{font-size:18px;font-weight:700;}
+.ah-sh-sub{font-size:12px;color:var(--text3);margin-top:2px;}
+.ah-sh-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:14px;}
+.ah-sh-stat{background:var(--bg4);border:0.5px solid var(--border);border-radius:14px;padding:10px;}
+.ah-sh-stat b{display:block;font-size:17px;font-weight:700;letter-spacing:-0.02em;white-space:nowrap;}
+.ah-sh-stat span{display:block;font-size:10.5px;color:var(--text3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ah-hyp{background:var(--bg4);border:0.5px solid var(--border);border-radius:16px;padding:12px 10px 8px;margin-bottom:14px;}
+.ah-hyp svg{display:block;width:100%;height:auto;overflow:visible;}
+.ah-stage-rows{display:grid;gap:6px;margin-bottom:6px;}
+.ah-stage-row{display:flex;align-items:center;gap:10px;background:var(--bg4);border:0.5px solid var(--border);border-radius:12px;padding:10px 12px;}
+.ah-stage-row i{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+.ah-stage-row b{flex:1;font-size:14px;font-weight:600;}
+.ah-stage-row em{font-style:normal;font-size:14px;font-weight:600;}
+.ah-stage-row small{font-size:11px;color:var(--text3);width:40px;text-align:right;}
+.ah-hist-row{display:grid;grid-template-columns:74px minmax(0,1fr) 62px;align-items:center;gap:10px;padding:9px 2px;border-top:0.5px solid var(--border);}
+.ah-hist-row:first-child{border-top:none;}
+.ah-hist-d{font-size:12.5px;font-weight:600;white-space:nowrap;}
+.ah-hist-d span{display:block;font-size:10.5px;font-weight:500;color:var(--text3);}
+.ah-hist-bar{display:flex;height:10px;border-radius:99px;overflow:hidden;background:var(--bg5);}
+.ah-hist-bar i{display:block;height:100%;}
+.ah-hist-v{text-align:right;font-size:13px;font-weight:700;white-space:nowrap;}
+.ah-hist-v span{display:block;font-size:10px;font-weight:500;color:var(--text3);}
 .ah-set-help{font-size:11.5px;line-height:1.5;color:var(--text3);padding:2px 4px 0;}
 .ah-set-help b{color:var(--text2);font-weight:600;}
 @media(max-width:360px){.ah-leg-val{font-size:12px;}.ah-act-split{font-size:9.5px;}}
@@ -2059,6 +2092,7 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
     <div class="section-head" style="margin-top:8px;"><div class="section-title">Steps</div></div>
     <div class="tracker-card" id="stepsCard">
       <div class="ah-src" id="stepsAhSrc" style="display:none;"></div>
+      <div class="ah-daynav" id="stepsAhNav" style="display:none;"></div>
       <div class="ah-connect-slot" id="stepsAhConnect" style="display:none;"></div>
       <div class="tc-top">
         <div class="tc-ring-wrap">
@@ -2071,7 +2105,7 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
           <div class="tc-ring-label" id="stepsRingPct">0%</div>
         </div>
         <div class="tc-info">
-          <div class="tc-eyebrow">Today's Steps</div>
+          <div class="tc-eyebrow" id="stepsEyebrow">Today's Steps</div>
           <div class="tc-big" id="stepsDisplay">0</div>
           <div class="tc-sub" id="stepsGoalLabel">Goal: 10,000</div>
           <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
@@ -2099,6 +2133,7 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
     <div class="section-head" style="margin-top:8px;"><div class="section-title">Sleep</div></div>
     <div class="tracker-card" id="sleepCard">
       <div class="ah-src" id="sleepAhSrc" style="display:none;"></div>
+      <div class="ah-daynav" id="sleepAhNav" style="display:none;"></div>
       <div class="ah-connect-slot" id="sleepAhConnect" style="display:none;"></div>
       <div class="tc-top">
         <div class="tc-ring-wrap">
@@ -2111,7 +2146,7 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
           <div class="tc-ring-label" id="sleepRingPct">—</div>
         </div>
         <div class="tc-info">
-          <div class="tc-eyebrow">Last Night</div>
+          <div class="tc-eyebrow" id="sleepEyebrow">Last Night</div>
           <div class="tc-big" id="sleepHoursDisplay">—</div>
           <div class="tc-sub" id="sleepQualLabel">Quality: —</div>
           <div style="margin-top:8px;">
@@ -2842,6 +2877,9 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
 </div>
 <div class="cm-dm" id="cmDm" style="display:none;" role="dialog" aria-label="Messages"></div>
 
+<div class="cm-overlay" id="ahSheetOverlay" onclick="if(event.target===this)ahSheetClose()">
+  <div class="cm-sheet" id="ahSheet"></div>
+</div>
 <div class="cm-overlay" id="hySheetOverlay" onclick="if(event.target===this)hySheetClose()">
   <div class="cm-sheet" id="hySheet"></div>
 </div>
@@ -9124,7 +9162,8 @@ function renderStepsCard() {
   const s = getStepsSettings();
   const goal = s.goal || 10000;
   const ahSteps = (typeof ahStepsMap === 'function') ? ahStepsMap() : null; // Apple Health (iPhone app)
-  const today = ahSteps ? (ahSteps[localISO(new Date())] || 0) : (d[getTodayKey()] || 0);
+  const ahSel = ahSteps ? (ahState.sel.steps || 0) : 0;   // days back the card shows (Apple Health only)
+  const today = ahSteps ? (ahSteps[ahSelKey('steps')] || 0) : (d[getTodayKey()] || 0);
   const pct = Math.min(today / goal, 1);
   const C = 207.35;
 
@@ -9140,6 +9179,7 @@ function renderStepsCard() {
   const el = (id) => document.getElementById(id);
   if(el('stepsDisplay')) el('stepsDisplay').textContent = today.toLocaleString();
   if(el('stepsGoalLabel')) el('stepsGoalLabel').textContent = `Goal: ${goal.toLocaleString()}`;
+  if(el('stepsEyebrow')) el('stepsEyebrow').textContent = ahSteps ? 'Steps' : "Today's Steps";
   if(el('stepsDistDisplay')) el('stepsDistDisplay').textContent = dist;
   if(el('stepsCalDisplay')) el('stepsCalDisplay').textContent = kcal;
   if(el('stepsGoalInput') && !el('stepsGoalInput').value) el('stepsGoalInput').value = goal;
@@ -9150,10 +9190,11 @@ function renderStepsCard() {
   // 7-day bars
   const days = [];
   for(let i=6;i>=0;i--){
-    const dt = new Date(); dt.setDate(dt.getDate()-i);
+    const back = i + ahSel;                        // days before today (window ends on the shown day)
+    const dt = new Date(); dt.setDate(dt.getDate()-back);
     const k = dt.toISOString().slice(0,10);
-    const label = i===0?'Today':dt.toLocaleDateString('en-US',{weekday:'short'}).slice(0,1);
-    days.push({steps:ahSteps ? (ahSteps[localISO(dt)]||0) : (d[k]||0), label, isToday:i===0});
+    const label = back===0?'Today':dt.toLocaleDateString('en-US',{weekday:'short'}).slice(0,1);
+    days.push({steps:ahSteps ? (ahSteps[localISO(dt)]||0) : (d[k]||0), label, isToday:i===0, back});
   }
   const maxSteps = Math.max(...days.map(d=>d.steps), goal, 1);
   const barsEl = document.getElementById('stepsBars');
@@ -9162,11 +9203,12 @@ function renderStepsCard() {
     barsEl.innerHTML = days.map(d=>{
       const h = Math.max(d.steps/maxSteps*44, d.steps>0?3:0);
       const cls = d.steps===0?'tc-bar empty':'tc-bar'+(d.isToday?' today':'');
-      return `<div class="tc-bar-wrap"><div class="${cls}" style="height:${h}px;"></div></div>`;
+      const tap = ahSteps ? ` ah-tap" onclick="ahSelect('steps',${d.back})` : '';
+      return `<div class="tc-bar-wrap${tap}"><div class="${cls}" style="height:${h}px;"></div></div>`;
     }).join('');
   }
   if(lblsEl) {
-    lblsEl.innerHTML = days.map(d=>`<div class="tc-bar-lbl">${d.label}</div>`).join('');
+    lblsEl.innerHTML = days.map(d=>`<div class="tc-bar-lbl${ahSteps && d.isToday ? ' sel' : ''}">${d.label}</div>`).join('');
   }
   if(typeof ahDecorateSteps === 'function') { try { ahDecorateSteps(!!ahSteps); } catch(e) {} }
 }
@@ -9289,8 +9331,17 @@ function renderSleepCard() {
   const pctEl = document.getElementById('sleepRingPct');
   const el = (id) => document.getElementById(id);
   const ahNight = (typeof ahLastNight === 'function') ? ahLastNight() : null; // Apple Health (iPhone app)
+  const ahSleepOn = (typeof ahLive === 'function') && ahLive() && Object.keys(ahState.nights).length > 0;
+  const ahSel = ahSleepOn ? (ahState.sel.sleep || 0) : 0;   // nights back the card shows (Apple Health only)
+  if(el('sleepEyebrow')) el('sleepEyebrow').textContent = ahSleepOn ? 'Sleep' : 'Last Night';
 
-  if(ahNight) {
+  if(ahSleepOn && ahSel > 0 && !ahNight) {
+    if(fg) fg.style.strokeDashoffset = C;
+    if(pctEl) pctEl.textContent = '—';
+    if(el('sleepHoursDisplay')) el('sleepHoursDisplay').textContent = '—';
+    if(el('sleepQualLabel')) el('sleepQualLabel').textContent = ahState.histLoading ? 'Reading Apple Health…' : 'No sleep recorded';
+    if(el('sleepStarsDisplay')) el('sleepStarsDisplay').innerHTML = '';
+  } else if(ahNight) {
     const mins = ahNight.asleep > 0 ? ahNight.asleep : ahNight.inBed;
     const pct = Math.min(mins / 60 / goalHrs, 1);
     if(fg) fg.style.strokeDashoffset = C*(1-pct);
@@ -9337,11 +9388,12 @@ function renderSleepCard() {
   // 7-day bars
   const days7 = [];
   for(let i=6;i>=0;i--){
-    const dt = new Date(); dt.setDate(dt.getDate()-i);
+    const back = i + ahSel;                        // nights before last night (window ends on the shown night)
+    const dt = new Date(); dt.setDate(dt.getDate()-back);
     const k = dt.toISOString().slice(0,10);
-    const label = i===0?'Today':dt.toLocaleDateString('en-US',{weekday:'short'}).slice(0,1);
+    const label = back===0?'Today':dt.toLocaleDateString('en-US',{weekday:'short'}).slice(0,1);
     const ahH = (typeof ahSleepHoursFor === 'function') ? ahSleepHoursFor(localISO(dt)) : null;
-    days7.push({hrs:ahH !== null ? ahH : (d[k]?.hrs||0), label, isToday:i===0});
+    days7.push({hrs:ahH !== null ? ahH : (d[k]?.hrs||0), label, isToday:i===0, back});
   }
   const maxH = Math.max(...days7.map(d=>d.hrs), goalHrs, 1);
   const barsEl = el('sleepBars');
@@ -9350,11 +9402,12 @@ function renderSleepCard() {
     barsEl.innerHTML = days7.map(d=>{
       const h = Math.max(d.hrs/maxH*44, d.hrs>0?3:0);
       const cls = d.hrs===0?'tc-bar empty':'tc-bar'+(d.isToday?' today':'');
-      return `<div class="tc-bar-wrap"><div class="${cls}" style="height:${h}px;"></div></div>`;
+      const tap = ahSleepOn ? ` ah-tap" onclick="ahSelect('sleep',${d.back})` : '';
+      return `<div class="tc-bar-wrap${tap}"><div class="${cls}" style="height:${h}px;"></div></div>`;
     }).join('');
   }
   if(lblsEl) {
-    lblsEl.innerHTML = days7.map(d=>`<div class="tc-bar-lbl">${d.label}</div>`).join('');
+    lblsEl.innerHTML = days7.map(d=>`<div class="tc-bar-lbl${ahSleepOn && d.isToday ? ' sel' : ''}">${d.label}</div>`).join('');
   }
 
   // Reminder toggle restore
@@ -9378,7 +9431,7 @@ function sheetCloserFor(el) {
     ['#saveMealOverlay', () => closeSaveMeal()], ['#savedMealsOverlay', () => closeSavedMeals()],
     ['#logWeightOverlay', () => closeLogWeight()], ['#exProgressOverlay', () => closeExProgress()],
     ['#cmSheetOverlay', () => cmSheetClose()],
-    ['#hySheetOverlay', () => hySheetClose()], ['#settingsSheet', () => closeSettings()],
+    ['#hySheetOverlay', () => hySheetClose()], ['#ahSheetOverlay', () => ahSheetClose()], ['#settingsSheet', () => closeSettings()],
     ['#summarySheet', () => closeSummary()], ['#swapSheet', () => closeSwap()], ['#onboardingSheet', () => obClose()]
   ];
   for(const [sel, fn] of map) if(el.closest(sel)) return fn;
@@ -13650,7 +13703,9 @@ const AH_STAGE = {                                                 // Apple Heal
   deep:  { label: 'Deep',  color: '#5E5CE6' }
 };
 // steps / burned / nights are keyed by local date 'YYYY-MM-DD' (a night is keyed by the morning it ends)
-let ahState = { status: 'off', loadedAt: 0, fullAt: 0, connecting: false, loading: false, steps: {}, burned: {}, nights: {} };
+let ahState = { status: 'off', loadedAt: 0, fullAt: 0, histAt: 0, connecting: false, loading: false, histLoading: false,
+  steps: {}, burned: {}, nights: {}, sel: { steps: 0, sleep: 0 } };   // sel = how many days back the card shows
+const AH_HISTORY_DAYS = 30;
 
 // True only inside the iPhone app. On the website (and Android) nothing here runs.
 function ahIsNativeIOS() {
@@ -13751,39 +13806,27 @@ function ahSleepSummary(samples) {
   const times = list.map(s => [new Date(s.startDate), new Date(s.endDate)]);
   out.from = new Date(Math.min(...times.map(t => t[0])));
   out.to = new Date(Math.max(...times.map(t => t[1])));
+  // For the timeline: the chosen source's stages in time order, plus time in bed from any source
+  out.segments = best.filter(s => ['rem', 'core', 'deep', 'awake', 'asleep'].includes(stageOf(s)))
+    .map(s => ({ stage: stageOf(s), start: new Date(s.startDate).getTime(), end: new Date(s.endDate).getTime() }))
+    .filter(g => g.end > g.start).sort((a, b) => a.start - b.start);
+  out.inBedRanges = list.filter(s => s.sleepState === 'inBed').map(s => ({ start: new Date(s.startDate).getTime(), end: new Date(s.endDate).getTime() }));
   return out;
 }
 
-// Reads Apple Health into memory. Every minute only today is re-read; the whole week every 15 minutes
-// (or when asked). Nothing is stored or uploaded.
-async function ahLoad(force, full) {
-  if(!ahIsNativeIOS() || ahState.loading) return;
-  if(ahState.status !== 'ready' && ahState.status !== 'error' && !force && !full) return;
-  ahState.loading = true; ahRenderBusy();
+// Reads one range of days from Apple Health into memory (steps, calories, and the nights ending on those days).
+// Returns false if nothing could be read. Nothing is stored or uploaded.
+async function ahFetchRange(from, nights, basalLimit) {
   const now = new Date(), today = ahDayStart(now);
-  const doFull = !!full || !ahState.fullAt || Date.now() - ahState.fullAt > AH_FULL_MS;
-  let from = today;
-  if(doFull) {
-    from = new Date(today); from.setDate(from.getDate() - 6);
-    try { const mon = ahDayStart(macroWeekMonday()); if(mon < from) from = mon; } catch(e) {}
-  }
-  const nights = doFull ? 7 : 1;
   const sleepFrom = new Date(today); sleepFrom.setDate(sleepFrom.getDate() - nights); sleepFrom.setHours(18, 0, 0, 0);
   const iso = d => d.toISOString();
   const [stepsR, activeR, basalR, sleepR] = await Promise.all([
     ahSafe(ahCall('queryAggregated', { dataType: 'steps', startDate: iso(from), endDate: iso(now), bucket: 'day', aggregation: 'sum' })),
     ahSafe(ahCall('queryAggregated', { dataType: 'calories', startDate: iso(from), endDate: iso(now), bucket: 'day', aggregation: 'sum' })),
-    ahSafe(ahCall('readSamples', { dataType: 'basalCalories', startDate: iso(from), endDate: iso(now), limit: doFull ? 30000 : 6000, ascending: true })),
-    ahSafe(ahCall('readSamples', { dataType: 'sleep', startDate: iso(sleepFrom), endDate: iso(now), limit: 5000, ascending: true }))
+    ahSafe(ahCall('readSamples', { dataType: 'basalCalories', startDate: iso(from), endDate: iso(now), limit: basalLimit, ascending: true })),
+    ahSafe(ahCall('readSamples', { dataType: 'sleep', startDate: iso(sleepFrom), endDate: iso(now), limit: 20000, ascending: true }))
   ]);
-  ahState.loading = false;
-  if(!stepsR.ok && !activeR.ok && !basalR.ok && !sleepR.ok) {
-    console.warn('Apple Health read failed:', stepsR.e);
-    if(ahState.status !== 'ready') ahState.status = 'error';
-    if(force) showToast("Couldn't read Apple Health right now");
-    ahRender();
-    return;
-  }
+  if(!stepsR.ok && !activeR.ok && !basalR.ok && !sleepR.ok) { console.warn('Apple Health read failed:', stepsR.e); return false; }
   const days = [];
   for(let d = new Date(from); d <= today; d.setDate(d.getDate() + 1)) days.push(ahKey(d));
   const perDay = r => { const m = {}; if(r.ok) ((r.v && r.v.samples) || []).forEach(b => { const k = ahKey(b.startDate); m[k] = (m[k] || 0) + ahNum(b.value); }); return m; };
@@ -13809,11 +13852,47 @@ async function ahLoad(force, full) {
       if(sum) ahState.nights[k] = sum; else delete ahState.nights[k];
     }
   }
+  return true;
+}
+
+// Every minute only today is re-read; this week every 15 minutes (or when asked).
+async function ahLoad(force, full) {
+  if(!ahIsNativeIOS() || ahState.loading) return;
+  if(ahState.status !== 'ready' && ahState.status !== 'error' && !force && !full) return;
+  ahState.loading = true; ahRenderBusy();
+  const today = ahDayStart(new Date());
+  const doFull = !!full || !ahState.fullAt || Date.now() - ahState.fullAt > AH_FULL_MS;
+  let from = today;
+  if(doFull) {
+    from = new Date(today); from.setDate(from.getDate() - 6);
+    try { const mon = ahDayStart(macroWeekMonday()); if(mon < from) from = mon; } catch(e) {}
+  }
+  const ok = await ahFetchRange(from, doFull ? 7 : 1, doFull ? 30000 : 6000);
+  ahState.loading = false;
+  if(!ok) {
+    if(ahState.status !== 'ready') ahState.status = 'error';
+    if(force) showToast("Couldn't read Apple Health right now");
+    ahRender();
+    return;
+  }
   ahState.status = 'ready';
   ahState.loadedAt = Date.now();
   if(doFull) ahState.fullAt = Date.now();
+  if(force) ahState.histAt = 0;      // a manual refresh also re-reads older days the next time they're viewed
   ahRender();
   if(force) showToast('Apple Health updated');
+}
+
+// Older days (up to 30) are read only when someone looks at them, then kept for 30 minutes.
+async function ahEnsureHistory() {
+  if(!ahLive() || ahState.histLoading || (ahState.histAt && Date.now() - ahState.histAt < 30 * 60000)) return;
+  ahState.histLoading = true; ahRender();
+  const from = ahDayStart(new Date()); from.setDate(from.getDate() - (AH_HISTORY_DAYS - 1));
+  const ok = await ahFetchRange(from, AH_HISTORY_DAYS, 60000);
+  ahState.histLoading = false;
+  if(ok) ahState.histAt = Date.now();
+  else showToast("Couldn't read older Apple Health days");
+  ahRender();
 }
 
 // ── What the rest of the app asks for ──
@@ -13837,7 +13916,35 @@ function ahStepsMap() {
 }
 // Sleep card: last night's sleep from Apple Health, or null (then the manual log is used).
 function ahLastNight() {
-  try { return ahLive() ? (ahState.nights[ahKey(new Date())] || null) : null; } catch(e) { return null; }
+  try { return ahLive() ? (ahState.nights[ahSelKey('sleep')] || null) : null; } catch(e) { return null; }
+}
+// The date a card is showing ('YYYY-MM-DD'); for sleep, the morning the night ended.
+function ahSelKey(kind) { const d = new Date(); d.setDate(d.getDate() - (ahState.sel[kind] || 0)); return ahKey(d); }
+function ahSelDate(kind) { const d = ahDayStart(new Date()); d.setDate(d.getDate() - (ahState.sel[kind] || 0)); return d; }
+// Card day switcher: delta +1 = one day back, -1 = one day forward. n = jump to that many days back.
+function ahStep(kind, delta) { ahSelect(kind, (ahState.sel[kind] || 0) + delta); }
+function ahSelect(kind, n) {
+  ahState.sel[kind] = Math.max(0, Math.min(AH_HISTORY_DAYS - 1, n));
+  if(ahState.sel[kind] > 5) ahEnsureHistory();
+  try { if(kind === 'steps') renderStepsCard(); else renderSleepCard(); } catch(e) {}
+  if(ahSheetIsOpen('sleep') && kind === 'sleep') ahOpenSleep();
+}
+function ahDayLabel(kind) {
+  const n = ahState.sel[kind] || 0, d = ahSelDate(kind);
+  const date = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  if(kind === 'sleep') {
+    const night = new Date(d); night.setDate(night.getDate() - 1);
+    const name = n === 0 ? 'Last night' : night.toLocaleDateString('en-US', { weekday: 'long' }) + ' night';
+    return { title: name, sub: night.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' → ' + date };
+  }
+  return { title: n === 0 ? 'Today' : n === 1 ? 'Yesterday' : d.toLocaleDateString('en-US', { weekday: 'long' }), sub: date };
+}
+function ahDayNavHTML(kind) {
+  const n = ahState.sel[kind] || 0, l = ahDayLabel(kind);
+  const loading = ahState.histLoading && n > 5;
+  return `<button onclick="ahStep('${kind}', 1)" ${n >= AH_HISTORY_DAYS - 1 ? 'disabled' : ''} aria-label="Earlier">‹</button>
+    <div class="ah-daynav-lbl">${l.title}<span>${loading ? 'Reading Apple Health…' : l.sub}</span></div>
+    <button onclick="ahStep('${kind}', -1)" ${n <= 0 ? 'disabled' : ''} aria-label="Later">›</button>`;
 }
 function ahSleepHoursFor(key) {
   try { const n = ahLive() ? ahState.nights[key] : null; return n ? Math.round((n.asleep > 0 ? n.asleep : n.inBed) / 6) / 10 : null; } catch(e) { return null; }
@@ -13867,6 +13974,7 @@ function ahShow(id, on, html) {
 function ahDecorateSteps(usingHealth) {
   const native = ahIsNativeIOS();
   ahShow('stepsAhSrc', native && usingHealth, ahSourceHTML());
+  ahShow('stepsAhNav', native && usingHealth, ahDayNavHTML('steps'));
   ahShow('stepsAhConnect', native && ahState.status === 'connect', ahConnectHTML('steps, sleep and calories burned'));
   ahShow('stepsInputRow', !(native && usingHealth));
 }
@@ -13874,10 +13982,14 @@ function ahDecorateSteps(usingHealth) {
 function ahDecorateSleep(night) {
   const native = ahIsNativeIOS();
   ahShow('sleepAhConnect', native && ahState.status === 'connect', ahConnectHTML('last night\'s sleep'));
-  ahShow('sleepManual', !(native && night));
-  if(!(native && ahLive())) { ahShow('sleepAhSrc', false); ahShow('sleepAhStages', false); return; }
-  ahShow('sleepAhSrc', true, ahSourceHTML(night ? undefined : 'no sleep recorded last night'));
-  if(!night) { ahShow('sleepAhStages', false); return; }
+  ahShow('sleepManual', !(native && (night || (ahLive() && (ahState.sel.sleep || 0) > 0))));
+  const top = document.querySelector('#sleepCard .tc-top');
+  if(!(native && ahLive())) { ahShow('sleepAhSrc', false); ahShow('sleepAhNav', false); ahShow('sleepAhStages', false); if(top) { top.onclick = null; top.style.cursor = ''; } return; }
+  const anyNights = Object.keys(ahState.nights).length > 0;
+  ahShow('sleepAhSrc', true, ahSourceHTML(night || anyNights ? undefined : 'no sleep recorded last night'));
+  ahShow('sleepAhNav', anyNights, ahDayNavHTML('sleep'));
+  if(top) { top.onclick = night ? () => ahOpenSleep() : null; top.style.cursor = night ? 'pointer' : ''; }
+  if(!night) { ahShow('sleepAhStages', !!(anyNights && (ahState.sel.sleep || 0) > 0), '<div class="ah-stages"><div class="ah-note">No sleep recorded in Apple Health for this night.</div></div>'); return; }
   let html = '<div class="ah-stages">';
   if(night.hasStages) {
     const parts = ['awake', 'rem', 'core', 'deep'];
@@ -13888,6 +14000,7 @@ function ahDecorateSleep(night) {
   } else {
     html += `<div class="ah-note">Sleep stages (REM, Core, Deep) need an Apple Watch or a sleep tracker that saves to Apple Health.</div>`;
   }
+  html += `<button class="ah-tl-btn" onclick="ahOpenSleep()">View sleep timeline ›</button>`;
   ahShow('sleepAhStages', true, html + '</div>');
 }
 // Macros Activity: Apple Health's total in place of the manual "Calories burned" box.
@@ -13898,7 +14011,121 @@ function ahRenderActivity() {
   ahShow('actHealthField', !!b);
   if(b) ahShow('actHealthBox', true, `<div class="ah-act-total">${Math.round(b.total).toLocaleString()}<span>kcal</span></div>
     <div class="ah-act-split"><i style="background:#FF9F0A;"></i>Active ${Math.round(b.active).toLocaleString()}</div>
-    <div class="ah-act-split"><i style="background:#BF5AF2;"></i>Resting ${Math.round(b.resting).toLocaleString()}</div>`);
+    <div class="ah-act-split"><i style="background:#BF5AF2;"></i>Resting ${Math.round(b.resting).toLocaleString()}</div>
+    <button class="ah-hist-btn" onclick="ahOpenBurnedHistory()">Past days ›</button>`);
+}
+
+// ── Pop-up sheets: sleep timeline and calories burned history ──
+function ahSheetIsOpen(kind) {
+  const o = document.getElementById('ahSheetOverlay');
+  return !!o && o.style.display === 'flex' && o.dataset.kind === kind;
+}
+function ahSheet(kind, html) {
+  const o = document.getElementById('ahSheetOverlay'), sh = document.getElementById('ahSheet');
+  const keep = o.style.display === 'flex' && o.dataset.kind === kind ? sh.scrollTop : 0;
+  sh.innerHTML = html; o.dataset.kind = kind; o.style.display = 'flex'; sh.scrollTop = keep;
+}
+function ahSheetClose() { const o = document.getElementById('ahSheetOverlay'); if(o) { o.style.display = 'none'; o.dataset.kind = ''; } }
+
+// Apple-style sleep chart: one row per stage, time across, thin lines joining stage changes.
+function ahHypnogramSVG(n) {
+  const segs = n.segments || [];
+  const bed = n.inBedRanges || [];
+  const t0 = Math.min(...segs.map(g => g.start), ...bed.map(b => b.start)), t1 = Math.max(...segs.map(g => g.end), ...bed.map(b => b.end));
+  if(!isFinite(t0) || !isFinite(t1) || t1 <= t0) return '';
+  const rows = n.hasStages ? ['awake', 'rem', 'core', 'deep'] : ['awake', 'asleep'];
+  const label = { awake: 'Awake', rem: 'REM', core: 'Core', deep: 'Deep', asleep: 'Asleep' };
+  const color = { awake: AH_STAGE.awake.color, rem: AH_STAGE.rem.color, core: AH_STAGE.core.color, deep: AH_STAGE.deep.color, asleep: AH_STAGE.core.color };
+  const L = 52, W = 300, R = 8, rowH = 34, barH = 20, top = 6, H = top + rows.length * rowH;
+  const x = t => L + (t - t0) / (t1 - t0) * W;
+  const yMid = st => top + rows.indexOf(st) * rowH + rowH / 2;
+  let g = '';
+  rows.forEach((st, i) => {   // row guides + names
+    const y = top + i * rowH + rowH / 2;
+    g += `<line x1="${L}" y1="${y}" x2="${L + W}" y2="${y}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
+    g += `<text x="0" y="${y + 4}" font-size="11" font-weight="600" fill="${color[st]}">${label[st]}</text>`;
+  });
+  bed.forEach(b => { g += `<rect x="${x(b.start)}" y="${top}" width="${Math.max(1, x(b.end) - x(b.start))}" height="${rows.length * rowH}" fill="rgba(255,255,255,0.03)" rx="6"/>`; });
+  const shown = segs.filter(s => rows.includes(s.stage));
+  shown.forEach((s, i) => {   // connectors between consecutive stages
+    const nx = shown[i + 1];
+    if(nx && nx.stage !== s.stage && nx.start - s.end < 5 * 60000) {
+      const xx = x(nx.start);
+      g += `<line x1="${xx}" y1="${yMid(s.stage)}" x2="${xx}" y2="${yMid(nx.stage)}" stroke="rgba(255,255,255,0.22)" stroke-width="1"/>`;
+    }
+  });
+  shown.forEach(s => {
+    const x0 = x(s.start), w = Math.max(1.5, x(s.end) - x0);
+    g += `<rect x="${x0}" y="${yMid(s.stage) - barH / 2}" width="${w}" height="${barH}" rx="${Math.min(4, w / 2)}" fill="${color[s.stage]}"/>`;
+  });
+  // hour ticks
+  const spanH = (t1 - t0) / 3600000, step = spanH > 9 ? 3 : spanH > 4 ? 2 : 1;
+  const first = new Date(t0); first.setMinutes(0, 0, 0);
+  while(first.getTime() < t0 || first.getHours() % step) first.setHours(first.getHours() + 1);
+  for(let t = first.getTime(); t <= t1; t += step * 3600000) {
+    const xx = x(t);
+    g += `<line x1="${xx}" y1="${top}" x2="${xx}" y2="${H}" stroke="rgba(255,255,255,0.07)" stroke-dasharray="2 3"/>`;
+    g += `<text x="${xx}" y="${H + 14}" font-size="10" fill="rgba(255,255,255,0.4)" text-anchor="middle">${new Date(t).toLocaleTimeString('en-US', { hour: 'numeric' })}</text>`;
+  }
+  return `<svg viewBox="0 0 ${L + W + R} ${H + 20}" role="img" aria-label="Sleep stages timeline">${g}</svg>`;
+}
+
+function ahOpenSleep() {
+  if(!ahLive()) return;
+  const n = ahState.nights[ahSelKey('sleep')];
+  const l = ahDayLabel('sleep');
+  const head = `<div class="ah-sh-head"><div><div class="ah-sh-title">${l.title}</div><div class="ah-sh-sub">${l.sub} · Apple Health</div></div></div>
+    <div class="ah-daynav" style="margin:0 0 14px;">${ahDayNavHTML('sleep')}</div>`;
+  if(!n) {
+    ahSheet('sleep', head + `<div class="ah-note" style="text-align:center;padding:24px 0 30px;">No sleep recorded in Apple Health for this night.</div>
+      <button class="ghost-btn" onclick="ahSheetClose()">Close</button>`);
+    return;
+  }
+  const parts = n.hasStages ? ['awake', 'rem', 'core', 'deep'] : ['awake', 'plain'];
+  const total = parts.reduce((t, k) => t + (n[k] || 0), 0) || 1;
+  const names = { awake: 'Awake', rem: 'REM', core: 'Core', deep: 'Deep', plain: 'Asleep' };
+  const colors = { awake: AH_STAGE.awake.color, rem: AH_STAGE.rem.color, core: AH_STAGE.core.color, deep: AH_STAGE.deep.color, plain: AH_STAGE.core.color };
+  ahSheet('sleep', head + `
+    <div class="ah-sh-stats">
+      <div class="ah-sh-stat"><b>${ahDur(n.asleep)}</b><span>Asleep</span></div>
+      <div class="ah-sh-stat"><b>${n.inBed > 0 ? ahDur(n.inBed) : '—'}</b><span>In bed</span></div>
+      <div class="ah-sh-stat"><b style="font-size:13px;line-height:1.35;">${ahTime(n.from)}<br>${ahTime(n.to)}</b><span>Start · end</span></div>
+    </div>
+    <div class="ah-hyp">${ahHypnogramSVG(n)}</div>
+    <div class="ah-stage-rows">${parts.filter(k => n[k] > 0 || k !== 'plain').map(k => `<div class="ah-stage-row"><i style="background:${colors[k]};"></i><b>${names[k]}</b><em>${ahDur(n[k] || 0)}</em><small>${Math.round((n[k] || 0) / total * 100)}%</small></div>`).join('')}</div>
+    ${n.hasStages ? '' : '<div class="ah-note" style="margin:8px 2px 0;">Sleep stages (REM, Core, Deep) need an Apple Watch or a sleep tracker that saves to Apple Health.</div>'}
+    <div class="ah-note" style="margin:10px 2px 14px;">From Apple Health · read-only · stays on this iPhone.</div>
+    <button class="ghost-btn" onclick="ahSheetClose()">Close</button>`);
+}
+
+// Calories burned (active + resting) for the last 30 days.
+function ahOpenBurnedHistory(silent) {
+  if(!ahLive()) return;
+  if(!silent) ahEnsureHistory();
+  const rows = [];
+  for(let i = 0; i < AH_HISTORY_DAYS; i++) {
+    const d = ahDayStart(new Date()); d.setDate(d.getDate() - i);
+    rows.push({ d, i, b: ahState.burned[ahKey(d)] || null });
+  }
+  const withData = rows.filter(r => r.b);
+  const max = Math.max(1, ...withData.map(r => r.b.total));
+  const avg = withData.length ? Math.round(withData.reduce((t, r) => t + r.b.total, 0) / withData.length) : 0;
+  const list = rows.map(r => {
+    const name = r.i === 0 ? 'Today' : r.i === 1 ? 'Yesterday' : r.d.toLocaleDateString('en-US', { weekday: 'short' });
+    const date = r.d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    if(!r.b) return `<div class="ah-hist-row"><div class="ah-hist-d">${name}<span>${date}</span></div><div class="ah-note">${ahState.histLoading && r.i > 6 ? 'Reading…' : 'No data'}</div><div class="ah-hist-v">—</div></div>`;
+    return `<div class="ah-hist-row"><div class="ah-hist-d">${name}<span>${date}</span></div>
+      <div class="ah-hist-bar" style="width:${Math.max(8, r.b.total / max * 100)}%;"><i style="width:${r.b.active / r.b.total * 100}%;background:#FF9F0A;"></i><i style="flex:1;background:#BF5AF2;"></i></div>
+      <div class="ah-hist-v">${Math.round(r.b.total).toLocaleString()}<span>${Math.round(r.b.active).toLocaleString()} active</span></div></div>`;
+  }).join('');
+  ahSheet('burned', `<div class="ah-sh-head"><div><div class="ah-sh-title">Calories burned</div><div class="ah-sh-sub">Apple Health · last ${AH_HISTORY_DAYS} days</div></div></div>
+    <div class="ah-sh-stats" style="grid-template-columns:repeat(2,minmax(0,1fr));">
+      <div class="ah-sh-stat"><b>${avg ? avg.toLocaleString() : '—'}</b><span>Daily average (kcal)</span></div>
+      <div class="ah-sh-stat"><b style="font-size:13px;line-height:1.5;"><span style="display:inline;color:#FF9F0A;">●</span> Active <span style="display:inline;color:#BF5AF2;margin-left:6px;">●</span> Resting</b><span>Total = active + resting</span></div>
+    </div>
+    <div>${list}</div>
+    <div class="ah-note" style="margin:12px 2px 14px;">From Apple Health · read-only · stays on this iPhone.</div>
+    <button class="ghost-btn" onclick="ahSheetClose()">Close</button>`);
 }
 
 // Redraws everything that shows Apple Health numbers.
@@ -13910,6 +14137,7 @@ function ahRender() {
     if(currentPage === 'macros') { renderDayNav(); renderHero(); renderMacroStats(); updateActivityStats(); renderWeekBars(); renderWeekTotals(); renderLine(); }
     else ahRenderActivity();
   } catch(e) {}
+  try { if(ahSheetIsOpen('sleep')) ahOpenSleep(); else if(ahSheetIsOpen('burned')) ahOpenBurnedHistory(true); } catch(e) {}
   ahRenderSettings();
 }
 function ahRenderBusy() {
