@@ -1385,6 +1385,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .cm-mention-who span{font-size:12px;color:var(--text3);}
 .cm-mention-row em{font-style:normal;font-size:11px;font-weight:600;color:var(--pink);}
 .cm-mention-hint{padding:12px;font-size:13px;color:var(--text3);}
+.cm-untag{margin-left:auto;align-self:center;background:none;border:0.5px solid var(--border2);border-radius:99px;padding:6px 12px;color:var(--text3);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;}
 .cm-pick{display:block;width:100%;text-align:left;background:var(--bg4);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 12px;color:var(--text);font-family:inherit;font-size:13px;line-height:1.4;margin-bottom:6px;cursor:pointer;}
 .cm-pick small{display:block;color:var(--text3);font-size:11px;}
 /* ── Community refresh ── */
@@ -12118,6 +12119,7 @@ function cmPostHTML(p) {
     <div class="cm-actions">
       <button class="cm-act${p.liked ? ' liked' : ''}" onclick="cmToggleLike('${id}')" aria-label="Like">${CM_HEART}<span>${cmNum(p.like_count)}</span></button>
       <button class="cm-act" onclick="cmToggleComments('${id}')" aria-label="Comments">${CM_BUBBLE}<span>${cmNum(p.comment_count)}</span></button>
+      ${p.tagged_me ? `<button class="cm-untag" onclick="cmRemoveMyTag('${id}')">Remove tag</button>` : ''}
     </div>
     ${cmState.open[id] ? cmCommentsHTML(id) : ''}
   </article>`;
@@ -12883,6 +12885,18 @@ async function cmDeleteComment(postId, commentId) {
   const p = cmFindPost(postId);
   if(p && r.data) p.comment_count = cmNum(r.data.comment_count);
   cmRedrawPost(postId);
+}
+
+// Take yourself off a post someone tagged you in.
+async function cmRemoveMyTag(id) {
+  if(!confirm('Remove your tag from this post? Your @name stays in the text but won’t link to you, and you won’t get notified about it.')) return;
+  const r = await cmApi('/community/tags/remove', 'POST', { post_id: id });
+  if(!r.ok) { if(r.status !== 401) showToast((r.data && r.data.error) || 'Could not remove your tag'); return; }
+  const p = cmFindPost(id);
+  if(p) { p.tags = (r.data && Array.isArray(r.data.tags)) ? r.data.tags : []; p.tagged_me = false; }
+  cmDraw();
+  if(typeof cmRefreshUnread === 'function') cmRefreshUnread(); // its "tagged you" notification is gone too
+  showToast('Tag removed');
 }
 
 async function cmDeletePost(id) {

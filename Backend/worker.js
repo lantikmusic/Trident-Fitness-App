@@ -132,6 +132,7 @@ export default {
     if (path === '/community/feed'            && request.method === 'GET')  return community(communityFeed, request, env.DB);
     if (path === '/community/posts'           && request.method === 'POST') return community(communityCreatePost, request, env.DB, env, ctx);
     if (path === '/community/posts/delete'    && request.method === 'POST') return community(communityDeletePost, request, env.DB);
+    if (path === '/community/tags/remove'     && request.method === 'POST') return community(communityRemoveMyTag, request, env.DB);
     if (path === '/community/like'            && request.method === 'POST') return community(communityToggleLike, request, env.DB, env, ctx);
     if (path === '/community/comments/like'   && request.method === 'POST') return community(communityToggleCommentLike, request, env.DB, env, ctx);
     if (path === '/community/post'            && request.method === 'GET')  return community(communityOnePost, request, env.DB);
@@ -861,7 +862,7 @@ async function communityFeed(request, DB) {
   const names = await usernamesFor(DB, page.map(r => r.user_id));
   const tags = await tagsFor(DB, page.map(r => r.id));
   return json({
-    posts: page.map(r => Object.assign(communityPostOut(r, session.user_id), { author_username: names[r.user_id] || null, tags: tags[r.id] || [] })),
+    posts: page.map(r => Object.assign(communityPostOut(r, session.user_id), { author_username: names[r.user_id] || null, tags: tags[r.id] || [], tagged_me: (tags[r.id] || []).some(t => t.user_id === session.user_id) })),
     next: list.length > limit ? page[page.length - 1].created_at : null
   });
 }
@@ -925,6 +926,19 @@ async function tagPostMentions(DB, env, ctx, postId, author, body) {
   }
 }
 
+// Someone tagged in a post takes themselves off it. The @name stays in the text but is no longer a link.
+async function communityRemoveMyTag(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+  let data;
+  try { data = await request.json(); } catch (e) { return error('Invalid request'); }
+  const postId = data && data.post_id;
+  if (typeof postId !== 'string' || !COMMUNITY_ID.test(postId)) return error('Invalid request');
+  await DB.prepare('DELETE FROM community_post_tags WHERE post_id = ? AND user_id = ?').bind(postId, session.user_id).run();
+  const tags = await tagsFor(DB, [postId]);
+  return json({ success: true, tags: tags[postId] || [] });
+}
+
 async function communityCreatePost(request, DB, env, ctx) {
   const session = await validateSession(request, DB);
   if (!session) return error('Unauthorized', 401);
@@ -971,7 +985,7 @@ async function communityCreatePost(request, DB, env, ctx) {
   const row = await DB.prepare(`${COMMUNITY_POST_SELECT} WHERE p.id = ?2`).bind(session.user_id, id).first();
   const tags = await tagsFor(DB, [id]);
   const names = await usernamesFor(DB, [session.user_id]);
-  return json({ success: true, post: Object.assign(communityPostOut(row, session.user_id), { tags: tags[id] || [], author_username: names[session.user_id] || null }) });
+  return json({ success: true, post: Object.assign(communityPostOut(row, session.user_id), { tags: tags[id] || [], tagged_me: false, author_username: names[session.user_id] || null }) });
 }
 
 async function communityDeletePost(request, DB) {
@@ -1184,7 +1198,7 @@ async function communityOnePost(request, DB) {
   if (!row) return error('Post not found', 404);
   const names = await usernamesFor(DB, [row.user_id]);
   const tags = await tagsFor(DB, [row.id]);
-  return json({ post: Object.assign(communityPostOut(row, session.user_id), { author_username: names[row.user_id] || null, tags: tags[row.id] || [] }) });
+  return json({ post: Object.assign(communityPostOut(row, session.user_id), { author_username: names[row.user_id] || null, tags: tags[row.id] || [], tagged_me: (tags[row.id] || []).some(t => t.user_id === session.user_id) }) });
 }
 
 // Everything that happened to me, newest first. Each part has the same columns:
