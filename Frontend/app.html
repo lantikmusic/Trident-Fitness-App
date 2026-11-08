@@ -114,7 +114,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .wn-logo{height:52px;width:auto;display:block;margin:0 auto 8px;filter:drop-shadow(0 0 10px rgba(50,252,253,0.3));}
 .wn-eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--pink);}
 .wn-title{font-size:24px;font-weight:800;letter-spacing:-0.02em;margin-top:4px;}
-.wn-date{font-size:12px;color:var(--text3);margin-top:3px;}
+.wn-date{font-size:12px;color:var(--text3);margin-top:6px;}
+.wn-ver{display:inline-block;padding:2px 8px;border-radius:99px;font-weight:700;color:var(--pink);background:rgba(50,252,253,0.1);border:0.5px solid rgba(50,252,253,0.3);}
 .wn-list{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;margin:16px -4px 0;padding:0 4px 18px;
   -webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 26px),transparent);mask-image:linear-gradient(to bottom,#000 calc(100% - 26px),transparent);}
 .wn-item{display:flex;gap:12px;align-items:flex-start;padding:11px 0;border-top:0.5px solid rgba(255,255,255,0.07);}
@@ -2949,7 +2950,7 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
   </div>
 
   <!-- Version -->
-  <div style="text-align:center;padding:0 20px;color:var(--text3);font-size:11px;">Trident Fitness · Built with ♥</div>
+  <div style="text-align:center;padding:0 20px;color:var(--text3);font-size:11px;">Trident Fitness<span id="appVersionLabel"></span> · Built with ♥</div>
 </div>
 
 <!-- Bottom Nav -->
@@ -13566,13 +13567,14 @@ function cmShareLastWorkout() {
 
 // ══════════════════════════════════════
 // WHAT'S NEW — a one-time pop-up on the Home screen after each update.
-// To announce an update: add a new entry at the TOP of this list with a new id.
+// To announce an update: add a new entry at the TOP of this list with a new id and the next version number.
 // Everyone sees the newest entry once; brand-new accounts skip it.
 // ══════════════════════════════════════
 function wnList() {
   return [
     {
       id: '2026-11-07',
+      version: '1.1',
       date: 'November 7, 2026',
       title: 'Fresh updates',
       items: [
@@ -13615,7 +13617,7 @@ function wnOpen(entry) {
         <img class="wn-logo" src="Icons/trident-mark.png" alt="">
         <div class="wn-eyebrow">What's new</div>
         <div class="wn-title" id="wnTitle">${wnEsc(entry.title || 'Fresh updates')}</div>
-        ${entry.date ? `<div class="wn-date">${wnEsc(entry.date)}</div>` : ''}
+        <div class="wn-date">${entry.version ? `<span class="wn-ver">Version ${wnEsc(entry.version)}</span>` : ''}${entry.version && entry.date ? ' · ' : ''}${wnEsc(entry.date || '')}</div>
       </div>
       <div class="wn-list">${(entry.items || []).map(it => `<div class="wn-item"><div class="wn-ic">${wnEsc(it.ic)}</div><div class="wn-txt"><b>${wnEsc(it.t)}</b><span>${wnEsc(it.d)}</span></div></div>`).join('')}</div>
       <button class="pink-btn wn-btn" onclick="wnClose()">Let's go</button>
@@ -13647,6 +13649,7 @@ try {
     // Logged in user — mark onboarding done, their data will load from cloud
     localStorage.setItem(ONBOARDING_KEY, '1');
   }
+  try { const v = wnList()[0].version; if(v) document.getElementById('appVersionLabel').textContent = ' · Version ' + v; } catch(e) {}
   // After the splash, show what changed in this update (once)
   setTimeout(() => { window._wnReady = true; wnMaybeShow(); }, 2800);
 } catch(e) {
