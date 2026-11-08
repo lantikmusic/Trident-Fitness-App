@@ -436,6 +436,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .af-ai-msg{font-size:12px;color:var(--text3);margin-top:4px;line-height:1.4;}
 .af-ai-res .af-row{border-bottom-color:rgba(255,255,255,.07);}
 .af-row-mac a{color:var(--pink);text-decoration:none;font-weight:600;}
+.af-credit{display:block;text-align:center;padding:12px 0 2px;font-size:11px;font-weight:600;color:var(--text3);text-decoration:none;}
 .af-field{min-width:0;margin-bottom:12px;}
 .af-field label{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;}
 .af-field label i{width:7px;height:7px;border-radius:50%;}
@@ -2156,7 +2157,7 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
               <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7.5"/><line x1="20.5" y1="20.5" x2="16.5" y2="16.5"/></svg>
             </div>
             <div class="af-tile-name">Search</div>
-            <div class="af-tile-sub">Food database</div>
+            <div class="af-tile-sub">Restaurants &amp; foods</div>
           </button>
           <button class="af-tile" id="afTileBarcode" onclick="openAddFoodScanner()">
             <div class="af-tile-ic">
@@ -2260,7 +2261,7 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
         <div id="addFoodSearchPanel" class="af-card" style="display:none;">
           <div class="af-panel-head">
             <div>
-              <div class="af-eyebrow">USDA &amp; Open Food Facts</div>
+              <div class="af-eyebrow">Restaurants &amp; brands</div>
               <div class="af-panel-title">Search foods</div>
             </div>
             <button class="af-pill" onclick="closeAddFoodSearch()"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
@@ -3502,6 +3503,23 @@ function normalizeOFF(p) {
 }
 
 // ── Search USDA ──
+// Restaurant and brand foods through the Trident server (keys stay on the server).
+async function searchFatSecret(query) {
+  try {
+    const res = await fetch(`${WORKER_URL}/food/search?q=${encodeURIComponent(query)}`, { headers: logMealHeaders() });
+    if(!res.ok) return [];                  // 503 = not set up yet; the other databases still work
+    const data = await res.json();
+    return (data.results || []).map(f => ({
+      name: f.brand ? `${f.brand} ${f.name}` : f.name,
+      protein: Number(f.protein) || 0, carbs: Number(f.carbs) || 0, fat: Number(f.fat) || 0,
+      cal: Number(f.calories) || 0, serving: f.serving || '', source: 'FatSecret'
+    }));
+  } catch(e) {
+    console.warn('FatSecret search error:', e);
+    return [];
+  }
+}
+
 async function searchUSDA(query) {
   const key = getUSDAKey();
   const url = `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${key}&query=${encodeURIComponent(query)}&pageSize=12&dataType=Branded,Foundation,SR%20Legacy`;
@@ -4360,13 +4378,15 @@ async function doAddFoodSearch() {
   const query = document.getElementById('addFoodInput').value.trim();
   if(!query) return;
   const el = document.getElementById('addFoodResults');
-  el.innerHTML = `<div class="af-empty">Searching USDA &amp; Open Food Facts…</div>`;
+  el.innerHTML = `<div class="af-empty">Searching restaurants &amp; food databases…</div>`;
   afAskAIOffer('', 0);
   try {
-    const [usda, off] = await Promise.allSettled([searchUSDA(query), searchOFF(query)]);
-    console.log('Search results:', {usda, off});
-    
+    const [fs, usda, off] = await Promise.allSettled([searchFatSecret(query), searchUSDA(query), searchOFF(query)]);
+    if(document.getElementById('addFoodInput').value.trim() !== query) return; // a newer search started
+
+    // FatSecret first: it has restaurant chains (McDonald's, Taco Bell, Urbane Cafe…)
     const results = dedupeResults([
+      ...(fs.status==='fulfilled'   ? fs.value   : []),
       ...(usda.status==='fulfilled' ? usda.value : []),
       ...(off.status==='fulfilled'  ? off.value  : []),
     ]);
@@ -4383,7 +4403,7 @@ async function doAddFoodSearch() {
     window._afResults = results;
     afAskAIOffer(query, results.length);
     el.innerHTML = results.map((f, ri) => {
-      const badge = f.source==='USDA' ? '<span class="af-badge usda">USDA</span>' : '<span class="af-badge off">OFF</span>';
+      const badge = f.source==='FatSecret' ? '' : f.source==='USDA' ? '<span class="af-badge usda">USDA</span>' : '<span class="af-badge off">OFF</span>';
       return `<div class="af-row af-res">
         <div class="af-res-top">
           <div class="af-row-main">
@@ -4397,7 +4417,8 @@ async function doAddFoodSearch() {
           <button class="af-res-add" onclick="afAddSearchResult(${ri})">Add to ${MEAL_LABELS[curMeal] || 'meal'}</button>
         </div>
       </div>`;
-    }).join('');
+    }).join('') + (results.some(f => f.source === 'FatSecret')
+      ? '<a class="af-credit" href="https://www.fatsecret.com" target="_blank" rel="noopener noreferrer">Powered by fatsecret</a>' : '');
   } catch(e) {
     console.error('Search error:', e);
     el.innerHTML = `<div class="af-empty err">Search failed — check your internet connection and try again</div>`;

@@ -172,6 +172,7 @@ export default {
     // ── AI food scan (Claude) ──
     if (path === '/food/scan'                 && request.method === 'POST') return handleFoodScan(request, env);
     if (path === '/food/lookup'               && request.method === 'POST') return handleFoodLookup(request, env);
+    if (path === '/food/search'               && request.method === 'GET')  return handleFoodSearch(request, env);
 
     // ── LogMeal Proxy Routes ──
     if (path.startsWith('/v2/')) return handleLogMealProxy(request, path + url.search, env);
@@ -2030,6 +2031,108 @@ async function handleFoodLookup(request, env) {
   }));
 
   return json({ results, message: foodScanText(call.input.message, 240) });
+}
+
+// ══════════════════════════════════════════════════════
+// FATSECRET FOOD SEARCH (restaurants like McDonald's, Taco Bell, Urbane Cafe)
+// ══════════════════════════════════════════════════════
+// Keys are Cloudflare secrets, set with:
+//   npx wrangler secret put FATSECRET_CLIENT_ID
+//   npx wrangler secret put FATSECRET_CLIENT_SECRET
+// Without them, /food/search answers 503 and the app just skips FatSecret.
+
+const FATSECRET_TOKEN_URL = 'https://oauth.fatsecret.com/connect/token';
+const FATSECRET_SEARCH_URL = 'https://platform.fatsecret.com/rest/foods/search/v1';
+let fatsecretToken = null;          // { value, expires } kept while this worker instance is alive
+// env.FATSECRET_TEST_BASE is only set when testing locally against a fake server.
+
+async function fatsecretAccessToken(env, force) {
+  if (!force && fatsecretToken && fatsecretToken.expires > Date.now() + 60000) return fatsecretToken.value;
+  const res = await fetch(env.FATSECRET_TEST_BASE ? env.FATSECRET_TEST_BASE + '/connect/token' : FATSECRET_TOKEN_URL, {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Basic ' + btoa(`${env.FATSECRET_CLIENT_ID}:${env.FATSECRET_CLIENT_SECRET}`),
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: 'grant_type=client_credentials&scope=basic',
+  });
+  if (!res.ok) {
+    console.error('FatSecret token failed:', res.status, (await res.text().catch(() => '')).slice(0, 200));
+    return null;
+  }
+  const data = await res.json().catch(() => ({}));
+  if (!data.access_token) return null;
+  fatsecretToken = { value: data.access_token, expires: Date.now() + (Number(data.expires_in) || 3600) * 1000 };
+  return fatsecretToken.value;
+}
+
+// "Per 1 sandwich - Calories: 800kcal | Fat: 36.00g | Carbs: 45.00g | Protein: 44.00g"
+function fatsecretParse(desc) {
+  const d = String(desc || '');
+  const num = re => { const m = d.match(re); return m ? parseFloat(m[1]) : 0; };
+  const per = d.match(/^Per\s+(.+?)\s+-\s/i);
+  return {
+    serving: per ? per[1].trim() : '',
+    calories: num(/Calories:\s*([\d.]+)/i),
+    fat: num(/Fat:\s*([\d.]+)/i),
+    carbs: num(/Carbs:\s*([\d.]+)/i),
+    protein: num(/Protein:\s*([\d.]+)/i),
+  };
+}
+
+async function handleFoodSearch(request, env) {
+  const session = await validateSession(request, env.DB);
+  if (!session) return error('Sign in to search foods', 401);
+  if (!env.FATSECRET_CLIENT_ID || !env.FATSECRET_CLIENT_SECRET) return error('FatSecret is not set up on the server', 503);
+
+  const url = new URL(request.url);
+  const query = foodScanText(url.searchParams.get('q'), 100);
+  if (query.length < 2) return json({ results: [] });
+
+  const search = async token => fetch(
+    `${env.FATSECRET_TEST_BASE ? env.FATSECRET_TEST_BASE + '/rest/foods/search/v1' : FATSECRET_SEARCH_URL}?search_expression=${encodeURIComponent(query)}&max_results=20&format=json`,
+    { headers: { 'Authorization': `Bearer ${token}` } }
+  );
+
+  try {
+    let token = await fatsecretAccessToken(env, false);
+    if (!token) return error('FatSecret sign-in failed', 502);
+    let res = await search(token);
+    if (res.status === 401) {                // token expired early: get a fresh one once
+      token = await fatsecretAccessToken(env, true);
+      if (!token) return error('FatSecret sign-in failed', 502);
+      res = await search(token);
+    }
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || data.error) {
+      console.error('FatSecret search failed:', res.status, JSON.stringify(data.error || {}).slice(0, 200));
+      return error('FatSecret search failed', 502);
+    }
+    let foods = data.foods && data.foods.food;
+    if (!foods) foods = [];
+    if (!Array.isArray(foods)) foods = [foods];   // one result comes back as an object
+
+    const results = foods.map(f => {
+      const n = fatsecretParse(f.food_description);
+      const link = String(f.food_url || '');
+      return {
+        id: foodScanText(f.food_id, 20),
+        name: foodScanText(f.food_name, 100),
+        brand: f.food_type === 'Brand' ? foodScanText(f.brand_name, 60) : '',
+        serving: foodScanText(n.serving, 60),
+        calories: Math.round(foodScanNum(n.calories, 10000)),
+        protein: Math.round(foodScanNum(n.protein, 1000) * 10) / 10,
+        carbs: Math.round(foodScanNum(n.carbs, 1000) * 10) / 10,
+        fat: Math.round(foodScanNum(n.fat, 1000) * 10) / 10,
+        url: /^https:\/\/[a-z0-9.-]*fatsecret\.com\//i.test(link) ? link.slice(0, 300) : '',
+      };
+    }).filter(f => f.name && (f.calories > 0 || f.protein > 0));
+
+    return json({ results });
+  } catch (e) {
+    console.error('FatSecret error:', e && e.message);
+    return error('FatSecret search failed', 502);
+  }
 }
 
 // ══════════════════════════════════════════════════════
