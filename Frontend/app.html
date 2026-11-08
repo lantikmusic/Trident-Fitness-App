@@ -1553,6 +1553,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .cm-sheet::before{cursor:pointer;}
 /* ── Community header buttons, comment likes, activity list ── */
 .cm-page-head{position:relative;}
+/* Trident logo centred in the space above the Community title */
+.cm-brand{position:absolute;left:50%;top:calc(env(safe-area-inset-top) + 4px);height:46px;width:auto;transform:translateX(-50%);display:block;pointer-events:none;filter:drop-shadow(0 0 8px rgba(50,252,253,0.25));}
 .cm-head-actions{position:absolute;right:20px;bottom:0;display:flex;gap:8px;}
 @media(max-width:374px){#page-community .page-title{font-size:28px;}.cm-head-actions{gap:5px;}.cm-head-actions .cm-inbox-btn{width:36px;height:36px;}.cm-head-actions .cm-inbox-btn svg{width:18px;height:18px;}}
 .cm-head-actions .cm-inbox-btn{position:relative;}
@@ -2692,6 +2694,7 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
 <!-- COMMUNITY -->
 <div class="page" id="page-community">
   <div class="page-header compact cm-page-head">
+    <img class="cm-brand" src="Icons/trident-mark.png" alt="">
     <div class="eyebrow">Together</div>
     <div class="page-title">Community</div>
     <div class="cm-head-actions" id="cmHeadActions"></div>
