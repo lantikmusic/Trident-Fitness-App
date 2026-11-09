@@ -2235,6 +2235,18 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
   backdrop-filter:blur(14px) saturate(150%);-webkit-backdrop-filter:blur(14px) saturate(150%);box-shadow:0 .5em 1.6em rgba(0,0,0,.35);}
 .cm-ovc-top{display:flex;align-items:center;gap:.45em;font-size:.62em;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--pink);white-space:nowrap;overflow:hidden;}
 .cm-ovc-top img{width:1.7em;height:1.7em;object-fit:contain;flex-shrink:0;}
+.cm-ovc-top i{margin-left:auto;padding-left:.6em;font-style:normal;font-weight:600;letter-spacing:0;text-transform:none;color:rgba(255,255,255,.6);overflow:hidden;text-overflow:ellipsis;min-width:0;}
+.cm-ovc-top span{flex-shrink:0;}
+.cm-ovc-rows{margin-top:.7em;padding-top:.45em;border-top:1px solid rgba(255,255,255,.14);}
+.cm-ovc-row{display:flex;justify-content:space-between;gap:.8em;font-size:.66em;line-height:1.5;}
+.cm-ovc-row span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:rgba(255,255,255,.82);}
+.cm-ovc-row em{flex-shrink:0;max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-style:normal;font-weight:700;}
+.cm-ovc-more{font-size:.6em;color:rgba(255,255,255,.55);margin-top:.2em;}
+/* Centre guides while placing the card (it locks to the middle) */
+.cm-ov-guide{position:absolute;z-index:2;pointer-events:none;opacity:0;transition:opacity .12s;background:var(--pink);box-shadow:0 0 6px var(--pink-glow);}
+.cm-ov-guide.v{left:50%;top:0;bottom:0;width:1.5px;margin-left:-.75px;}
+.cm-ov-guide.h{top:50%;left:0;right:0;height:1.5px;margin-top:-.75px;}
+.cm-ov-guide.on{opacity:.9;}
 .cm-ovc-title{font-size:1.12em;font-weight:800;letter-spacing:-.01em;margin:.35em 0 .6em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 .cm-ovc-stats{display:flex;gap:.8em;}
 .cm-ovc-stats div{flex:1;min-width:0;}
@@ -13166,6 +13178,7 @@ function cmWoStats(payload) {
 }
 // Workout / PR card placed on top of the photo. ov = { x, y } (card centre, 0–1 across and down the
 // photo) and s (card width as a share of the photo's width). It scales with the photo.
+const CM_OV_ROWS = 6;   // exercise rows shown on the photo card; the rest are one tap away below the photo
 function cmOvOk(ov) {
   return !!ov && typeof ov === 'object' && [ov.x, ov.y, ov.s].every(n => typeof n === 'number' && isFinite(n))
     && ov.x >= 0 && ov.x <= 1 && ov.y >= 0 && ov.y <= 1 && ov.s >= 0.25 && ov.s <= 1;
@@ -13182,9 +13195,13 @@ function cmOvCardHTML(type, payload, ov, editable) {
   } else {
     const nEx = Array.isArray(payload.exercises) ? payload.exercises.length : 0, vol = cmNum(payload.volume);
     const stats = cmWoStats(payload) || [[String(nEx), 'exercises'], [String(cmNum(payload.sets) || '—'), 'sets'], [vol ? (vol >= 10000 ? (Math.round(vol / 100) / 10) + 'k' : vol.toLocaleString()) : '—', 'lbs lifted']];
-    inner = `<div class="cm-ovc-top">${mark}<span>${cmEsc(cmWoBadge(payload))}</span></div>
+    const exs = Array.isArray(payload.exercises) ? payload.exercises : [];
+    const rows = exs.slice(0, CM_OV_ROWS).map(ex => `<div class="cm-ovc-row"><span>${cmEsc(ex && ex.name)}</span><em>${cmEsc(cmSetsText(ex))}</em></div>`).join('')
+      + (exs.length > CM_OV_ROWS ? `<div class="cm-ovc-more">+${exs.length - CM_OV_ROWS} more</div>` : '');
+    inner = `<div class="cm-ovc-top">${mark}<span>${cmEsc(cmWoBadge(payload))}</span>${payload.program ? `<i>${cmEsc(payload.program)}</i>` : ''}</div>
       <div class="cm-ovc-title">${cmEsc(payload.day || 'Workout')}</div>
-      <div class="cm-ovc-stats">${stats.map(x => `<div><b>${cmEsc(x[0])}</b><span>${cmEsc(x[1])}</span></div>`).join('')}</div>`;
+      <div class="cm-ovc-stats">${stats.map(x => `<div><b>${cmEsc(x[0])}</b><span>${cmEsc(x[1])}</span></div>`).join('')}</div>
+      ${rows ? `<div class="cm-ovc-rows">${rows}</div>` : ''}`;
   }
   return `<div class="cm-ovc${editable ? ' edit' : ''}"${editable ? ' id="cmOvCard"' : ''} style="${pos}">${inner}</div>`;
 }
@@ -13422,7 +13439,7 @@ function cmPostHTML(p) {
   const photo = !!p.has_photo;
   const ov = photo && (p.type === 'workout' || p.type === 'pr') && p.payload && cmOvOk(p.payload.overlay) ? p.payload.overlay : null;
   const attach = !ov ? cmAttachHTML(p.type, p.payload)
-    : (p.type === 'workout' ? `<button class="cm-wo-more" onclick="cmOvMore(this)">See full workout</button><div hidden>${cmAttachHTML(p.type, p.payload)}</div>` : '');
+    : (p.type === 'workout' && Array.isArray(p.payload.exercises) && p.payload.exercises.length > CM_OV_ROWS ? `<button class="cm-wo-more" onclick="cmOvMore(this)">See full workout</button><div hidden>${cmAttachHTML(p.type, p.payload)}</div>` : '');
   const bodyText = String(p.body || '');
   const long = bodyText.length > 160 || (bodyText.match(/\n/g) || []).length > 2;
   const big = !photo && !attach && bodyText.length > 0 && bodyText.length <= 140;
@@ -14800,10 +14817,11 @@ function cmDrawDraft() {
       const a = cmDraft.aspect;
       document.getElementById('cmAttachPreview').innerHTML = `<div class="cm-ov-stage" id="cmOvStage" style="aspect-ratio:${a};width:min(100%, calc(60vh * ${a}))">
           <img src="${cmDraft.photo}" alt="Selected photo" draggable="false">
+          <div class="cm-ov-guide v" id="cmOvGuideV"></div><div class="cm-ov-guide h" id="cmOvGuideH"></div>
           ${cmOvCardHTML(kind, cmDraft.attach.payload, cmDraft.ov, true)}
         </div>
         <div class="cm-ov-tools">
-          <div class="cm-ov-hint">Drag the card to move it. Pinch or use the slider to resize.</div>
+          <div class="cm-ov-hint">Drag the card to move it. It locks to the middle. Pinch or use the slider to resize.</div>
           <input type="range" class="cm-ov-size" id="cmOvSize" min="35" max="95" step="1" value="${Math.round(cmDraft.ov.s * 100)}" oninput="cmOvSetSize(this.value)" aria-label="Card size">
         </div>
         <div class="cm-ov-btns">
@@ -14827,6 +14845,15 @@ function cmDrawDraft() {
     if(cmDraft.attach) html += `<button class="cm-chip" style="margin:0 0 10px 6px;" onclick="cmOvToggle(true)">Put card on photo</button>`;
   }
   document.getElementById('cmAttachPreview').innerHTML = html;
+}
+function cmOvGuides(v, h) {
+  const gv = document.getElementById('cmOvGuideV'), gh = document.getElementById('cmOvGuideH');
+  if(gv) gv.classList.toggle('on', !!v);
+  if(gh) gh.classList.toggle('on', !!h);
+}
+// A light tap from the iPhone (app only; quietly does nothing on the website)
+function cmHaptic() {
+  try { if(window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform()) Capacitor.nativePromise('Haptic', 'impact', {}).catch(() => {}); } catch(e) {}
 }
 function cmOvToggle(on) { if(cmDraft.ov) cmDraft.ov.on = !!on; cmDrawDraft(); }
 function cmOvSetSize(v) { if(!cmDraft.ov) return; cmDraft.ov.s = Math.min(0.95, Math.max(0.35, Number(v) / 100 || 0.62)); cmOvApply(); }
@@ -14857,7 +14884,8 @@ function cmOvBind() {
   const dist = a => a.length > 1 ? Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y) : 0;
   const begin = () => {
     const a = [...pts.values()], r = stage.getBoundingClientRect();
-    g = { x: cmDraft.ov.x, y: cmDraft.ov.y, s: cmDraft.ov.s, W: r.width, H: r.height, c: mid(a), d: dist(a) };
+    g = { x: cmDraft.ov.x, y: cmDraft.ov.y, s: cmDraft.ov.s, W: r.width, H: r.height, c: mid(a), d: dist(a),
+      lockX: Math.abs(cmDraft.ov.x - 0.5) < 1e-6, lockY: Math.abs(cmDraft.ov.y - 0.5) < 1e-6 };
   };
   stage.addEventListener('pointerdown', e => {
     if(!cmDraft.ov || pts.size >= 2) return;
@@ -14873,13 +14901,20 @@ function cmOvBind() {
     e.preventDefault();
     const a = [...pts.values()], c = mid(a);
     if(a.length > 1 && g.d > 0) cmDraft.ov.s = Math.min(0.95, Math.max(0.35, g.s * dist(a) / g.d));
-    cmDraft.ov.x = g.x + (c.x - g.c.x) / g.W;
-    cmDraft.ov.y = g.y + (c.y - g.c.y) / g.H;
+    // Centre lock: within 10px of the middle it snaps there and stays until pulled 24px away
+    const rx = g.x + (c.x - g.c.x) / g.W, ry = g.y + (c.y - g.c.y) / g.H;
+    const offX = Math.abs(rx - 0.5) * g.W, offY = Math.abs(ry - 0.5) * g.H;
+    const lockX = g.lockX ? offX < 24 : offX < 10, lockY = g.lockY ? offY < 24 : offY < 10;
+    if((lockX && !g.lockX) || (lockY && !g.lockY)) cmHaptic();
+    g.lockX = lockX; g.lockY = lockY;
+    cmDraft.ov.x = lockX ? 0.5 : rx;
+    cmDraft.ov.y = lockY ? 0.5 : ry;
     cmOvApply();
+    cmOvGuides(lockX && cmDraft.ov.x === 0.5, lockY && cmDraft.ov.y === 0.5);
   });
   const end = e => {
     if(!pts.delete(e.pointerId)) return;
-    if(pts.size && g) begin(); else if(!pts.size) { g = null; card.classList.remove('grab'); }
+    if(pts.size && g) begin(); else if(!pts.size) { g = null; card.classList.remove('grab'); cmOvGuides(false, false); }
   };
   stage.addEventListener('pointerup', end);
   stage.addEventListener('pointercancel', end);
@@ -15885,7 +15920,7 @@ function wnList() {
       date: 'November 10, 2026',
       title: 'Show off your workouts',
       items: [
-        { ic: '🖼️', t: 'Workout card on your photo', d: 'Add a photo and a workout or PR to a post, and the card sits right on the photo. Drag it where you want and pinch to resize it before you post.' },
+        { ic: '🖼️', t: 'Workout card on your photo', d: 'Add a photo and a workout or PR to a post, and the card sits right on the photo with your program, exercises and weights. Drag it where you want (it locks to the middle) and pinch to resize it before you post.' },
         { ic: '🏈', t: 'Share any session', d: 'Football, game days, Muay Thai and recovery sessions can be shared to Community now, not just lifting days.' },
         { ic: '🏋️', t: 'All your workouts on your profile', d: 'Your Workouts tab lists every workout you finish. The ones you haven\'t shared say "Only you can see this", with a Share button.' },
         { ic: '📸', t: 'Every photo in your grid', d: 'All your photos show in the grid now, including workout and PR photos.' }
