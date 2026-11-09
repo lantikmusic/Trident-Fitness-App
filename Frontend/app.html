@@ -716,6 +716,23 @@ body:not([data-page="dashboard"]) .settings-btn{display:none;}
 .deficit-c{color:var(--pink);}
 /* ══ Macros tab refresh (scoped to the tab) ══ */
 #page-macros .day-nav-wrap{padding-top:14px;}
+/* Week arrows above the day strip */
+.mx-wk{display:grid;grid-template-columns:36px 1fr 36px;align-items:center;gap:8px;margin-bottom:10px;}
+.mx-wk-arrow{width:36px;height:36px;border-radius:50%;padding:0;display:flex;align-items:center;justify-content:center;color:var(--text);cursor:pointer;
+  background:linear-gradient(180deg,rgba(255,255,255,.11),rgba(255,255,255,.04)),var(--bg3);border:0.5px solid rgba(255,255,255,.12);-webkit-tap-highlight-color:transparent;transition:transform .12s,opacity .15s;}
+.mx-wk-arrow:active:not(:disabled){transform:scale(.9);}
+.mx-wk-arrow:disabled{opacity:.28;cursor:default;}
+.mx-wk-mid{position:relative;text-align:center;min-width:0;}
+.mx-wk.past .mx-wk-mid{padding:0 60px;}
+.mx-wk-name{font-size:15px;font-weight:700;letter-spacing:-0.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mx-wk-range{font-size:12px;color:var(--text3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.mx-wk.past .mx-wk-name{color:var(--pink);}
+.mx-wk-today{position:absolute;right:0;top:50%;transform:translateY(-50%);padding:6px 11px;border-radius:99px;border:0.5px solid var(--pink-border);background:var(--pink-dim);color:var(--pink);font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+@media(max-width:359px){.mx-wk{gap:6px;}.mx-wk.past .mx-wk-mid{padding:0 50px;}.mx-wk-name{font-size:13px;}.mx-wk-range{font-size:11px;}.mx-wk-today{padding:5px 8px;font-size:11px;}}
+#page-macros.mx-wk-loading .container{opacity:.45;pointer-events:none;transition:opacity .2s;}
+#page-macros .day-nav-wrap{transition:opacity .2s;}
+.mx-act-note{font-size:12px;color:var(--text3);margin-top:8px;}
+#f-burned:disabled,#f-notes:disabled{opacity:.6;}
 #page-macros .day-nav{gap:2px;padding:4px;border-radius:20px;background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.02)),var(--bg3);border:0.5px solid rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.06);}
 #page-macros .day-btn{display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 0 8px;border-radius:16px;color:var(--text3);-webkit-tap-highlight-color:transparent;}
 #page-macros .day-btn .dn-d{font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;}
@@ -2510,6 +2527,7 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
     <div class="page-title">Macros</div>
   </div>
   <div class="day-nav-wrap">
+    <div class="mx-wk" id="mxWk"></div>
     <div class="day-nav" id="dayNav"></div>
   </div>
   <div class="container">
@@ -2556,13 +2574,14 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
         <div class="field" id="actHealthField" style="display:none;"><label>Burned · <span style="color:var(--pink);">Apple Health</span></label><div class="ah-act-box" id="actHealthBox"></div></div>
         <div class="field"><label>Notes</label><div class="iw"><input type="text" id="f-notes" placeholder="e.g. 45 min run" oninput="onActivityInput()"></div></div>
       </div>
+      <div class="mx-act-note" id="mxActNote" style="display:none;">Burned calories and notes can only be changed for this week.</div>
       <div class="act-stats">
         <div class="act-stat"><div class="act-stat-val" id="act-burned-display">0</div><div class="act-stat-lbl">kcal burned</div></div>
         <div class="act-stat"><div class="act-stat-val" id="act-net-display">0</div><div class="act-stat-lbl" id="act-net-lbl">net balance</div></div>
       </div>
     </div>
     <!-- Weekly -->
-    <div class="section-head"><div class="section-title">This Week</div><div class="section-sub" id="weekNetLbl"></div></div>
+    <div class="section-head"><div class="section-title" id="mxWeekTitle">This Week</div><div class="section-sub" id="weekNetLbl"></div></div>
     <div class="week-panel">
       <div class="legend">
         <span><span class="ldot" style="background:var(--pink);opacity:.9;"></span>Intake</span>
@@ -3469,7 +3488,15 @@ const GYM_DAYS_KEY = 'trident_gym_days_v1';
 const SAVED_MEALS_KEY = 'trident_saved_meals_v1'; // { updatedAt, meals:[{ id, name, items:[{name,protein,carbs,fat,cal}] }] } // every date a gym workout was logged, kept for good
 
 const load = k => { try { const r=localStorage.getItem(k); return r?JSON.parse(r):null; } catch{return null;} };
-const save = (k,v) => localStorage.setItem(k, JSON.stringify(v));
+// Macros week arrows: 0 = this week, -1 = last week, … While an earlier week is on screen, this week's
+// data waits in mxThisWeek, and saving the macros writes that earlier week's copy instead (never this week's).
+var mxWeekOff = 0, mxThisWeek = null, mxLoading = false, mxGen = 0;
+const MX_PAST_KEY = 'trident_macro_past_v1';   // { 'YYYY-MM-DD' (Monday): week } — the last 12 weeks seen on this phone
+const MX_MAX_BACK = 52;
+const save = (k,v) => {
+  if(k === MACRO_KEY && mxWeekOff < 0) { mxPastPut(localISO(mxMonday(mxWeekOff)), v); return; }
+  localStorage.setItem(k, JSON.stringify(v));
+};
 
 // ══════════════════════════════════════════════════════
 // CLOUD SYNC — Cloudflare Worker + D1
@@ -3701,8 +3728,8 @@ async function loadFromCloud() {
           day.meals[m].fat     = Math.round(items.reduce((s,it)=>s+(it.fat||0),0)*10)/10;
         });
       });
-      save(MACRO_KEY, storedMacros);
-      macroData = storedMacros;
+      localStorage.setItem(MACRO_KEY, JSON.stringify(storedMacros));
+      if(mxWeekOff < 0) mxThisWeek = storedMacros; else macroData = storedMacros;
     }
 
     // Re-render everything with cloud data
@@ -3782,6 +3809,7 @@ function pageSlide(fromEl, toEl, dir) {
 }
 function navTo(page) {
   if(page === 'community' && currentPage === 'community' && window._cmProfView) { cmProfileExit(); return; }
+  if(page !== 'macros' && mxWeekOff < 0) mxBackToThisWeek();
   pageSlideFinish();
   const fromPage = document.querySelector('.page.active');
   const slideDir = Math.sign(navIndexOf(page) - navIndexOf(currentPage));
@@ -3832,8 +3860,14 @@ function macroWeekMonday() {
   m.setDate(m.getDate() - ((m.getDay() + 6) % 7));
   return m;
 }
-function macroSlotDate(dayIdx) {
+function mxMonday(off) {
   const m = macroWeekMonday();
+  m.setDate(m.getDate() + 7 * (off || 0));
+  return m;
+}
+// The date of a Mon–Sun slot in the week on screen (or in week `off`: 0 = this week)
+function macroSlotDate(dayIdx, off) {
+  const m = mxMonday(off === undefined ? mxWeekOff : off);
   m.setDate(m.getDate() + dayIdx);
   return localISO(m);
 }
@@ -3841,7 +3875,7 @@ function macroSlotDate(dayIdx) {
 // for entries saved by older versions of the app, which used the UTC date).
 function macroInThisWeek(dateStr, dayIdx) {
   if(!/^\d{4}-\d{2}-\d{2}$/.test(String(dateStr || ''))) return false;
-  const slot = new Date(macroSlotDate(dayIdx) + 'T00:00:00'), d = new Date(dateStr + 'T00:00:00');
+  const slot = new Date(macroSlotDate(dayIdx, 0) + 'T00:00:00'), d = new Date(dateStr + 'T00:00:00');
   return Math.abs(Math.round((d - slot) / 86400000)) <= 1;
 }
 // New week: start empty. Returns true when it reset.
@@ -3849,6 +3883,11 @@ function macroWeekCheck() {
   const WEEK_KEY = 'trident_macro_week_start_v1';
   const mondayStr = macroWeekMonday().toDateString();
   if(localStorage.getItem(WEEK_KEY) === mondayStr) return false;
+  if(mxWeekOff < 0) mxBackToThisWeek();
+  try {
+    const old = new Date(localStorage.getItem(WEEK_KEY) || '');
+    if(!isNaN(old)) mxPastPut(localISO(old), normalizeMacroWeek(load(MACRO_KEY)));
+  } catch(e) {}
   macroData = emptyWeek();
   save(MACRO_KEY, macroData);
   localStorage.setItem(WEEK_KEY, mondayStr);
@@ -3926,6 +3965,7 @@ function saveDay(){
   renderMacros();showToast('Meal saved!');
 }
 function onActivityInput(){
+  if(mxWeekOff < 0) return;   // earlier weeks: burned and notes are view-only
   const bf=document.getElementById('actBurnedField');
   if(!bf || bf.style.display!=='none') macroData[cur].burned=parseFloat(document.getElementById('f-burned').value)||0;
   macroData[cur].notes=document.getElementById('f-notes').value||'';
@@ -3957,7 +3997,7 @@ function mxGoals() {
 function mxDayLabel(i) {
   const d = new Date(macroSlotDate(i) + 'T12:00:00');
   const s = d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
-  return i === getTodayIdx() ? 'Today · ' + s : s;
+  return i === getTodayIdx() && mxWeekOff === 0 ? 'Today · ' + s : s;
 }
 function renderHero(){
   const el = document.getElementById('mxSumTop');
@@ -3992,8 +4032,115 @@ function renderHero(){
     </div>`;
 }
 
+// ── Week arrows on the Macros tab ──
+function mxPastAll() {
+  try { const o = JSON.parse(localStorage.getItem(MX_PAST_KEY) || '{}'); return o && typeof o === 'object' && !Array.isArray(o) ? o : {}; } catch(e) { return {}; }
+}
+function mxPastGet(mon) { const w = mxPastAll()[mon]; return w ? normalizeMacroWeek(w) : null; }
+function mxPastPut(mon, week) {
+  try {
+    const all = mxPastAll(); all[mon] = week;
+    const keys = Object.keys(all).sort();
+    while(keys.length > 12) delete all[keys.shift()];
+    localStorage.setItem(MX_PAST_KEY, JSON.stringify(all));
+  } catch(e) {}
+}
+function mxWeekName(off) { return off === 0 ? 'This week' : off === -1 ? 'Last week' : (-off) + ' weeks ago'; }
+function mxWeekRange(off) {
+  const a = mxMonday(off), b = new Date(a); b.setDate(a.getDate() + 6);
+  const mo = d => d.toLocaleDateString('en-US', { month: 'short' });
+  const yr = b.getFullYear() !== new Date().getFullYear() ? ', ' + b.getFullYear() : '';
+  return (a.getMonth() === b.getMonth() ? `${mo(a)} ${a.getDate()} – ${b.getDate()}` : `${mo(a)} ${a.getDate()} – ${mo(b)} ${b.getDate()}`) + yr;
+}
+function mxRenderWeekBar() {
+  const el = document.getElementById('mxWk'); if(!el) return;
+  const off = mxWeekOff, chev = d => `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="${d}"/></svg>`;
+  el.classList.toggle('past', off < 0);
+  el.innerHTML = `<button class="mx-wk-arrow" onclick="mxGoWeek(mxWeekOff-1)" aria-label="Previous week"${off <= -MX_MAX_BACK ? ' disabled' : ''}>${chev('15 18 9 12 15 6')}</button>
+    <div class="mx-wk-mid"><div class="mx-wk-name">${mxWeekName(off)}</div><div class="mx-wk-range">${mxWeekRange(off)}${mxLoading ? ' · loading…' : ''}</div>
+      ${off < 0 ? `<button class="mx-wk-today" onclick="mxToday()">Today</button>` : ''}</div>
+    <button class="mx-wk-arrow" onclick="mxGoWeek(mxWeekOff+1)" aria-label="Next week"${off >= 0 ? ' disabled' : ''}>${chev('9 18 15 12 9 6')}</button>`;
+  const t = document.getElementById('mxWeekTitle');
+  if(t) t.textContent = off === 0 ? 'This Week' : off === -1 ? 'Last Week' : 'Week of ' + mxMonday(off).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+// Reads an earlier week's food from the account. Each day is asked for separately, plus one day either
+// side (older versions saved some food under the UTC date). Null if any part can't be read.
+async function mxFetchWeek(off) {
+  const mon = mxMonday(off), dates = [];
+  for(let i = -1; i <= 7; i++) { const d = new Date(mon); d.setDate(mon.getDate() + i); dates.push(localISO(d)); }
+  const res = await Promise.all(dates.map(d => cloudGet('/macros?date=' + d)));
+  if(res.some(r => !r || typeof r !== 'object')) return null;
+  const inSlot = (ds, i) => {
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(String(ds || ''))) return false;
+    const slot = new Date(macroSlotDate(i, off) + 'T00:00:00'), d = new Date(ds + 'T00:00:00');
+    return Math.abs(Math.round((d - slot) / 86400000)) <= 1;
+  };
+  const week = emptyWeek(), seen = new Set();
+  res.forEach(r => (Array.isArray(r.items) ? r.items : []).forEach(e => {
+    if(!e || (e.id && seen.has(e.id))) return;
+    if(e.id) seen.add(e.id);
+    const i = Number(e.day_index);
+    if(!Number.isInteger(i) || i < 0 || i > 6 || !MEALS.includes(e.meal) || !inSlot(e.log_date, i)) return;
+    week[i].meals[e.meal].items.push({ name: e.food_name || 'Food', cal: Number(e.calories) || 0, protein: Number(e.protein) || 0, carbs: Number(e.carbs) || 0, fat: Number(e.fat) || 0, _synced: true });
+  }));
+  // Burned calories and notes: the account keeps only the latest one per weekday, so older weeks
+  // use the copy kept on this phone (if any).
+  const burned = ((res.find(r => r.burned && typeof r.burned === 'object') || {}).burned) || {};
+  const kept = mxPastGet(localISO(mon));
+  const r1 = n => Math.round(n * 10) / 10;
+  week.forEach((day, i) => {
+    const b = burned[i];
+    if(b && inSlot(b.date, i)) { day.burned = Number(b.burned) || 0; day.notes = b.notes || ''; }
+    else if(kept && kept[i]) { day.burned = kept[i].burned || 0; day.notes = kept[i].notes || ''; }
+    MEALS.forEach(m => {
+      const it = day.meals[m].items;
+      day.meals[m].protein = r1(it.reduce((a, x) => a + (x.protein || 0), 0));
+      day.meals[m].carbs = r1(it.reduce((a, x) => a + (x.carbs || 0), 0));
+      day.meals[m].fat = r1(it.reduce((a, x) => a + (x.fat || 0), 0));
+    });
+  });
+  return week;
+}
+async function mxGoWeek(off) {
+  off = Math.max(-MX_MAX_BACK, Math.min(0, Math.round(Number(off)) || 0));
+  if(off === mxWeekOff) return;
+  saveMealInputs();
+  if(mxWeekOff === 0) mxThisWeek = macroData;
+  mxWeekOff = off;
+  const gen = ++mxGen;
+  if(off === 0) {
+    macroData = mxThisWeek || normalizeMacroWeek(load(MACRO_KEY)); mxThisWeek = null;
+    mxLoading = false; renderMacros(); return;
+  }
+  const monKey = localISO(mxMonday(off));
+  macroData = mxPastGet(monKey) || emptyWeek();
+  mxLoading = isLoggedIn();
+  renderMacros();
+  if(off >= -4 && typeof ahEnsureHistory === 'function') { try { ahEnsureHistory(); } catch(e) {} }  // Apple Health burned (last 30 days)
+  if(!mxLoading) return;
+  const fresh = await mxFetchWeek(off);
+  if(gen !== mxGen) return;
+  mxLoading = false;
+  if(fresh) { macroData = fresh; mxPastPut(monKey, fresh); }
+  else showToast("Couldn't load that week. Check your connection and try again.");
+  renderMacros();
+}
+// Back to this week (leaving the Macros tab, a new day, or "Today"), on today
+function mxBackToThisWeek() {
+  if(!(mxWeekOff < 0)) return;
+  mxGen++; mxWeekOff = 0; mxLoading = false;
+  macroData = mxThisWeek || normalizeMacroWeek(load(MACRO_KEY)); mxThisWeek = null;
+  cur = getTodayIdx();
+}
+function mxToday() { mxBackToThisWeek(); swDay(getTodayIdx()); }
+function mxBusy() {
+  if(!mxLoading) return false;
+  showToast('Loading that week…'); return true;
+}
+
 function renderDayNav(){
-  const today=getTodayIdx();
+  mxRenderWeekBar();
+  const today=mxWeekOff===0?getTodayIdx():-1;
   document.getElementById('dayNav').innerHTML=DAYS.map((d,i)=>{
     const tot=dayTotals(macroData[i]),logged=tot.cal>0||tot.burned>0;
     let num='';try{num=Number(macroSlotDate(i).slice(8,10));}catch(e){}
@@ -4253,6 +4400,11 @@ function renderLine(){
 }
 
 function renderMacros(){
+  const pg = document.getElementById('page-macros'); if(pg) pg.classList.toggle('mx-wk-loading', !!mxLoading);
+  const past = mxWeekOff < 0;
+  ['f-burned','f-notes'].forEach(id => { const f = document.getElementById(id); if(f) f.disabled = past; });
+  const an = document.getElementById('mxActNote'); if(an) an.style.display = past ? '' : 'none';
+  const as = document.getElementById('actSaveStatus'); if(as) as.style.visibility = past ? 'hidden' : '';
   renderDayNav();renderHero();renderMacroStats();renderMealTabCals();updateActivityStats();renderWeekBars();renderWeekTotals();renderLine();
   document.getElementById('f-burned').value=macroData[cur].burned||'';
   document.getElementById('f-notes').value=macroData[cur].notes||'';
@@ -4861,6 +5013,7 @@ function saveToFoodLib(name, protein, carbs, fat) {
 }
 
 function addFoodItem(name, protein, carbs, fat, save2=true, skipLib=false) {
+  if(mxBusy()) return;
   const meal = macroData[cur].meals[curMeal];
   if(!meal.items) meal.items = [];
   const cal = Math.round(protein*4 + carbs*4 + fat*9);
@@ -4887,7 +5040,7 @@ function addFoodItem(name, protein, carbs, fat, save2=true, skipLib=false) {
   renderMacroStats();
 }
 
-function deleteFoodItem(idx) {
+function deleteFoodItem(idx) { if(mxBusy()) return;
   const meal = macroData[cur].meals[curMeal];
   const removed = meal.items[idx];
   // Remove from cloud
@@ -4913,7 +5066,7 @@ function deleteFoodItem(idx) {
   renderMacroStats();
 }
 
-function clearFoodLog() {
+function clearFoodLog() { if(mxBusy()) return;
   const meal = macroData[cur].meals[curMeal];
   meal.items = [];
   meal.protein = 0; meal.carbs = 0; meal.fat = 0;
@@ -5070,7 +5223,7 @@ function confirmSaveMeal() {
 
 // ── List, add, rename, edit, delete ──
 let _smOpen = null; // id of the meal whose items are shown
-function openSavedMeals() { _smOpen = null; renderSavedMeals(); document.getElementById('savedMealsOverlay').style.display = 'flex'; }
+function openSavedMeals() { if(mxBusy()) return; _smOpen = null; renderSavedMeals(); document.getElementById('savedMealsOverlay').style.display = 'flex'; }
 function closeSavedMeals() { document.getElementById('savedMealsOverlay').style.display = 'none'; }
 function renderSavedMeals() {
   const data = smLoad();
@@ -5117,7 +5270,7 @@ function smRemoveItem(id, idx) {
   m.items.splice(idx, 1); smStore(data); renderSavedMeals();
 }
 // Puts every item of the saved meal into the meal being viewed, each saved to the account.
-function addSavedMeal(id) {
+function addSavedMeal(id) { if(mxBusy()) return;
   const m = smLoad().meals.find(x => x.id === id); if(!m) return;
   const meal = macroData[cur].meals[curMeal];
   if(!Array.isArray(meal.items)) meal.items = [];
@@ -5138,7 +5291,7 @@ function addSavedMeal(id) {
 // ══════════════════════════════════════
 // ADD FOOD SCREEN
 // ══════════════════════════════════════
-function openAddFood() {
+function openAddFood() { if(mxBusy()) return;
   const labels = { breakfast:'Breakfast', lunch:'Lunch', dinner:'Dinner' };
   const el = document.getElementById('addFoodMealLabel');
   if(el) el.textContent = 'Adding to ' + (labels[curMeal] || curMeal);
@@ -9717,7 +9870,7 @@ function closeResetConfirm() {
 }
 function executeResetAll() {
   // USDA_KEY_STORAGE and GEMINI_KEY_STORAGE are intentionally excluded — keys are preserved
-  [MACRO_KEY, WORKOUT_KEY, PROGRESS_KEY, GOALS_KEY, FOODLIB_KEY, PR_KEY, EX_PHOTO_KEY, SETTINGS_KEY, GYM_DAYS_KEY, SAVED_MEALS_KEY].forEach(k => localStorage.removeItem(k));
+  [MACRO_KEY, WORKOUT_KEY, PROGRESS_KEY, GOALS_KEY, FOODLIB_KEY, PR_KEY, EX_PHOTO_KEY, SETTINGS_KEY, GYM_DAYS_KEY, SAVED_MEALS_KEY, MX_PAST_KEY].forEach(k => localStorage.removeItem(k));
   localStorage.removeItem(ONBOARDING_KEY);
   location.reload();
 }
@@ -10826,7 +10979,7 @@ function aiRetry() {
   startAICamera();
 }
 
-function aiLogFood(name, cal, protein, carbs, fat) {
+function aiLogFood(name, cal, protein, carbs, fat) { if(mxBusy()) return;
   const meal = macroData[cur].meals[curMeal];
   if(!meal.items) meal.items = [];
   const time = new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});
@@ -15393,6 +15546,15 @@ document.addEventListener('visibilitychange', () => {
 function wnList() {
   return [
     {
+      id: '2026-11-09b',
+      version: '1.5',
+      date: 'November 9, 2026',
+      title: 'Go back in time',
+      items: [
+        { ic: '📅', t: 'Past weeks in Macros', d: 'Use the arrows above the days to go back to earlier weeks. You can add, fix or remove food on any past day. Tap Today to jump back.' }
+      ]
+    },
+    {
       id: '2026-11-09',
       version: '1.4',
       date: 'November 9, 2026',
@@ -15738,6 +15900,7 @@ document.addEventListener('visibilitychange', () => {
     if(window._macroDay === today) return;
     const wasToday = cur === (window._macroTodayIdx != null ? window._macroTodayIdx : cur);
     window._macroDay = today; window._macroTodayIdx = getTodayIdx();
+    if(mxWeekOff < 0) mxBackToThisWeek();
     const reset = macroWeekCheck();
     if(reset || wasToday) cur = getTodayIdx();
     if(typeof renderMacros === 'function') { renderMacros(); renderDashboard(); }
