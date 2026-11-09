@@ -778,6 +778,22 @@ body:not([data-page="dashboard"]) .settings-btn{display:none;}
 #page-macros .meal-tab.active{color:var(--text);background:linear-gradient(180deg,rgba(255,255,255,.13),rgba(255,255,255,.05));box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 4px 14px rgba(0,0,0,.35);border:0;}
 #page-macros .meal-tab.active .meal-icon{color:var(--pink);}
 #page-macros .meal-tab.active .meal-cals{color:var(--pink);opacity:1;}
+/* Sliding highlight for the Macros day strip and meal tabs (same motion as the tab bar) */
+.seg-pill{position:absolute;left:0;top:0;width:0;height:0;pointer-events:none;z-index:0;
+  transition:transform .4s cubic-bezier(.32,1.08,.48,1),width .4s cubic-bezier(.32,1.08,.48,1),height .4s cubic-bezier(.32,1.08,.48,1);}
+.seg-pill.moving{animation:navPillSquish .42s ease;}
+@media (prefers-reduced-motion: reduce){.seg-pill{transition:none;}.seg-pill.moving{animation:none;}}
+#page-macros .day-nav,#page-macros .meal-tabs{position:relative;}
+#page-macros .day-btn,#page-macros .meal-tab{position:relative;z-index:1;}
+#dayNav .seg-pill{border-radius:16px;background:var(--pink);box-shadow:0 4px 16px var(--pink-glow);}
+#dayNav.seg-on .day-btn.active{background:transparent;box-shadow:none;}
+#dayNav.seg-on .day-btn,#dayNav.seg-on .day-btn span{transition:color .16s ease;}
+/* The new day keeps its light text until the highlight arrives */
+#dayNav.seg-on .day-btn.active.seg-arriving{color:var(--text3);}
+#dayNav.seg-on .day-btn.active.seg-arriving .dn-n{color:var(--text);}
+#page-macros .meal-tabs .seg-pill{border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,.13),rgba(255,255,255,.05));box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 4px 14px rgba(0,0,0,.35);}
+#page-macros .meal-tabs.seg-on .meal-tab.active{background:transparent;box-shadow:none;}
+#page-macros .meal-tabs.seg-on .meal-tab,#page-macros .meal-tabs.seg-on .meal-tab *{transition:color .22s ease .08s;}
 
 #page-macros .meal-panel{border-radius:var(--radius-xl);padding:16px;border:0.5px solid rgba(255,255,255,.09);margin-bottom:12px;}
 #page-macros .meal-panel-header{margin-bottom:12px;}
@@ -3926,7 +3942,7 @@ function getWeekLabel(){
 }
 
 // Meal functions
-function switchMeal(meal){saveMealInputs();curMeal=meal;document.querySelectorAll('.meal-tab').forEach((t,i)=>t.classList.toggle('active',MEALS[i]===meal));document.getElementById('mealPanelTitle').textContent=MEAL_LABELS[meal];loadMealInputs();renderFoodLog();}
+function switchMeal(meal){saveMealInputs();curMeal=meal;document.querySelectorAll('.meal-tab').forEach((t,i)=>t.classList.toggle('active',MEALS[i]===meal));document.getElementById('mealPanelTitle').textContent=MEAL_LABELS[meal];mxMealPill();loadMealInputs();renderFoodLog();}
 function loadMealInputs(){const m=macroData[cur].meals[curMeal];renderFoodLog();renderMealMacroPills();}
 function saveMealInputs(){const meal=macroData[cur].meals[curMeal];if(!meal.items)meal.items=[];}
 function onMacroInput(){renderMealMacroPills();renderMealTabCals();renderHero();renderMacroStats();}
@@ -4138,6 +4154,37 @@ function mxBusy() {
   showToast('Loading that week…'); return true;
 }
 
+// One highlight that slides to the chosen button, like the tab bar. `box` keeps where it was last,
+// so it still slides when the buttons are redrawn. Until it is placed, the buttons' own highlight shows.
+function segPill(box, active, instant) {
+  try {
+    if(!box) return;
+    let pill = box.querySelector(':scope > .seg-pill');
+    const created = !pill;
+    if(created) { pill = document.createElement('span'); pill.className = 'seg-pill'; pill.setAttribute('aria-hidden', 'true'); box.insertBefore(pill, box.firstChild); }
+    if(!active || !box.offsetWidth) return;   // not on screen yet: placed when it is
+    const pos = { x: active.offsetLeft, y: active.offsetTop, w: active.offsetWidth, h: active.offsetHeight };
+    const last = box._segPos;
+    const put = p => { pill.style.width = p.w + 'px'; pill.style.height = p.h + 'px'; pill.style.transform = `translate(${p.x}px,${p.y}px)`; };
+    const still = () => { pill.style.transition = 'none'; void pill.offsetWidth; };
+    const moved = last && (last.x !== pos.x || last.y !== pos.y);
+    if(instant || !moved) { still(); put(pos); void pill.offsetWidth; pill.style.transition = ''; }
+    else {
+      if(created) { still(); put(last); void pill.offsetWidth; pill.style.transition = ''; }
+      put(pos);
+      pill.classList.remove('moving'); void pill.offsetWidth; pill.classList.add('moving');
+      clearTimeout(pill._mv); pill._mv = setTimeout(() => pill.classList.remove('moving'), 450);
+      active.classList.add('seg-arriving');
+      setTimeout(() => active.classList.remove('seg-arriving'), 190);
+    }
+    box._segPos = pos;
+    box.classList.add('seg-on');
+  } catch(e) {}
+}
+function mxMealPill(instant) { segPill(document.querySelector('#page-macros .meal-tabs'), document.querySelector('#page-macros .meal-tab.active'), instant); }
+function mxDayPill(instant) { segPill(document.getElementById('dayNav'), document.querySelector('#dayNav .day-btn.active'), instant); }
+window.addEventListener('resize', () => { mxDayPill(true); mxMealPill(true); });
+
 function renderDayNav(){
   mxRenderWeekBar();
   const today=mxWeekOff===0?getTodayIdx():-1;
@@ -4146,6 +4193,7 @@ function renderDayNav(){
     let num='';try{num=Number(macroSlotDate(i).slice(8,10));}catch(e){}
     return`<button class="day-btn${i===cur?' active':''}${logged&&i!==cur?' logged':''}${i===today?' today':''}" onclick="swDay(${i})" aria-label="${d}${i===today?' (today)':''}"><span class="dn-d">${d}</span><span class="dn-n">${num}</span></button>`;
   }).join('');
+  mxDayPill();
 }
 function swDay(i){saveMealInputs();cur=i;curMeal='breakfast';document.querySelectorAll('.meal-tab').forEach((t,j)=>t.classList.toggle('active',j===0));document.getElementById('mealPanelTitle').textContent='Breakfast';document.getElementById('f-burned').value=macroData[cur].burned||'';document.getElementById('f-notes').value=macroData[cur].notes||'';loadMealInputs();renderMacros();}
 
@@ -4400,6 +4448,7 @@ function renderLine(){
 }
 
 function renderMacros(){
+  mxMealPill();
   const pg = document.getElementById('page-macros'); if(pg) pg.classList.toggle('mx-wk-loading', !!mxLoading);
   const past = mxWeekOff < 0;
   ['f-burned','f-notes'].forEach(id => { const f = document.getElementById(id); if(f) f.disabled = past; });
@@ -15551,7 +15600,8 @@ function wnList() {
       date: 'November 9, 2026',
       title: 'Go back in time',
       items: [
-        { ic: '📅', t: 'Past weeks in Macros', d: 'Use the arrows above the days to go back to earlier weeks. You can add, fix or remove food on any past day. Tap Today to jump back.' }
+        { ic: '📅', t: 'Past weeks in Macros', d: 'Use the arrows above the days to go back to earlier weeks. You can add, fix or remove food on any past day. Tap Today to jump back.' },
+        { ic: '✨', t: 'Smoother Macros', d: 'The highlight now glides to the day or meal you tap, just like the tab bar at the bottom.' }
       ]
     },
     {
