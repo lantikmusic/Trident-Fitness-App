@@ -2165,6 +2165,25 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
 .cm-attach-host .cm-attach-wo .cm-attach-title{font-size:20px;font-weight:800;letter-spacing:-0.02em;margin-top:2px;}
 .cm-attach-host .cm-attach-stats div{background:rgba(255,255,255,0.05);border-radius:14px;padding:10px 4px;}
 .cm-attach-host .cm-attach-stats b{font-size:19px;font-weight:800;}
+/* PRs on workout cards (like Strava's achievements) */
+.cm-attach-headline{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.cm-attach-headline .cm-attach-title{min-width:0;}
+.cm-ach{flex-shrink:0;display:flex;align-items:center;gap:2px;margin-top:4px;}
+.cm-ach span{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-right:4px;}
+.cm-ach .cm-medal{width:18px;height:21px;}
+.cm-ach .cm-medal+.cm-medal{margin-left:-6px;}
+.cm-ach b{font-size:17px;font-weight:800;margin-left:3px;}
+.cm-medal{display:block;flex-shrink:0;}
+.cm-prs{display:flex;flex-direction:column;gap:6px;margin:0 0 10px;}
+.cm-prs-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:14px;background:rgba(255,199,44,.07);border:0.5px solid rgba(255,199,44,.22);}
+.cm-prs-row .cm-medal{width:30px;height:36px;}
+.cm-prs-row.top{padding:13px 14px;}
+.cm-prs-row.top .cm-medal{width:38px;height:45px;}
+.cm-prs-row div{min-width:0;}
+.cm-prs-row b{display:block;font-size:13.5px;font-weight:700;line-height:1.3;}
+.cm-prs-row.top b{font-size:15px;font-weight:800;}
+.cm-prs-row span{display:block;font-size:12px;color:#FFC72C;font-weight:600;margin-top:2px;}
+.cm-prs-more{font-size:12px;color:var(--text3);margin:0 4px;}
 .cm-attach-host .cm-attach-pr{flex-direction:column;align-items:center;text-align:center;gap:4px;padding:22px 16px 18px;background:radial-gradient(70% 60% at 50% 20%,rgba(255,214,10,0.22),transparent 70%),linear-gradient(160deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));}
 .cm-attach-host .cm-attach-pr .cm-pr-trophy{font-size:48px;}
 .cm-attach-host .cm-attach-pr .cm-attach-title{font-size:18px;font-weight:700;}
@@ -2242,6 +2261,12 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
 .cm-ovc-row span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:rgba(255,255,255,.82);}
 .cm-ovc-row em{flex-shrink:0;max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-style:normal;font-weight:700;}
 .cm-ovc-more{font-size:.6em;color:rgba(255,255,255,.55);margin-top:.2em;}
+.cm-ovc-prs{display:flex;align-items:center;gap:.45em;margin-top:.65em;padding:.4em .55em;border-radius:.6em;background:rgba(255,199,44,.14);border:1px solid rgba(255,199,44,.32);font-size:.64em;color:#FFE08A;}
+.cm-ovc-prs .cm-medal{width:1.6em;height:1.9em;}
+.cm-ovc-prs span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cm-ovc-prs b{color:#fff;}
+.cm-ovc-prs em{flex-shrink:0;font-style:normal;font-weight:800;color:#FFC72C;}
+.cm-ovc-prs i{flex-shrink:0;font-style:normal;font-weight:800;color:rgba(255,199,44,.75);}
 /* Centre guides while placing the card (it locks to the middle) */
 .cm-ov-guide{position:absolute;z-index:2;pointer-events:none;opacity:0;transition:opacity .12s;background:var(--pink);box-shadow:0 0 6px var(--pink-glow);}
 .cm-ov-guide.v{left:50%;top:0;bottom:0;width:1.5px;margin-left:-.75px;}
@@ -7062,6 +7087,7 @@ function nextWorkout(event) {
   const ex   = day.exercises[activeExerciseIdx];
   const sets = workoutState.logs[logKey]?.[activeExerciseIdx] || [];
   const newPRs = checkExercisePR(ex, sets);
+  logPRsNote(logKey, newPRs);
   save(WORKOUT_KEY, workoutState);
 
   const goNext = () => {
@@ -7087,6 +7113,22 @@ function nextWorkout(event) {
   }
 }
 
+// PRs set in each logged program day ({ logKey: [{ name, weight, prev }] }), for sharing.
+const LOG_PRS_KEY = 'trident_log_prs_v1';
+function logPRsNote(logKey, prs) {
+  try {
+    if(!logKey || !Array.isArray(prs) || !prs.length) return;
+    const all = load(LOG_PRS_KEY) || {};
+    let list = Array.isArray(all[logKey]) ? all[logKey] : [];
+    prs.forEach(pr => {
+      const had = list.find(x => x.name === pr.name);
+      if(had && had.weight >= pr.weight) return;
+      list = list.filter(x => x.name !== pr.name).concat([{ name: String(pr.name).slice(0, 60), weight: Number(pr.weight) || 0, prev: had ? had.prev : (Number(pr.prev) || 0) }]);
+    });
+    all[logKey] = list.slice(-8);
+    save(LOG_PRS_KEY, all);
+  } catch(e) {}
+}
 function checkExercisePR(ex, sets) {
   let prData = load(PR_KEY) || {};
   const newPRs = [];
@@ -7160,6 +7202,7 @@ function finishWorkout() {
     }
   }
 
+  logPRsNote(logKey, sessionPRs);
   workoutState.dayIdx = workoutDayIdx;
   save(WORKOUT_KEY, workoutState);
   save(PR_KEY, prData);
@@ -12627,7 +12670,17 @@ function hyCheckPR(workout, key, sess) {
   prData[exKey] = { weight: best, date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }), ts: Date.now(), name: e.name, prev };
   try { save(PR_KEY, prData); } catch(err) {}
   if(isLoggedIn()) cloudPost('/prs', prData);
+  hyNotePR(sess, { name: e.name, weight: best, prev });
+  hySave();
   return { name: e.name, weight: best, prev };
+}
+// Keeps the PRs a session set (so sharing it can show them off). A lift beaten twice in one
+// session keeps its best from before the session as "prev".
+function hyNotePR(sess, pr) {
+  if(!sess || !pr || !pr.name) return;
+  const list = Array.isArray(sess.prs) ? sess.prs : [];
+  const had = list.find(x => x.name === pr.name);
+  sess.prs = list.filter(x => x.name !== pr.name).concat([{ name: String(pr.name).slice(0, 60), weight: Number(pr.weight) || 0, prev: had ? had.prev : (Number(pr.prev) || 0) }]).slice(-8);
 }
 // The exercises of this session in order, skipping optional sections.
 function hyPendingAfter(c, fromKey) {
@@ -12847,6 +12900,7 @@ function hyFinish() {
     }
   });
   if(prs.length) { try { save(PR_KEY, prData); } catch(e) {} if(isLoggedIn()) cloudPost('/prs', prData); }
+  prs.forEach(pr => hyNotePR(sess, pr));
   const moved = c.slot.gym ? hyAdvanceRotation(sess, 'completed') : false;
   hySave(true);
   hyRender();
@@ -12890,8 +12944,21 @@ function hySharePayload(w, sess, sid, always) {
     if(sess.rpe) stats.push([String(sess.rpe), 'RPE']);
     stats = stats.slice(0, 3);
   }
+  // PRs: noted on the session; older sessions: a record still standing that was set that day
+  let prs = Array.isArray(sess.prs) ? sess.prs.slice() : null;
+  if(!prs) {
+    prs = [];
+    try {
+      const prData = load(PR_KEY) || {};
+      t.exercises.filter(e => e.record).forEach(e => {
+        const best = Math.max(0, ...e.sets.map(x => x.w));
+        const rec = prData[e.name.toLowerCase().replace(/[^a-z0-9]/g, '_')];
+        if(best > 0 && rec && Number(rec.weight) === best && rec.ts && localISO(new Date(rec.ts)) === String(sess.date)) prs.push({ name: e.name, weight: best, prev: Number(rec.prev) || 0 });
+      });
+    } catch(e) {}
+  }
   return { program: 'LANTIK Hybrid Athlete', day: String(w.name).slice(0, 80), week: sess.blockWeek || 1, cat: w.category || 'strength',
-    volume: t.volume, sets: t.sets, exercises: lifts.concat(work, games).slice(0, 12), stats,
+    volume: t.volume, sets: t.sets, exercises: lifts.concat(work, games).slice(0, 12), stats, prs: cmCleanPRs(prs),
     date: String(sess.date || '').slice(0, 10), sid: String(sid || sess.id || '').slice(0, 40) };
 }
 function hySummary(sid, extra) {
@@ -13201,12 +13268,40 @@ function cmOvCardHTML(type, payload, ov, editable) {
     inner = `<div class="cm-ovc-top">${mark}<span>${cmEsc(cmWoBadge(payload))}</span>${payload.program ? `<i>${cmEsc(payload.program)}</i>` : ''}</div>
       <div class="cm-ovc-title">${cmEsc(payload.day || 'Workout')}</div>
       <div class="cm-ovc-stats">${stats.map(x => `<div><b>${cmEsc(x[0])}</b><span>${cmEsc(x[1])}</span></div>`).join('')}</div>
+      ${cmOvPRsHTML(payload)}
       ${rows ? `<div class="cm-ovc-rows">${rows}</div>` : ''}`;
   }
   return `<div class="cm-ovc${editable ? ' edit' : ''}"${editable ? ' id="cmOvCard"' : ''} style="${pos}">${inner}</div>`;
 }
+function cmOvPRsHTML(payload) {
+  const prs = cmCleanPRs(payload && payload.prs);
+  if(!prs.length) return '';
+  const pr = prs[0];
+  return `<div class="cm-ovc-prs">${CM_MEDAL}<span><b>New ${cmEsc(pr.name)} PR</b></span><em>${pr.weight.toLocaleString()} lbs</em>${prs.length > 1 ? `<i>+${prs.length - 1}</i>` : ''}</div>`;
+}
 function cmOvMore(btn) { const box = btn.nextElementSibling; if(box) box.hidden = false; btn.remove(); }
-function cmAttachHTML(type, payload) {
+// PRs a workout carries: up to 6, newest data only (older posts have none)
+function cmCleanPRs(list) {
+  return (Array.isArray(list) ? list : []).filter(x => x && x.name && cmNum(x.weight) > 0)
+    .map(x => ({ name: String(x.name).slice(0, 60), weight: cmNum(x.weight), prev: cmNum(x.prev) })).slice(0, 6);
+}
+const CM_MEDAL = `<svg class="cm-medal" viewBox="0 0 32 38" aria-hidden="true"><path d="M7 1h7l4 9h-7z" fill="#D99A00"/><path d="M25 1h-7l-4 9h7z" fill="#F2B705"/><circle cx="16" cy="24" r="12.5" fill="#FFC72C" stroke="#C98A00" stroke-width="2"/><text x="16" y="28.6" text-anchor="middle" font-size="12" font-weight="900" fill="#6B4500" font-family="-apple-system,'Helvetica Neue',Arial,sans-serif">PR</text></svg>`;
+// "Logan's heaviest Back Squat ever!" banners, like Strava's achievements
+function cmPRsHTML(payload, who) {
+  const prs = cmCleanPRs(payload && payload.prs);
+  if(!prs.length) return '';
+  const owner = who === 'you' ? 'Your' : (who ? cmEsc(who) + '’s' : '');
+  const line = pr => `${owner ? owner + ' heaviest' : 'Heaviest'} ${cmEsc(pr.name)} ever!`;
+  const sub = pr => `${pr.weight.toLocaleString()} lbs${pr.prev ? ` · up ${(Math.round((pr.weight - pr.prev) * 10) / 10).toLocaleString()} lbs` : ''}`;
+  const shown = prs.slice(0, 3);
+  return `<div class="cm-prs">${shown.map((pr, i) => `<div class="cm-prs-row${i ? '' : ' top'}">${CM_MEDAL}<div><b>${line(pr)}</b><span>${sub(pr)}</span></div></div>`).join('')}
+    ${prs.length > 3 ? `<div class="cm-prs-more">+${prs.length - 3} more ${prs.length - 3 === 1 ? 'PR' : 'PRs'}</div>` : ''}</div>`;
+}
+function cmAchHTML(payload) {
+  const n = cmCleanPRs(payload && payload.prs).length;
+  return n ? `<div class="cm-ach" aria-label="${n} ${n === 1 ? 'PR' : 'PRs'}"><span>${n === 1 ? 'PR' : 'PRs'}</span>${CM_MEDAL}${n > 1 ? CM_MEDAL : ''}<b>${n}</b></div>` : '';
+}
+function cmAttachHTML(type, payload, who) {
   if(!payload || typeof payload !== 'object') return '';
   if(type === 'workout') {
     const exs = Array.isArray(payload.exercises) ? payload.exercises.slice(0, 12) : [];
@@ -13215,12 +13310,13 @@ function cmAttachHTML(type, payload) {
     const stats = cmWoStats(payload);
     return `<div class="cm-attach cm-attach-wo">
       <div class="cm-attach-top"><span class="cm-attach-badge">${cmWoBadge(payload)}</span>${payload.program ? `<span class="cm-attach-prog">${cmEsc(payload.program)}</span>` : ''}</div>
-      <div class="cm-attach-title">${cmEsc(payload.day || 'Workout')}</div>
+      <div class="cm-attach-headline"><div class="cm-attach-title">${cmEsc(payload.day || 'Workout')}</div>${cmAchHTML(payload)}</div>
       ${stats ? `<div class="cm-attach-stats">${stats.map(x => `<div><b>${cmEsc(x[0])}</b><span>${cmEsc(x[1])}</span></div>`).join('')}</div>` : `<div class="cm-attach-stats">
         <div><b>${nEx}</b><span>exercises</span></div>
         <div><b>${cmNum(payload.sets) || '—'}</b><span>sets</span></div>
         <div><b>${vol ? (vol >= 10000 ? (Math.round(vol / 100) / 10) + 'k' : vol.toLocaleString()) : '—'}</b><span>lbs lifted</span></div>
       </div>`}
+      ${cmPRsHTML(payload, who)}
       ${exs.map(ex => `<div class="cm-attach-row"><span>${cmEsc(ex && ex.name)}</span><span>${cmEsc(cmSetsText(ex))}</span></div>`).join('')}
     </div>`;
   }
@@ -13438,8 +13534,9 @@ function cmPostHTML(p) {
   const kind = p.type === 'workout' ? 'shared a workout' : p.type === 'pr' ? 'hit a PR' : '';
   const photo = !!p.has_photo;
   const ov = photo && (p.type === 'workout' || p.type === 'pr') && p.payload && cmOvOk(p.payload.overlay) ? p.payload.overlay : null;
-  const attach = !ov ? cmAttachHTML(p.type, p.payload)
-    : (p.type === 'workout' && Array.isArray(p.payload.exercises) && p.payload.exercises.length > CM_OV_ROWS ? `<button class="cm-wo-more" onclick="cmOvMore(this)">See full workout</button><div hidden>${cmAttachHTML(p.type, p.payload)}</div>` : '');
+  const first = String(p.author_name || '').trim().split(/\s+/)[0] || '';
+  const attach = !ov ? cmAttachHTML(p.type, p.payload, first)
+    : (p.type === 'workout' && Array.isArray(p.payload.exercises) && p.payload.exercises.length > CM_OV_ROWS ? `<button class="cm-wo-more" onclick="cmOvMore(this)">See full workout</button><div hidden>${cmAttachHTML(p.type, p.payload, first)}</div>` : '');
   const bodyText = String(p.body || '');
   const long = bodyText.length > 160 || (bodyText.match(/\n/g) || []).length > 2;
   const big = !photo && !attach && bodyText.length > 0 && bodyText.length <= 140;
@@ -13529,7 +13626,7 @@ function cmLocalWorkouts() {
       const m = /^(.+)_w(\d+)_d(\d+)$/.exec(key); if(!m) return;
       const prog = getProgram(m[1]); const day = prog && prog.days[Number(m[3])];
       if(!day || !Array.isArray(day.exercises)) return;
-      const payload = cmBuildWorkoutPayload(prog, day, Number(m[2]), logs[key]);
+      const payload = cmBuildWorkoutPayload(prog, day, Number(m[2]), logs[key], key);
       if(payload) out.push({ key: 'wo:' + key, date: '', payload, sort: Number(m[2]) * 100 + Number(m[3]) });
     });
   } catch(e) {}
@@ -13569,7 +13666,7 @@ function cmWorkoutsHTML(posts, mine) {
         const lw = x.lw;
         return `<div class="cmp-wcard cmp-wlocal cm-attach-host">
           <div class="cmp-wdate">${cmEsc(lw.date ? hyDateLabel(lw.date) : (lw.payload.program || 'Workout'))}<span>Only you can see this</span></div>
-          ${cmAttachHTML('workout', lw.payload)}
+          ${cmAttachHTML('workout', lw.payload, 'you')}
           <div class="cmp-wfoot"><button class="cmp-wshare" onclick="cmShareLocalWorkout(${x.i})">Share to Community</button></div>
         </div>`;
       }
@@ -13578,7 +13675,7 @@ function cmWorkoutsHTML(posts, mine) {
       if(!id) return '';
       return `<button class="cmp-wcard cm-attach-host" onclick="cmGridOpen('${id}')" aria-label="Open this ${p.type === 'pr' ? 'PR' : 'workout'}">
         <div class="cmp-wdate">${cmEsc(day(p.created_at))}<span>${cmEsc(cmTimeAgo(p.created_at))}</span></div>
-        ${cmAttachHTML(p.type, p.payload)}
+        ${cmAttachHTML(p.type, p.payload, String(p.author_name || '').trim().split(/\s+/)[0])}
         <div class="cmp-wfoot"><span class="${p.liked ? 'on' : ''}">${CM_HEART}${cmNum(p.like_count)}</span><span>${CM_BUBBLE}${cmNum(p.comment_count)}</span></div>
       </button>`;
     }).join('')}</div>`;
@@ -14964,7 +15061,7 @@ async function cmPhotoChosen(input) {
   cmDrawDraft();
 }
 
-function cmBuildWorkoutPayload(prog, day, week, log) {
+function cmBuildWorkoutPayload(prog, day, week, log, logKey) {
   let volume = 0, setCount = 0;
   const exercises = [];
   day.exercises.forEach((ex, ei) => {
@@ -14977,13 +15074,16 @@ function cmBuildWorkoutPayload(prog, day, week, log) {
     exercises.push({ name: String(ex.name).slice(0, 60), sets: logged.slice(0, 8) });
   });
   if(!exercises.length) return null;
+  let prs = [];
+  try { const all = load(LOG_PRS_KEY) || {}; if(logKey && Array.isArray(all[logKey])) prs = all[logKey]; } catch(e) {}
   return {
     program: String(prog.name).slice(0, 80),
     day: String(day.name).slice(0, 80),
     week: week + 1,
     volume: Math.round(volume),
     sets: setCount,
-    exercises: exercises.slice(0, 12)
+    exercises: exercises.slice(0, 12),
+    prs: cmCleanPRs(prs)
   };
 }
 
@@ -15022,7 +15122,7 @@ function cmWorkoutOptions() {
     const week = Number(m[2]), dayIdx = Number(m[3]);
     const day = prog && prog.days[dayIdx];
     if(!day || !Array.isArray(day.exercises)) return;
-    const payload = cmBuildWorkoutPayload(prog, day, week, logs[key]);
+    const payload = cmBuildWorkoutPayload(prog, day, week, logs[key], key);
     if(payload) out.push({ label: `${day.name}`, sub: `${prog.name} · Week ${week + 1}`, payload, sort: week * 100 + dayIdx });
   });
   out.sort((a, b) => b.sort - a.sort);
@@ -15114,7 +15214,7 @@ function cmShareLastWorkout() {
   const prog = getProgram(selectedProgram);
   const day = prog && prog.days[workoutDayIdx];
   const payload = (day && Array.isArray(day.exercises))
-    ? cmBuildWorkoutPayload(prog, day, workoutWeek, workoutState.logs[getLogKey()])
+    ? cmBuildWorkoutPayload(prog, day, workoutWeek, workoutState.logs[getLogKey()], getLogKey())
     : null;
   if(!payload) { showToast('Nothing logged to share yet'); return; }
   closeSummary();
@@ -15918,8 +16018,9 @@ function wnList() {
       id: '2026-11-10b',
       version: '1.7',
       date: 'November 10, 2026',
-      title: 'Better photo cards',
+      title: 'Better photo cards and PRs',
       items: [
+        { ic: '🥇', t: 'Show off your PRs', d: 'When you share a workout where you set a PR, everyone sees it: a gold PR medal, a count, and a banner like "Logan\'s heaviest Back Squat ever!" with how much you added.' },
         { ic: '🏋️', t: 'More on the card', d: 'The workout card on your photo now shows your program, each exercise and the weights you used.' },
         { ic: '🎯', t: 'Locks to the middle', d: 'When you drag the card near the middle of your photo, it locks into place, with guide lines (and a little tap on iPhone). Keep dragging to move it again.' }
       ]
