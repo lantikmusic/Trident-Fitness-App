@@ -13169,7 +13169,7 @@ function cmSetsText(ex) {
 
 // Workout badge by session type (field training, game day, sport, recovery, or a lift)
 function cmWoBadge(payload) {
-  return ({ field: '🏈 Field training', competition: '🏈 Game day', sport: '🥊 Sport', recovery: '🧘 Recovery' })[payload && payload.cat] || '🏋️ Workout';
+  return ({ field: '🏈 Field training', competition: '🏈 Game day', sport: '🥊 Sport', recovery: '🧘 Recovery' })[payload && payload.cat] || 'Workout';
 }
 // The three headline numbers a newer workout carries (older posts: null, so the lifting numbers show)
 function cmWoStats(payload) {
