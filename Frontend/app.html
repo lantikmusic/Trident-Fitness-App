@@ -2227,6 +2227,33 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
 .cmp-wdate span{font-weight:500;letter-spacing:0;text-transform:none;color:var(--text3);}
 .cmp-wfoot{display:flex;gap:14px;margin:8px 4px 0;font-size:12.5px;font-weight:600;color:var(--text3);}
 .cmp-wfoot span{display:flex;align-items:center;gap:5px;}
+/* Workout / PR card on top of a photo (feed and post editor). 15em wide, so it scales with the photo. */
+.cm-media,.cm-ov-stage{container-type:inline-size;}
+.cm-ovc{position:absolute;z-index:1;box-sizing:border-box;width:calc(var(--s, .62) * 100%);transform:translate(-50%,-50%);
+  font-size:calc(var(--s, .62) * 24px);font-size:calc(var(--s, .62) * 100cqw / 15);padding:.8em .95em .85em;border-radius:1.05em;color:#fff;text-align:left;line-height:1.2;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.03)),rgba(10,10,12,.5);border:1px solid rgba(255,255,255,.18);
+  backdrop-filter:blur(14px) saturate(150%);-webkit-backdrop-filter:blur(14px) saturate(150%);box-shadow:0 .5em 1.6em rgba(0,0,0,.35);}
+.cm-ovc-top{display:flex;align-items:center;gap:.45em;font-size:.62em;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--pink);white-space:nowrap;overflow:hidden;}
+.cm-ovc-top img{width:1.7em;height:1.7em;object-fit:contain;flex-shrink:0;}
+.cm-ovc-title{font-size:1.12em;font-weight:800;letter-spacing:-.01em;margin:.35em 0 .6em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.cm-ovc-stats{display:flex;gap:.8em;}
+.cm-ovc-stats div{flex:1;min-width:0;}
+.cm-ovc-stats b{display:block;font-size:1.3em;font-weight:800;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cm-ovc-stats span{display:block;font-size:.58em;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.62);margin-top:.15em;white-space:nowrap;}
+.cm-ovc-pr{font-size:2.2em;font-weight:900;letter-spacing:-.03em;line-height:1;}
+.cm-ovc-pr small{font-size:.38em;font-weight:700;color:rgba(255,255,255,.62);margin-left:.25em;letter-spacing:0;}
+.cm-ovc.edit{pointer-events:auto;cursor:grab;touch-action:none;transition:box-shadow .15s;}
+.cm-ovc.edit.grab{cursor:grabbing;box-shadow:0 0 0 2px var(--pink),0 .6em 1.8em rgba(0,0,0,.45);}
+.cm-ov-stage{position:relative;margin:0 auto 10px;border-radius:16px;overflow:hidden;background:#0d0d0f;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
+.cm-ov-stage>img{display:block;width:100%;height:100%;object-fit:cover;pointer-events:none;}
+.cm-ov-tools{display:flex;flex-direction:column;gap:6px;margin-bottom:10px;}
+.cm-ov-hint{font-size:12px;color:var(--text3);text-align:center;}
+.cm-ov-size{width:100%;accent-color:var(--pink);}
+.cm-ov-btns{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
+.cm-wo-more{display:block;background:none;border:none;padding:2px 0 8px;font-family:inherit;font-size:13px;font-weight:600;color:var(--pink);cursor:pointer;}
+.cmp-wlocal{cursor:default;}
+.cmp-wlocal:active{transform:none;}
+.cmp-wshare{margin-left:auto;padding:7px 13px;border-radius:99px;border:0.5px solid var(--pink-border);background:var(--pink-dim);color:var(--pink);font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .cmp-wfoot svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linejoin:round;}
 .cmp-wfoot span.on{color:#FF375F;} .cmp-wfoot span.on svg{fill:#FF375F;stroke:#FF375F;}
 .cmp-tabs button svg{width:24px;height:24px;}
@@ -12814,6 +12841,47 @@ function hyFinish() {
   hySummary(sess.id, { prs, moved });
   if(prs.length) showPRPopup(prs, 0, () => {});
 }
+// What a LANTIK session shares to Community: lifting sets, plus the other work done (drills, sprints,
+// jumps, games…) and up to three headline numbers. Null when nothing was done (unless `always`).
+function hySharePayload(w, sess, sid, always) {
+  if(!w || !sess) return null;
+  const t = hyTotals(w, sess);
+  const lifts = t.exercises.map(e => ({ name: String(e.name).slice(0, 60), sets: e.sets.slice(0, 8) }));
+  const liftIds = new Set(t.exercises.map(e => 'main.' + e.id));
+  const work = [];
+  (w.sections || []).forEach(section => {
+    if(section.key === 'primer') return;                 // warm-ups aren't listed
+    section.items.forEach(ex => {
+      const key = section.key + '.' + ex.id;
+      if(liftIds.has(key)) return;
+      const st = sess.ex && sess.ex[key];
+      if(!st || st.skipped) return;
+      const done = (st.sets || []).filter(x => x && x.done);
+      if(!done.length && !st.done) return;
+      const text = done.length ? done.map(x => hySetText(ex, x)).join(' · ') : 'Done';
+      work.push({ name: String(hyExName(w.id, key, ex)).slice(0, 60), sets: [], text: text.slice(0, 60) });
+    });
+  });
+  const games = [];
+  (sess.games || []).forEach((g, i) => { if(g && g.done) games.push({ name: 'Game ' + (i + 1), sets: [], text: ([g.result, g.duration ? g.duration + ' min' : ''].filter(Boolean).join(' · ') || 'Played').slice(0, 60) }); });
+  if(!lifts.length && !work.length && !games.length && !sess.duration && !always) return null;
+  let stats;
+  if(lifts.length) {
+    const vol = t.volume ? (t.volume >= 10000 ? (Math.round(t.volume / 100) / 10) + 'k' : t.volume.toLocaleString()) : '—';
+    stats = [[String(lifts.length), lifts.length === 1 ? 'exercise' : 'exercises'], [String(t.sets), 'sets'], [vol, 'lbs lifted']];
+  } else {
+    stats = [];
+    if(w.games) stats.push([`${games.length}/${w.games}`, 'games']);
+    else if(work.length) stats.push([String(work.length), work.length === 1 ? 'drill' : 'drills']);
+    if(sess.duration) stats.push([String(sess.duration), 'min']);
+    if(sess.intensity) stats.push([String(sess.intensity).slice(0, 12), 'intensity']);
+    if(sess.rpe) stats.push([String(sess.rpe), 'RPE']);
+    stats = stats.slice(0, 3);
+  }
+  return { program: 'LANTIK Hybrid Athlete', day: String(w.name).slice(0, 80), week: sess.blockWeek || 1, cat: w.category || 'strength',
+    volume: t.volume, sets: t.sets, exercises: lifts.concat(work, games).slice(0, 12), stats,
+    date: String(sess.date || '').slice(0, 10), sid: String(sid || sess.id || '').slice(0, 40) };
+}
 function hySummary(sid, extra) {
   const sess = hyState.sessions[sid]; if(!sess) return;
   const w = hyWorkout(sess.workoutId), t = hyTotals(w, sess), x = extra || {};
@@ -12824,7 +12892,8 @@ function hySummary(sid, extra) {
   if(t.volume) stats.push([t.volume.toLocaleString(), 'lbs lifted']);
   if(sess.duration) stats.push([sess.duration, 'Minutes']);
   if(sess.rpe) stats.push([sess.rpe, 'Session RPE']);
-  window._hyShare = t.exercises.length ? { type: 'workout', payload: { program: 'LANTIK Hybrid Athlete', day: w.name.slice(0, 80), week: sess.blockWeek || 1, volume: t.volume, sets: t.sets, exercises: t.exercises.slice(0, 12).map(e => ({ name: e.name.slice(0, 60), sets: e.sets.slice(0, 8) })) } } : null;
+  const sharePayload = hySharePayload(w, sess, sid);
+  window._hyShare = sharePayload ? { type: 'workout', payload: sharePayload } : null;
   const detail = (w.sections || []).map(section => {
     const lines = section.items.map(ex => {
       const st = sess.ex[section.key + '.' + ex.id];
@@ -13076,6 +13145,7 @@ function cmQuick(kind) {
 }
 
 function cmSetsText(ex) {
+  if(ex && typeof ex.text === 'string' && ex.text) return ex.text;
   const sets = Array.isArray(ex && ex.sets) ? ex.sets : [];
   const parts = sets.slice(0, 4).map(st => {
     const w = cmNum(st && st.w), r = cmNum(st && st.r);
@@ -13085,20 +13155,55 @@ function cmSetsText(ex) {
   return parts.join(', ');
 }
 
+// Workout badge by session type (field training, game day, sport, recovery, or a lift)
+function cmWoBadge(payload) {
+  return ({ field: '🏈 Field training', competition: '🏈 Game day', sport: '🥊 Sport', recovery: '🧘 Recovery' })[payload && payload.cat] || '🏋️ Workout';
+}
+// The three headline numbers a newer workout carries (older posts: null, so the lifting numbers show)
+function cmWoStats(payload) {
+  const st = payload && Array.isArray(payload.stats) ? payload.stats.filter(x => Array.isArray(x) && x.length === 2).slice(0, 3) : [];
+  return st.length ? st.map(x => [String(x[0]).slice(0, 14), String(x[1]).slice(0, 14)]) : null;
+}
+// Workout / PR card placed on top of the photo. ov = { x, y } (card centre, 0–1 across and down the
+// photo) and s (card width as a share of the photo's width). It scales with the photo.
+function cmOvOk(ov) {
+  return !!ov && typeof ov === 'object' && [ov.x, ov.y, ov.s].every(n => typeof n === 'number' && isFinite(n))
+    && ov.x >= 0 && ov.x <= 1 && ov.y >= 0 && ov.y <= 1 && ov.s >= 0.25 && ov.s <= 1;
+}
+function cmOvCardHTML(type, payload, ov, editable) {
+  if(!payload || !cmOvOk(ov)) return '';
+  const pos = `left:${(ov.x * 100).toFixed(2)}%;top:${(ov.y * 100).toFixed(2)}%;--s:${ov.s.toFixed(3)}`;
+  const mark = `<img src="Icons/trident-mark.png" alt="" onerror="this.remove()">`;
+  let inner;
+  if(type === 'pr') {
+    inner = `<div class="cm-ovc-top">${mark}<span>🏆 New PR</span></div>
+      <div class="cm-ovc-title">${cmEsc(payload.exercise || 'Lift')}</div>
+      <div class="cm-ovc-pr">${cmNum(payload.weight)}<small>lbs</small></div>`;
+  } else {
+    const nEx = Array.isArray(payload.exercises) ? payload.exercises.length : 0, vol = cmNum(payload.volume);
+    const stats = cmWoStats(payload) || [[String(nEx), 'exercises'], [String(cmNum(payload.sets) || '—'), 'sets'], [vol ? (vol >= 10000 ? (Math.round(vol / 100) / 10) + 'k' : vol.toLocaleString()) : '—', 'lbs lifted']];
+    inner = `<div class="cm-ovc-top">${mark}<span>${cmEsc(cmWoBadge(payload))}</span></div>
+      <div class="cm-ovc-title">${cmEsc(payload.day || 'Workout')}</div>
+      <div class="cm-ovc-stats">${stats.map(x => `<div><b>${cmEsc(x[0])}</b><span>${cmEsc(x[1])}</span></div>`).join('')}</div>`;
+  }
+  return `<div class="cm-ovc${editable ? ' edit' : ''}"${editable ? ' id="cmOvCard"' : ''} style="${pos}">${inner}</div>`;
+}
+function cmOvMore(btn) { const box = btn.nextElementSibling; if(box) box.hidden = false; btn.remove(); }
 function cmAttachHTML(type, payload) {
   if(!payload || typeof payload !== 'object') return '';
   if(type === 'workout') {
     const exs = Array.isArray(payload.exercises) ? payload.exercises.slice(0, 12) : [];
     const nEx = Array.isArray(payload.exercises) ? payload.exercises.length : 0;
     const vol = cmNum(payload.volume);
+    const stats = cmWoStats(payload);
     return `<div class="cm-attach cm-attach-wo">
-      <div class="cm-attach-top"><span class="cm-attach-badge">🏋️ Workout</span>${payload.program ? `<span class="cm-attach-prog">${cmEsc(payload.program)}</span>` : ''}</div>
+      <div class="cm-attach-top"><span class="cm-attach-badge">${cmWoBadge(payload)}</span>${payload.program ? `<span class="cm-attach-prog">${cmEsc(payload.program)}</span>` : ''}</div>
       <div class="cm-attach-title">${cmEsc(payload.day || 'Workout')}</div>
-      <div class="cm-attach-stats">
+      ${stats ? `<div class="cm-attach-stats">${stats.map(x => `<div><b>${cmEsc(x[0])}</b><span>${cmEsc(x[1])}</span></div>`).join('')}</div>` : `<div class="cm-attach-stats">
         <div><b>${nEx}</b><span>exercises</span></div>
         <div><b>${cmNum(payload.sets) || '—'}</b><span>sets</span></div>
         <div><b>${vol ? (vol >= 10000 ? (Math.round(vol / 100) / 10) + 'k' : vol.toLocaleString()) : '—'}</b><span>lbs lifted</span></div>
-      </div>
+      </div>`}
       ${exs.map(ex => `<div class="cm-attach-row"><span>${cmEsc(ex && ex.name)}</span><span>${cmEsc(cmSetsText(ex))}</span></div>`).join('')}
     </div>`;
   }
@@ -13315,7 +13420,9 @@ function cmPostHTML(p) {
   const handle = p.author_username ? cmEsc(p.author_username) : '';
   const kind = p.type === 'workout' ? 'shared a workout' : p.type === 'pr' ? 'hit a PR' : '';
   const photo = !!p.has_photo;
-  const attach = cmAttachHTML(p.type, p.payload);
+  const ov = photo && (p.type === 'workout' || p.type === 'pr') && p.payload && cmOvOk(p.payload.overlay) ? p.payload.overlay : null;
+  const attach = !ov ? cmAttachHTML(p.type, p.payload)
+    : (p.type === 'workout' ? `<button class="cm-wo-more" onclick="cmOvMore(this)">See full workout</button><div hidden>${cmAttachHTML(p.type, p.payload)}</div>` : '');
   const bodyText = String(p.body || '');
   const long = bodyText.length > 160 || (bodyText.match(/\n/g) || []).length > 2;
   const big = !photo && !attach && bodyText.length > 0 && bodyText.length <= 140;
@@ -13340,7 +13447,7 @@ ${photo ? '' : `    <div class="cm-pad cm-head">
       ${p.mine ? `<button class="cm-del" onclick="cmDeletePost('${id}')" aria-label="Delete post">${CM_TRASH}</button>` : (p.following ? '' : `<button class="cm-follow" onclick="cmToggleFollow('${uid}')">Follow</button>`)}
     </div>`}
     ${photo
-      ? `${cmMediaHTML(id, name, cmMediaHeadHTML(p, id, uid, name, handle))}<div class="cm-pad">${actions}${body}${attach}${viewC}</div>`
+      ? `${cmMediaHTML(id, name, cmMediaHeadHTML(p, id, uid, name, handle) + (ov ? cmOvCardHTML(p.type, p.payload, ov) : ''))}<div class="cm-pad">${actions}${body}${attach}${viewC}</div>`
       : `<div class="cm-pad">${body}${attach}${actions}${viewC}</div>`}
     ${cmState.open[id] ? `<div class="cm-pad">${cmCommentsHTML(id)}</div>` : ''}
   </article>`;
@@ -13370,8 +13477,9 @@ function cmStoriesHTML() {
 }
 
 // Profile: 3-across grid of posts (photos fill the tile), or the full list.
+// Grid: every photo (workout and PR photos too) plus text posts. Workouts without a photo live in the Workouts tab.
 function cmGridHTML(posts) {
-  posts = posts.filter(p => !cmIsWorkoutPost(p));
+  posts = posts.filter(p => p && (p.has_photo || !cmIsWorkoutPost(p)));
   if(!posts.length) return '';
   return `<div class="cmp-grid">${posts.map(p => {
     const id = cmSafeId(p && p.id);
@@ -13385,14 +13493,70 @@ function cmGridHTML(posts) {
   }).join('')}</div>`;
 }
 function cmIsWorkoutPost(p) { return !!p && (p.type === 'workout' || p.type === 'pr') && !!p.payload; }
-// Workouts tab: the workouts and PRs this person shared, newest first. Tap one for the full post.
-function cmWorkoutsHTML(posts) {
-  const list = posts.filter(cmIsWorkoutPost);
-  if(!list.length) return '';
-  const nW = list.filter(p => p.type === 'workout').length, nP = list.length - nW;
+// Your completed workouts on this phone: LANTIK sessions (dated) and other programs' logged days.
+function cmLocalWorkouts() {
+  const out = [];
+  try {
+    const sessions = (typeof hyState !== 'undefined' && hyState && hyState.sessions) || {};
+    Object.keys(sessions).forEach(sid => {
+      const sess = sessions[sid];
+      if(!sess || sess.status !== 'completed' || sess.restDay) return;
+      const w = hyWorkout(sess.workoutId); if(!w) return;
+      const payload = hySharePayload(w, sess, sid, true); if(!payload) return;
+      out.push({ key: 'hy:' + sid, date: String(sess.date || sid.slice(0, 10)), payload });
+    });
+  } catch(e) {}
+  try {
+    const logs = (workoutState && workoutState.logs) || {};
+    Object.keys(logs).forEach(key => {
+      const m = /^(.+)_w(\d+)_d(\d+)$/.exec(key); if(!m) return;
+      const prog = getProgram(m[1]); const day = prog && prog.days[Number(m[3])];
+      if(!day || !Array.isArray(day.exercises)) return;
+      const payload = cmBuildWorkoutPayload(prog, day, Number(m[2]), logs[key]);
+      if(payload) out.push({ key: 'wo:' + key, date: '', payload, sort: Number(m[2]) * 100 + Number(m[3]) });
+    });
+  } catch(e) {}
+  return out;
+}
+// A workout post already shared from this session (newer posts carry its id; older ones match by name and date)
+function cmLocalIsShared(lw, posts) {
+  return posts.some(p => {
+    if(p.type !== 'workout' || !p.payload) return false;
+    if(p.payload.sid) return p.payload.sid === lw.payload.sid;
+    if(p.payload.day !== lw.payload.day) return false;
+    if(!lw.date) return true;
+    const d = new Date(p.created_at), s = new Date(lw.date + 'T00:00:00');
+    const diff = (d - s) / 86400000;
+    return diff > -1 && diff < 3;
+  });
+}
+function cmShareLocalWorkout(i) {
+  const lw = (window._cmLocalWo || [])[i];
+  if(!lw) return;
+  cmOpenCompose({ type: 'workout', payload: lw.payload });
+}
+// Workouts tab: the workouts and PRs this person shared, newest first (tap one for the full post).
+// On your own profile it also lists the workouts you finished but didn't share; only you see those.
+function cmWorkoutsHTML(posts, mine) {
+  const shared = posts.filter(cmIsWorkoutPost);
+  const local = mine ? cmLocalWorkouts().filter(lw => !cmLocalIsShared(lw, shared)) : [];
+  window._cmLocalWo = local;
+  if(!shared.length && !local.length) return '';
+  const when = x => x.post ? new Date(x.post.created_at).getTime() || 0 : (x.lw.date ? new Date(x.lw.date + 'T12:00:00').getTime() : -1e15 + (x.lw.sort || 0));
+  const items = shared.map(p => ({ post: p })).concat(local.map((lw, i) => ({ lw, i }))).sort((a, b) => when(b) - when(a));
+  const nW = shared.filter(p => p.type === 'workout').length + local.length, nP = shared.length - shared.filter(p => p.type === 'workout').length;
   const day = iso => { const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }); };
   return `<div class="cmp-wsum"><span><b>${nW}</b> ${nW === 1 ? 'workout' : 'workouts'}</span><span><b>${nP}</b> ${nP === 1 ? 'PR' : 'PRs'}</span></div>
-    <div class="cmp-wlist">${list.map(p => {
+    <div class="cmp-wlist">${items.map(x => {
+      if(x.lw) {
+        const lw = x.lw;
+        return `<div class="cmp-wcard cmp-wlocal cm-attach-host">
+          <div class="cmp-wdate">${cmEsc(lw.date ? hyDateLabel(lw.date) : (lw.payload.program || 'Workout'))}<span>Only you can see this</span></div>
+          ${cmAttachHTML('workout', lw.payload)}
+          <div class="cmp-wfoot"><button class="cmp-wshare" onclick="cmShareLocalWorkout(${x.i})">Share to Community</button></div>
+        </div>`;
+      }
+      const p = x.post;
       const id = cmSafeId(p.id);
       if(!id) return '';
       return `<button class="cmp-wcard cm-attach-host" onclick="cmGridOpen('${id}')" aria-label="Open this ${p.type === 'pr' ? 'PR' : 'workout'}">
@@ -13557,7 +13721,7 @@ async function cmOpenProfile(uid, opts) {
   cmDraw();
   if(!same) window.scrollTo(0, 0);
 
-  const [r, posts] = await Promise.all([cmApi(`/community/profile?user_id=${uid}`), cmApi(`/community/feed?limit=15&user=${uid}`)]);
+  const [r, posts] = await Promise.all([cmApi(`/community/profile?user_id=${uid}`), cmApi(`/community/feed?limit=30&user=${uid}`)]);
   if(cmProf.uid !== uid || cmState.view !== 'profile') return;
   cmProf.loading = false;
   if(!r.ok || !r.data) { cmProf.data = { error: true }; cmDraw(); return; }
@@ -13568,6 +13732,24 @@ async function cmOpenProfile(uid, opts) {
     cmProf.next = posts.data.next || null;
   }
   cmDraw();
+  cmProfileFill(uid);
+}
+// Keeps loading older posts in the background (up to 300) so both tabs show everything.
+async function cmProfileFill(uid) {
+  if(cmProf.filling === uid) return;
+  cmProf.filling = uid;
+  try {
+    for(let page = 0; page < 9 && cmProf.next && cmProf.uid === uid && cmState.view === 'profile'; page++) {
+      const r = await cmApi(`/community/feed?limit=30&user=${uid}&before=${encodeURIComponent(cmProf.next)}`);
+      if(cmProf.uid !== uid || cmState.view !== 'profile' || !r.ok || !r.data || !Array.isArray(r.data.posts)) break;
+      const have = new Set(cmProf.posts.map(p => p.id));
+      cmProf.posts = cmProf.posts.concat(r.data.posts.filter(p => !have.has(p.id)));
+      cmProf.next = r.data.next || null;
+      const y = window.scrollY;
+      cmDraw();
+      window.scrollTo(0, y);
+    }
+  } finally { if(cmProf.filling === uid) cmProf.filling = null; }
 }
 
 // Your own profile, from the Community tab. Looks up your account id once.
@@ -13640,7 +13822,7 @@ async function cmProfileRefresh(uid, withPosts) {
   if(cmState.view !== 'profile' || cmProf.uid !== uid) return;
   const [r, posts] = await Promise.all([
     cmApi(`/community/profile?user_id=${uid}`),
-    withPosts ? cmApi(`/community/feed?limit=15&user=${uid}`) : Promise.resolve(null)
+    withPosts ? cmApi(`/community/feed?limit=30&user=${uid}`) : Promise.resolve(null)
   ]);
   if(cmProf.uid !== uid || cmState.view !== 'profile') return;
   if(r.ok && r.data) { cmProf.data = r.data; window._cmProf = r.data; }
@@ -13649,13 +13831,14 @@ async function cmProfileRefresh(uid, withPosts) {
     cmProf.next = posts.ok && posts.data ? posts.data.next || null : null;
   }
   cmDraw();
+  if(posts) cmProfileFill(uid);
 }
 
 async function cmProfileMore() {
   if(!cmProf.next || cmProf.loading) return;
   const uid = cmProf.uid;
   cmProf.loading = true; cmDraw();
-  const r = await cmApi(`/community/feed?limit=15&user=${uid}&before=${encodeURIComponent(cmProf.next)}`);
+  const r = await cmApi(`/community/feed?limit=30&user=${uid}&before=${encodeURIComponent(cmProf.next)}`);
   cmProf.loading = false;
   if(cmProf.uid !== uid) return;
   if(r.ok && r.data && Array.isArray(r.data.posts)) {
@@ -13700,11 +13883,11 @@ function cmProfilePageHTML() {
 
   let postsHTML;
   if(pr.blocked) postsHTML = `<div class="cm-empty" style="padding:24px 0;">You blocked ${name}. Unblock to see their posts.</div>`;
-  else if(!cmProf.posts.length) postsHTML = cmProf.loading ? `<div class="cm-empty" style="padding:24px 0;">Loading posts…</div>` : `<div class="cmp-empty"><div class="cmp-empty-ic">${CM_BUBBLE}</div><b>No posts yet</b><span>${pr.is_me ? 'Your posts will show up here.' : `When ${name} posts, you'll see it here.`}</span></div>`;
-  else postsHTML = (cmProf.view === 'posts' ? cmGridHTML(cmProf.posts) : cmWorkoutsHTML(cmProf.posts))
+  else if(!cmProf.posts.length && !(pr.is_me && cmProf.view !== 'posts' && cmLocalWorkouts().length)) postsHTML = cmProf.loading ? `<div class="cm-empty" style="padding:24px 0;">Loading posts…</div>` : `<div class="cmp-empty"><div class="cmp-empty-ic">${CM_BUBBLE}</div><b>No posts yet</b><span>${pr.is_me ? 'Your posts will show up here.' : `When ${name} posts, you'll see it here.`}</span></div>`;
+  else postsHTML = (cmProf.view === 'posts' ? cmGridHTML(cmProf.posts) : cmWorkoutsHTML(cmProf.posts, !!pr.is_me))
     || (cmProf.view === 'posts'
       ? `<div class="cmp-empty"><div class="cmp-empty-ic">${CM_BUBBLE}</div><b>No photos or posts yet</b><span>${pr.is_me ? 'Photos and posts you share show up here.' : `When ${name} posts, you'll see it here.`}</span></div>`
-      : `<div class="cmp-empty"><div class="cmp-empty-ic">${CMP_DUMBBELL}</div><b>No workouts shared yet</b><span>${pr.is_me ? 'Finish a workout and tap Share to Community to add it here.' : `When ${name} shares a workout or PR, it shows up here.`}</span></div>`)
+      : `<div class="cmp-empty"><div class="cmp-empty-ic">${CMP_DUMBBELL}</div><b>${pr.is_me ? 'No workouts yet' : 'No workouts shared yet'}</b><span>${pr.is_me ? 'Workouts you finish show up here.' : `When ${name} shares a workout or PR, it shows up here.`}</span></div>`)
     + (cmProf.next ? `<button class="ghost-btn" style="margin:4px 0 16px;" onclick="cmProfileMore()">${cmProf.loading ? 'Loading…' : 'Load more posts'}</button>` : '');
 
   return bar + `<div class="cmp-head">
@@ -14602,6 +14785,37 @@ function cmDrawDraft() {
   document.getElementById('cmChipPhoto').classList.toggle('on', !!cmDraft.photo);
   document.getElementById('cmChipWorkout').classList.toggle('on', kind === 'workout');
   document.getElementById('cmChipPR').classList.toggle('on', kind === 'pr');
+  if(cmDraft.photo && cmDraft.attach) {
+    if(!cmDraft.ov) cmDraft.ov = { x: 0.5, y: 0.78, s: 0.62, on: true };
+    if(cmDraft.ov.on) {
+      if(!cmDraft.aspect || cmDraft.aspectOf !== cmDraft.photo) {
+        // Photo shape first (same limits as the feed), then draw
+        const src = cmDraft.photo, im = new Image();
+        im.onload = () => { if(cmDraft.photo !== src) return; cmDraft.aspectOf = src; cmDraft.aspect = Math.round(cmClampAspect(im.naturalWidth / im.naturalHeight || 0.8) * 1000) / 1000; cmDrawDraft(); };
+        im.onerror = () => { if(cmDraft.photo !== src) return; cmDraft.aspectOf = src; cmDraft.aspect = 0.8; cmDrawDraft(); };
+        im.src = src;
+        document.getElementById('cmAttachPreview').innerHTML = '';
+        return;
+      }
+      const a = cmDraft.aspect;
+      document.getElementById('cmAttachPreview').innerHTML = `<div class="cm-ov-stage" id="cmOvStage" style="aspect-ratio:${a};width:min(100%, calc(60vh * ${a}))">
+          <img src="${cmDraft.photo}" alt="Selected photo" draggable="false">
+          ${cmOvCardHTML(kind, cmDraft.attach.payload, cmDraft.ov, true)}
+        </div>
+        <div class="cm-ov-tools">
+          <div class="cm-ov-hint">Drag the card to move it. Pinch or use the slider to resize.</div>
+          <input type="range" class="cm-ov-size" id="cmOvSize" min="35" max="95" step="1" value="${Math.round(cmDraft.ov.s * 100)}" oninput="cmOvSetSize(this.value)" aria-label="Card size">
+        </div>
+        <div class="cm-ov-btns">
+          <button class="cm-chip" onclick="cmOvToggle(false)">Show card below photo</button>
+          <button class="cm-chip" onclick="cmClearAttach()">Remove ${kind === 'pr' ? 'PR' : 'workout'}</button>
+          <button class="cm-chip" onclick="cmClearPhoto()">Remove photo</button>
+        </div>`;
+      cmOvApply();
+      cmOvBind();
+      return;
+    }
+  }
   let html = '';
   if(cmDraft.attach) {
     html += cmAttachHTML(cmDraft.attach.type, cmDraft.attach.payload)
@@ -14610,8 +14824,67 @@ function cmDrawDraft() {
   if(cmDraft.photo) {
     html += `<img class="cm-photo" src="${cmDraft.photo}" alt="Selected photo">`
       + `<button class="cm-chip" style="margin-bottom:10px;" onclick="cmClearPhoto()">Remove photo</button>`;
+    if(cmDraft.attach) html += `<button class="cm-chip" style="margin:0 0 10px 6px;" onclick="cmOvToggle(true)">Put card on photo</button>`;
   }
   document.getElementById('cmAttachPreview').innerHTML = html;
+}
+function cmOvToggle(on) { if(cmDraft.ov) cmDraft.ov.on = !!on; cmDrawDraft(); }
+function cmOvSetSize(v) { if(!cmDraft.ov) return; cmDraft.ov.s = Math.min(0.95, Math.max(0.35, Number(v) / 100 || 0.62)); cmOvApply(); }
+// Puts the card where cmDraft.ov says, kept fully inside the photo (and no taller than it).
+function cmOvApply() {
+  const stage = document.getElementById('cmOvStage'), card = document.getElementById('cmOvCard'), ov = cmDraft.ov;
+  if(!stage || !card || !ov) return;
+  card.style.setProperty('--s', ov.s.toFixed(3));
+  const W = stage.clientWidth, H = stage.clientHeight;
+  if(!W || !H) return;
+  let ch = card.offsetHeight;
+  if(ch > H * 0.92) { ov.s = Math.max(0.3, ov.s * H * 0.92 / ch); card.style.setProperty('--s', ov.s.toFixed(3)); ch = card.offsetHeight; }
+  const hx = Math.min(0.5, card.offsetWidth / 2 / W), hy = Math.min(0.5, ch / 2 / H);
+  ov.x = Math.min(1 - hx, Math.max(hx, ov.x));
+  ov.y = Math.min(1 - hy, Math.max(hy, ov.y));
+  card.style.left = (ov.x * 100).toFixed(2) + '%';
+  card.style.top = (ov.y * 100).toFixed(2) + '%';
+  const sz = document.getElementById('cmOvSize');
+  if(sz && document.activeElement !== sz) sz.value = Math.round(ov.s * 100);
+}
+// One finger on the card moves it; two fingers anywhere on the photo resize (and move) it.
+function cmOvBind() {
+  const stage = document.getElementById('cmOvStage'), card = document.getElementById('cmOvCard');
+  if(!stage || !card) return;
+  const pts = new Map();
+  let g = null;
+  const mid = a => ({ x: a.reduce((t, p) => t + p.x, 0) / a.length, y: a.reduce((t, p) => t + p.y, 0) / a.length });
+  const dist = a => a.length > 1 ? Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y) : 0;
+  const begin = () => {
+    const a = [...pts.values()], r = stage.getBoundingClientRect();
+    g = { x: cmDraft.ov.x, y: cmDraft.ov.y, s: cmDraft.ov.s, W: r.width, H: r.height, c: mid(a), d: dist(a) };
+  };
+  stage.addEventListener('pointerdown', e => {
+    if(!cmDraft.ov || pts.size >= 2) return;
+    pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    try { stage.setPointerCapture(e.pointerId); } catch(err) {}
+    // Start moving when a finger lands on the card, or resizing as soon as two fingers are down
+    if(pts.size === 2 || card.contains(e.target)) { e.preventDefault(); begin(); card.classList.add('grab'); }
+  });
+  stage.addEventListener('pointermove', e => {
+    if(!pts.has(e.pointerId)) return;
+    pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if(!g) return;
+    e.preventDefault();
+    const a = [...pts.values()], c = mid(a);
+    if(a.length > 1 && g.d > 0) cmDraft.ov.s = Math.min(0.95, Math.max(0.35, g.s * dist(a) / g.d));
+    cmDraft.ov.x = g.x + (c.x - g.c.x) / g.W;
+    cmDraft.ov.y = g.y + (c.y - g.c.y) / g.H;
+    cmOvApply();
+  });
+  const end = e => {
+    if(!pts.delete(e.pointerId)) return;
+    if(pts.size && g) begin(); else if(!pts.size) { g = null; card.classList.remove('grab'); }
+  };
+  stage.addEventListener('pointerup', end);
+  stage.addEventListener('pointercancel', end);
+  // Safari: stop the page from zooming during a pinch on the photo
+  stage.addEventListener('touchmove', e => { if(g) e.preventDefault(); }, { passive: false });
 }
 function cmClearAttach() { cmDraft.attach = null; cmDrawDraft(); }
 function cmClearPhoto() { cmDraft.photo = null; cmDrawDraft(); }
@@ -14679,7 +14952,7 @@ function cmBuildWorkoutPayload(prog, day, week, log) {
   };
 }
 
-// LANTIK sessions with logged lifting sets, newest first (same payload as the session summary's Share button).
+// LANTIK sessions with anything logged (lifts, drills, games…), newest first (same payload as the session summary's Share button).
 function cmHybridWorkoutOptions() {
   const out = [];
   try {
@@ -14689,14 +14962,13 @@ function cmHybridWorkoutOptions() {
       if(!sess || sess.status === 'skipped' || sess.restDay) return;
       const w = hyWorkout(sess.workoutId);
       if(!w) return;
-      const t = hyTotals(w, sess);
-      if(!t.exercises.length) return;
-      const vol = t.volume ? ` · ${t.volume >= 10000 ? (Math.round(t.volume / 100) / 10) + 'k' : t.volume.toLocaleString()} lbs` : '';
+      const payload = hySharePayload(w, sess, sid);
+      if(!payload) return;
+      const sum = payload.stats.map(x => x[0] + ' ' + x[1]).join(' · ');
       out.push({
         label: w.name,
-        sub: `${hyDateLabel(sess.date)} · ${t.sets} sets${vol}${sess.status === 'completed' ? '' : ' · not finished'}`,
-        payload: { program: 'LANTIK Hybrid Athlete', day: String(w.name).slice(0, 80), week: sess.blockWeek || 1, volume: t.volume, sets: t.sets,
-          exercises: t.exercises.slice(0, 12).map(e => ({ name: String(e.name).slice(0, 60), sets: e.sets.slice(0, 8) })) },
+        sub: `${hyDateLabel(sess.date)}${sum ? ' · ' + sum : ''}${sess.status === 'completed' ? '' : ' · not finished'}`,
+        payload,
         sort: String(sess.date || sid.slice(0, 10)) + sid
       });
     });
@@ -14765,6 +15037,19 @@ function cmChooseAttachment(i) {
   cmDrawDraft();
 }
 
+// The attachment's details, plus where its card sits on the photo (when it's on the photo)
+function cmDraftPayload() {
+  if(!cmDraft.attach) return null;
+  const payload = Object.assign({}, cmDraft.attach.payload);
+  delete payload.overlay;
+  const ov = cmDraft.ov;
+  if(cmDraft.photo && ov && ov.on) {
+    const r3 = n => Math.round(n * 1000) / 1000;
+    const o = { x: r3(ov.x), y: r3(ov.y), s: r3(ov.s) };
+    if(cmOvOk(o)) payload.overlay = o;
+  }
+  return payload;
+}
 async function cmSubmitPost() {
   if(cmDraft.sending) return;
   const body = document.getElementById('cmText').value.trim();
@@ -14774,7 +15059,7 @@ async function cmSubmitPost() {
   const r = await cmApi('/community/posts', 'POST', {
     type: cmDraft.attach ? cmDraft.attach.type : 'text',
     body,
-    payload: cmDraft.attach ? cmDraft.attach.payload : null,
+    payload: cmDraftPayload(),
     photo: cmDraft.photo
   });
   cmDraft.sending = false; btn.disabled = false; btn.textContent = 'Post';
@@ -15594,6 +15879,18 @@ document.addEventListener('visibilitychange', () => {
 // ══════════════════════════════════════
 function wnList() {
   return [
+    {
+      id: '2026-11-10',
+      version: '1.6',
+      date: 'November 10, 2026',
+      title: 'Show off your workouts',
+      items: [
+        { ic: '🖼️', t: 'Workout card on your photo', d: 'Add a photo and a workout or PR to a post, and the card sits right on the photo. Drag it where you want and pinch to resize it before you post.' },
+        { ic: '🏈', t: 'Share any session', d: 'Football, game days, Muay Thai and recovery sessions can be shared to Community now, not just lifting days.' },
+        { ic: '🏋️', t: 'All your workouts on your profile', d: 'Your Workouts tab lists every workout you finish. The ones you haven\'t shared say "Only you can see this", with a Share button.' },
+        { ic: '📸', t: 'Every photo in your grid', d: 'All your photos show in the grid now, including workout and PR photos.' }
+      ]
+    },
     {
       id: '2026-11-09b',
       version: '1.5',
