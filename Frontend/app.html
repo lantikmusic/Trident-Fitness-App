@@ -2112,16 +2112,16 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
 .cm-more{position:absolute;right:0;bottom:0;background:linear-gradient(90deg,transparent,var(--bg) 30%);border:none;padding:0 0 0 28px;color:var(--text3);font:inherit;cursor:pointer;}
 .cm-viewc{display:block;background:none;border:none;padding:2px 0 0;color:var(--text3);font-family:inherit;font-size:14px;cursor:pointer;}
 .cm-post .cm-comments{border-top:none;margin-top:8px;padding-top:4px;}
-.cm-post .cm-attach{border-radius:20px;margin-bottom:10px;}
-.cm-post .cm-attach-wo{padding:16px;background:radial-gradient(120% 90% at 100% 0%,var(--pink-dim),transparent 60%),linear-gradient(160deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));border:0.5px solid var(--pink-border);}
-.cm-post .cm-attach-wo .cm-attach-title{font-size:20px;font-weight:800;letter-spacing:-0.02em;margin-top:2px;}
-.cm-post .cm-attach-stats div{background:rgba(255,255,255,0.05);border-radius:14px;padding:10px 4px;}
-.cm-post .cm-attach-stats b{font-size:19px;font-weight:800;}
-.cm-post .cm-attach-pr{flex-direction:column;align-items:center;text-align:center;gap:4px;padding:22px 16px 18px;background:radial-gradient(70% 60% at 50% 20%,rgba(255,214,10,0.22),transparent 70%),linear-gradient(160deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));}
-.cm-post .cm-attach-pr .cm-pr-trophy{font-size:48px;}
-.cm-post .cm-attach-pr .cm-attach-title{font-size:18px;font-weight:700;}
-.cm-post .cm-pr-weight{font-size:52px;font-weight:900;letter-spacing:-0.03em;line-height:1.05;background:linear-gradient(180deg,#FFF3B0,#FFD60A 55%,#FF9F0A);-webkit-background-clip:text;background-clip:text;color:transparent;}
-.cm-post .cm-pr-weight span{-webkit-text-fill-color:var(--text3);}
+.cm-attach-host .cm-attach{border-radius:20px;margin-bottom:10px;}
+.cm-attach-host .cm-attach-wo{padding:16px;background:radial-gradient(120% 90% at 100% 0%,var(--pink-dim),transparent 60%),linear-gradient(160deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));border:0.5px solid var(--pink-border);}
+.cm-attach-host .cm-attach-wo .cm-attach-title{font-size:20px;font-weight:800;letter-spacing:-0.02em;margin-top:2px;}
+.cm-attach-host .cm-attach-stats div{background:rgba(255,255,255,0.05);border-radius:14px;padding:10px 4px;}
+.cm-attach-host .cm-attach-stats b{font-size:19px;font-weight:800;}
+.cm-attach-host .cm-attach-pr{flex-direction:column;align-items:center;text-align:center;gap:4px;padding:22px 16px 18px;background:radial-gradient(70% 60% at 50% 20%,rgba(255,214,10,0.22),transparent 70%),linear-gradient(160deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));}
+.cm-attach-host .cm-attach-pr .cm-pr-trophy{font-size:48px;}
+.cm-attach-host .cm-attach-pr .cm-attach-title{font-size:18px;font-weight:700;}
+.cm-attach-host .cm-pr-weight{font-size:52px;font-weight:900;letter-spacing:-0.03em;line-height:1.05;background:linear-gradient(180deg,#FFF3B0,#FFD60A 55%,#FF9F0A);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.cm-attach-host .cm-pr-weight span{-webkit-text-fill-color:var(--text3);}
 .cm-burst{position:fixed;z-index:9999;width:96px;height:96px;margin:-48px 0 0 -48px;pointer-events:none;animation:cmBurst .85s ease forwards;filter:drop-shadow(0 6px 24px rgba(255,55,95,0.55));}
 .cm-burst svg{width:100%;height:100%;fill:#FF375F;stroke:#fff;stroke-width:1;}
 @keyframes cmBurst{0%{transform:scale(.2);opacity:0;}20%{transform:scale(1.15);opacity:1;}40%{transform:scale(.95);}70%{transform:scale(1);opacity:1;}100%{transform:scale(1.1) translateY(-30px);opacity:0;}}
@@ -2168,6 +2168,23 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
 .cmp-tile.wo{background:radial-gradient(circle at 50% 30%,var(--pink-dim),transparent 70%),#141414;}
 .cmp-tile.txt{background:linear-gradient(160deg,#1c1c1e,#121212);}
 .cmp-tile.txt p{margin:0;font-size:11.5px;line-height:1.35;color:var(--text2);display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;}
+/* Profile: Workouts tab + single post view */
+.cmp-wsum{display:flex;gap:16px;margin:-2px 2px 12px;font-size:13px;color:var(--text3);}
+.cmp-wsum b{color:var(--text);font-weight:800;margin-right:2px;}
+.cmp-wlist{display:flex;flex-direction:column;gap:12px;margin-bottom:16px;}
+.cmp-wcard{display:block;width:100%;text-align:left;background:none;border:none;padding:0;color:inherit;font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .15s;}
+.cmp-wcard:active{transform:scale(.985);}
+.cmp-wcard .cm-attach{margin-bottom:0;}
+.cmp-wdate{display:flex;justify-content:space-between;align-items:baseline;margin:0 4px 6px;font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--text2);}
+.cmp-wdate span{font-weight:500;letter-spacing:0;text-transform:none;color:var(--text3);}
+.cmp-wfoot{display:flex;gap:14px;margin:8px 4px 0;font-size:12.5px;font-weight:600;color:var(--text3);}
+.cmp-wfoot span{display:flex;align-items:center;gap:5px;}
+.cmp-wfoot svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linejoin:round;}
+.cmp-wfoot span.on{color:#FF375F;} .cmp-wfoot span.on svg{fill:#FF375F;stroke:#FF375F;}
+.cmp-tabs button svg{width:24px;height:24px;}
+.cmp-empty-ic svg{width:26px;height:26px;}
+.cmp-postview{padding-top:4px;}
+.cmp-postview .cm-post{border-bottom:none;}
 </style>
 <script>/* No zooming: block iOS pinch-zoom (double-tap and tap-in-a-box zoom are stopped by the viewport + touch-action) */try{['gesturestart','gesturechange','gestureend'].forEach(function(t){document.addEventListener(t,function(e){e.preventDefault();},{passive:false});});}catch(e){}</script>
 </head>
@@ -12746,6 +12763,7 @@ const CM_HEART = '<svg viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 
 const CM_BUBBLE = '<svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5z"/></svg>';
 let cmState = { posts: [], next: null, status: 'idle', loadedAt: 0, busy: false, comments: {}, open: {}, scope: 'all', view: 'feed' };
 // Profile page (shown in the Community tab in place of the feed)
+const CMP_DUMBBELL = '<svg viewBox="0 0 24 24"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg>';
 let cmProf = { uid: null, data: null, posts: [], next: null, loading: false, stack: [], feedScroll: 0, menu: false };
 const CM_TRASH = '<svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>';
 const CM_SEND = '<svg viewBox="0 0 24 24"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>';
@@ -13062,7 +13080,7 @@ function cmPostHTML(p) {
       <button class="cm-act" onclick="cmToggleComments('${id}')" aria-label="Comments">${CM_BUBBLE}<span>${nC || ''}</span></button>
       ${p.tagged_me ? `<button class="cm-untag" onclick="cmRemoveMyTag('${id}')">Remove tag</button>` : ''}
     </div>`;
-  return `<article class="cm-post${photo ? ' has-media' : ''}" id="cm-post-${id}">
+  return `<article class="cm-post cm-attach-host${photo ? ' has-media' : ''}" id="cm-post-${id}">
     <div class="cm-pad cm-head">
       <button class="cm-who" onclick="cmOpenProfile('${uid}')" aria-label="Open ${name}'s profile">
         <div class="cm-ring">${cmAvatarHTML(p)}</div>
@@ -13102,6 +13120,8 @@ function cmStoriesHTML() {
 
 // Profile: 3-across grid of posts (photos fill the tile), or the full list.
 function cmGridHTML(posts) {
+  posts = posts.filter(p => !cmIsWorkoutPost(p));
+  if(!posts.length) return '';
   return `<div class="cmp-grid">${posts.map(p => {
     const id = cmSafeId(p && p.id);
     if(!id) return '';
@@ -13113,11 +13133,36 @@ function cmGridHTML(posts) {
     return `<button class="cmp-cell" onclick="cmGridOpen('${id}')" aria-label="Open post">${inner}${p.like_count ? `<span class="cmp-cell-likes">${CM_HEART}${cmNum(p.like_count)}</span>` : ''}</button>`;
   }).join('')}</div>`;
 }
-function cmProfileView(v) { cmProf.view = v; cmDraw(); }
+function cmIsWorkoutPost(p) { return !!p && (p.type === 'workout' || p.type === 'pr') && !!p.payload; }
+// Workouts tab: the workouts and PRs this person shared, newest first. Tap one for the full post.
+function cmWorkoutsHTML(posts) {
+  const list = posts.filter(cmIsWorkoutPost);
+  if(!list.length) return '';
+  const nW = list.filter(p => p.type === 'workout').length, nP = list.length - nW;
+  const day = iso => { const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }); };
+  return `<div class="cmp-wsum"><span><b>${nW}</b> ${nW === 1 ? 'workout' : 'workouts'}</span><span><b>${nP}</b> ${nP === 1 ? 'PR' : 'PRs'}</span></div>
+    <div class="cmp-wlist">${list.map(p => {
+      const id = cmSafeId(p.id);
+      if(!id) return '';
+      return `<button class="cmp-wcard cm-attach-host" onclick="cmGridOpen('${id}')" aria-label="Open this ${p.type === 'pr' ? 'PR' : 'workout'}">
+        <div class="cmp-wdate">${cmEsc(day(p.created_at))}<span>${cmEsc(cmTimeAgo(p.created_at))}</span></div>
+        ${cmAttachHTML(p.type, p.payload)}
+        <div class="cmp-wfoot"><span class="${p.liked ? 'on' : ''}">${CM_HEART}${cmNum(p.like_count)}</span><span>${CM_BUBBLE}${cmNum(p.comment_count)}</span></div>
+      </button>`;
+    }).join('')}</div>`;
+}
+function cmProfileView(v) { cmProf.view = v; cmProf.post = null; cmDraw(); }
+// Opens one post full size inside the profile (back returns to the same spot)
 function cmGridOpen(id) {
-  cmProf.view = 'list'; cmDraw();
-  const el = document.getElementById('cm-post-' + id);
-  if(el) { const y = el.getBoundingClientRect().top + window.scrollY - 70; window.scrollTo(0, Math.max(0, y)); }
+  cmProf.postScroll = window.scrollY || 0;
+  cmProf.post = id;
+  cmDraw();
+  window.scrollTo(0, 0);
+}
+function cmPostClose() {
+  cmProf.post = null;
+  cmDraw();
+  window.scrollTo(0, cmProf.postScroll || 0);
 }
 
 function cmDraw() {
@@ -13256,7 +13301,7 @@ async function cmOpenProfile(uid, opts) {
   cmState.view = 'profile';
   cmProfileOpen = uid;
   cmProf.menu = false;
-  if(!same) { cmProf.uid = uid; cmProf.data = null; cmProf.posts = []; cmProf.next = null; cmProf.view = 'grid'; }
+  if(!same) { cmProf.uid = uid; cmProf.data = null; cmProf.posts = []; cmProf.next = null; cmProf.view = 'workouts'; cmProf.post = null; }
   cmProf.loading = true;
   cmDraw();
   if(!same) window.scrollTo(0, 0);
@@ -13319,6 +13364,7 @@ async function cmSaveBio() {
 
 // Back arrow: previous profile, or the feed where you left it.
 function cmProfileBack() {
+  if(cmProf.post) { cmPostClose(); return; }
   const prev = cmProf.stack.pop();
   if(prev) { cmOpenProfile(prev, { back: true }); return; }
   cmProfileExit();
@@ -13370,6 +13416,11 @@ function cmProfilePageHTML() {
   const title = pr && !pr.error ? (pr.username ? '@' + cmEsc(pr.username) : cmEsc(pr.name || 'Member')) : '';
   const bar = `<div class="cmp-bar"><button class="cmp-back" onclick="cmProfileBack()" aria-label="Back">${cmBackSvg()}</button><div class="cmp-bar-title">${title}</div></div>`;
   if(!pr) return bar + `<div class="cm-empty" style="padding-top:40px;">Loading…</div>`;
+  if(cmProf.post) {
+    const op = cmProf.posts.find(x => x.id === cmProf.post);
+    if(op) return `<div class="cmp-bar"><button class="cmp-back" onclick="cmPostClose()" aria-label="Back">${cmBackSvg()}</button><div class="cmp-bar-title">${cmIsWorkoutPost(op) ? (op.type === 'pr' ? 'PR' : 'Workout') : 'Post'}</div></div><div class="cmp-postview">${cmPostHTML(op)}</div>`;
+    cmProf.post = null;
+  }
   if(pr.error) return bar + `<div class="cm-empty" style="padding-top:40px;">This profile could not be loaded.</div><button class="ghost-btn" onclick="cmOpenProfile('${uid}')">Try again</button>`;
 
   const name = cmEsc(pr.name || 'Member');
@@ -13391,7 +13442,10 @@ function cmProfilePageHTML() {
   let postsHTML;
   if(pr.blocked) postsHTML = `<div class="cm-empty" style="padding:24px 0;">You blocked ${name}. Unblock to see their posts.</div>`;
   else if(!cmProf.posts.length) postsHTML = cmProf.loading ? `<div class="cm-empty" style="padding:24px 0;">Loading posts…</div>` : `<div class="cmp-empty"><div class="cmp-empty-ic">${CM_BUBBLE}</div><b>No posts yet</b><span>${pr.is_me ? 'Your posts will show up here.' : `When ${name} posts, you'll see it here.`}</span></div>`;
-  else postsHTML = (cmProf.view === 'list' ? cmProf.posts.map(cmPostHTML).join('') : cmGridHTML(cmProf.posts))
+  else postsHTML = (cmProf.view === 'posts' ? cmGridHTML(cmProf.posts) : cmWorkoutsHTML(cmProf.posts))
+    || (cmProf.view === 'posts'
+      ? `<div class="cmp-empty"><div class="cmp-empty-ic">${CM_BUBBLE}</div><b>No photos or posts yet</b><span>${pr.is_me ? 'Photos and posts you share show up here.' : `When ${name} posts, you'll see it here.`}</span></div>`
+      : `<div class="cmp-empty"><div class="cmp-empty-ic">${CMP_DUMBBELL}</div><b>No workouts shared yet</b><span>${pr.is_me ? 'Finish a workout and tap Share to Community to add it here.' : `When ${name} shares a workout or PR, it shows up here.`}</span></div>`)
     + (cmProf.next ? `<button class="ghost-btn" style="margin:4px 0 16px;" onclick="cmProfileMore()">${cmProf.loading ? 'Loading…' : 'Load more posts'}</button>` : '');
 
   return bar + `<div class="cmp-head">
@@ -13410,8 +13464,8 @@ function cmProfilePageHTML() {
       ${menu}
     </div>
     <div class="cmp-tabs" role="tablist">
-      <button class="${cmProf.view === 'list' ? '' : 'on'}" onclick="cmProfileView('grid')" aria-label="Grid" aria-selected="${cmProf.view !== 'list'}"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></svg></button>
-      <button class="${cmProf.view === 'list' ? 'on' : ''}" onclick="cmProfileView('list')" aria-label="List" aria-selected="${cmProf.view === 'list'}"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="11" rx="2"/><path d="M4 18h16M4 21h10"/></svg></button>
+      <button class="${cmProf.view === 'posts' ? '' : 'on'}" onclick="cmProfileView('workouts')" aria-label="Workouts" aria-selected="${cmProf.view !== 'posts'}">${CMP_DUMBBELL}</button>
+      <button class="${cmProf.view === 'posts' ? 'on' : ''}" onclick="cmProfileView('posts')" aria-label="Photos and posts" aria-selected="${cmProf.view === 'posts'}"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></svg></button>
     </div>
     ${postsHTML}`;
 }
@@ -15286,7 +15340,7 @@ function wnList() {
       title: 'Fresh updates',
       items: [
         { ic: '📸', t: 'A brand-new Community', d: 'Photos now show full size, edge to edge, even tall 9:16 shots. Double-tap a photo to like it, tap it to see it full screen, and find recent members in the row at the top.' },
-        { ic: '🔲', t: 'Profile grid', d: 'Profiles show posts in a photo grid. Tap the list icon to see them as full posts.' },
+        { ic: '🏋️', t: 'New profiles', d: 'Profiles open on Workouts, showing the workouts and PRs someone shared. Tap the grid icon for their photos, and tap any one to see the full post.' },
         { ic: '📤', t: 'Share your meals', d: 'Tap Share on a meal in the Macros tab to make a see-through sticker with its calories and macros. Put it on top of your food photo in your Instagram story.' }
       ]
     },
