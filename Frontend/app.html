@@ -9017,6 +9017,7 @@ function restPushSend(body) {
 }
 function restPushSync() {
   clearTimeout(restPushTimer);
+  if(lnAvailable()) { lnRestSync(); return; }   // iPhone app: alert scheduled on the phone
   const ready = restPushReady();
   if(!ready) return;
   if(!restTimer.endsAt) {
@@ -9509,6 +9510,7 @@ function toggleSleepReminder() {
   save(SLEEP_SETTINGS_KEY, s);
   document.getElementById('sleepReminderTime').style.display = enabled ? 'block' : 'none';
   if(enabled) scheduleSleepReminder(s.reminderTime);
+  else { clearTimeout(window._sleepReminderTimer); if(lnAvailable()) lnBedtimeSync(''); }
   showToast(enabled ? 'Bedtime reminder on!' : 'Reminder off');
 }
 
@@ -9522,6 +9524,7 @@ function saveSleepReminderTime() {
 }
 
 function scheduleSleepReminder(timeStr) {
+  if(lnAvailable()) { lnBedtimeSync(timeStr); return; }   // iPhone app: daily phone alert
   if(!('Notification' in window)) return;
   if(Notification.permission === 'denied') return;
   if(Notification.permission === 'default') {
@@ -9533,6 +9536,7 @@ function scheduleSleepReminder(timeStr) {
 
 function doScheduleReminder(timeStr) {
   if(!timeStr) return;
+  if(lnAvailable()) { lnBedtimeSync(timeStr); return; }   // iPhone app: daily phone alert
   const [h,m] = timeStr.split(':').map(Number);
   const now = new Date();
   const target = new Date(now);
@@ -13347,6 +13351,100 @@ async function cmSendDm() {
 // (sw.js) shows them; tapping one opens the conversation, profile or post it is about.
 const PUSH_ON_KEY = 'trident_push_on_v1';
 window._pushState = 'unknown';
+// ══════════════════════════════════════
+// PHONE ALERTS IN THE IPHONE APP — scheduled on the phone itself (Capacitor Local Notifications),
+// so they work without Apple's push service: the rest timer and the bedtime reminder.
+// Message / follower / comment alerts need Apple's push service (paid developer account) — not yet.
+// ══════════════════════════════════════
+var LN_REST_ID = 4201, LN_BED_ID = 4202, LN_TEST_ID = 4203;
+var lnPerm = null, lnLastBed = null, lnQueue = Promise.resolve();
+// Alerts are updated one at a time, each reading the latest state, so a quick start → skip can't leave one behind.
+function lnQueued(job) { lnQueue = lnQueue.then(job, job).catch(() => {}); return lnQueue; }
+function lnAvailable() {
+  try {
+    const c = window.Capacitor;
+    return !!(c && typeof c.isNativePlatform === 'function' && c.isNativePlatform() &&
+      (typeof c.isPluginAvailable !== 'function' || c.isPluginAvailable('LocalNotifications') || typeof c.nativePromise === 'function'));
+  } catch(e) { return false; }
+}
+function lnCall(method, options) {
+  const cap = window.Capacitor;
+  const plugin = cap && cap.Plugins && cap.Plugins.LocalNotifications;
+  if(plugin && typeof plugin[method] === 'function') return plugin[method](options || {});
+  if(cap && typeof cap.nativePromise === 'function') return cap.nativePromise('LocalNotifications', method, options || {});
+  return Promise.reject(new Error('Phone alerts are not available in this version of the app'));
+}
+// 'granted' | 'denied' | 'prompt'. ask = show iPhone's "Allow notifications?" if not decided yet.
+async function lnPermission(ask) {
+  try {
+    let r = await lnCall('checkPermissions');
+    lnPerm = r && r.display;
+    if(lnPerm !== 'granted' && ask && lnPerm !== 'denied') { r = await lnCall('requestPermissions'); lnPerm = r && r.display; }
+  } catch(e) { lnPerm = lnPerm || 'prompt'; }
+  return lnPerm;
+}
+async function lnSchedule(n) {
+  await lnCall('cancel', { notifications: [{ id: n.id }] }).catch(() => {});
+  return lnCall('schedule', { notifications: [n] });
+}
+// Rest timer: an alert at the moment the rest ends (silent if the app is open — the timer beeps then).
+function lnRestSync() { if(lnAvailable()) lnQueued(lnRestSyncNow); }
+async function lnRestSyncNow() {
+  try {
+    if(!restTimer.endsAt) { await lnCall('cancel', { notifications: [{ id: LN_REST_ID }] }); return; }
+    const endsAt = restTimer.endsAt;
+    if(await lnPermission(true) !== 'granted' || restTimer.endsAt !== endsAt) return;
+    const label = restPushLabel();
+    await lnSchedule({ id: LN_REST_ID, title: 'Rest is over 💪', body: label ? `Time for your next set of ${label}.` : 'Time for your next set.',
+      schedule: { at: new Date(endsAt), allowWhileIdle: true }, foreground: false });
+  } catch(e) { console.warn('Rest alert not scheduled:', e); }
+}
+// Bedtime reminder: every day at the chosen time ('HH:MM'), or cancelled when timeStr is empty.
+function lnBedtimeSync(timeStr) {
+  if(!lnAvailable()) return;
+  const key = timeStr || '';
+  if(key === lnLastBed) return;      // already scheduled (the Sleep card re-arms often)
+  lnLastBed = key;
+  lnQueued(() => lnBedtimeSyncNow(timeStr));
+}
+async function lnBedtimeSyncNow(timeStr) {
+  try {
+    if(!timeStr) { await lnCall('cancel', { notifications: [{ id: LN_BED_ID }] }); return; }
+    if(await lnPermission(true) !== 'granted') { lnLastBed = null; return; }
+    const [h, m] = timeStr.split(':').map(Number);
+    await lnSchedule({ id: LN_BED_ID, title: '🌙 Bedtime Reminder', body: "Time to wind down! Aim for a great night's sleep.",
+      schedule: { on: { hour: h, minute: m }, allowWhileIdle: true }, foreground: true });
+  } catch(e) { lnLastBed = null; console.warn('Bedtime alert not scheduled:', e); }
+}
+// Settings → Notifications row inside the iPhone app.
+async function lnSettingsUI() {
+  const status = document.getElementById('pushStatus'), btn = document.getElementById('pushBtn'), test = document.getElementById('pushTestBtn');
+  const p = await lnPermission(false);
+  window._pushState = 'native';
+  if(!status) return;
+  const soon = ' Alerts for messages, new followers and comments are coming to the iPhone app soon.';
+  status.textContent = p === 'granted' ? 'On: rest timer and bedtime reminder alerts.' + soon
+    : p === 'denied' ? 'Blocked. Turn them on in iPhone Settings → Notifications → Trident Fitness.' + soon
+    : 'Get an alert when your rest is over and at bedtime.' + soon;
+  btn.style.display = p === 'granted' || p === 'denied' ? 'none' : '';
+  btn.textContent = 'Turn on'; btn.classList.remove('off');
+  test.style.display = p === 'granted' ? 'block' : 'none';
+}
+async function lnTurnOn() {
+  const p = await lnPermission(true);
+  if(p === 'granted') {
+    showToast('Phone alerts on');
+    try { const s = getSleepSettings(); if(s.reminderEnabled && s.reminderTime) { lnLastBed = null; lnBedtimeSync(s.reminderTime); } } catch(e) {}
+  } else if(p === 'denied') showToast('Turn them on in iPhone Settings → Notifications → Trident Fitness');
+  lnSettingsUI();
+}
+async function lnSendTest() {
+  try {
+    await lnSchedule({ id: LN_TEST_ID, title: 'Trident Fitness', body: 'Phone alerts are working ✅', schedule: { at: new Date(Date.now() + 5000), allowWhileIdle: true }, foreground: true });
+    showToast('Test alert in 5 seconds — try locking your phone');
+  } catch(e) { showToast("Couldn't send a test alert"); }
+}
+
 function pushSupported() { return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window; }
 function pushIsIOSBrowserTab() { return /iPhone|iPad|iPod/.test(navigator.userAgent) && !window.navigator.standalone; }
 function pushKeyBytes(b64) {
@@ -13368,6 +13466,7 @@ async function pushSendSubscription(sub) {
 }
 // Works out what to show: unsupported, needs-home-screen, blocked, signed-out, on or off.
 async function pushRefreshUI() {
+  if(lnAvailable()) { await lnSettingsUI(); return 'native'; }
   let state;
   if(!pushSupported()) state = pushIsIOSBrowserTab() ? 'homescreen' : 'unsupported';
   else if(!isLoggedIn()) state = 'signedout';
@@ -13427,8 +13526,9 @@ async function pushDisable() {
   showToast('Notifications off');
   pushRefreshUI();
 }
-function pushToggle() { if(window._pushState === 'on') pushDisable(); else pushEnable(); }
+function pushToggle() { if(lnAvailable()) { lnTurnOn(); return; } if(window._pushState === 'on') pushDisable(); else pushEnable(); }
 async function pushSendTest() {
+  if(lnAvailable()) { lnSendTest(); return; }
   const btn = document.getElementById('pushTestBtn'); if(btn) btn.disabled = true;
   const r = await cmApi('/push/test', 'POST', {});
   if(btn) btn.disabled = false;
