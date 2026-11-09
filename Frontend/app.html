@@ -1321,6 +1321,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .ah-more{display:block;width:100%;margin-top:8px;padding:10px;border-radius:12px;border:0.5px solid var(--border2);background:transparent;color:var(--text2);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;}
 .ah-hr-chart{background:var(--bg4);border:0.5px solid var(--border);border-radius:16px;padding:12px 10px 8px;margin-bottom:14px;}
 .ah-hr-chart svg{display:block;width:100%;height:auto;overflow:visible;}
+/* Home: connect Apple Health card */
+.ah-home{position:relative;overflow:hidden;margin-bottom:16px;padding:18px;border-radius:var(--radius-xl);
+  background:radial-gradient(120% 90% at 0% 0%,rgba(255,55,95,0.10) 0%,transparent 50%),radial-gradient(120% 90% at 100% 0%,rgba(50,252,253,0.10) 0%,transparent 55%),var(--bg3);
+  border:0.5px solid var(--pink-border);box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);}
+.ah-home-brand{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.ah-home-brand img{width:46px;height:46px;flex-shrink:0;margin:3px;display:block;}   /* Apple's icon, unaltered, with clear space */
+.ah-home-brand .ah-home-name{font-size:12px;font-weight:600;color:var(--text2);}
+.ah-home-brand b{display:block;font-size:19px;font-weight:700;letter-spacing:-0.02em;color:var(--text);margin-top:1px;}
+.ah-home-x{position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:50%;border:none;background:rgba(255,255,255,0.06);color:var(--text3);font-size:17px;line-height:1;cursor:pointer;font-family:inherit;}
+.ah-home p{font-size:13.5px;line-height:1.5;color:var(--text2);margin:0 0 12px;}
+.ah-home-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:14px;}
+.ah-home-item{display:flex;align-items:center;gap:8px;min-width:0;padding:9px 10px;border-radius:12px;background:var(--bg4);border:0.5px solid var(--border);font-size:12.5px;font-weight:600;}
+.ah-home-item i{font-style:normal;font-size:15px;flex-shrink:0;}
+.ah-home-item span{min-width:0;line-height:1.25;}
+@media(max-width:360px){.ah-home{padding:16px 14px;}.ah-home-item{font-size:11.5px;padding:8px;gap:6px;}.ah-home p{font-size:13px;}}
+.ah-home-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;font-size:11px;color:var(--text3);}
+.ah-home-foot button{border:none;background:none;color:var(--text2);font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;padding:4px 0;}
+.ah-home-foot svg{width:12px;height:12px;vertical-align:-1px;margin-right:4px;}
 .ah-set-help{font-size:11.5px;line-height:1.5;color:var(--text3);padding:2px 4px 0;}
 .ah-set-help b{color:var(--text2);font-weight:600;}
 @media(max-width:360px){.ah-leg-val{font-size:12px;}.ah-act-split{font-size:9.5px;}}
@@ -2167,6 +2185,8 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
   </div>
   <div class="container">
     <div style="height:16px;"></div>
+    <!-- Connect Apple Health (iPhone app only, until connected) -->
+    <div id="ahHomeCard" style="display:none;"></div>
     <!-- Today's workout preview -->
     <div class="section-head" style="margin-top:0;"><div class="section-title">Today's Workout</div></div>
     <div id="dashWorkout"></div>
@@ -14573,6 +14593,36 @@ async function ahOpenWorkout(key) {
   render(hr, series);
 }
 
+// ── Home: "Connect Apple Health" card for people who haven't connected yet ──
+// The Apple Health icon is Apple's official artwork (Apple Design Resources), shown unaltered next to the name,
+// and only inside the iPhone app. It's not a button; the cyan button connects.
+const AH_HOME_HIDE_KEY = 'trident_health_card_hidden_v1';
+const AH_HEALTH_ICON = 'Icons/apple-health.png';   // kept only in the iPhone project (Apple's license: in-app use only)
+function ahHomeCardHide() { try { localStorage.setItem(AH_HOME_HIDE_KEY, '1'); } catch(e) {} ahRenderHomeCard(); }
+function ahRenderHomeCard() {
+  const el = document.getElementById('ahHomeCard');
+  if(!el) return;
+  let hidden = false; try { hidden = localStorage.getItem(AH_HOME_HIDE_KEY) === '1'; } catch(e) {}
+  const st = ahState.status;
+  const show = ahIsNativeIOS() && !hidden && (st === 'connect' || (st === 'ready' && ahState.needsMore));
+  el.style.display = show ? '' : 'none';
+  if(!show) return;
+  const more = st === 'ready';   // already connected; only workouts & heart data are new
+  const items = more
+    ? [['🏋️', 'Watch workouts'], ['❤️', 'Heart rate'], ['📈', 'Resting HR & HRV'], ['🫁', 'VO₂ max']]
+    : [['👟', 'Steps'], ['🔥', 'Calories burned'], ['🌙', 'Sleep & stages'], ['🏋️', 'Workouts'], ['❤️', 'Heart rate & HRV'], ['🫁', 'VO₂ max']];
+  el.innerHTML = `<div class="ah-home">
+    <button class="ah-home-x" onclick="ahHomeCardHide()" aria-label="Hide">×</button>
+    <div class="ah-home-brand"><img src="${AH_HEALTH_ICON}" alt="" onerror="this.style.display='none'">
+      <div><div class="ah-home-name">Apple Health</div><b>${more ? 'Add workouts & heart data' : 'Connect Apple Health'}</b></div></div>
+    <p>${more ? 'Bring in your Apple Watch and Apple Fitness workouts plus heart health from the Apple Health app.'
+              : 'See your Apple Health and Apple Fitness data in Trident: your Steps, Sleep and Macros fill in automatically, and your Apple Watch workouts and heart health show on Progress.'}</p>
+    <div class="ah-home-grid">${items.map(([i, t]) => `<div class="ah-home-item"><i>${i}</i><span>${t}</span></div>`).join('')}</div>
+    <button class="pink-btn" onclick="ahConnect()" ${ahState.connecting ? 'disabled' : ''}>${ahState.connecting ? 'Opening Apple Health…' : more ? 'Allow workouts & heart data' : 'Connect Apple Health'}</button>
+    <div class="ah-home-foot"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>Read-only · stays on this iPhone</span><button onclick="ahHomeCardHide()">Not now</button></div>
+  </div>`;
+}
+
 // Redraws everything that shows Apple Health numbers.
 function ahRender() {
   try { renderStepsCard(); } catch(e) {}
@@ -14584,6 +14634,7 @@ function ahRender() {
   } catch(e) {}
   try { if(ahSheetIsOpen('sleep')) ahOpenSleep(); else if(ahSheetIsOpen('burned')) ahOpenBurnedHistory(true); } catch(e) {}
   try { ahRenderFitness(); if(ahLive() && !ahState.fit.loadedAt) ahLoadFitness(false); } catch(e) {}
+  try { ahRenderHomeCard(); } catch(e) {}
   ahRenderSettings();
 }
 function ahRenderBusy() {
