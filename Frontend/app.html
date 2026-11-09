@@ -913,6 +913,29 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .summary-ex-name{font-size:13px;font-weight:600;}
 .summary-ex-sets{font-size:11px;color:var(--text3);margin-top:2px;}
 .summary-ex-best{font-size:14px;font-weight:700;color:var(--pink);}
+/* Share to socials (Macros) */
+.mx-share-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;margin-top:14px;padding:10px;border-radius:12px;border:0.5px solid var(--pink-border);background:var(--pink-dim);color:var(--pink);font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.mx-share-btn:active{transform:scale(.98);}
+.shr-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:360;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;transition:opacity .3s;}
+.shr-overlay.open{opacity:1;}
+.shr-sheet{position:fixed;left:0;right:0;bottom:0;z-index:361;background:var(--bg3);border-radius:24px 24px 0 0;border-top:0.5px solid var(--pink-border);padding:0 20px calc(22px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .38s cubic-bezier(.32,0,.15,1);max-height:94vh;overflow-y:auto;}
+.shr-sheet.open{transform:translateY(0);}
+.shr-handle{width:36px;height:4px;background:var(--border2);border-radius:99px;margin:12px auto 0;}
+.shr-head{display:flex;align-items:center;justify-content:space-between;padding:12px 0;}
+.shr-title{font-size:20px;font-weight:700;letter-spacing:-.02em;}
+.shr-x{width:32px;height:32px;border-radius:50%;background:var(--bg4);border:0.5px solid var(--border2);color:var(--text2);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.shr-seg{display:flex;gap:4px;padding:4px;background:var(--bg4);border-radius:99px;margin-bottom:14px;}
+.shr-seg button{flex:1;padding:9px 0;border:none;border-radius:99px;background:transparent;color:var(--text2);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:background .2s,color .2s;}
+.shr-seg button.active{background:var(--pink);color:#000;}
+.shr-preview{display:flex;align-items:center;justify-content:center;height:min(50vh,440px);border-radius:18px;margin-bottom:12px;overflow:hidden;background:#0a0a0a;}
+.shr-preview.clear{background-color:#2a2a2c;background-image:linear-gradient(45deg,#1c1c1e 25%,transparent 25%),linear-gradient(-45deg,#1c1c1e 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#1c1c1e 75%),linear-gradient(-45deg,transparent 75%,#1c1c1e 75%);background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0;}
+.shr-preview img{max-width:100%;max-height:100%;display:block;border-radius:12px;}
+.shr-preview.clear img{border-radius:0;max-width:92%;}
+.shr-spin{width:26px;height:26px;border-radius:50%;border:3px solid rgba(255,255,255,.15);border-top-color:var(--pink);animation:shrSpin .8s linear infinite;}
+@keyframes shrSpin{to{transform:rotate(360deg);}}
+.shr-hint{font-size:12.5px;line-height:1.45;color:var(--text3);text-align:center;margin:0 6px 14px;}
+.shr-hint b{color:var(--text2);font-weight:600;}
+#shrSaveBtn:disabled,#shrCopyBtn:disabled{opacity:.5;}
 .summary-pr-badge{font-size:10px;font-weight:700;color:#FFD700;background:rgba(255,215,0,.12);border:0.5px solid rgba(255,215,0,.3);padding:2px 7px;border-radius:99px;margin-left:6px;}
 /* Food search modal */
 .food-search-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:160;flex-direction:column;align-items:center;justify-content:flex-start;padding:20px;overflow-y:auto;}
@@ -2051,6 +2074,95 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
 @keyframes rtIn{from{opacity:0;transform:translateY(24px) scale(.97);}to{opacity:1;transform:none;}}
 
 
+/* ══ Community feed redesign: edge-to-edge posts, full-size photos (up to 9:16) ══ */
+.cm-post{margin:0 -16px 6px;padding:14px 0 14px;background:none;border:none;border-radius:0;box-shadow:none;border-bottom:0.5px solid rgba(255,255,255,0.08);animation:cmIn .35s ease both;}
+@keyframes cmIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+.cm-pad{padding:0 16px;}
+.cm-post .cm-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.cm-post .cm-ring .cm-avatar{width:38px;height:38px;border:2px solid var(--bg);}
+.cm-post .cm-name{font-size:15px;font-weight:700;}
+.cm-post .cm-time{font-size:12px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cm-post .cm-follow{border-radius:10px;padding:7px 14px;font-weight:700;background:var(--pink-dim);border:0.5px solid var(--pink-border);}
+.cm-media{position:relative;width:100%;touch-action:manipulation;max-height:88vh;overflow:hidden;background:#0d0d0f;cursor:pointer;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none;}
+.cm-media:not(.ready){background:linear-gradient(90deg,#111 0%,#1c1c1e 50%,#111 100%);background-size:200% 100%;animation:cmShimmer 1.3s linear infinite;}
+.cm-media img{display:block;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .35s ease;}
+.cm-media.ready img{opacity:1;}
+.cm-media.broken::after{content:'Photo unavailable';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:13px;}
+.cm-post.has-media .cm-head{margin-bottom:10px;}
+.cm-post .cm-actions{display:flex;align-items:center;gap:2px;margin:0 -8px;padding:0;border:none;}
+.cm-post.has-media .cm-actions{margin-top:8px;margin-bottom:4px;}
+.cm-post:not(.has-media) .cm-actions{margin-top:2px;}
+.cm-post .cm-act{gap:6px;padding:8px;color:var(--text);font-size:14px;font-weight:600;border-radius:12px;}
+.cm-post .cm-act svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linejoin:round;stroke-linecap:round;}
+.cm-post .cm-act span:empty{display:none;}
+.cm-post .cm-act.liked{color:#FF375F;}
+.cm-post .cm-act.liked svg{fill:#FF375F;stroke:#FF375F;}
+.cm-post .cm-act.pop svg{animation:cmPop .45s cubic-bezier(.3,1.6,.5,1);}
+@keyframes cmPop{0%{transform:scale(1);}35%{transform:scale(1.35);}100%{transform:scale(1);}}
+.cm-post .cm-body{font-size:15px;line-height:1.5;margin-bottom:10px;white-space:pre-wrap;word-break:break-word;}
+.cm-post .cm-body.big{font-size:19px;line-height:1.4;font-weight:500;letter-spacing:-0.01em;}
+.cm-post .cm-body.cm-caption{font-size:14.5px;margin:2px 0 6px;}
+.cm-post .cm-body.clamp{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;position:relative;}
+.cm-cap-name{background:none;border:none;padding:0;color:var(--text);font:inherit;font-weight:700;cursor:pointer;}
+.cm-more{position:absolute;right:0;bottom:0;background:linear-gradient(90deg,transparent,var(--bg) 30%);border:none;padding:0 0 0 28px;color:var(--text3);font:inherit;cursor:pointer;}
+.cm-viewc{display:block;background:none;border:none;padding:2px 0 0;color:var(--text3);font-family:inherit;font-size:14px;cursor:pointer;}
+.cm-post .cm-comments{border-top:none;margin-top:8px;padding-top:4px;}
+.cm-post .cm-attach{border-radius:20px;margin-bottom:10px;}
+.cm-post .cm-attach-wo{padding:16px;background:radial-gradient(120% 90% at 100% 0%,var(--pink-dim),transparent 60%),linear-gradient(160deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));border:0.5px solid var(--pink-border);}
+.cm-post .cm-attach-wo .cm-attach-title{font-size:20px;font-weight:800;letter-spacing:-0.02em;margin-top:2px;}
+.cm-post .cm-attach-stats div{background:rgba(255,255,255,0.05);border-radius:14px;padding:10px 4px;}
+.cm-post .cm-attach-stats b{font-size:19px;font-weight:800;}
+.cm-post .cm-attach-pr{flex-direction:column;align-items:center;text-align:center;gap:4px;padding:22px 16px 18px;background:radial-gradient(70% 60% at 50% 20%,rgba(255,214,10,0.22),transparent 70%),linear-gradient(160deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));}
+.cm-post .cm-attach-pr .cm-pr-trophy{font-size:48px;}
+.cm-post .cm-attach-pr .cm-attach-title{font-size:18px;font-weight:700;}
+.cm-post .cm-pr-weight{font-size:52px;font-weight:900;letter-spacing:-0.03em;line-height:1.05;background:linear-gradient(180deg,#FFF3B0,#FFD60A 55%,#FF9F0A);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.cm-post .cm-pr-weight span{-webkit-text-fill-color:var(--text3);}
+.cm-burst{position:fixed;z-index:9999;width:96px;height:96px;margin:-48px 0 0 -48px;pointer-events:none;animation:cmBurst .85s ease forwards;filter:drop-shadow(0 6px 24px rgba(255,55,95,0.55));}
+.cm-burst svg{width:100%;height:100%;fill:#FF375F;stroke:#fff;stroke-width:1;}
+@keyframes cmBurst{0%{transform:scale(.2);opacity:0;}20%{transform:scale(1.15);opacity:1;}40%{transform:scale(.95);}70%{transform:scale(1);opacity:1;}100%{transform:scale(1.1) translateY(-30px);opacity:0;}}
+.cm-viewer{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0);display:none;align-items:center;justify-content:center;transition:background .22s;}
+.cm-viewer.open{background:rgba(0,0,0,0.96);}
+.cm-viewer img{max-width:100%;max-height:100%;object-fit:contain;opacity:0;transform:scale(.96);transition:opacity .22s,transform .22s;}
+.cm-viewer.open img{opacity:1;transform:none;}
+.cm-viewer-x{position:absolute;top:calc(env(safe-area-inset-top) + 12px);right:16px;width:38px;height:38px;border-radius:50%;border:0.5px solid rgba(255,255,255,0.2);background:rgba(40,40,40,0.6);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:#fff;font-size:16px;cursor:pointer;}
+/* Recent posters row */
+.cm-stories{display:flex;gap:14px;overflow-x:auto;margin:0 -16px 14px;padding:2px 16px 4px;scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+.cm-stories::-webkit-scrollbar{display:none;}
+.cm-story{flex-shrink:0;width:66px;display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:none;padding:0;color:var(--text2);font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.cm-story:active .cm-story-ring{transform:scale(.94);}
+.cm-story-ring{position:relative;display:block;padding:2.5px;border-radius:50%;background:conic-gradient(from 200deg,var(--pink),#BF5AF2,#FF375F,var(--pink));transition:transform .15s;}
+.cm-story-ring.old{background:rgba(255,255,255,0.18);}
+.cm-story-ring.me{background:rgba(255,255,255,0.14);}
+.cm-story-ring .cm-avatar{width:58px;height:58px;font-size:20px;border:3px solid var(--bg);}
+.cm-story-ring i{position:absolute;right:-1px;bottom:-1px;width:22px;height:22px;border-radius:50%;background:var(--pink);color:#000;border:2.5px solid var(--bg);display:flex;align-items:center;justify-content:center;font-style:normal;font-size:15px;font-weight:800;line-height:1;}
+.cm-story-name{max-width:66px;font-size:11.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+/* Slimmer post box */
+.cm-composer{border-radius:20px;padding:10px 10px 10px 12px;background:linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02)),var(--bg3);margin-bottom:8px;}
+.cm-composer.open{padding:14px;}
+.cm-composer:not(.open) .cm-composer-chips{display:none;}
+.cm-composer-ph{background:none;border:none;padding:10px 4px;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
+.cm-comp-photo{flex-shrink:0;width:40px;height:40px;border-radius:12px;border:0.5px solid var(--border2);background:var(--bg4);color:var(--pink);display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.cm-comp-photo svg{width:20px;height:20px;}
+.cm-composer.open .cm-comp-photo{display:none;}
+#cmAttachPreview .cm-photo{max-height:60vh;object-fit:contain;background:#0d0d0f;}
+/* Profile grid */
+.cmp-tabs{gap:0;}
+.cmp-tabs button{flex:1;display:flex;align-items:center;justify-content:center;padding:0 0 11px;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-0.5px;color:var(--text3);cursor:pointer;}
+.cmp-tabs button.on{color:var(--text);border-bottom-color:var(--pink);}
+.cmp-tabs button svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.cmp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin:-14px -16px 16px;}
+.cmp-cell{position:relative;aspect-ratio:3/4;padding:0;border:none;background:#111;overflow:hidden;cursor:pointer;}
+.cmp-cell img{width:100%;height:100%;object-fit:cover;display:block;}
+.cmp-cell-likes{position:absolute;left:6px;bottom:5px;display:flex;align-items:center;gap:3px;color:#fff;font-size:11px;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,0.7);}
+.cmp-cell-likes svg{width:12px;height:12px;fill:#fff;stroke:none;}
+.cmp-tile{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px;text-align:center;}
+.cmp-tile span{font-size:26px;}
+.cmp-tile b{font-size:22px;font-weight:900;color:#FFD60A;} .cmp-tile b small{font-size:10px;color:var(--text3);margin-left:2px;}
+.cmp-tile em{font-style:normal;font-size:11px;font-weight:600;color:var(--text2);line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.cmp-tile.pr{background:radial-gradient(circle at 50% 30%,rgba(255,214,10,0.2),transparent 70%),#141414;}
+.cmp-tile.wo{background:radial-gradient(circle at 50% 30%,var(--pink-dim),transparent 70%),#141414;}
+.cmp-tile.txt{background:linear-gradient(160deg,#1c1c1e,#121212);}
+.cmp-tile.txt p{margin:0;font-size:11.5px;line-height:1.35;color:var(--text2);display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;}
 </style>
 <script>/* No zooming: block iOS pinch-zoom (double-tap and tap-in-a-box zoom are stopped by the viewport + touch-action) */try{['gesturestart','gesturechange','gestureend'].forEach(function(t){document.addEventListener(t,function(e){e.preventDefault();},{passive:false});});}catch(e){}</script>
 </head>
@@ -2349,6 +2461,7 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
     <div class="mx-sum" id="balanceHero">
       <div id="mxSumTop"></div>
       <div class="mx-bars" id="statsGrid"></div>
+      <button class="mx-share-btn" onclick="shrOpen()" aria-label="Share today's macros to socials"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Share to socials</button>
     </div>
     <!-- Meal tabs -->
     <div class="meal-tabs" role="tablist" aria-label="Meal">
@@ -2704,6 +2817,21 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
   </div>
 </div>
 
+<!-- Share to socials (Macros): story-size picture to save and post -->
+<div class="shr-overlay" id="shrOverlay" onclick="shrClose()"></div>
+<div class="shr-sheet" id="shrSheet" role="dialog" aria-modal="true" aria-label="Share to socials">
+  <div class="shr-handle"></div>
+  <div class="shr-head"><div class="shr-title">Share to socials</div><button class="shr-x" onclick="shrClose()" aria-label="Close">✕</button></div>
+  <div class="shr-seg" role="tablist">
+    <button data-s="card" class="active" onclick="shrSetStyle('card')">Card</button>
+    <button data-s="clear" onclick="shrSetStyle('clear')">See-through</button>
+  </div>
+  <div class="shr-preview" id="shrPreview"><div class="shr-spin"></div></div>
+  <div class="shr-hint" id="shrHint"></div>
+  <button class="pink-btn" id="shrSaveBtn" onclick="shrSave()" disabled>Save to Photos</button>
+  <button class="ghost-btn" id="shrCopyBtn" onclick="shrCopy()" style="margin-top:8px;display:none;" disabled>Copy as sticker</button>
+</div>
+
 <!-- Food Search Modal -->
 <div class="food-search-modal" id="foodSearchModal">
   <div class="food-search-card">
@@ -3005,6 +3133,7 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
       <div class="cm-composer-row" onclick="cmOpenCompose()">
         <button class="cm-me-av" id="cmComposerAv" onclick="event.stopPropagation();cmOpenMyProfile()" aria-label="My profile"></button>
         <div class="cm-composer-ph">What did you crush today?</div>
+        <button class="cm-comp-photo" onclick="event.stopPropagation();cmQuick('photo')" aria-label="Add a photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="15" rx="3"/><circle cx="12" cy="12.5" r="3.5"/><path d="M8 5l1.5-2h5L16 5"/></svg></button>
         <textarea class="cm-composer-text" id="cmText" rows="1" maxlength="1000" placeholder="Share a win, a workout, or a question… Type @ to tag a friend" oninput="cmUpdateCount();cmGrowText();cmMentionInput()" onclick="event.stopPropagation();cmMentionInput()" onblur="setTimeout(cmMentionHide,200)"></textarea>
       </div>
       <div id="cmMention" class="cm-mention-box" style="display:none;"></div>
@@ -3030,6 +3159,7 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
   <div class="cm-sheet" id="cmSheet"></div>
 </div>
 <div class="cm-dm" id="cmDm" style="display:none;" role="dialog" aria-label="Messages"></div>
+<div class="cm-viewer" id="cmViewer" onclick="cmCloseViewer()" role="dialog" aria-label="Photo"><img id="cmViewerImg" alt=""><button class="cm-viewer-x" aria-label="Close">✕</button></div>
 
 <div class="cm-overlay" id="ahSheetOverlay" onclick="if(event.target===this)ahSheetClose()">
   <div class="cm-sheet" id="ahSheet"></div>
@@ -3827,6 +3957,213 @@ function renderMacroStats(){
       <div class="mx-bar-track"><div class="mx-bar-fill" style="width:${pct.toFixed(1)}%;background:${mxColor(k)}"></div></div>
     </div>`;
   }).join('');
+}
+
+// ── Share to socials (Macros): draws a story-size picture (1080×1920) of the selected day's
+// macros. "Card" has the dark brand background; "See-through" has no background (cropped
+// around the stats) so it can sit on top of your own photo. Made on this device only.
+var SHR = { style: 'card', day: 0, blobs: {}, url: '', gen: 0 };
+var SHR_MARK = null;
+var SHR_FONT = "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif";
+function shrFont(w, px, italic) { return (italic ? 'italic ' : '') + w + ' ' + px + 'px ' + SHR_FONT; }
+function shrLoadMark() {
+  if(!SHR_MARK) SHR_MARK = new Promise(res => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = 'Icons/trident-mark.png'; });
+  return SHR_MARK;
+}
+function shrRGBA(color, a) {
+  const h = String(color || '').trim().replace('#', '');
+  const f = h.length === 3 ? h.split('').map(c => c + c).join('') : h;
+  const n = /^[0-9a-f]{6}$/i.test(f) ? parseInt(f, 16) : 0x32FCFD;
+  return 'rgba(' + (n >> 16 & 255) + ',' + (n >> 8 & 255) + ',' + (n & 255) + ',' + a + ')';
+}
+function shrRound(ctx, x, y, w, h, r) {
+  r = Math.min(r, h / 2, w / 2);
+  ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+}
+// Centered text with letter spacing (canvas letterSpacing isn't on every iPhone yet)
+function shrSpaced(ctx, text, x, y, sp) {
+  const ch = Array.from(text), ws = ch.map(c => ctx.measureText(c).width);
+  let cx = x - (ws.reduce((a, b) => a + b, 0) + sp * (ch.length - 1)) / 2;
+  ctx.textAlign = 'left';
+  ch.forEach((c, i) => { ctx.fillText(c, cx, y); cx += ws[i] + sp; });
+  ctx.textAlign = 'center';
+}
+function shrDayText(i) {
+  const d = new Date(macroSlotDate(i) + 'T12:00:00');
+  return d.toLocaleDateString('en-US', { weekday: 'long' }) + ' · ' + d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+}
+async function shrDraw(style, dayIdx) {
+  const W = 1080, H = 1920, clear = style === 'clear';
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  const ctx = cv.getContext('2d');
+  const t = dayTotals(macroData[dayIdx]), goals = mxGoals();
+  let acc = getAccentColor(); if(!/^#[0-9a-f]{3,6}$/i.test(acc)) acc = '#32FCFD';
+  const red = '#FF453A', over = t.cal > goals.cal;
+  const dim = clear ? 'rgba(255,255,255,.92)' : 'rgba(255,255,255,.55)';
+  const shadow = on => { ctx.shadowColor = on && clear ? 'rgba(0,0,0,.7)' : 'transparent'; ctx.shadowBlur = on && clear ? 26 : 0; ctx.shadowOffsetY = on && clear ? 3 : 0; };
+  ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+  if(!clear) {
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+    let g = ctx.createRadialGradient(W * .92, H * .1, 0, W * .92, H * .1, W);
+    g.addColorStop(0, shrRGBA(acc, .30)); g.addColorStop(1, shrRGBA(acc, 0)); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    g = ctx.createRadialGradient(W * .05, H * .95, 0, W * .05, H * .95, W * .95);
+    g.addColorStop(0, shrRGBA(acc, .16)); g.addColorStop(1, shrRGBA(acc, 0)); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  }
+  shadow(true);
+  // Logo + wordmark + date (kept below Instagram's top bar)
+  const mark = await shrLoadMark();
+  if(mark) { const mh = 128, mw = mark.width * mh / mark.height; ctx.drawImage(mark, (W - mw) / 2, 262, mw, mh); }
+  ctx.font = shrFont(900, 62, true);
+  const w1 = ctx.measureText('TRIDENT').width, gap = 62 * .28, w2 = ctx.measureText('FITNESS').width, x0 = (W - (w1 + gap + w2)) / 2;
+  ctx.textAlign = 'left'; ctx.fillStyle = '#fff'; ctx.fillText('TRIDENT', x0, 466);
+  ctx.fillStyle = acc; ctx.fillText('FITNESS', x0 + w1 + gap, 466); ctx.textAlign = 'center';
+  ctx.font = shrFont(700, 30); ctx.fillStyle = dim; shrSpaced(ctx, shrDayText(dayIdx).toUpperCase(), W / 2, 532, 6);
+  // Glass panel (Card only)
+  const px = 80, py = 590, pw = W - 160, ph = 950;
+  shadow(false);
+  if(!clear) {
+    shrRound(ctx, px, py, pw, ph, 64);
+    const pg = ctx.createLinearGradient(0, py, 0, py + ph);
+    pg.addColorStop(0, 'rgba(255,255,255,.09)'); pg.addColorStop(1, 'rgba(255,255,255,.035)');
+    ctx.fillStyle = pg; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(255,255,255,.13)'; ctx.stroke();
+  }
+  // Calorie ring
+  const cx = W / 2, cy = 815, R = 175, pct = goals.cal > 0 ? Math.min(t.cal / goals.cal, 1) : 0;
+  ctx.lineCap = 'round'; ctx.lineWidth = 36;
+  shadow(true);
+  ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.strokeStyle = clear ? 'rgba(255,255,255,.3)' : 'rgba(255,255,255,.09)'; ctx.stroke();
+  if(pct > 0) {
+    if(!clear) { ctx.shadowColor = shrRGBA(over ? red : acc, .55); ctx.shadowBlur = 34; }
+    ctx.beginPath(); ctx.arc(cx, cy, R, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * pct);
+    ctx.strokeStyle = over ? red : acc; ctx.stroke();
+  }
+  shadow(true);
+  ctx.fillStyle = '#fff'; ctx.font = shrFont(800, 104); ctx.fillText(Math.round(t.cal).toLocaleString(), cx, cy + 26);
+  ctx.font = shrFont(600, 32); ctx.fillStyle = dim; ctx.fillText('of ' + goals.cal.toLocaleString() + ' kcal', cx, cy + 82);
+  // Left / burned / net
+  const left = Math.round(goals.cal - t.cal), net = Math.round(t.cal - t.burned);
+  [[over ? 'KCAL OVER' : 'KCAL LEFT', Math.abs(left).toLocaleString(), over ? red : acc],
+   ['KCAL BURNED', Math.round(t.burned).toLocaleString(), '#fff'],
+   ['NET KCAL', (net > 0 ? '+' : net < 0 ? '−' : '') + Math.abs(net).toLocaleString(), '#fff']].forEach((c, i) => {
+    const x = px + pw * (i * 2 + 1) / 6;
+    ctx.font = shrFont(800, 54); ctx.fillStyle = c[2]; ctx.fillText(c[1], x, 1100);
+    ctx.font = shrFont(700, 22); ctx.fillStyle = dim; shrSpaced(ctx, c[0], x, 1140, 3);
+  });
+  if(!clear) { shadow(false); ctx.fillStyle = 'rgba(255,255,255,.08)'; ctx.fillRect(px + 60, 1186, pw - 120, 2); }
+  // Protein / carbs / fat bars
+  const bx = px + 60, bw = pw - 120;
+  [['Protein', 'protein'], ['Carbs', 'carbs'], ['Fat', 'fat']].forEach(([name, k], i) => {
+    const y = 1258 + i * 90, val = Math.round(t[k]), goal = goals[k], p = goal > 0 ? Math.min(val / goal, 1) : 0;
+    shadow(true);
+    ctx.beginPath(); ctx.arc(bx + 9, y - 12, 9, 0, Math.PI * 2); ctx.fillStyle = mxColor(k); ctx.fill();
+    ctx.textAlign = 'left'; ctx.font = shrFont(700, 34); ctx.fillStyle = '#fff'; ctx.fillText(name, bx + 30, y);
+    ctx.textAlign = 'right'; ctx.font = shrFont(600, 32); ctx.fillStyle = dim;
+    const tail = ' / ' + goal + 'g'; ctx.fillText(tail, bx + bw, y);
+    const tw = ctx.measureText(tail).width;
+    ctx.font = shrFont(800, 34); ctx.fillStyle = val > goal ? red : '#fff'; ctx.fillText(String(val), bx + bw - tw, y);
+    ctx.textAlign = 'center';
+    shrRound(ctx, bx, y + 22, bw, 16, 8); ctx.fillStyle = clear ? 'rgba(255,255,255,.3)' : 'rgba(255,255,255,.08)'; ctx.fill();
+    shadow(false);
+    if(p > 0) { shrRound(ctx, bx, y + 22, Math.max(16, bw * p), 16, 8); ctx.fillStyle = mxColor(k); ctx.fill(); }
+  });
+  if(!clear) return cv;
+  // See-through: crop to the stats so it's easy to place as a sticker
+  const top = 236, h = 1300, out = document.createElement('canvas');
+  out.width = W; out.height = h;
+  out.getContext('2d').drawImage(cv, 0, top, W, h, 0, 0, W, h);
+  return out;
+}
+function shrIsNative() { try { return !!(window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform()); } catch(e) { return false; } }
+function shrCanCopy() { return !!(window.ClipboardItem && navigator.clipboard && navigator.clipboard.write); }
+function shrFileName(style) { return 'trident-macros-' + macroSlotDate(SHR.day) + (style === 'clear' ? '-sticker' : '') + '.png'; }
+async function shrRender(style) {
+  if(SHR.blobs[style]) return SHR.blobs[style];
+  const cv = await shrDraw(style, SHR.day);
+  const blob = await new Promise(r => cv.toBlob(r, 'image/png'));
+  if(!blob) throw new Error('no image');
+  SHR.blobs[style] = { blob, file: new File([blob], shrFileName(style), { type: 'image/png' }) };
+  return SHR.blobs[style];
+}
+function shrShow() {
+  const style = SHR.style, item = SHR.blobs[style];
+  document.querySelectorAll('#shrSheet .shr-seg button').forEach(b => b.classList.toggle('active', b.dataset.s === style));
+  const pv = document.getElementById('shrPreview');
+  pv.classList.toggle('clear', style === 'clear');
+  if(SHR.url) { URL.revokeObjectURL(SHR.url); SHR.url = ''; }
+  if(item) { SHR.url = URL.createObjectURL(item.blob); pv.innerHTML = '<img alt="Preview of your share picture" src="' + SHR.url + '">'; }
+  else pv.innerHTML = '<div class="shr-spin"></div>';
+  const save = document.getElementById('shrSaveBtn'), copy = document.getElementById('shrCopyBtn');
+  save.disabled = !item; copy.disabled = !item;
+  const native = shrIsNative();
+  const canShareFiles = !native && item && navigator.canShare && navigator.canShare({ files: [item.file] });
+  save.textContent = native ? 'Save to Photos' : canShareFiles ? 'Save or share image' : 'Download image';
+  copy.style.display = style === 'clear' && shrCanCopy() ? '' : 'none';
+  const how = native ? '' : canShareFiles ? ' Tap <b>Save Image</b> in the menu to put it in Photos.' : '';
+  document.getElementById('shrHint').innerHTML = style === 'clear'
+    ? 'No background, so it sits on top of your own photo or video.' + how + (shrCanCopy() ? ' Or tap <b>Copy as sticker</b>, then paste it on your Instagram story.' : '')
+    : 'A story-size picture of your day.' + how + ' Then post it from your photos to your story.';
+}
+async function shrOpen() {
+  if(typeof saveMealInputs === 'function') { try { saveMealInputs(); } catch(e) {} }
+  const t = dayTotals(macroData[cur]);
+  if(!t.cal) { showToast('Log some food first, then share your day'); return; }
+  SHR.day = cur; SHR.blobs = {}; const gen = ++SHR.gen;
+  const ov = document.getElementById('shrOverlay'), sh = document.getElementById('shrSheet');
+  ov.style.display = 'block';
+  requestAnimationFrame(() => { ov.classList.add('open'); sh.classList.add('open'); });
+  shrShow();
+  try {
+    await shrRender(SHR.style); if(gen !== SHR.gen) return; shrShow();
+    await shrRender(SHR.style === 'card' ? 'clear' : 'card');
+  } catch(e) { if(gen === SHR.gen) { showToast('Couldn\'t make the picture. Please try again.'); shrClose(); } }
+}
+async function shrSetStyle(style) {
+  SHR.style = style; shrShow();
+  if(!SHR.blobs[style]) { const gen = SHR.gen; try { await shrRender(style); } catch(e) {} if(gen === SHR.gen && SHR.style === style) shrShow(); }
+}
+function shrClose() {
+  SHR.gen++;
+  const ov = document.getElementById('shrOverlay'), sh = document.getElementById('shrSheet');
+  ov.classList.remove('open'); sh.classList.remove('open');
+  setTimeout(() => { if(!sh.classList.contains('open')) { ov.style.display = 'none'; if(SHR.url) { URL.revokeObjectURL(SHR.url); SHR.url = ''; } } }, 380);
+}
+function shrB64(blob) {
+  return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(',')[1] || ''); r.onerror = rej; r.readAsDataURL(blob); });
+}
+function shrDownload(item) {
+  const a = document.createElement('a'), u = URL.createObjectURL(item.blob);
+  a.href = u; a.download = item.file.name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(u), 4000);
+}
+async function shrSave() {
+  const item = SHR.blobs[SHR.style]; if(!item) return;
+  if(shrIsNative()) {
+    const btn = document.getElementById('shrSaveBtn'); btn.disabled = true;
+    try {
+      await Capacitor.nativePromise('PhotoSaver', 'savePng', { data: await shrB64(item.blob) });
+      showToast('Saved to Photos ✓');
+    } catch(e) {
+      const code = String((e && (e.code || e.message)) || '');
+      if(/DENIED/i.test(code)) showToast('Allow Photos: iPhone Settings → Trident Fitness → Photos', 4200);
+      else if(/UNIMPLEMENTED|not implemented/i.test(code)) showToast('Update the app to save pictures', 3200);
+      else showToast('Couldn\'t save the picture. Please try again.');
+    } finally { btn.disabled = false; }
+    return;
+  }
+  if(navigator.canShare && navigator.canShare({ files: [item.file] })) {
+    try { await navigator.share({ files: [item.file] }); }
+    catch(e) { if(e && e.name !== 'AbortError') shrDownload(item); }
+    return;
+  }
+  shrDownload(item);
+}
+async function shrCopy() {
+  const item = SHR.blobs.clear; if(!item || !shrCanCopy()) return;
+  try {
+    await navigator.clipboard.write([new ClipboardItem({ 'image/png': item.blob })]);
+    showToast('Copied! Paste it on your Instagram story', 2800);
+  } catch(e) { showToast('Couldn\'t copy. Use Save instead.'); }
 }
 
 function renderWeekBars(containerId='wbars', labelId='wlabels'){
@@ -12635,28 +12972,149 @@ function cmTagChip() {
   cmMentionInput();
 }
 
+// ── Feed photos: shown edge to edge at their real shape (from wide 1.91:1 up to tall 9:16).
+// The shape of each photo is remembered on this device so the feed doesn't jump while loading.
+var cmAspect = (function() { try { return JSON.parse(localStorage.getItem('trident_cm_aspect_v1') || '{}') || {}; } catch(e) { return {}; } })();
+function cmAspectSave() {
+  try {
+    const k = Object.keys(cmAspect);
+    if(k.length > 400) k.slice(0, k.length - 400).forEach(x => delete cmAspect[x]);
+    localStorage.setItem('trident_cm_aspect_v1', JSON.stringify(cmAspect));
+  } catch(e) {}
+}
+function cmClampAspect(r) { return Math.min(1.91, Math.max(9 / 16, r)); }
+function cmMediaLoaded(img, id) {
+  const r = img.naturalWidth / img.naturalHeight;
+  const box = img.parentNode;
+  if(box) box.classList.add('ready');
+  if(!r || !isFinite(r)) return;
+  const a = Math.round(cmClampAspect(r) * 1000) / 1000;
+  if(box) box.style.aspectRatio = String(a);
+  if(cmAspect[id] !== a) { cmAspect[id] = a; cmAspectSave(); }
+}
+function cmMediaHTML(id, name) {
+  const a = cmAspect[id];
+  return `<div class="cm-media${a ? ' ready' : ''}" style="aspect-ratio:${a || 0.8}" onclick="cmMediaTap(event,'${id}')">
+    <img src="${WORKER_URL}/community/photo/${id}" alt="Photo shared by ${name}" loading="lazy" decoding="async" draggable="false" onload="cmMediaLoaded(this,'${id}')" onerror="this.parentNode.classList.add('broken','ready')">
+  </div>`;
+}
+// One tap: full-screen photo. Two quick taps: like, with a heart pop (like Instagram).
+var cmTap = { id: null, t: 0, timer: null };
+function cmMediaTap(ev, id) {
+  const now = Date.now();
+  if(cmTap.id === id && now - cmTap.t < 320) {
+    clearTimeout(cmTap.timer); cmTap.id = null;
+    cmHeartBurst(ev.clientX, ev.clientY);
+    const p = cmFindPost(id);
+    if(p && !p.liked) cmToggleLike(id);
+    return;
+  }
+  cmTap.id = id; cmTap.t = now; clearTimeout(cmTap.timer);
+  cmTap.timer = setTimeout(() => { cmTap.id = null; cmOpenViewer(id); }, 320);
+}
+function cmHeartBurst(x, y) {
+  const b = document.createElement('div');
+  b.className = 'cm-burst'; b.innerHTML = CM_HEART;
+  b.style.left = (x || window.innerWidth / 2) + 'px'; b.style.top = (y || window.innerHeight / 2) + 'px';
+  document.body.appendChild(b);
+  setTimeout(() => b.remove(), 900);
+}
+function cmOpenViewer(id) {
+  const v = document.getElementById('cmViewer'), im = document.getElementById('cmViewerImg');
+  if(!v || !im) return;
+  im.src = `${WORKER_URL}/community/photo/${cmSafeId(id)}`;
+  v.style.display = 'flex';
+  requestAnimationFrame(() => v.classList.add('open'));
+}
+function cmCloseViewer() {
+  const v = document.getElementById('cmViewer');
+  if(!v) return;
+  v.classList.remove('open');
+  setTimeout(() => { if(!v.classList.contains('open')) { v.style.display = 'none'; document.getElementById('cmViewerImg').removeAttribute('src'); } }, 220);
+}
+// Long captions show 3 lines with "more"
+function cmMore(btn) { const c = btn.closest('.cm-body'); if(c) c.classList.remove('clamp'); btn.remove(); }
+
 function cmPostHTML(p) {
   const id = cmSafeId(p && p.id);
   if(!id) return '';
   const name = cmEsc(p.author_name || 'Member');
-  return `<article class="cm-post" id="cm-post-${id}">
-    <div class="cm-head">
-      <button class="cm-who" onclick="cmOpenProfile('${cmSafeId(p.user_id)}')" aria-label="Open ${name}'s profile">
-        <div class="cm-ring">${cmAvatarHTML(p)}</div>
-        <div style="min-width:0;"><div class="cm-name">${name}</div><div class="cm-time">${p.author_username ? `<span class="cm-handle">@${cmEsc(p.author_username)}</span> · ` : ''}${cmEsc(cmTimeAgo(p.created_at))}${p.type === 'workout' ? ' · <span class="cm-kind">shared a workout</span>' : p.type === 'pr' ? ' · <span class="cm-kind">hit a PR</span>' : ''}</div></div>
-      </button>
-      ${p.mine ? `<button class="cm-del" onclick="cmDeletePost('${id}')" aria-label="Delete post">${CM_TRASH}</button>` : (p.following ? '' : `<button class="cm-follow" onclick="cmToggleFollow('${cmSafeId(p.user_id)}')">+ Follow</button>`)}
-    </div>
-    ${p.body ? `<div class="cm-body">${cmBodyHTML(p)}</div>` : ''}
-    ${cmAttachHTML(p.type, p.payload)}
-    ${p.has_photo ? `<img class="cm-photo" src="${WORKER_URL}/community/photo/${id}" alt="Photo shared by ${name}" loading="lazy">` : ''}
-    <div class="cm-actions">
-      <button class="cm-act${p.liked ? ' liked' : ''}" onclick="cmToggleLike('${id}')" aria-label="Like">${CM_HEART}<span>${cmNum(p.like_count)}</span></button>
-      <button class="cm-act" onclick="cmToggleComments('${id}')" aria-label="Comments">${CM_BUBBLE}<span>${cmNum(p.comment_count)}</span></button>
+  const uid = cmSafeId(p.user_id);
+  const handle = p.author_username ? cmEsc(p.author_username) : '';
+  const kind = p.type === 'workout' ? 'shared a workout' : p.type === 'pr' ? 'hit a PR' : '';
+  const photo = !!p.has_photo;
+  const attach = cmAttachHTML(p.type, p.payload);
+  const bodyText = String(p.body || '');
+  const long = bodyText.length > 160 || (bodyText.match(/\n/g) || []).length > 2;
+  const big = !photo && !attach && bodyText.length > 0 && bodyText.length <= 140;
+  const body = bodyText
+    ? `<div class="cm-body${photo ? ' cm-caption' : ''}${big ? ' big' : ''}${long ? ' clamp' : ''}">${photo ? `<button class="cm-cap-name" onclick="cmOpenProfile('${uid}')">${handle || name}</button> ` : ''}${cmBodyHTML(p)}${long ? `<button class="cm-more" onclick="cmMore(this)">more</button>` : ''}</div>`
+    : '';
+  const nC = cmNum(p.comment_count);
+  const viewC = (!cmState.open[id] && nC) ? `<button class="cm-viewc" onclick="cmToggleComments('${id}')">${nC === 1 ? 'View 1 comment' : `View all ${nC} comments`}</button>` : '';
+  const pop = p._pop ? ' pop' : '';
+  if(p._pop) setTimeout(() => { p._pop = false; }, 0);
+  const actions = `<div class="cm-actions">
+      <button class="cm-act${p.liked ? ' liked' : ''}${pop}" onclick="cmToggleLike('${id}')" aria-label="${p.liked ? 'Unlike' : 'Like'}" aria-pressed="${!!p.liked}">${CM_HEART}<span>${cmNum(p.like_count) || ''}</span></button>
+      <button class="cm-act" onclick="cmToggleComments('${id}')" aria-label="Comments">${CM_BUBBLE}<span>${nC || ''}</span></button>
       ${p.tagged_me ? `<button class="cm-untag" onclick="cmRemoveMyTag('${id}')">Remove tag</button>` : ''}
+    </div>`;
+  return `<article class="cm-post${photo ? ' has-media' : ''}" id="cm-post-${id}">
+    <div class="cm-pad cm-head">
+      <button class="cm-who" onclick="cmOpenProfile('${uid}')" aria-label="Open ${name}'s profile">
+        <div class="cm-ring">${cmAvatarHTML(p)}</div>
+        <div style="min-width:0;"><div class="cm-name">${name}</div><div class="cm-time">${handle ? `<span class="cm-handle">@${handle}</span> · ` : ''}${cmEsc(cmTimeAgo(p.created_at))}${kind ? ` · <span class="cm-kind">${kind}</span>` : ''}</div></div>
+      </button>
+      ${p.mine ? `<button class="cm-del" onclick="cmDeletePost('${id}')" aria-label="Delete post">${CM_TRASH}</button>` : (p.following ? '' : `<button class="cm-follow" onclick="cmToggleFollow('${uid}')">Follow</button>`)}
     </div>
-    ${cmState.open[id] ? cmCommentsHTML(id) : ''}
+    ${photo
+      ? `${cmMediaHTML(id, name)}<div class="cm-pad">${actions}${body}${attach}${viewC}</div>`
+      : `<div class="cm-pad">${body}${attach}${actions}${viewC}</div>`}
+    ${cmState.open[id] ? `<div class="cm-pad">${cmCommentsHTML(id)}</div>` : ''}
   </article>`;
+}
+
+// Row of recent posters at the top of the feed (tap to open their profile). "You" starts a post.
+function cmStoriesHTML() {
+  if(cmState.status !== 'ready' || !cmState.posts.length) return '';
+  const seen = new Set(), people = [];
+  cmState.posts.forEach(p => {
+    const uid = cmSafeId(p && p.user_id);
+    if(!uid || p.mine || seen.has(uid)) return;
+    seen.add(uid);
+    people.push(p);
+  });
+  if(!people.length) return '';
+  const fresh = p => { const t = Date.parse(p.created_at); return isFinite(t) && Date.now() - t < 86400000; };
+  const first = n => cmEsc(String(n || 'Member').trim().split(/\s+/)[0]);
+  return `<div class="cm-stories" role="list">
+    <button class="cm-story" role="listitem" onclick="cmOpenCompose()" aria-label="New post">
+      <span class="cm-story-ring me">${cmMyAvatarHTML()}<i>+</i></span><span class="cm-story-name">You</span>
+    </button>
+    ${people.slice(0, 16).map(p => `<button class="cm-story" role="listitem" onclick="cmOpenProfile('${cmSafeId(p.user_id)}')" aria-label="${cmEsc(p.author_name || 'Member')}">
+      <span class="cm-story-ring${fresh(p) ? '' : ' old'}">${cmAvatarHTML(p)}</span><span class="cm-story-name">${first(p.author_name)}</span>
+    </button>`).join('')}
+  </div>`;
+}
+
+// Profile: 3-across grid of posts (photos fill the tile), or the full list.
+function cmGridHTML(posts) {
+  return `<div class="cmp-grid">${posts.map(p => {
+    const id = cmSafeId(p && p.id);
+    if(!id) return '';
+    let inner;
+    if(p.has_photo) inner = `<img src="${WORKER_URL}/community/photo/${id}" alt="" loading="lazy" decoding="async" onerror="this.remove()">`;
+    else if(p.type === 'pr' && p.payload) inner = `<div class="cmp-tile pr"><span>🏆</span><b>${cmNum(p.payload.weight)}<small>lbs</small></b><em>${cmEsc(p.payload.exercise || 'PR')}</em></div>`;
+    else if(p.type === 'workout' && p.payload) inner = `<div class="cmp-tile wo"><span>🏋️</span><em>${cmEsc(p.payload.day || 'Workout')}</em></div>`;
+    else inner = `<div class="cmp-tile txt"><p>${cmEsc(String(p.body || '').slice(0, 90))}</p></div>`;
+    return `<button class="cmp-cell" onclick="cmGridOpen('${id}')" aria-label="Open post">${inner}${p.like_count ? `<span class="cmp-cell-likes">${CM_HEART}${cmNum(p.like_count)}</span>` : ''}</button>`;
+  }).join('')}</div>`;
+}
+function cmProfileView(v) { cmProf.view = v; cmDraw(); }
+function cmGridOpen(id) {
+  cmProf.view = 'list'; cmDraw();
+  const el = document.getElementById('cm-post-' + id);
+  if(el) { const y = el.getBoundingClientRect().top + window.scrollY - 70; window.scrollTo(0, Math.max(0, y)); }
 }
 
 function cmDraw() {
@@ -12672,6 +13130,7 @@ function cmDraw() {
       <div class="cm-scope${following ? ' following' : ''}"><span class="cm-scope-pill"></span><button class="cm-scope-btn${following ? '' : ' active'}" onclick="cmSetScope('all')">Main Feed</button><button class="cm-scope-btn${following ? ' active' : ''}" onclick="cmSetScope('following')">Following</button></div>
       <button class="cm-me-btn" onclick="cmOpenMyProfile()" aria-label="My profile"><span class="cm-ring">${cmMyAvatarHTML()}</span></button>
     </div>
+    ${cmStoriesHTML()}
     ${unGet() || !window._unKnown ? '' : `<div class="cm-un-card">
       <div class="cm-un-ic">@</div>
       <div style="flex:1;min-width:0;"><b>Choose a username</b><span>So friends can find and follow you</span></div>
@@ -12794,7 +13253,7 @@ async function cmOpenProfile(uid, opts) {
   cmState.view = 'profile';
   cmProfileOpen = uid;
   cmProf.menu = false;
-  if(!same) { cmProf.uid = uid; cmProf.data = null; cmProf.posts = []; cmProf.next = null; }
+  if(!same) { cmProf.uid = uid; cmProf.data = null; cmProf.posts = []; cmProf.next = null; cmProf.view = 'grid'; }
   cmProf.loading = true;
   cmDraw();
   if(!same) window.scrollTo(0, 0);
@@ -12929,7 +13388,7 @@ function cmProfilePageHTML() {
   let postsHTML;
   if(pr.blocked) postsHTML = `<div class="cm-empty" style="padding:24px 0;">You blocked ${name}. Unblock to see their posts.</div>`;
   else if(!cmProf.posts.length) postsHTML = cmProf.loading ? `<div class="cm-empty" style="padding:24px 0;">Loading posts…</div>` : `<div class="cmp-empty"><div class="cmp-empty-ic">${CM_BUBBLE}</div><b>No posts yet</b><span>${pr.is_me ? 'Your posts will show up here.' : `When ${name} posts, you'll see it here.`}</span></div>`;
-  else postsHTML = cmProf.posts.map(cmPostHTML).join('')
+  else postsHTML = (cmProf.view === 'list' ? cmProf.posts.map(cmPostHTML).join('') : cmGridHTML(cmProf.posts))
     + (cmProf.next ? `<button class="ghost-btn" style="margin:4px 0 16px;" onclick="cmProfileMore()">${cmProf.loading ? 'Loading…' : 'Load more posts'}</button>` : '');
 
   return bar + `<div class="cmp-head">
@@ -12947,7 +13406,10 @@ function cmProfilePageHTML() {
       <div class="cmp-btns">${buttons}</div>
       ${menu}
     </div>
-    <div class="cmp-tabs"><span>${CM_BUBBLE}Posts</span></div>
+    <div class="cmp-tabs" role="tablist">
+      <button class="${cmProf.view === 'list' ? '' : 'on'}" onclick="cmProfileView('grid')" aria-label="Grid" aria-selected="${cmProf.view !== 'list'}"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></svg></button>
+      <button class="${cmProf.view === 'list' ? 'on' : ''}" onclick="cmProfileView('list')" aria-label="List" aria-selected="${cmProf.view === 'list'}"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="11" rx="2"/><path d="M4 18h16M4 21h10"/></svg></button>
+    </div>
     ${postsHTML}`;
 }
 
@@ -13610,6 +14072,7 @@ async function cmToggleLike(id) {
   const was = !!p.liked, wasCount = cmNum(p.like_count);
   p.liked = !was;
   p.like_count = Math.max(0, wasCount + (was ? -1 : 1));
+  if(p.liked) p._pop = true;
   cmRedrawPost(id);
   const r = await cmApi('/community/like', 'POST', { post_id: id });
   p._liking = false;
@@ -13843,7 +14306,7 @@ function cmCompressImage(file) {
     img.onload = () => {
       try {
         let out = '';
-        for(const [maxSide, quality] of [[1280, 0.78], [1080, 0.7], [900, 0.62], [720, 0.55]]) {
+        for(const [maxSide, quality] of [[1600, 0.8], [1280, 0.78], [1080, 0.7], [900, 0.62], [720, 0.55]]) {
           const scale = Math.min(1, maxSide / Math.max(img.naturalWidth, img.naturalHeight, 1));
           const canvas = document.createElement('canvas');
           canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
@@ -14813,6 +15276,17 @@ document.addEventListener('visibilitychange', () => {
 // ══════════════════════════════════════
 function wnList() {
   return [
+    {
+      id: '2026-11-08b',
+      version: '1.3',
+      date: 'November 8, 2026',
+      title: 'Fresh updates',
+      items: [
+        { ic: '📸', t: 'A brand-new Community', d: 'Photos now show full size, edge to edge, even tall 9:16 shots. Double-tap a photo to like it, tap it to see it full screen, and find recent members in the row at the top.' },
+        { ic: '🔲', t: 'Profile grid', d: 'Profiles show posts in a photo grid. Tap the list icon to see them as full posts.' },
+        { ic: '📤', t: 'Share your macros', d: 'Tap Share to socials on the Macros tab to make a story-size picture of your day, with a see-through version to put on your own photo. Save it and post it to your story.' }
+      ]
+    },
     {
       id: '2026-11-08',
       version: '1.2',
