@@ -245,3 +245,22 @@ CREATE TABLE IF NOT EXISTS community_bios (
   bio TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );
+
+-- Completed workouts shown on a member's profile (only when they turn it on in the app).
+-- wkey is the app's own id for the workout, e.g. 'hy:2026-11-05_fb'. No Apple Health data.
+CREATE TABLE IF NOT EXISTS community_workouts (
+  user_id TEXT NOT NULL,
+  wkey TEXT NOT NULL,
+  done_on TEXT NOT NULL DEFAULT '',
+  payload_json TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  PRIMARY KEY (user_id, wkey)
+);
+CREATE INDEX IF NOT EXISTS idx_community_workouts_user ON community_workouts(user_id, done_on);
+
+-- Per-member Community choices (for now: show all completed workouts on my profile)
+CREATE TABLE IF NOT EXISTS community_prefs (
+  user_id TEXT PRIMARY KEY,
+  show_workouts INTEGER NOT NULL,
+  updated_at TEXT NOT NULL
+);

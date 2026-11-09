@@ -148,6 +148,10 @@ export default {
     if (path === '/community/follow'          && request.method === 'POST') return community(communityToggleFollow, request, env.DB, env, ctx);
     if (path === '/community/block'           && request.method === 'POST') return community(communityToggleBlock, request, env.DB);
     if (path === '/community/bio'             && request.method === 'POST') return community(communitySetBio, request, env.DB);
+    if (path === '/community/workouts'        && request.method === 'GET')  return community(communityWorkouts, request, env.DB);
+    if (path === '/community/workouts'        && request.method === 'POST') return community(communitySaveWorkouts, request, env.DB);
+    if (path === '/community/workouts/prefs'  && request.method === 'GET')  return community(communityWorkoutPrefs, request, env.DB);
+    if (path === '/community/workouts/prefs'  && request.method === 'POST') return community(communitySetWorkoutPrefs, request, env.DB);
     if (path === '/community/search'          && request.method === 'GET')  return community(communitySearch, request, env.DB);
 
     // ── Usernames (@handle used to find friends) ──
@@ -1524,6 +1528,105 @@ async function bioOf(DB, userId) {
   } catch (e) {
     return '';
   }
+}
+
+// ── Completed workouts on profiles ──
+// Each member chooses whether every workout they finish shows on their profile (not just the ones
+// they post). Off: nothing is stored here, and turning it off deletes what was stored.
+// Apple Health data is never sent here: these are workouts logged in the app.
+const WORKOUTS_SHOWN_BY_DEFAULT = false;
+const WORKOUT_KEY_RE = /^[A-Za-z0-9_:.-]{1,100}$/;
+const WORKOUT_MAX_PER_USER = 1000;
+const WORKOUTS_PAGE = 100;
+
+async function workoutsShown(DB, userId) {
+  const row = await DB.prepare('SELECT show_workouts FROM community_prefs WHERE user_id = ?').bind(userId).first();
+  return row ? !!row.show_workouts : WORKOUTS_SHOWN_BY_DEFAULT;
+}
+
+async function communityWorkoutPrefs(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+  const shown = await workoutsShown(DB, session.user_id);
+  const n = await DB.prepare('SELECT COUNT(*) AS n FROM community_workouts WHERE user_id = ?').bind(session.user_id).first();
+  return json({ show_workouts: shown, stored: (n && n.n) || 0 });
+}
+
+async function communitySetWorkoutPrefs(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+  let data;
+  try { data = await request.json(); } catch (e) { return error('Invalid request'); }
+  if (!data || typeof data.show_workouts !== 'boolean') return error('Invalid request');
+  const now = new Date().toISOString();
+  const stmts = [DB.prepare(
+    `INSERT INTO community_prefs (user_id, show_workouts, updated_at) VALUES (?, ?, ?)
+     ON CONFLICT(user_id) DO UPDATE SET show_workouts = excluded.show_workouts, updated_at = excluded.updated_at`
+  ).bind(session.user_id, data.show_workouts ? 1 : 0, now)];
+  if (!data.show_workouts) stmts.push(DB.prepare('DELETE FROM community_workouts WHERE user_id = ?').bind(session.user_id));
+  await DB.batch(stmts);
+  return json({ success: true, show_workouts: data.show_workouts });
+}
+
+// Adds/updates and removes your stored workouts (the app sends only what changed).
+async function communitySaveWorkouts(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+  let data;
+  try { data = await request.json(); } catch (e) { return error('Invalid request'); }
+  if (!data || typeof data !== 'object') return error('Invalid request');
+  const upsert = Array.isArray(data.upsert) ? data.upsert : [];
+  const remove = Array.isArray(data.remove) ? data.remove : [];
+  if (upsert.length > 50 || remove.length > 100) return error('Too many at once', 413);
+  if (!(await workoutsShown(DB, session.user_id))) return error('Showing your workouts is turned off', 403);
+
+  const now = new Date().toISOString();
+  const stmts = [];
+  for (const k of remove) {
+    if (typeof k !== 'string' || !WORKOUT_KEY_RE.test(k)) return error('Invalid request');
+    stmts.push(DB.prepare('DELETE FROM community_workouts WHERE user_id = ? AND wkey = ?').bind(session.user_id, k));
+  }
+  for (const w of upsert) {
+    if (!w || typeof w !== 'object' || typeof w.key !== 'string' || !WORKOUT_KEY_RE.test(w.key)) return error('Invalid request');
+    const date = typeof w.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(w.date) ? w.date : '';
+    if (!w.payload || typeof w.payload !== 'object' || Array.isArray(w.payload)) return error('Invalid request');
+    const payloadJson = JSON.stringify(w.payload);
+    if (payloadJson.length > COMMUNITY_MAX_PAYLOAD) return error('That workout is too large', 413);
+    stmts.push(DB.prepare(
+      `INSERT INTO community_workouts (user_id, wkey, done_on, payload_json, updated_at) VALUES (?, ?, ?, ?, ?)
+       ON CONFLICT(user_id, wkey) DO UPDATE SET done_on = excluded.done_on, payload_json = excluded.payload_json, updated_at = excluded.updated_at`
+    ).bind(session.user_id, w.key, date, payloadJson, now));
+  }
+  if (stmts.length) await DB.batch(stmts);
+  // Keep at most WORKOUT_MAX_PER_USER (the oldest go first)
+  await DB.prepare(
+    `DELETE FROM community_workouts WHERE user_id = ?1 AND wkey IN (
+       SELECT wkey FROM community_workouts WHERE user_id = ?1 ORDER BY done_on DESC, updated_at DESC LIMIT -1 OFFSET ?2)`
+  ).bind(session.user_id, WORKOUT_MAX_PER_USER).run();
+  return json({ success: true });
+}
+
+// A member's completed workouts, newest first: yours always; someone else's only when they show
+// them and neither of you has blocked the other.
+async function communityWorkouts(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+  const userId = new URL(request.url).searchParams.get('user_id') || '';
+  if (!COMMUNITY_ID.test(userId)) return error('Invalid request');
+  const me = session.user_id;
+  if (userId !== me) {
+    const blocked = await DB.prepare('SELECT 1 AS x FROM dm_blocks WHERE (blocker_id = ?1 AND blocked_id = ?2) OR (blocker_id = ?2 AND blocked_id = ?1)').bind(me, userId).first();
+    if (blocked || !(await workoutsShown(DB, userId))) return json({ shown: false, workouts: [] });
+  }
+  const rows = await DB.prepare(
+    `SELECT wkey, done_on, payload_json FROM community_workouts WHERE user_id = ?
+     ORDER BY CASE WHEN done_on = '' THEN 1 ELSE 0 END, done_on DESC, updated_at DESC LIMIT ?`
+  ).bind(userId, WORKOUTS_PAGE).all();
+  const workouts = [];
+  for (const r of rows.results || []) {
+    try { workouts.push({ key: r.wkey, date: r.done_on, payload: JSON.parse(r.payload_json) }); } catch (e) {}
+  }
+  return json({ shown: userId === me ? await workoutsShown(DB, me) : true, workouts });
 }
 
 async function communitySetBio(request, DB) {

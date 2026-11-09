@@ -2289,6 +2289,14 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
 .cm-ov-btns{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
 .cm-wo-more{display:block;background:none;border:none;padding:2px 0 8px;font-family:inherit;font-size:13px;font-weight:600;color:var(--pink);cursor:pointer;}
 .cmp-wlocal{cursor:default;}
+.cmp-woshow{display:flex;align-items:center;gap:12px;margin:0 0 14px;padding:12px 14px;border-radius:16px;background:var(--pink-dim);border:0.5px solid var(--pink-border);}
+.cmp-woshow div{flex:1;min-width:0;}
+.cmp-woshow b{display:block;font-size:14px;font-weight:700;}
+.cmp-woshow span{display:block;font-size:12px;color:var(--text3);margin-top:2px;}
+.cmp-woshow button{flex-shrink:0;padding:8px 14px;border-radius:99px;border:none;background:var(--pink);color:#000;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;}
+.cmp-woshow.on{background:none;border:none;padding:0 4px;}
+.cmp-woshow.on span{flex:1;margin:0;font-size:12.5px;}
+.cmp-woshow.on button{background:none;color:var(--text3);padding:4px 0;font-weight:600;text-decoration:underline;}
 .cmp-wlocal:active{transform:none;}
 .cmp-wshare{margin-left:auto;padding:7px 13px;border-radius:99px;border:0.5px solid var(--pink-border);background:var(--pink-dim);color:var(--pink);font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .cmp-wfoot svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linejoin:round;}
@@ -3394,6 +3402,14 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
       <div class="settings-row-right"><button class="push-btn" id="pushBtn" style="display:none;" onclick="pushToggle()">Turn on</button></div>
     </div>
     <button class="ghost-btn" id="pushTestBtn" style="display:none;margin-top:4px;" onclick="pushSendTest()">Send a test notification</button>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-section-label">Community</div>
+    <div class="settings-row">
+      <div style="min-width:0;padding-right:10px;"><div class="settings-row-label">Show all my workouts</div><div class="settings-row-sub" id="cmWoSub">Off: only the workouts you post show on your profile</div></div>
+      <label class="toggle-wrap" style="flex-shrink:0;"><input type="checkbox" id="cmWoToggle" onchange="cmWoSetShow(this.checked)"><span class="toggle-slider"></span></label>
+    </div>
   </div>
 
   <div class="settings-section" id="ahSettings" style="display:none;">
@@ -7207,6 +7223,7 @@ function finishWorkout() {
   save(WORKOUT_KEY, workoutState);
   save(PR_KEY, prData);
   gymDayAddToday();
+  setTimeout(() => { try { cmWoSync(true); } catch(e) {} }, 1500);
   // Cloud sync
   cloudPost('/workout', { program: workoutState.program, state: workoutCloudState() });
   cloudPost('/prs', prData);
@@ -9825,6 +9842,7 @@ function openSettings() {
   try { unSettingsFill(); } catch(e) {}
   pushRefreshUI();
   try { ahRenderSettings(); } catch(e) {}
+  try { cmWoSettingsOpen(); } catch(e) {}
   renderSettingsProgPicker();
   const overlay = document.getElementById('settingsOverlay');
   const sheet = document.getElementById('settingsSheet');
@@ -12905,6 +12923,7 @@ function hyFinish() {
   hySave(true);
   hyRender();
   hySummary(sess.id, { prs, moved });
+  setTimeout(() => { try { cmWoSync(true); } catch(e) {} }, 1500);
   if(prs.length) showPRPopup(prs, 0, () => {});
 }
 // What a LANTIK session shares to Community: lifting sets, plus the other work done (drills, sprints,
@@ -13644,6 +13663,83 @@ function cmLocalIsShared(lw, posts) {
     return diff > -1 && diff < 3;
   });
 }
+// ── All completed workouts on your profile (your choice; off unless you turn it on) ──
+// When on, workouts finished in the app are copied to your account so others see them on your
+// profile. Only what changed is sent. Apple Health workouts are never included.
+var cmWo = { show: null, at: 0, syncing: false, lastSync: 0 };
+const WO_SYNC_KEY = 'trident_wo_synced_v1';   // { uid, items: { key: fingerprint } } — what the account already has
+async function cmWoPrefs(force) {
+  if(!isLoggedIn()) return null;
+  if(!force && cmWo.show !== null && Date.now() - cmWo.at < 30 * 60000) return cmWo.show;
+  const r = await cmApi('/community/workouts/prefs');
+  if(r.ok && r.data && typeof r.data.show_workouts === 'boolean') { cmWo.show = r.data.show_workouts; cmWo.at = Date.now(); }
+  return cmWo.show;
+}
+function cmWoHash(str) { let h = 5381; for(let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0; return (h >>> 0) + ':' + str.length; }
+async function cmWoMeId() {
+  if(window._cmMeId) return window._cmMeId;
+  const r = await cmApi('/auth/me');
+  const id = r.ok && r.data && r.data.user ? cmSafeId(r.data.user.id) : '';
+  if(id) window._cmMeId = id;
+  return id;
+}
+async function cmWoSync(force) {
+  if(!isLoggedIn() || cmWo.syncing) return;
+  if(!force && Date.now() - cmWo.lastSync < 10 * 60000) return;
+  cmWo.syncing = true;
+  try {
+    if((await cmWoPrefs(force)) !== true) return;
+    const uid = await cmWoMeId(); if(!uid) return;
+    let map = load(WO_SYNC_KEY);
+    if(!map || map.uid !== uid || !map.items || typeof map.items !== 'object') map = { uid, items: {} };
+    const local = cmLocalWorkouts();
+    const want = {};
+    local.forEach(lw => {
+      const key = String(lw.key).replace(/[^A-Za-z0-9_:.-]/g, '_').slice(0, 100);
+      const body = JSON.stringify(lw.payload);
+      if(body.length > 5800) return;                      // too big for the account (very rare)
+      want[key] = { key, date: /^\d{4}-\d{2}-\d{2}$/.test(lw.date) ? lw.date : '', payload: lw.payload, h: cmWoHash(lw.date + body) };
+    });
+    const upsert = Object.values(want).filter(w => map.items[w.key] !== w.h);
+    let remove = Object.keys(map.items).filter(k => !want[k]);
+    // Safety: never wipe the account because this phone's workouts haven't loaded
+    if(!local.length || remove.length > Math.max(3, Object.keys(map.items).length / 2)) remove = [];
+    remove = remove.slice(0, 100);
+    let i = 0;
+    do {
+      const chunk = upsert.slice(i, i + 25);
+      const rm = i === 0 ? remove : [];
+      if(!chunk.length && !rm.length) break;
+      const r = await cmApi('/community/workouts', 'POST', { upsert: chunk.map(w => ({ key: w.key, date: w.date, payload: w.payload })), remove: rm });
+      if(!r.ok) { if(r.status === 403) cmWo.show = false; return; }
+      chunk.forEach(w => { map.items[w.key] = w.h; });
+      rm.forEach(k => { delete map.items[k]; });
+      save(WO_SYNC_KEY, map);
+      i += 25;
+    } while(i < upsert.length);
+    cmWo.lastSync = Date.now();
+  } catch(e) { console.warn('Workouts not synced:', e); }
+  finally { cmWo.syncing = false; }
+}
+async function cmWoSetShow(on) {
+  if(!isLoggedIn()) { showToast('Sign in first'); return; }
+  const r = await cmApi('/community/workouts/prefs', 'POST', { show_workouts: !!on });
+  if(!r.ok) { if(r.status !== 401) showToast("Couldn't change that. Try again."); cmWoRenderToggle(); return; }
+  cmWo.show = !!on; cmWo.at = Date.now();
+  try { localStorage.removeItem(WO_SYNC_KEY); } catch(e) {}
+  showToast(on ? 'Your workouts now show on your profile' : 'Hidden. Only the workouts you post show now');
+  cmWoRenderToggle();
+  if(cmState.view === 'profile') cmDraw();
+  if(on) cmWoSync(true);
+}
+function cmWoRenderToggle() {
+  const t = document.getElementById('cmWoToggle'), sub = document.getElementById('cmWoSub');
+  if(!t) return;
+  t.checked = cmWo.show === true;
+  t.disabled = !isLoggedIn();
+  if(sub) sub.textContent = !isLoggedIn() ? 'Sign in to use this' : (cmWo.show ? 'Everyone in Community can see every workout you finish' : 'Off: only the workouts you post show on your profile');
+}
+async function cmWoSettingsOpen() { cmWoRenderToggle(); await cmWoPrefs(true); cmWoRenderToggle(); }
 function cmShareLocalWorkout(i) {
   const lw = (window._cmLocalWo || [])[i];
   if(!lw) return;
@@ -13653,21 +13749,29 @@ function cmShareLocalWorkout(i) {
 // On your own profile it also lists the workouts you finished but didn't share; only you see those.
 function cmWorkoutsHTML(posts, mine) {
   const shared = posts.filter(cmIsWorkoutPost);
-  const local = mine ? cmLocalWorkouts().filter(lw => !cmLocalIsShared(lw, shared)) : [];
-  window._cmLocalWo = local;
+  const local = (mine ? cmLocalWorkouts() : (cmProf.workouts || [])).filter(lw => lw && lw.payload && !cmLocalIsShared(lw, shared));
+  window._cmLocalWo = mine ? local : [];
   if(!shared.length && !local.length) return '';
+  const prompt = !mine || cmWo.show === null ? ''
+    : cmWo.show ? `<div class="cmp-woshow on"><span>All your workouts show on your profile.</span><button onclick="cmWoSetShow(false)">Hide</button></div>`
+    : `<div class="cmp-woshow"><div><b>Show all your workouts?</b><span>Right now only you can see the workouts you haven't posted.</span></div><button onclick="cmWoSetShow(true)">Show them</button></div>`;
   const when = x => x.post ? new Date(x.post.created_at).getTime() || 0 : (x.lw.date ? new Date(x.lw.date + 'T12:00:00').getTime() : -1e15 + (x.lw.sort || 0));
   const items = shared.map(p => ({ post: p })).concat(local.map((lw, i) => ({ lw, i }))).sort((a, b) => when(b) - when(a));
-  const nW = shared.filter(p => p.type === 'workout').length + local.length, nP = shared.length - shared.filter(p => p.type === 'workout').length;
+  // PRs: PR posts plus the PRs set inside the listed workouts
+  const nW = shared.filter(p => p.type === 'workout').length + local.length;
+  const nP = shared.filter(p => p.type === 'pr').length
+    + shared.filter(p => p.type === 'workout').concat(local).reduce((t, x) => t + cmCleanPRs(x.payload && x.payload.prs).length, 0);
   const day = iso => { const d = new Date(iso); return isNaN(d) ? '' : d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }); };
-  return `<div class="cmp-wsum"><span><b>${nW}</b> ${nW === 1 ? 'workout' : 'workouts'}</span><span><b>${nP}</b> ${nP === 1 ? 'PR' : 'PRs'}</span></div>
+  const owner = mine ? 'you' : String((cmProf.data && cmProf.data.name) || '').trim().split(/\s+/)[0];
+  return `${prompt}<div class="cmp-wsum"><span><b>${nW}</b> ${nW === 1 ? 'workout' : 'workouts'}</span><span><b>${nP}</b> ${nP === 1 ? 'PR' : 'PRs'}</span></div>
     <div class="cmp-wlist">${items.map(x => {
       if(x.lw) {
         const lw = x.lw;
+        const when = /^\d{4}-\d{2}-\d{2}$/.test(String(lw.date || '')) ? hyDateLabel(lw.date) : (lw.payload.program || 'Workout');
         return `<div class="cmp-wcard cmp-wlocal cm-attach-host">
-          <div class="cmp-wdate">${cmEsc(lw.date ? hyDateLabel(lw.date) : (lw.payload.program || 'Workout'))}<span>Only you can see this</span></div>
-          ${cmAttachHTML('workout', lw.payload, 'you')}
-          <div class="cmp-wfoot"><button class="cmp-wshare" onclick="cmShareLocalWorkout(${x.i})">Share to Community</button></div>
+          <div class="cmp-wdate">${cmEsc(when)}<span>${mine ? (cmWo.show ? 'Not posted' : 'Only you can see this') : ''}</span></div>
+          ${cmAttachHTML('workout', lw.payload, owner)}
+          ${mine ? `<div class="cmp-wfoot"><button class="cmp-wshare" onclick="cmShareLocalWorkout(${x.i})">Share to Community</button></div>` : ''}
         </div>`;
       }
       const p = x.post;
@@ -13830,7 +13934,7 @@ async function cmOpenProfile(uid, opts) {
   cmState.view = 'profile';
   cmProfileOpen = uid;
   cmProf.menu = false;
-  if(!same) { cmProf.uid = uid; cmProf.data = null; cmProf.posts = []; cmProf.next = null; cmProf.view = 'workouts'; cmProf.post = null; }
+  if(!same) { cmProf.uid = uid; cmProf.data = null; cmProf.posts = []; cmProf.next = null; cmProf.view = 'workouts'; cmProf.post = null; cmProf.workouts = null; }
   cmProf.loading = true;
   cmDraw();
   if(!same) window.scrollTo(0, 0);
@@ -13847,6 +13951,20 @@ async function cmOpenProfile(uid, opts) {
   }
   cmDraw();
   cmProfileFill(uid);
+  cmProfileWorkouts(uid, !!r.data.is_me);
+}
+// Your profile: whether all your workouts show (and a quiet sync). Someone else's: the workouts they show.
+async function cmProfileWorkouts(uid, isMe) {
+  if(isMe) {
+    await cmWoPrefs();
+    if(cmProf.uid === uid && cmState.view === 'profile') { const y = window.scrollY; cmDraw(); window.scrollTo(0, y); }
+    cmWoSync(false);
+    return;
+  }
+  const r = await cmApi(`/community/workouts?user_id=${uid}`);
+  if(cmProf.uid !== uid || cmState.view !== 'profile') return;
+  cmProf.workouts = r.ok && r.data && Array.isArray(r.data.workouts) ? r.data.workouts : [];
+  const y = window.scrollY; cmDraw(); window.scrollTo(0, y);
 }
 // Keeps loading older posts in the background (up to 300) so both tabs show everything.
 async function cmProfileFill(uid) {
@@ -13997,7 +14115,7 @@ function cmProfilePageHTML() {
 
   let postsHTML;
   if(pr.blocked) postsHTML = `<div class="cm-empty" style="padding:24px 0;">You blocked ${name}. Unblock to see their posts.</div>`;
-  else if(!cmProf.posts.length && !(pr.is_me && cmProf.view !== 'posts' && cmLocalWorkouts().length)) postsHTML = cmProf.loading ? `<div class="cm-empty" style="padding:24px 0;">Loading posts…</div>` : `<div class="cmp-empty"><div class="cmp-empty-ic">${CM_BUBBLE}</div><b>No posts yet</b><span>${pr.is_me ? 'Your posts will show up here.' : `When ${name} posts, you'll see it here.`}</span></div>`;
+  else if(!cmProf.posts.length && !(cmProf.view !== 'posts' && (pr.is_me ? cmLocalWorkouts().length : (cmProf.workouts || []).length))) postsHTML = cmProf.loading ? `<div class="cm-empty" style="padding:24px 0;">Loading posts…</div>` : `<div class="cmp-empty"><div class="cmp-empty-ic">${CM_BUBBLE}</div><b>No posts yet</b><span>${pr.is_me ? 'Your posts will show up here.' : `When ${name} posts, you'll see it here.`}</span></div>`;
   else postsHTML = (cmProf.view === 'posts' ? cmGridHTML(cmProf.posts) : cmWorkoutsHTML(cmProf.posts, !!pr.is_me))
     || (cmProf.view === 'posts'
       ? `<div class="cmp-empty"><div class="cmp-empty-ic">${CM_BUBBLE}</div><b>No photos or posts yet</b><span>${pr.is_me ? 'Photos and posts you share show up here.' : `When ${name} posts, you'll see it here.`}</span></div>`
@@ -16020,6 +16138,7 @@ function wnList() {
       date: 'November 10, 2026',
       title: 'Better photo cards and PRs',
       items: [
+        { ic: '👀', t: 'Show all your workouts', d: 'Want friends to see every workout you finish, not just the ones you post? Turn on Show all my workouts in Settings (or on your profile). It\'s off unless you turn it on.' },
         { ic: '🥇', t: 'Show off your PRs', d: 'When you share a workout where you set a PR, everyone sees it: a gold PR medal, a count, and a banner like "Logan\'s heaviest Back Squat ever!" with how much you added.' },
         { ic: '🏋️', t: 'More on the card', d: 'The workout card on your photo now shows your program, each exercise and the weights you used.' },
         { ic: '🎯', t: 'Locks to the middle', d: 'When you drag the card near the middle of your photo, it locks into place, with guide lines (and a little tap on iPhone). Keep dragging to move it again.' }
@@ -16400,6 +16519,9 @@ document.addEventListener('visibilitychange', () => {
   } catch(e) {}
 });
 window._macroDay = new Date().toDateString(); window._macroTodayIdx = getTodayIdx();
+// All-workouts-on-profile: catch up a little after start, and when coming back to the app
+setTimeout(() => { try { cmWoSync(false); } catch(e) {} }, 9000);
+document.addEventListener('visibilitychange', () => { if(!document.hidden) { try { cmWoSync(false); } catch(e) {} } });
 </script>
 <!-- Saved meals: save sheet -->
 <div id="saveMealOverlay" class="log-weight-overlay" style="display:none;" onclick="if(event.target===this)closeSaveMeal()">
