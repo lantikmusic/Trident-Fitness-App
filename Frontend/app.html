@@ -1264,6 +1264,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .ah-sh-stat{background:var(--bg4);border:0.5px solid var(--border);border-radius:14px;padding:10px;}
 .ah-sh-stat b{display:block;font-size:17px;font-weight:700;letter-spacing:-0.02em;white-space:nowrap;}
 .ah-sh-stat span{display:block;font-size:10.5px;color:var(--text3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ah-goal{display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:12px 14px;border-radius:16px;background:linear-gradient(135deg,rgba(50,252,253,0.12),rgba(50,252,253,0.03));border:0.5px solid var(--pink-border);}
+.ah-goal-ring{position:relative;width:52px;height:52px;flex-shrink:0;}
+.ah-goal-ring svg{width:52px;height:52px;filter:drop-shadow(0 0 6px rgba(50,252,253,0.35));}
+.ah-goal-ring b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;}
+.ah-goal-txt{min-width:0;}
+.ah-goal-txt b{display:block;font-size:16px;font-weight:700;}
+.ah-goal-txt span{display:block;font-size:12px;line-height:1.4;color:var(--text2);margin-top:2px;}
 .ah-hyp{background:var(--bg4);border:0.5px solid var(--border);border-radius:16px;padding:12px 10px 8px;margin-bottom:14px;}
 .ah-hyp svg{display:block;width:100%;height:auto;overflow:visible;}
 .ah-stage-rows{display:grid;gap:6px;margin-bottom:6px;}
@@ -1916,6 +1923,64 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
 .rest-log-input{border-radius:12px;padding:10px 4px;}
 .rest-log-save{border-radius:14px;padding:12px;box-shadow:0 4px 16px var(--pink-glow);}
 .rest-timer-skip{background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.03));border:0.5px solid rgba(255,255,255,.12);padding:11px 20px;}
+/* Gym Days: this week's check-ins (Mon–Sun) */
+.gyc-week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;margin:12px 0 0;}
+.gyc-wd{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;}
+.gyc-wd span{font-size:11px;font-weight:600;color:var(--text3);}
+.gyc-wd.is-today span{color:var(--pink);}
+.gyc-wd i{width:34px;height:34px;max-width:100%;aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.08);}
+.gyc-wd i svg{width:16px;height:16px;}
+.gyc-wd.done i{background:linear-gradient(180deg,rgba(255,255,255,0.16),rgba(255,255,255,0.06));border-color:rgba(255,255,255,0.18);color:var(--text);box-shadow:inset 0 1px 0 rgba(255,255,255,0.12);}
+.gyc-wd.done.is-today i{background:var(--pink);border-color:var(--pink);color:#000;box-shadow:0 0 12px rgba(50,252,253,0.5);}
+.gyc-wd.today i{background:transparent;border:2.5px solid var(--pink);box-shadow:0 0 10px rgba(50,252,253,0.35);}
+.gyc-wd.future i{opacity:.45;}
+/* ── Rest timer (redesigned: glowing ring, set circles, pause, stats) ── */
+.rest-overlay{background:radial-gradient(130% 70% at 50% 0%,rgba(50,252,253,0.12),transparent 60%),rgba(0,0,0,0.9);padding:calc(env(safe-area-inset-top) + 10px) 12px calc(env(safe-area-inset-bottom) + 10px);}
+.rest-timer-card{width:min(400px,100%);max-height:100%;padding:14px 18px 16px;border-radius:32px;text-align:center;
+  background:linear-gradient(180deg,rgba(50,252,253,0.09) 0%,rgba(255,255,255,0.02) 38%,rgba(255,255,255,0.01) 100%),rgba(20,21,23,0.88);
+  backdrop-filter:blur(26px) saturate(160%);-webkit-backdrop-filter:blur(26px) saturate(160%);
+  border:0.5px solid rgba(255,255,255,0.13);box-shadow:inset 0 1px 0 rgba(255,255,255,0.1),0 30px 80px rgba(0,0,0,0.7),0 0 70px rgba(50,252,253,0.12);}
+.rt-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;flex-shrink:0;}
+.rt-back,.rt-head-sp{width:40px;height:40px;flex-shrink:0;}
+.rt-back{border-radius:50%;border:0.5px solid rgba(255,255,255,0.16);background:linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0.04));color:var(--text);font-size:24px;line-height:1;padding-bottom:3px;cursor:pointer;font-family:inherit;box-shadow:inset 0 1px 0 rgba(255,255,255,0.12);}
+.rest-timer-card .rest-timer-label{margin:0;font-size:12px;letter-spacing:.2em;}
+.rt-ring-row{margin:4px 0 10px !important;}
+.rest-timer-card .rest-timer-circle{width:224px;height:224px;margin:0 auto;}
+.rest-timer-card .rest-timer-circle svg{width:224px;height:224px;color:var(--pink);filter:drop-shadow(0 0 9px currentColor) drop-shadow(0 0 22px rgba(50,252,253,0.25));}
+.rest-timer-card .rtc-bg{stroke:rgba(255,255,255,0.06);stroke-width:11;}
+.rest-timer-card .rtc-fill{stroke-width:11;}
+.rt-disc{position:absolute;inset:30px;border-radius:50%;background:radial-gradient(circle at 50% 30%,#26292c 0%,#16181a 62%,#101112 100%);
+  box-shadow:0 14px 34px rgba(0,0,0,0.65),inset 0 1px 0 rgba(255,255,255,0.07),inset 0 -10px 24px rgba(0,0,0,0.45);}
+.rt-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.rest-timer-card .rest-timer-num{position:static;display:block;font-size:56px;font-weight:700;letter-spacing:-0.04em;line-height:1;font-variant-numeric:tabular-nums;}
+.rt-remaining{font-size:13px;font-weight:500;color:var(--text3);margin-top:6px;}
+.rest-timer-card .rest-timer-ex{font-size:19px;font-weight:700;color:var(--text);letter-spacing:-0.02em;margin:2px 0 10px;line-height:1.25;}
+.rt-sets{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.rt-sets:empty{display:none;}
+.rt-sets-lbl{font-size:11px;font-weight:600;color:var(--text3);margin-right:4px;}
+.rt-set{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--text3);border:0.5px solid rgba(255,255,255,0.1);background:transparent;}
+.rt-set.done{color:var(--text);background:linear-gradient(180deg,rgba(255,255,255,0.13),rgba(255,255,255,0.05));border-color:rgba(255,255,255,0.14);}
+.rt-set.cur{color:var(--pink);border:2px solid var(--pink);box-shadow:0 0 12px rgba(50,252,253,0.45),inset 0 0 8px rgba(50,252,253,0.15);}
+.rt-controls{display:flex;align-items:center;justify-content:center;gap:26px;margin:0 0 14px !important;}
+.rt-side{width:58px;height:58px;border-radius:50%;border:0.5px solid rgba(255,255,255,0.14);background:linear-gradient(180deg,rgba(255,255,255,0.11),rgba(255,255,255,0.03));color:var(--text);cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,0.1);}
+.rt-side b{font-size:16px;font-weight:700;line-height:1;}
+.rt-side span{font-size:9.5px;color:var(--text3);margin-top:2px;}
+.rt-side:active,.rt-play:active{transform:scale(0.94);}
+.rt-play{width:78px;height:78px;border-radius:50%;border:none;background:var(--pink);color:#000;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 6px rgba(50,252,253,0.12),0 8px 28px rgba(50,252,253,0.45);}
+.rt-play svg{width:30px;height:30px;}
+.rt-stats{display:grid !important;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 12px !important;}
+.rt-stat{background:linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));border:0.5px solid rgba(255,255,255,0.09);border-radius:16px;padding:10px 6px;min-width:0;}
+.rt-stat-lbl{font-size:11px;color:var(--text3);font-weight:500;}
+.rt-stat-val{font-size:17px;font-weight:700;letter-spacing:-0.02em;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums;}
+.rest-timer-card .rest-log-section{background:linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));border:0.5px solid rgba(255,255,255,0.09);border-radius:18px;}
+.rest-timer-card .rest-log-input{background:rgba(0,0,0,0.35);border-color:rgba(255,255,255,0.1);}
+.rest-timer-card .rest-timer-presets{margin:12px 0 0;}
+.rest-timer-card .rest-timer-skip{margin-top:10px;}
+@media(max-height:760px){.rest-timer-card .rest-timer-circle,.rest-timer-card .rest-timer-circle svg{width:190px;height:190px;}.rt-disc{inset:26px;}.rest-timer-card .rest-timer-num{font-size:48px;}.rt-play{width:68px;height:68px;}.rt-side{width:52px;height:52px;}}
+@media(max-width:360px){.rt-controls{gap:18px;}.rt-stat-val{font-size:15px;}.rt-set{width:30px;height:30px;font-size:13px;}}
+@media (prefers-reduced-motion: no-preference){.rest-overlay.show .rest-timer-card{animation:rtIn .32s cubic-bezier(.22,.9,.3,1.05);}}
+@keyframes rtIn{from{opacity:0;transform:translateY(24px) scale(.97);}to{opacity:1;transform:none;}}
+
 
 </style>
 <script>/* No zooming: block iOS pinch-zoom (double-tap and tap-in-a-box zoom are stopped by the viewport + touch-action) */try{['gesturestart','gesturechange','gestureend'].forEach(function(t){document.addEventListener(t,function(e){e.preventDefault();},{passive:false});});}catch(e){}</script>
@@ -2784,35 +2849,42 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
 <!-- Rest Timer Overlay -->
 <div class="rest-overlay" id="restOverlay">
   <div class="rest-timer-card">
-    <div class="rest-timer-label">Rest Timer</div>
-    <div class="rest-timer-ex" id="restTimerEx">Next set coming up…</div>
-
-    <!-- Preset durations -->
-    <div class="rest-timer-presets">
-      <button class="rest-preset" onclick="setRestDuration(30)">30s</button>
-      <button class="rest-preset active" onclick="setRestDuration(60)">60s</button>
-      <button class="rest-preset" onclick="setRestDuration(90)">90s</button>
-      <button class="rest-preset" onclick="setRestDuration(120)">2m</button>
+    <div class="rt-head">
+      <button class="rt-back" onclick="skipRest()" aria-label="Close rest timer">‹</button>
+      <div class="rest-timer-label">Rest Timer</div>
+      <div class="rt-head-sp"></div>
     </div>
 
-    <!-- Countdown ring with +/- controls -->
-    <div class="rest-timer-row">
-      <div style="display:flex;flex-direction:column;align-items:center;">
-        <button class="rest-adjust-btn" onclick="adjustRest(-15)">−</button>
-        <div class="rest-adjust-label">−15s</div>
-      </div>
+    <!-- Countdown ring -->
+    <div class="rest-timer-row rt-ring-row">
       <div class="rest-timer-circle">
-        <svg viewBox="0 0 160 160">
+        <svg viewBox="0 0 160 160" id="rtcSvg">
           <circle class="rtc-bg" cx="80" cy="80" r="70"/>
           <circle class="rtc-fill" id="rtcFill" cx="80" cy="80" r="70"
             stroke-dasharray="439.82" stroke-dashoffset="0"/>
         </svg>
-        <div class="rest-timer-num" id="restTimerNum">60</div>
+        <div class="rt-disc"></div>
+        <div class="rt-center">
+          <div class="rest-timer-num" id="restTimerNum">1:00</div>
+          <div class="rt-remaining" id="restTimerSub">Remaining</div>
+        </div>
       </div>
-      <div style="display:flex;flex-direction:column;align-items:center;">
-        <button class="rest-adjust-btn" onclick="adjustRest(15)">＋</button>
-        <div class="rest-adjust-label">+15s</div>
-      </div>
+    </div>
+
+    <div class="rest-timer-ex" id="restTimerEx">Next set coming up…</div>
+    <div class="rt-sets" id="restSetsRow"></div>
+
+    <!-- Controls: −15s · pause/resume · +15s -->
+    <div class="rest-timer-row rt-controls">
+      <button class="rt-side" onclick="adjustRest(-15)" aria-label="15 seconds less"><b>−15</b><span>sec</span></button>
+      <button class="rt-play" id="restPauseBtn" onclick="toggleRestPause()" aria-label="Pause rest timer"></button>
+      <button class="rt-side" onclick="adjustRest(15)" aria-label="15 seconds more"><b>+15</b><span>sec</span></button>
+    </div>
+
+    <div class="rest-timer-row rt-stats">
+      <div class="rt-stat"><div class="rt-stat-lbl">Elapsed</div><div class="rt-stat-val" id="restStatElapsed" style="color:var(--pink);">0:00</div></div>
+      <div class="rt-stat"><div class="rt-stat-lbl">Set</div><div class="rt-stat-val" id="restStatSet">—</div></div>
+      <div class="rt-stat"><div class="rt-stat-lbl">Last set</div><div class="rt-stat-val" id="restStatLast" style="color:#BF5AF2;">—</div></div>
     </div>
 
     <!-- Log last set -->
@@ -2829,6 +2901,14 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
         </div>
       </div>
       <button class="rest-log-save" onclick="saveRestLog()">Save Set ✓</button>
+    </div>
+
+    <!-- Preset durations -->
+    <div class="rest-timer-presets">
+      <button class="rest-preset" onclick="setRestDuration(30)">30s</button>
+      <button class="rest-preset active" onclick="setRestDuration(60)">60s</button>
+      <button class="rest-preset" onclick="setRestDuration(90)">90s</button>
+      <button class="rest-preset" onclick="setRestDuration(120)">2m</button>
     </div>
 
     <button class="rest-timer-skip" onclick="skipRest()">Skip Rest →</button>
@@ -8322,6 +8402,12 @@ function renderGymYear() {
     <div class="gyc-eyebrow">Gym Days · ${year}</div>
     <div class="gyc-top"><div class="gyc-num">${total}</div><div class="gyc-lbl">${total === 1 ? 'day' : 'days'} at the gym<br>this year</div></div>
     <div class="gyc-pace">${paceText}</div>
+    <div class="gyc-week" aria-label="This week">${Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + i), iso = localISO(d);
+      const done = set.has(iso), isToday = iso === todayISO, future = iso > todayISO;
+      const cls = done ? 'done' : isToday ? 'today' : future ? 'future' : 'missed';
+      return `<div class="gyc-wd ${cls}${isToday ? ' is-today' : ''}"><span>${d.toLocaleDateString('en-US', { weekday: 'short' }).slice(0, 2)}</span><i>${done ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12.5 10 17.5 19 7.5"/></svg>' : ''}</i></div>`;
+    }).join('')}</div>
     <div class="gyc-stats">
       <div class="gyc-stat"><div class="gyc-stat-val">${thisWeek}</div><div class="gyc-stat-lbl">This week</div></div>
       <div class="gyc-stat"><div class="gyc-stat-val">${thisMonth}</div><div class="gyc-stat-lbl">This month</div></div>
@@ -8597,8 +8683,13 @@ let restTimer = {
   activeEi: null,
   activeSet: null,
   exName: '',
-  endsAt: 0
+  endsAt: 0,
+  paused: false,
+  elapsedMs: 0,     // rest time that has actually passed (for the Elapsed tile)
+  runStart: 0
 };
+function restElapsedReset() { restTimer.elapsedMs = 0; restTimer.runStart = 0; }
+function restElapsedSecs() { return Math.floor((restTimer.elapsedMs + (restTimer.runStart ? Date.now() - restTimer.runStart : 0)) / 1000); }
 
 function setRestDuration(secs) {
   restTimer.duration = secs;
@@ -8661,8 +8752,15 @@ function startRest(ei, setIdx, exName, suggested) {
 
   // Label
   document.getElementById('restTimerEx').textContent = `${exName} — Set ${setIdx + 1}`;
+  try {
+    const ex = getProgram(selectedProgram).days[workoutDayIdx].exercises[ei];
+    const total = Math.max(Number(ex && ex.sets) || 0, log.length);
+    restSetInfo(total, Array.from({ length: total }, (_, i) => !!(log[i] && (log[i].weight || log[i].reps))), setIdx,
+      prevSet ? restSetText(prevSet.weight, prevSet.reps) : '');
+  } catch(e) { restSetInfo(0, [], setIdx, ''); }
 
   // Show overlay
+  restElapsedReset();
   document.getElementById('restOverlay').classList.add('show');
 
   // Mark rest btn as active
@@ -8679,14 +8777,50 @@ function startRestCountdown() {
   stopRestCountdown();
   // Count down to a fixed end time, so the timer stays right while the phone is
   // locked or another app is open (the phone pauses the page in the background).
+  if(restTimer.runStart) restTimer.elapsedMs += Date.now() - restTimer.runStart;
   restTimer.endsAt = Date.now() + restTimer.remaining * 1000;
+  restTimer.runStart = Date.now();
+  restTimer.paused = false;
   restTimer.interval = setInterval(restTimerTick, 250);
   restPushSync();
+  restPauseIcon();
 }
 function stopRestCountdown() {
   clearInterval(restTimer.interval);
+  if(restTimer.runStart) { restTimer.elapsedMs += Date.now() - restTimer.runStart; restTimer.runStart = 0; }
   restTimer.endsAt = 0;
   restPushSync();
+  restPauseIcon();
+}
+// Pause / resume (the middle button). Pausing also cancels the "rest is over" notification.
+function toggleRestPause() {
+  if(restTimer.endsAt) { stopRestCountdown(); restTimer.paused = true; }
+  else if(restTimer.remaining > 0) startRestCountdown();
+  restPauseIcon();
+  updateRestTimerDisplay();
+}
+function restPauseIcon() {
+  const b = document.getElementById('restPauseBtn');
+  if(!b) return;
+  const running = !!restTimer.endsAt;
+  b.innerHTML = running
+    ? '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4.5" width="4.2" height="15" rx="1.4"/><rect x="13.8" y="4.5" width="4.2" height="15" rx="1.4"/></svg>'
+    : '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.2v13.6a1 1 0 0 0 1.5.86l11-6.8a1 1 0 0 0 0-1.72l-11-6.8A1 1 0 0 0 8 5.2z"/></svg>';
+  b.setAttribute('aria-label', running ? 'Pause rest timer' : 'Resume rest timer');
+}
+// Set circles + "Set" and "Last set" tiles. total = sets for this exercise, done = [true/false per set].
+function restSetInfo(total, done, current, last) {
+  const row = document.getElementById('restSetsRow');
+  total = Math.max(0, Math.min(12, Number(total) || 0));
+  if(row) row.innerHTML = total ? '<span class="rt-sets-lbl">Sets</span>' + Array.from({ length: total }, (_, i) =>
+    `<div class="rt-set${i === current ? ' cur' : done[i] ? ' done' : ''}">${i + 1}</div>`).join('') : '';
+  const setEl = document.getElementById('restStatSet'), lastEl = document.getElementById('restStatLast');
+  if(setEl) setEl.textContent = total ? `${current + 1} of ${Math.max(total, current + 1)}` : `Set ${current + 1}`;
+  if(lastEl) lastEl.textContent = last || '—';
+}
+function restSetText(w, r) {
+  w = String(w || '').trim(); r = String(r || '').trim();
+  return w && r ? `${w} × ${r}` : w ? w : r ? `${r} reps` : '';
 }
 function restTimerTick() {
   if(!restTimer.endsAt) return;
@@ -8702,9 +8836,14 @@ function restTimerTick() {
 document.addEventListener('visibilitychange', () => { if(!document.hidden) restTimerTick(); });
 
 function updateRestTimerDisplay() {
-  const t = restTimer.remaining;
-  const display = t >= 60 ? `${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}` : String(Math.max(0,t));
+  const t = Math.max(0, restTimer.remaining);
+  const display = `${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`;
   document.getElementById('restTimerNum').textContent = display;
+  const el2 = restElapsedSecs();
+  const elEl = document.getElementById('restStatElapsed');
+  if(elEl) elEl.textContent = `${Math.floor(el2/60)}:${String(el2%60).padStart(2,'0')}`;
+  const sub = document.getElementById('restTimerSub');
+  if(sub) sub.textContent = restTimer.paused ? 'Paused' : 'Remaining';
 
   // Ring progress — goes from full to empty as time runs out
   const pct = Math.max(0, restTimer.remaining / restTimer.duration);
@@ -8714,6 +8853,8 @@ function updateRestTimerDisplay() {
 
   // Color shifts red in last 10 seconds
   fill.style.stroke = restTimer.remaining <= 10 ? '#FF453A' : 'var(--pink)';
+  const svg = document.getElementById('rtcSvg');
+  if(svg) svg.style.color = restTimer.remaining <= 10 ? '#FF453A' : 'var(--pink)';
   document.getElementById('restTimerNum').style.color = restTimer.remaining <= 10 ? '#FF453A' : 'var(--text)';
 }
 
@@ -8725,6 +8866,8 @@ function restTimerDone(late) {
   document.getElementById('restTimerNum').textContent = 'Go!';
   document.getElementById('restTimerNum').style.color = 'var(--pink)';
   document.getElementById('rtcFill').style.stroke = 'var(--pink)';
+  const svgD = document.getElementById('rtcSvg'); if(svgD) svgD.style.color = 'var(--pink)';
+  const subD = document.getElementById('restTimerSub'); if(subD) subD.textContent = 'Rest over';
   document.getElementById('rtcFill').style.strokeDashoffset = 0;
   // The timer gets out of the way: the set being logged is saved (if there is something to save) and the sheet closes.
   setTimeout(restAutoFinish, late ? 0 : 450);
@@ -8864,9 +9007,12 @@ function adjustRest(secs) {
   // Also extend duration so the ring percentage stays sensible
   if(secs > 0) restTimer.duration = Math.max(restTimer.duration, restTimer.remaining);
   updateRestTimerDisplay();
-  // Restart countdown from new remaining time
+  // Restart countdown from new remaining time (stays paused if it was paused)
+  const wasPaused = restTimer.paused;
   stopRestCountdown();
-  if(restTimer.remaining > 0) startRestCountdown();
+  restTimer.paused = wasPaused;
+  if(restTimer.remaining > 0 && !wasPaused) startRestCountdown();
+  restPauseIcon(); updateRestTimerDisplay();
 }
 
 function skipRest() {
@@ -8875,6 +9021,8 @@ function skipRest() {
 
 function closeRest() {
   stopRestCountdown();
+  restTimer.paused = false;
+  restElapsedReset();
   document.getElementById('restOverlay').classList.remove('show');
   document.querySelectorAll('.rest-btn').forEach(b => b.classList.remove('resting'));
   // Reset for next use
@@ -11704,8 +11852,14 @@ function hyLogSet(key, setIdx) {
   overlay.querySelector('.rest-timer-label').textContent = timed ? 'Rest Timer' : 'Log';
   overlay.querySelector('.rest-log-title').textContent = f.required ? 'Log completed set' : 'Log it (numbers optional)';
   document.getElementById('restTimerEx').textContent = `${hyExName(c.workout.id, key, ex)} — ${ex.kind === 'sprint' ? 'Rep' : 'Set'} ${setIdx + 1}`;
+  try {
+    const target = hyRx(c.workout, found.section, ex, c.sess).sets;
+    const sets = (st && st.sets) || [];
+    restSetInfo(Math.max(target || 0, sets.length), sets.map(x => !!(x && x.done)), setIdx, prev && prev.done ? restSetText(prev.w, prev.r) : '');
+  } catch(e) { restSetInfo(0, [], setIdx, ''); }
   restTimer.activeEi = null; restTimer.activeSet = null;
   stopRestCountdown();
+  restElapsedReset();
   overlay.classList.add('show');
   if(timed) {
     restTimer.duration = ex.rest; restTimer.remaining = ex.rest;
@@ -14091,11 +14245,25 @@ function ahOpenSleep() {
       <div class="ah-sh-stat"><b>${n.inBed > 0 ? ahDur(n.inBed) : '—'}</b><span>In bed</span></div>
       <div class="ah-sh-stat"><b style="font-size:13px;line-height:1.35;">${ahTime(n.from)}<br>${ahTime(n.to)}</b><span>Start · end</span></div>
     </div>
+    ${ahSleepGoalHTML(n)}
     <div class="ah-hyp">${ahHypnogramSVG(n)}</div>
     <div class="ah-stage-rows">${parts.filter(k => n[k] > 0 || k !== 'plain').map(k => `<div class="ah-stage-row"><i style="background:${colors[k]};"></i><b>${names[k]}</b><em>${ahDur(n[k] || 0)}</em><small>${Math.round((n[k] || 0) / total * 100)}%</small></div>`).join('')}</div>
     ${n.hasStages ? '' : '<div class="ah-note" style="margin:8px 2px 0;">Sleep stages (REM, Core, Deep) need an Apple Watch or a sleep tracker that saves to Apple Health.</div>'}
     <div class="ah-note" style="margin:10px 2px 14px;">From Apple Health · read-only · stays on this iPhone.</div>
     <button class="ghost-btn" onclick="ahSheetClose()">Close</button>`);
+}
+
+// How the night compares with the 8-hour sleep goal (the same goal the Sleep card's ring uses).
+function ahSleepGoalHTML(n) {
+  const goalMin = 8 * 60, mins = n.asleep > 0 ? n.asleep : n.inBed;
+  const pct = Math.round(mins / goalMin * 100), diff = Math.round(Math.abs(mins - goalMin));
+  const title = pct >= 100 ? 'Goal reached' : pct >= 85 ? 'Nearly there' : 'Short night';
+  const sub = pct >= 100 ? `You slept ${ahDur(mins)}${diff >= 5 ? ', ' + ahDur(diff) + ' over' : ''} your 8-hour goal.`
+    : `You slept ${ahDur(mins)}, ${ahDur(diff)} short of your 8-hour goal.`;
+  const C = 2 * Math.PI * 20, p = Math.min(1, mins / goalMin);
+  return `<div class="ah-goal"><div class="ah-goal-ring"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="5"/>
+      <circle cx="24" cy="24" r="20" fill="none" stroke="var(--pink)" stroke-width="5" stroke-linecap="round" stroke-dasharray="${C.toFixed(2)}" stroke-dashoffset="${(C * (1 - p)).toFixed(2)}" transform="rotate(-90 24 24)"/></svg><b>${pct}%</b></div>
+    <div class="ah-goal-txt"><b>${title}</b><span>${sub}</span></div></div>`;
 }
 
 // Calories burned (active + resting) for the last 30 days.
@@ -14179,6 +14347,16 @@ document.addEventListener('visibilitychange', () => {
 // ══════════════════════════════════════
 function wnList() {
   return [
+    {
+      id: '2026-11-08',
+      version: '1.2',
+      date: 'November 8, 2026',
+      title: 'Fresh updates',
+      items: [
+        { ic: '⏱️', t: 'New rest timer', d: 'A bigger glowing countdown ring, a pause button, your set progress at a glance (Set 2 of 4), and your last set right there while you rest.' },
+        { ic: '✅', t: 'Weekly check-ins', d: 'The Gym Days card on Home now shows this week Monday to Sunday, with a check on every day you trained.' }
+      ]
+    },
     {
       id: '2026-11-07',
       version: '1.1',
