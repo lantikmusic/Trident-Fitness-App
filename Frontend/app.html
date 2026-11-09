@@ -2188,6 +2188,18 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
 .cm-post .cm-uname{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .cm-post .cm-when{font-weight:500;color:var(--text3);font-size:13px;}
 .cm-post .cm-time:empty{display:none;}
+.cm-post.has-media{padding-top:0;}
+.cm-mhead{position:absolute;left:0;right:0;top:0;z-index:2;display:flex;align-items:center;gap:10px;padding:12px 12px 34px;background:linear-gradient(180deg,rgba(0,0,0,.55),rgba(0,0,0,.18) 60%,transparent);cursor:default;}
+.cm-mwho{display:flex;align-items:center;gap:9px;min-width:0;background:none;border:none;padding:0;color:#fff;font-family:inherit;text-align:left;cursor:pointer;}
+.cm-mring{flex-shrink:0;padding:2px;border-radius:50%;background:conic-gradient(from 200deg,var(--pink),#BF5AF2,#FF375F,var(--pink));}
+.cm-mring .cm-avatar{width:34px;height:34px;border:2px solid rgba(0,0,0,.6);}
+.cm-mtext{display:flex;align-items:baseline;gap:6px;min-width:0;text-shadow:0 1px 6px rgba(0,0,0,.6);}
+.cm-mtext b{font-size:14.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cm-mtext i{font-style:normal;font-size:12.5px;font-weight:500;opacity:.8;white-space:nowrap;}
+.cm-mfollow{margin-left:auto;flex-shrink:0;padding:6px 14px;border-radius:10px;border:1px solid rgba(255,255,255,.75);background:rgba(0,0,0,.18);color:#fff;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
+.cm-mbtn{margin-left:auto;flex-shrink:0;width:34px;height:34px;border-radius:50%;border:none;background:rgba(0,0,0,.3);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
+.cm-mbtn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+#page-community.cm-prof-mode .cm-mfollow{display:none;}
 </style>
 <script>/* No zooming: block iOS pinch-zoom (double-tap and tap-in-a-box zoom are stopped by the viewport + touch-action) */try{['gesturestart','gesturechange','gestureend'].forEach(function(t){document.addEventListener(t,function(e){e.preventDefault();},{passive:false});});}catch(e){}</script>
 </head>
@@ -13016,9 +13028,9 @@ function cmMediaLoaded(img, id) {
   if(box) box.style.aspectRatio = String(a);
   if(cmAspect[id] !== a) { cmAspect[id] = a; cmAspectSave(); }
 }
-function cmMediaHTML(id, name) {
+function cmMediaHTML(id, name, overlay) {
   const a = cmAspect[id];
-  return `<div class="cm-media${a ? ' ready' : ''}" style="aspect-ratio:${a || 0.8}" onclick="cmMediaTap(event,'${id}')">
+  return `<div class="cm-media${a ? ' ready' : ''}" style="aspect-ratio:${a || 0.8}" onclick="cmMediaTap(event,'${id}')">${overlay || ''}
     <img src="${WORKER_URL}/community/photo/${id}" alt="Photo shared by ${name}" loading="lazy" decoding="async" draggable="false" onload="cmMediaLoaded(this,'${id}')" onerror="this.parentNode.classList.add('broken','ready')">
   </div>`;
 }
@@ -13059,6 +13071,16 @@ function cmCloseViewer() {
 // Long captions show 3 lines with "more"
 function cmMore(btn) { const c = btn.closest('.cm-body'); if(c) c.classList.remove('clamp'); btn.remove(); }
 
+// Username + picture on top of the photo (top left), follow / delete at top right
+function cmMediaHeadHTML(p, id, uid, name, handle) {
+  return `<div class="cm-mhead" onclick="event.stopPropagation()">
+    <button class="cm-mwho" onclick="cmOpenProfile('${uid}')" aria-label="Open ${name}'s profile">
+      <span class="cm-mring">${cmAvatarHTML(p)}</span>
+      <span class="cm-mtext"><b>${handle || name}</b><i>${cmEsc(cmTimeAgo(p.created_at))}</i></span>
+    </button>
+    ${p.mine ? `<button class="cm-mbtn" onclick="cmDeletePost('${id}')" aria-label="Delete post">${CM_TRASH}</button>` : (p.following ? '' : `<button class="cm-mfollow" onclick="cmToggleFollow('${uid}')">Follow</button>`)}
+  </div>`;
+}
 function cmPostHTML(p) {
   const id = cmSafeId(p && p.id);
   if(!id) return '';
@@ -13084,15 +13106,15 @@ function cmPostHTML(p) {
       ${p.tagged_me ? `<button class="cm-untag" onclick="cmRemoveMyTag('${id}')">Remove tag</button>` : ''}
     </div>`;
   return `<article class="cm-post cm-attach-host${photo ? ' has-media' : ''}" id="cm-post-${id}">
-    <div class="cm-pad cm-head">
+${photo ? '' : `    <div class="cm-pad cm-head">
       <button class="cm-who" onclick="cmOpenProfile('${uid}')" aria-label="Open ${name}'s profile">
         <div class="cm-ring">${cmAvatarHTML(p)}</div>
         <div style="min-width:0;"><div class="cm-name cm-uname">${handle || name}<span class="cm-when"> · ${cmEsc(cmTimeAgo(p.created_at))}</span></div><div class="cm-time">${handle ? name : ''}${handle && kind ? ' · ' : ''}${kind ? `<span class="cm-kind">${kind}</span>` : ''}</div></div>
       </button>
       ${p.mine ? `<button class="cm-del" onclick="cmDeletePost('${id}')" aria-label="Delete post">${CM_TRASH}</button>` : (p.following ? '' : `<button class="cm-follow" onclick="cmToggleFollow('${uid}')">Follow</button>`)}
-    </div>
+    </div>`}
     ${photo
-      ? `${cmMediaHTML(id, name)}<div class="cm-pad">${actions}${body}${attach}${viewC}</div>`
+      ? `${cmMediaHTML(id, name, cmMediaHeadHTML(p, id, uid, name, handle))}<div class="cm-pad">${actions}${body}${attach}${viewC}</div>`
       : `<div class="cm-pad">${body}${attach}${actions}${viewC}</div>`}
     ${cmState.open[id] ? `<div class="cm-pad">${cmCommentsHTML(id)}</div>` : ''}
   </article>`;
