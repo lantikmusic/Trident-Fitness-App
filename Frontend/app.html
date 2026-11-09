@@ -1287,6 +1287,40 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .ah-hist-bar i{display:block;height:100%;}
 .ah-hist-v{text-align:right;font-size:13px;font-weight:700;white-space:nowrap;}
 .ah-hist-v span{display:block;font-size:10px;font-weight:500;color:var(--text3);}
+/* Progress tab: Heart Health + Workouts from Apple Health */
+.ah-panel{background:radial-gradient(120% 80% at 100% 0%,rgba(50,252,253,0.06) 0%,transparent 55%),var(--bg3);}
+.ah-ph{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px;}
+.ah-ph-t{font-size:17px;font-weight:700;letter-spacing:-0.02em;}
+.ah-ph-s{font-size:11.5px;color:var(--text3);margin-top:2px;}
+.ah-ph-b{display:inline-flex;align-items:center;gap:5px;flex-shrink:0;font-size:10.5px;font-weight:600;color:var(--pink);padding:4px 8px;border-radius:99px;background:rgba(50,252,253,0.08);border:0.5px solid var(--pink-border);white-space:nowrap;}
+.ah-ph-b svg{width:11px;height:11px;}
+.ah-hm{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px;}
+.ah-hm-t{min-width:0;text-align:left;background:var(--bg4);border:0.5px solid var(--border);border-radius:14px;padding:10px;cursor:pointer;font-family:inherit;color:var(--text);-webkit-tap-highlight-color:transparent;}
+.ah-hm-t.sel{border-color:var(--c);box-shadow:0 0 0 1px var(--c) inset,0 0 14px color-mix(in srgb,var(--c) 30%,transparent);}
+.ah-hm-l{font-size:10.5px;font-weight:600;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ah-hm-v{font-size:21px;font-weight:700;letter-spacing:-0.03em;margin-top:4px;white-space:nowrap;}
+.ah-hm-v small{font-size:10.5px;font-weight:600;color:var(--text3);margin-left:2px;letter-spacing:0;}
+.ah-hm-d{font-size:10.5px;font-weight:600;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+@media(max-width:360px){.ah-hm{gap:6px;}.ah-hm-t{padding:9px 7px;}.ah-hm-v{font-size:18px;}.ah-hm-v small{font-size:9.5px;}.ah-hm-l,.ah-hm-d{font-size:9.5px;}.ah-ws b{font-size:15px;}}
+.ah-trend{background:var(--bg4);border:0.5px solid var(--border);border-radius:14px;padding:10px 10px 6px;}
+.ah-trend svg{display:block;width:100%;height:auto;overflow:visible;}
+.ah-trend-h{display:flex;justify-content:space-between;font-size:10.5px;color:var(--text3);margin:0 2px 6px;}
+.ah-ws{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:10px;}
+.ah-ws div{background:var(--bg4);border:0.5px solid var(--border);border-radius:14px;padding:10px;min-width:0;}
+.ah-ws b{display:block;font-size:17px;font-weight:700;white-space:nowrap;}
+.ah-ws span{display:block;font-size:10.5px;color:var(--text3);margin-top:2px;}
+.ah-wo{display:flex;align-items:center;gap:12px;width:100%;padding:11px 2px;border:none;border-top:0.5px solid var(--border);background:none;color:var(--text);font-family:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.ah-wo:first-child{border-top:none;}
+.ah-wo-ic{width:40px;height:40px;flex-shrink:0;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:19px;background:rgba(50,252,253,0.08);border:0.5px solid var(--pink-border);}
+.ah-wo-m{flex:1;min-width:0;}
+.ah-wo-n{font-size:14.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ah-wo-d{font-size:11.5px;color:var(--text3);margin-top:1px;}
+.ah-wo-c{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;}
+.ah-wo-c span{font-size:11px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--bg4);border:0.5px solid var(--border);white-space:nowrap;}
+.ah-wo-chev{color:var(--text3);font-size:20px;flex-shrink:0;}
+.ah-more{display:block;width:100%;margin-top:8px;padding:10px;border-radius:12px;border:0.5px solid var(--border2);background:transparent;color:var(--text2);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;}
+.ah-hr-chart{background:var(--bg4);border:0.5px solid var(--border);border-radius:16px;padding:12px 10px 8px;margin-bottom:14px;}
+.ah-hr-chart svg{display:block;width:100%;height:auto;overflow:visible;}
 .ah-set-help{font-size:11.5px;line-height:1.5;color:var(--text3);padding:2px 4px 0;}
 .ah-set-help b{color:var(--text2);font-weight:600;}
 @media(max-width:360px){.ah-leg-val{font-size:12px;}.ah-act-split{font-size:9.5px;}}
@@ -2661,6 +2695,9 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
   <div class="container">
     <div style="height:14px;"></div>
     <div class="progress-stat-row" id="progressStats"></div>
+    <!-- Apple Health: heart health + workouts from Apple Watch / Fitness (iPhone app only) -->
+    <div class="panel ah-panel" id="ahHeartPanel" style="display:none;margin-bottom:12px;"></div>
+    <div class="panel ah-panel" id="ahWorkoutsPanel" style="display:none;margin-bottom:12px;"></div>
     <!-- Muscle growth -->
     <div class="panel" style="margin-bottom:12px;" id="muscleGrowthPanel">
       <div class="mg-head"><div class="panel-title" style="margin:0;">Muscle Growth 💪</div></div>
@@ -3041,6 +3078,10 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
     <div class="settings-row">
       <div style="min-width:0;padding-right:10px;"><div class="settings-row-label">Apple Health</div><div class="settings-row-sub" id="ahSetStatus">Steps, calories and sleep · read-only</div></div>
       <div class="settings-row-right"><button class="push-btn" id="ahSetBtn" onclick="ahSettingsButton()">Connect</button></div>
+    </div>
+    <div class="settings-row">
+      <div style="min-width:0;padding-right:10px;"><div class="settings-row-label">Count Apple Watch workouts</div><div class="settings-row-sub">Strength, HIIT and cross-training workouts count as gym days</div></div>
+      <label class="toggle-wrap" style="flex-shrink:0;"><input type="checkbox" id="ahGymToggle" onchange="ahSetGymCount(this.checked)"><span class="toggle-slider"></span></label>
     </div>
     <div class="ah-set-help">Read-only: Trident never changes your Health data, and it stays on this iPhone (it isn't sent to Trident's servers). To change what Trident can read, open the <b>Health</b> app → tap your picture → <b>Apps</b> → <b>Trident Fitness</b>.</div>
   </div>
@@ -7913,6 +7954,7 @@ function renderMuscleGrowth(animate) {
 }
 
 function renderProgress(){
+  try { if(typeof ahRenderFitness === 'function') { ahRenderFitness(); ahLoadFitness(false); } } catch(e) {}  // Apple Health panels (iPhone app)
   try { renderMuscleGrowth(true); } catch(e) { console.warn('Muscle growth skipped:', e); }
   const weights=progressData.filter(e=>e.weight).map(e=>e.weight);
   const latest=weights[0],prev=weights[1];
@@ -8375,6 +8417,8 @@ function renderGymYear() {
   if(!el) return;
   let days;
   try { days = gymDaysAll(); } catch(e) { days = []; }
+  // Apple Watch strength / HIIT days (iPhone app): shown here only, never saved into the synced list
+  try { if(typeof ahGymDays === 'function') { const extra = ahGymDays(); if(extra.length) days = Array.from(new Set(days.concat(extra))).sort(); } } catch(e) {}
   const set = new Set(days);
   const now = new Date(), year = now.getFullYear(), todayISO = localISO(now);
   const inYear = days.filter(d => d.slice(0, 4) === String(year));
@@ -13846,7 +13890,8 @@ function cmShareLastWorkout() {
 // Health numbers are kept in memory only: never saved in this app's storage and never sent to Trident's
 // server (no save()/cloudPost of Health values; the manual steps/sleep/burned entries are left untouched).
 // ══════════════════════════════════════
-const AH_READ = ['steps', 'calories', 'basalCalories', 'sleep'];   // 'calories' = active energy
+const AH_FIT_TYPES = ['workouts', 'heartRate', 'restingHeartRate', 'heartRateVariability', 'vo2Max'];
+const AH_READ = ['steps', 'calories', 'basalCalories', 'sleep'].concat(AH_FIT_TYPES);   // 'calories' = active energy
 const AH_ASKED_KEY = 'trident_health_asked_v1';                    // only remembers that Connect was tapped (no health data)
 const AH_QUICK_MS = 60 * 1000;                                     // re-read today's numbers this often while open
 const AH_FULL_MS = 15 * 60 * 1000;                                 // re-read the whole week this often
@@ -13858,7 +13903,7 @@ const AH_STAGE = {                                                 // Apple Heal
 };
 // steps / burned / nights are keyed by local date 'YYYY-MM-DD' (a night is keyed by the morning it ends)
 let ahState = { status: 'off', loadedAt: 0, fullAt: 0, histAt: 0, connecting: false, loading: false, histLoading: false,
-  steps: {}, burned: {}, nights: {}, sel: { steps: 0, sleep: 0 } };   // sel = how many days back the card shows
+  steps: {}, burned: {}, nights: {}, sel: { steps: 0, sleep: 0 }, needsMore: false };   // needsMore = workouts/heart not asked yet   // sel = how many days back the card shows
 const AH_HISTORY_DAYS = 30;
 
 // True only inside the iPhone app. On the website (and Android) nothing here runs.
@@ -13899,12 +13944,12 @@ async function ahInit() {
     if(!av || !av.available) { ahState.status = 'unavailable'; ahRender(); return; }
   } catch(e) { ahState.status = 'unavailable'; ahRender(); return; }
   let asked = ahAsked();
-  if(!asked) {
-    // "readAuthorized" means iOS already showed its permission screen for that type (iOS never says what was chosen)
-    const st = await ahSafe(ahCall('checkAuthorization', { read: AH_READ, write: [] }));
-    if(st.ok && st.v && Array.isArray(st.v.readAuthorized) && st.v.readAuthorized.length) { asked = true; ahSetAsked(); }
-  }
+  // "readAuthorized" means iOS already showed its permission screen for that type (iOS never says what was chosen)
+  const st = await ahSafe(ahCall('checkAuthorization', { read: AH_READ, write: [] }));
+  const seen = st.ok && st.v && Array.isArray(st.v.readAuthorized) ? st.v.readAuthorized : null;
+  if(!asked && seen && seen.length) { asked = true; ahSetAsked(); }
   if(!asked) { ahState.status = 'connect'; ahRender(); return; }
+  ahState.needsMore = !!seen && AH_FIT_TYPES.some(t => !seen.includes(t));   // connected before workouts/heart were added
   ahLoad(false, true);
 }
 
@@ -13916,7 +13961,9 @@ async function ahConnect() {
   ahState.connecting = false;
   if(!r.ok) { ahRender(); showToast("Couldn't open Apple Health permissions. Please try again."); return; }
   ahSetAsked();
+  ahState.needsMore = false;
   await ahLoad(true, true);
+  ahLoadFitness(true);
 }
 
 // Adds up samples from one source only (the one with the most), so iPhone + Apple Watch aren't counted twice.
@@ -14296,6 +14343,236 @@ function ahOpenBurnedHistory(silent) {
     <button class="ghost-btn" onclick="ahSheetClose()">Close</button>`);
 }
 
+// ── Apple Watch / Fitness: workouts + heart health (Progress tab) ──
+// Same rules as above: read-only, kept in memory only, never saved or sent anywhere.
+const AH_GYM_KEY = 'trident_health_gym_v1';            // the "Count Apple Watch workouts" switch (a setting, not health data)
+const AH_GYM_TYPES = ['traditionalStrengthTraining', 'functionalStrengthTraining', 'strengthTraining', 'weightlifting',
+  'highIntensityIntervalTraining', 'crossTraining', 'coreTraining', 'mixedCardio', 'kickboxing', 'boxing'];
+const AH_WO = {
+  running: ['Run', '🏃'], walking: ['Walk', '🚶'], hiking: ['Hike', '🥾'], cycling: ['Cycle', '🚴'], handCycling: ['Hand Cycle', '🚴'],
+  traditionalStrengthTraining: ['Strength Training', '🏋️'], functionalStrengthTraining: ['Functional Strength', '🏋️'], strengthTraining: ['Strength Training', '🏋️'], weightlifting: ['Weightlifting', '🏋️'],
+  highIntensityIntervalTraining: ['HIIT', '🔥'], crossTraining: ['Cross Training', '🤸'], coreTraining: ['Core Training', '🤸'], mixedCardio: ['Mixed Cardio', '❤️‍🔥'],
+  elliptical: ['Elliptical', '⚡'], rowing: ['Rowing', '🚣'], stairClimbing: ['Stair Stepper', '🪜'], stairs: ['Stairs', '🪜'], jumpRope: ['Jump Rope', '⚡'],
+  yoga: ['Yoga', '🧘'], pilates: ['Pilates', '🧘'], mindAndBody: ['Mind & Body', '🧘'], flexibility: ['Flexibility', '🤸'], cooldown: ['Cooldown', '🧊'], barre: ['Barre', '🩰'],
+  swimming: ['Swim', '🏊'], swimmingPool: ['Pool Swim', '🏊'], swimmingOpenWater: ['Open Water Swim', '🏊'], boxing: ['Boxing', '🥊'], kickboxing: ['Kickboxing', '🥊'], martialArts: ['Martial Arts', '🥋'],
+  dance: ['Dance', '💃'], climbing: ['Climbing', '🧗'], basketball: ['Basketball', '🏀'], soccer: ['Soccer', '⚽'], tennis: ['Tennis', '🎾'], pickleball: ['Pickleball', '🏓'], golf: ['Golf', '⛳'],
+  americanFootball: ['Football', '🏈'], baseball: ['Baseball', '⚾'], volleyball: ['Volleyball', '🏐'], skiing: ['Skiing', '⛷️'], downhillSkiing: ['Downhill Skiing', '⛷️'], snowboarding: ['Snowboarding', '🏂']
+};
+const AH_HM = {
+  rhr: { label: 'Resting HR', unit: 'bpm', color: '#FF453A', better: -1 },
+  hrv: { label: 'HRV', unit: 'ms', color: '#32FCFD', better: 1 },   // labels kept short so three tiles fit small phones
+  vo2: { label: 'VO₂ max', unit: '', color: '#30D158', better: 1 }
+};
+ahState.fit = { loadedAt: 0, loading: false, workouts: null, rhr: null, hrv: null, vo2: null, hr: {}, metric: 'rhr', showAll: false };
+
+function ahGymCountOn() { try { return localStorage.getItem(AH_GYM_KEY) !== '0'; } catch(e) { return true; } }
+function ahSetGymCount(on) {
+  try { localStorage.setItem(AH_GYM_KEY, on ? '1' : '0'); } catch(e) {}
+  try { renderGymYear(); } catch(e) {}
+}
+// Days with an Apple Watch strength / HIIT workout (shown in the Gym Days card only; never added to the saved list).
+function ahGymDays() {
+  try {
+    if(!ahLive() || !ahGymCountOn() || !ahState.fit.workouts) return [];
+    return ahState.fit.workouts.filter(w => AH_GYM_TYPES.includes(w.workoutType)).map(w => ahKey(w.startDate));
+  } catch(e) { return []; }
+}
+function ahWoName(w) {
+  const m = AH_WO[w.workoutType];
+  if(m) return m[0];
+  return String(w.workoutType || 'Workout').replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase());
+}
+function ahWoIcon(w) { return (AH_WO[w.workoutType] || [0, '⚡'])[1]; }
+function ahWoKey(w) { return w.platformId || (w.startDate + '|' + w.workoutType); }
+function ahMiles(m) { return Math.round(ahNum(m) / 1609.344 * 100) / 100; }
+function ahDurS(sec) { const m = Math.round(ahNum(sec) / 60); return m >= 60 ? `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, '0')}m` : `${m} min`; }
+
+// Reads workouts (this year, for Gym Days; the last 30 days are listed) and heart health trends.
+async function ahLoadFitness(force) {
+  const f = ahState.fit;
+  if(!ahLive() || ahState.needsMore || f.loading) return;
+  if(!force && f.loadedAt && Date.now() - f.loadedAt < AH_FULL_MS) return;
+  f.loading = true; ahRenderFitness();
+  const now = new Date(), iso = d => d.toISOString();
+  const yearStart = new Date(now.getFullYear(), 0, 1);
+  const d90 = ahDayStart(now); d90.setDate(d90.getDate() - 89);
+  const d365 = ahDayStart(now); d365.setDate(d365.getDate() - 364);
+  const [woR, rhrR, hrvR, vo2R] = await Promise.all([
+    ahSafe(ahCall('queryWorkouts', { startDate: iso(yearStart < d90 ? yearStart : d90), endDate: iso(now), limit: 1000, ascending: false })),
+    ahSafe(ahCall('queryAggregated', { dataType: 'restingHeartRate', startDate: iso(d90), endDate: iso(now), bucket: 'day', aggregation: 'average' })),
+    ahSafe(ahCall('readSamples', { dataType: 'heartRateVariability', startDate: iso(d90), endDate: iso(now), limit: 5000, ascending: true })),
+    ahSafe(ahCall('readSamples', { dataType: 'vo2Max', startDate: iso(d365), endDate: iso(now), limit: 1000, ascending: true }))
+  ]);
+  f.loading = false;
+  if(woR.ok) f.workouts = ((woR.v && woR.v.workouts) || []).filter(w => w && w.startDate)
+    .sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+  const series = arr => arr.filter(p => p.v > 0).sort((a, b) => a.t - b.t);
+  if(rhrR.ok) f.rhr = series(((rhrR.v && rhrR.v.samples) || []).map(b => ({ t: new Date(b.startDate).getTime(), v: ahNum(b.value) })));
+  const daily = samples => {   // one value per day (average), so busy days don't dominate
+    const by = {};
+    (samples || []).forEach(s => { const k = ahKey(s.startDate); (by[k] = by[k] || []).push(ahNum(s.value)); });
+    return series(Object.keys(by).map(k => ({ t: new Date(k + 'T12:00:00').getTime(), v: by[k].reduce((a, b) => a + b, 0) / by[k].length })));
+  };
+  if(hrvR.ok) f.hrv = daily(hrvR.v && hrvR.v.samples);
+  if(vo2R.ok) f.vo2 = daily(vo2R.v && vo2R.v.samples);
+  if(woR.ok || rhrR.ok || hrvR.ok || vo2R.ok) f.loadedAt = Date.now();
+  else if(force) showToast("Couldn't read workouts from Apple Health");
+  ahRenderFitness();
+  try { renderGymYear(); } catch(e) {}
+}
+
+// Average + max heart rate during one workout (read when the workout is shown).
+async function ahWorkoutHR(w) {
+  const k = ahWoKey(w), f = ahState.fit;
+  if(f.hr[k]) return f.hr[k];
+  f.hr[k] = { pending: true };
+  const r = await ahSafe(ahCall('queryAggregated', { dataType: 'heartRate', startDate: w.startDate, endDate: w.endDate, bucket: 'day', aggregation: ['average', 'max'] }));
+  const buckets = r.ok ? ((r.v && r.v.samples) || []) : [];
+  const avgs = buckets.map(b => ahNum((b.values && b.values.average) || b.value)).filter(v => v > 0);
+  const maxs = buckets.map(b => ahNum(b.values && b.values.max)).filter(v => v > 0);
+  f.hr[k] = { avg: avgs.length ? Math.round(avgs.reduce((a, b) => a + b, 0) / avgs.length) : 0, max: maxs.length ? Math.round(Math.max(...maxs)) : 0 };
+  return f.hr[k];
+}
+
+function ahHmLatest(arr) { return arr && arr.length ? arr[arr.length - 1] : null; }
+// Change vs about 30 days earlier (null when there isn't enough history).
+function ahHmDelta(arr) {
+  const last = ahHmLatest(arr);
+  if(!last) return null;
+  const target = last.t - 30 * 86400000;
+  const past = arr.filter(p => p.t <= target + 3 * 86400000);
+  if(!past.length) return null;
+  const ref = past.reduce((best, p) => Math.abs(p.t - target) < Math.abs(best.t - target) ? p : best, past[0]);
+  return last.v - ref.v;
+}
+function ahTrendSVG(arr, color) {
+  if(!arr || arr.length < 2) return '<div class="ah-note" style="padding:18px 4px;text-align:center;">Not enough readings yet for a trend.</div>';
+  const W = 320, H = 96, P = 6;
+  const t0 = arr[0].t, t1 = arr[arr.length - 1].t || t0 + 1;
+  let lo = Math.min(...arr.map(p => p.v)), hi = Math.max(...arr.map(p => p.v));
+  if(hi - lo < 2) { lo -= 1; hi += 1; }
+  const x = t => P + (t - t0) / Math.max(1, t1 - t0) * (W - 2 * P), y = v => P + (1 - (v - lo) / (hi - lo)) * (H - 2 * P);
+  const pts = arr.map(p => `${x(p.t).toFixed(1)},${y(p.v).toFixed(1)}`).join(' ');
+  const last = arr[arr.length - 1];
+  return `<svg viewBox="0 0 ${W} ${H}"><defs><linearGradient id="ahTg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${color}" stop-opacity="0.28"/><stop offset="1" stop-color="${color}" stop-opacity="0"/></linearGradient></defs>
+    <polygon points="${x(t0)},${H} ${pts} ${x(last.t)},${H}" fill="url(#ahTg)"/>
+    <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" style="filter:drop-shadow(0 0 4px ${color});"/>
+    <circle cx="${x(last.t)}" cy="${y(last.v)}" r="4" fill="${color}" stroke="#000" stroke-width="1.5"/></svg>`;
+}
+function ahNeedsMoreHTML() {
+  return `<div class="ah-connect" style="margin:0;"><div class="ah-connect-ic">${AH_IC.heart}</div>
+    <div class="ah-connect-txt"><b>Allow workouts &amp; heart data</b><span>Read your Apple Watch workouts, heart rate, HRV and VO₂ max. Read-only, stays on this iPhone.</span></div>
+    <button class="push-btn" onclick="ahConnect()" ${ahState.connecting ? 'disabled' : ''}>${ahState.connecting ? '…' : 'Allow'}</button></div>`;
+}
+function ahPanelHead(title, sub) {
+  return `<div class="ah-ph"><div><div class="ah-ph-t">${title}</div><div class="ah-ph-s">${sub}</div></div><span class="ah-ph-b">${AH_IC.heart}Apple Health</span></div>`;
+}
+
+function ahRenderFitness() {
+  const heart = document.getElementById('ahHeartPanel'), wos = document.getElementById('ahWorkoutsPanel');
+  if(!heart || !wos) return;
+  const on = ahLive();
+  heart.style.display = on ? '' : 'none';
+  wos.style.display = on ? '' : 'none';
+  if(!on) return;
+  if(ahState.needsMore) {
+    heart.innerHTML = ahPanelHead('Heart Health', 'Resting heart rate, HRV and VO₂ max') + ahNeedsMoreHTML();
+    wos.style.display = 'none';
+    return;
+  }
+  const f = ahState.fit;
+  const reading = f.loading && !f.loadedAt;
+  // ── Heart Health
+  const tile = k => {
+    const arr = f[k], last = ahHmLatest(arr), d = ahHmDelta(arr), m = AH_HM[k];
+    const val = last ? (k === 'vo2' ? last.v.toFixed(1) : Math.round(last.v)) : '—';
+    let delta = '<span style="color:var(--text3);">New</span>';
+    if(d !== null && Math.abs(d) >= (k === 'vo2' ? 0.1 : 1)) {
+      const good = Math.sign(d) === m.better;
+      delta = `<span style="color:${good ? '#30D158' : '#FF9F0A'};">${d > 0 ? '↑' : '↓'} ${k === 'vo2' ? Math.abs(d).toFixed(1) : Math.round(Math.abs(d))} <span style="color:var(--text3);font-weight:500;">30d</span></span>`;
+    } else if(d !== null) delta = '<span style="color:var(--text3);">Steady</span>';
+    if(!last) delta = `<span style="color:var(--text3);">${reading ? 'Reading…' : 'No readings'}</span>`;
+    return `<button class="ah-hm-t${f.metric === k ? ' sel' : ''}" style="--c:${m.color};" onclick="ahState.fit.metric='${k}';ahRenderFitness();">
+      <div class="ah-hm-l">${m.label}</div><div class="ah-hm-v" style="color:${last ? m.color : 'var(--text3)'};">${val}${last && m.unit ? `<small>${m.unit}</small>` : ''}</div><div class="ah-hm-d">${delta}</div></button>`;
+  };
+  const sel = f.metric, selArr = f[sel], m = AH_HM[sel];
+  const span = sel === 'vo2' ? 'last 12 months' : 'last 90 days';
+  const notes = { rhr: 'Lower usually means better cardio fitness. Measured by Apple Watch.', hrv: 'Higher usually means better recovery. Measured overnight by Apple Watch.', vo2: 'Estimated by Apple Watch during outdoor walks, runs and hikes.' };
+  heart.innerHTML = ahPanelHead('Heart Health', 'From Apple Watch · tap a tile for its trend') +
+    `<div class="ah-hm">${['rhr', 'hrv', 'vo2'].map(tile).join('')}</div>
+     <div class="ah-trend"><div class="ah-trend-h"><span style="color:${m.color};font-weight:600;">${m.label} · ${span}</span><span>${selArr && selArr.length ? (sel === 'vo2' ? Math.min(...selArr.map(p => p.v)).toFixed(1) + '–' + Math.max(...selArr.map(p => p.v)).toFixed(1) : Math.round(Math.min(...selArr.map(p => p.v))) + '–' + Math.round(Math.max(...selArr.map(p => p.v)))) + (m.unit ? ' ' + m.unit : '') : ''}</span></div>
+     ${reading ? '<div class="ah-note" style="padding:18px 4px;text-align:center;">Reading Apple Health…</div>' : ahTrendSVG(selArr, m.color)}</div>
+     <div class="ah-note" style="margin-top:8px;">${notes[sel]}</div>`;
+  // ── Workouts (last 30 days)
+  const cut = Date.now() - 30 * 86400000;
+  const list = (f.workouts || []).filter(w => new Date(w.startDate).getTime() >= cut);
+  const totMin = list.reduce((t, w) => t + ahNum(w.duration) / 60, 0), totCal = list.reduce((t, w) => t + ahNum(w.totalEnergyBurned), 0);
+  const shown = f.showAll ? list : list.slice(0, 5);
+  let html = ahPanelHead('Workouts', 'From Apple Watch & Fitness · last 30 days');
+  if(reading) html += '<div class="ah-note" style="padding:14px 4px;text-align:center;">Reading Apple Health…</div>';
+  else if(!list.length) html += '<div class="ah-note" style="padding:14px 4px;text-align:center;">No workouts recorded in Apple Health in the last 30 days. Workouts you start on Apple Watch or in the Fitness app show up here.</div>';
+  else {
+    html += `<div class="ah-ws"><div><b>${list.length}</b><span>Workouts</span></div><div><b>${totMin >= 60 ? Math.floor(totMin / 60) + 'h ' + Math.round(totMin % 60) + 'm' : Math.round(totMin) + 'm'}</b><span>Total time</span></div><div><b>${Math.round(totCal).toLocaleString()}</b><span>Calories</span></div></div>`;
+    html += '<div>' + shown.map(w => {
+      const k = ahWoKey(w), hr = f.hr[k];
+      if(!hr) ahWorkoutHR(w).then(() => { if(document.getElementById('ahWorkoutsPanel')) ahRenderFitness(); });
+      const d = new Date(w.startDate);
+      const when = `${d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} · ${ahTime(d)}`;
+      const chips = [ahDurS(w.duration)];
+      if(ahNum(w.totalDistance) > 30) chips.push(ahMiles(w.totalDistance) + ' mi');
+      if(ahNum(w.totalEnergyBurned) > 0) chips.push(Math.round(w.totalEnergyBurned) + ' cal');
+      if(hr && hr.avg) chips.push(`<span style="color:#FF453A;">♥</span> ${hr.avg} bpm`);
+      return `<button class="ah-wo" onclick="ahOpenWorkout('${k.replace(/[^A-Za-z0-9|:.\-_]/g, '')}')"><div class="ah-wo-ic">${ahWoIcon(w)}</div>
+        <div class="ah-wo-m"><div class="ah-wo-n">${ahWoName(w)}</div><div class="ah-wo-d">${when}</div><div class="ah-wo-c">${chips.map(c => `<span>${c}</span>`).join('')}</div></div><div class="ah-wo-chev">›</div></button>`;
+    }).join('') + '</div>';
+    if(list.length > 5) html += `<button class="ah-more" onclick="ahState.fit.showAll=!ahState.fit.showAll;ahRenderFitness();">${f.showAll ? 'Show less' : `Show all ${list.length} workouts`}</button>`;
+  }
+  wos.innerHTML = html;
+}
+
+// Workout details: totals, pace and a heart rate chart for the session.
+async function ahOpenWorkout(key) {
+  const w = (ahState.fit.workouts || []).find(x => ahWoKey(x).replace(/[^A-Za-z0-9|:.\-_]/g, '') === key);
+  if(!w) return;
+  const d = new Date(w.startDate), end = new Date(w.endDate);
+  const render = (hr, series) => {
+    const stats = [[ahDurS(w.duration), 'Duration']];
+    if(ahNum(w.totalEnergyBurned) > 0) stats.push([Math.round(w.totalEnergyBurned).toLocaleString(), 'Calories']);
+    const mi = ahMiles(w.totalDistance);
+    if(mi > 0.02) {
+      stats.push([mi + ' mi', 'Distance']);
+      const paceS = ahNum(w.duration) / mi;
+      if(['running', 'walking', 'hiking'].includes(w.workoutType) && isFinite(paceS)) stats.push([`${Math.floor(paceS / 60)}:${String(Math.round(paceS % 60)).padStart(2, '0')}`, 'Pace /mi']);
+    }
+    stats.push([hr && hr.avg ? hr.avg + ' bpm' : '—', 'Avg heart rate'], [hr && hr.max ? hr.max + ' bpm' : '—', 'Max heart rate']);
+    let chart = '<div class="ah-note" style="padding:16px 4px;text-align:center;">Reading heart rate…</div>';
+    if(series) chart = series.length > 1 ? (() => {
+      const W = 320, H = 110, P = 6, t0 = series[0].t, t1 = series[series.length - 1].t;
+      const lo = Math.min(...series.map(p => p.v)) - 3, hi = Math.max(...series.map(p => p.v)) + 3;
+      const x = t => P + (t - t0) / Math.max(1, t1 - t0) * (W - 2 * P), y = v => P + (1 - (v - lo) / (hi - lo)) * (H - 2 * P);
+      const pts = series.map(p => `${x(p.t).toFixed(1)},${y(p.v).toFixed(1)}`).join(' ');
+      return `<div class="ah-trend-h"><span style="color:#FF453A;font-weight:600;">Heart rate</span><span>${Math.round(lo + 3)}–${Math.round(hi - 3)} bpm</span></div>
+        <svg viewBox="0 0 ${W} ${H + 16}"><defs><linearGradient id="ahHg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF453A" stop-opacity="0.3"/><stop offset="1" stop-color="#FF453A" stop-opacity="0"/></linearGradient></defs>
+        <polygon points="${x(t0)},${H} ${pts} ${x(t1)},${H}" fill="url(#ahHg)"/>
+        <polyline points="${pts}" fill="none" stroke="#FF453A" stroke-width="2" stroke-linejoin="round" style="filter:drop-shadow(0 0 3px #FF453A);"/>
+        <text x="${P}" y="${H + 14}" font-size="10" fill="rgba(255,255,255,0.4)">${ahTime(t0)}</text>
+        <text x="${W - P}" y="${H + 14}" font-size="10" fill="rgba(255,255,255,0.4)" text-anchor="end">${ahTime(t1)}</text></svg>`;
+    })() : '<div class="ah-note" style="padding:16px 4px;text-align:center;">No heart rate recorded during this workout.</div>';
+    ahSheet('workout', `<div class="ah-sh-head"><div style="display:flex;align-items:center;gap:12px;"><div class="ah-wo-ic" style="width:46px;height:46px;font-size:22px;">${ahWoIcon(w)}</div>
+        <div><div class="ah-sh-title">${ahWoName(w)}</div><div class="ah-sh-sub">${d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })} · ${ahTime(d)} – ${ahTime(end)}</div></div></div></div>
+      <div class="ah-sh-stats">${stats.map(([v, l]) => `<div class="ah-sh-stat"><b>${v}</b><span>${l}</span></div>`).join('')}</div>
+      <div class="ah-hr-chart">${chart}</div>
+      <div class="ah-note" style="margin:0 2px 14px;">Recorded by ${String(w.sourceName || 'Apple Health').replace(/[<>&"]/g, '')} · read-only · stays on this iPhone.</div>
+      <button class="ghost-btn" onclick="ahSheetClose()">Close</button>`);
+  };
+  render(ahState.fit.hr[ahWoKey(w)] || null, null);
+  const [hr, r] = await Promise.all([ahWorkoutHR(w), ahSafe(ahCall('readSamples', { dataType: 'heartRate', startDate: w.startDate, endDate: w.endDate, limit: 4000, ascending: true }))]);
+  if(!ahSheetIsOpen('workout')) return;
+  let series = r.ok ? ((r.v && r.v.samples) || []).map(s => ({ t: new Date(s.startDate).getTime(), v: ahNum(s.value) })).filter(p => p.v > 0) : [];
+  if(series.length > 240) { const step = Math.ceil(series.length / 240); series = series.filter((_, i) => i % step === 0); }
+  render(hr, series);
+}
+
 // Redraws everything that shows Apple Health numbers.
 function ahRender() {
   try { renderStepsCard(); } catch(e) {}
@@ -14306,6 +14583,7 @@ function ahRender() {
     else ahRenderActivity();
   } catch(e) {}
   try { if(ahSheetIsOpen('sleep')) ahOpenSleep(); else if(ahSheetIsOpen('burned')) ahOpenBurnedHistory(true); } catch(e) {}
+  try { ahRenderFitness(); if(ahLive() && !ahState.fit.loadedAt) ahLoadFitness(false); } catch(e) {}
   ahRenderSettings();
 }
 function ahRenderBusy() {
@@ -14316,6 +14594,7 @@ function ahRenderBusy() {
 function ahRenderSettings() {
   const status = document.getElementById('ahSetStatus'), btn = document.getElementById('ahSetBtn');
   if(!status || !btn) return;
+  const gt = document.getElementById('ahGymToggle'); if(gt) gt.checked = ahGymCountOn();
   const st = ahState.status;
   btn.style.display = st === 'unavailable' || st === 'checking' ? 'none' : '';
   btn.disabled = !!(ahState.connecting || ahState.loading);
@@ -14334,7 +14613,7 @@ function ahSettingsButton() {
   else ahLoad(true, true);
 }
 // Keep it fresh: every minute while the app is on screen, and right away when coming back to it.
-setInterval(() => { if(!document.hidden && ahLive()) ahLoad(false, false); }, AH_QUICK_MS);
+setInterval(() => { if(!document.hidden && ahLive()) { ahLoad(false, false); ahLoadFitness(false); } }, AH_QUICK_MS);
 document.addEventListener('visibilitychange', () => {
   if(document.hidden || !ahIsNativeIOS()) return;
   if((ahState.status === 'ready' || ahState.status === 'error') && Date.now() - ahState.loadedAt > 15000) ahLoad(false, false);
