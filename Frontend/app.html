@@ -61,7 +61,10 @@
     });
   }
 </script>
+<script>/* iPhone app only: mark the page so scroll bars inside sheets can be hidden (the website keeps them) */try{if(window.Capacitor&&typeof Capacitor.isNativePlatform==='function'&&Capacitor.isNativePlatform())document.documentElement.classList.add('tf-native');}catch(e){}</script>
 <style>
+html.tf-native *{scrollbar-width:none;}
+html.tf-native ::-webkit-scrollbar{display:none;width:0;height:0;}
 html,body{touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%;}
 
 :root {
