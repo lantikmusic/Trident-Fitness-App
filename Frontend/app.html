@@ -1337,6 +1337,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .ah-home-item span{min-width:0;line-height:1.25;}
 @media(max-width:360px){.ah-home{padding:16px 14px;}.ah-home-item{font-size:11.5px;padding:8px;gap:6px;}.ah-home p{font-size:13px;}}
 .ah-home-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;font-size:11px;color:var(--text3);}
+.ah-sync{position:relative;display:flex;align-items:center;gap:14px;margin-bottom:16px;padding:14px 40px 14px 14px;border-radius:var(--radius-xl);cursor:pointer;
+  background:linear-gradient(180deg,rgba(255,255,255,0.07),rgba(255,255,255,0.02)),var(--bg3);border:0.5px solid rgba(255,255,255,0.12);box-shadow:inset 0 1px 0 rgba(255,255,255,0.07);-webkit-tap-highlight-color:transparent;}
+.ah-sync:active{transform:scale(0.99);}
+.ah-sync-icons{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.ah-sync-icons img{width:40px;height:40px;display:block;margin:4px 0;}          /* Apple's icon: unaltered, clear space, not overlapped */
+.ah-sync-icons img.ah-sync-tf{border-radius:10px;}                                /* Trident's own icon */
+.ah-sync-txt{flex:1;min-width:0;}
+.ah-sync-txt b{display:block;font-size:16px;font-weight:700;letter-spacing:-0.01em;}
+.ah-sync-txt span{display:block;font-size:12.5px;line-height:1.4;color:var(--text2);margin-top:2px;}
+.ah-sync-chev{font-size:24px;color:var(--text3);flex-shrink:0;}
+.ah-sync-x{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;border:none;background:transparent;color:var(--text3);font-size:15px;line-height:1;cursor:pointer;font-family:inherit;}
+.ah-sync .ah-sync-chev{position:absolute;right:14px;top:50%;transform:translateY(-50%);}
+.ah-sheet-p{font-size:13.5px;line-height:1.5;color:var(--text2);margin:0 0 12px;}
+@media(max-width:360px){.ah-sync{gap:10px;padding:12px 34px 12px 12px;}.ah-sync-icons img{width:34px;height:34px;}.ah-sync-txt b{font-size:15px;}.ah-sync-txt span{font-size:12px;}}
 .ah-home-foot button{border:none;background:none;color:var(--text2);font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;padding:4px 0;}
 .ah-home-foot svg{width:12px;height:12px;vertical-align:-1px;margin-right:4px;}
 .ah-set-help{font-size:11.5px;line-height:1.5;color:var(--text3);padding:2px 4px 0;}
@@ -13982,6 +13996,7 @@ async function ahConnect() {
   if(!r.ok) { ahRender(); showToast("Couldn't open Apple Health permissions. Please try again."); return; }
   ahSetAsked();
   ahState.needsMore = false;
+  if(ahSheetIsOpen('connect')) ahSheetClose();
   await ahLoad(true, true);
   ahLoadFitness(true);
 }
@@ -14599,28 +14614,46 @@ async function ahOpenWorkout(key) {
 const AH_HOME_HIDE_KEY = 'trident_health_card_hidden_v1';
 const AH_HEALTH_ICON = 'Icons/apple-health.png';   // kept only in the iPhone project (Apple's license: in-app use only)
 function ahHomeCardHide() { try { localStorage.setItem(AH_HOME_HIDE_KEY, '1'); } catch(e) {} ahRenderHomeCard(); }
+function ahHomeWants() {   // which version applies: null (hidden), 'connect' or 'more'
+  let hidden = false; try { hidden = localStorage.getItem(AH_HOME_HIDE_KEY) === '1'; } catch(e) {}
+  const st = ahState.status;
+  if(!ahIsNativeIOS()) return null;
+  if(st === 'connect') return hidden ? null : 'connect';
+  if(st === 'ready' && ahState.needsMore) return hidden ? null : 'more';
+  return null;
+}
+// Compact "Sync" row on Home (Apple's icon and Trident's icon side by side, never overlapping).
 function ahRenderHomeCard() {
   const el = document.getElementById('ahHomeCard');
   if(!el) return;
-  let hidden = false; try { hidden = localStorage.getItem(AH_HOME_HIDE_KEY) === '1'; } catch(e) {}
-  const st = ahState.status;
-  const show = ahIsNativeIOS() && !hidden && (st === 'connect' || (st === 'ready' && ahState.needsMore));
-  el.style.display = show ? '' : 'none';
-  if(!show) return;
-  const more = st === 'ready';   // already connected; only workouts & heart data are new
+  const want = ahHomeWants();
+  el.style.display = want ? '' : 'none';
+  if(!want) { if(ahSheetIsOpen('connect')) ahSheetClose(); return; }
+  const more = want === 'more';
+  el.innerHTML = `<div class="ah-sync" role="button" tabindex="0" onclick="ahOpenConnectSheet()">
+    <div class="ah-sync-icons"><img src="${AH_HEALTH_ICON}" alt="" onerror="this.style.display='none'"><img src="Icons/icon-192.png" alt="" class="ah-sync-tf"></div>
+    <div class="ah-sync-txt"><b>${more ? 'Add workouts & heart data' : 'Sync Apple Health'}</b>
+      <span>${more ? 'Bring in Apple Watch & Apple Fitness workouts and heart health.' : 'Connect Apple Health & Apple Fitness for steps, sleep, workouts and heart insights.'}</span></div>
+    <div class="ah-sync-chev">›</div>
+    <button class="ah-sync-x" onclick="event.stopPropagation();ahHomeCardHide()" aria-label="Hide">×</button>
+  </div>`;
+  if(ahSheetIsOpen('connect')) ahOpenConnectSheet();
+}
+// The details + Connect button, in a sheet.
+function ahOpenConnectSheet() {
+  const want = ahHomeWants() || (ahState.status === 'connect' ? 'connect' : ahState.needsMore ? 'more' : null);
+  if(!want) return;
+  const more = want === 'more';
   const items = more
     ? [['🏋️', 'Watch workouts'], ['❤️', 'Heart rate'], ['📈', 'Resting HR & HRV'], ['🫁', 'VO₂ max']]
     : [['👟', 'Steps'], ['🔥', 'Calories burned'], ['🌙', 'Sleep & stages'], ['🏋️', 'Workouts'], ['❤️', 'Heart rate & HRV'], ['🫁', 'VO₂ max']];
-  el.innerHTML = `<div class="ah-home">
-    <button class="ah-home-x" onclick="ahHomeCardHide()" aria-label="Hide">×</button>
-    <div class="ah-home-brand"><img src="${AH_HEALTH_ICON}" alt="" onerror="this.style.display='none'">
+  ahSheet('connect', `<div class="ah-home-brand"><img src="${AH_HEALTH_ICON}" alt="" onerror="this.style.display='none'">
       <div><div class="ah-home-name">Apple Health</div><b>${more ? 'Add workouts & heart data' : 'Connect Apple Health'}</b></div></div>
-    <p>${more ? 'Bring in your Apple Watch and Apple Fitness workouts plus heart health from the Apple Health app.'
+    <p class="ah-sheet-p">${more ? 'Bring in your Apple Watch and Apple Fitness workouts plus heart health from the Apple Health app.'
               : 'See your Apple Health and Apple Fitness data in Trident: your Steps, Sleep and Macros fill in automatically, and your Apple Watch workouts and heart health show on Progress.'}</p>
     <div class="ah-home-grid">${items.map(([i, t]) => `<div class="ah-home-item"><i>${i}</i><span>${t}</span></div>`).join('')}</div>
     <button class="pink-btn" onclick="ahConnect()" ${ahState.connecting ? 'disabled' : ''}>${ahState.connecting ? 'Opening Apple Health…' : more ? 'Allow workouts & heart data' : 'Connect Apple Health'}</button>
-    <div class="ah-home-foot"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>Read-only · stays on this iPhone</span><button onclick="ahHomeCardHide()">Not now</button></div>
-  </div>`;
+    <div class="ah-home-foot"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>Read-only · stays on this iPhone</span><button onclick="ahSheetClose();ahHomeCardHide()">Not now</button></div>`);
 }
 
 // Redraws everything that shows Apple Health numbers.
