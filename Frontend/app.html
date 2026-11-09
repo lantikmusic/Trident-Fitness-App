@@ -2185,6 +2185,9 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
 .cmp-empty-ic svg{width:26px;height:26px;}
 .cmp-postview{padding-top:4px;}
 .cmp-postview .cm-post{border-bottom:none;}
+.cm-post .cm-uname{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cm-post .cm-when{font-weight:500;color:var(--text3);font-size:13px;}
+.cm-post .cm-time:empty{display:none;}
 </style>
 <script>/* No zooming: block iOS pinch-zoom (double-tap and tap-in-a-box zoom are stopped by the viewport + touch-action) */try{['gesturestart','gesturechange','gestureend'].forEach(function(t){document.addEventListener(t,function(e){e.preventDefault();},{passive:false});});}catch(e){}</script>
 </head>
@@ -13084,7 +13087,7 @@ function cmPostHTML(p) {
     <div class="cm-pad cm-head">
       <button class="cm-who" onclick="cmOpenProfile('${uid}')" aria-label="Open ${name}'s profile">
         <div class="cm-ring">${cmAvatarHTML(p)}</div>
-        <div style="min-width:0;"><div class="cm-name">${name}</div><div class="cm-time">${handle ? `<span class="cm-handle">@${handle}</span> · ` : ''}${cmEsc(cmTimeAgo(p.created_at))}${kind ? ` · <span class="cm-kind">${kind}</span>` : ''}</div></div>
+        <div style="min-width:0;"><div class="cm-name cm-uname">${handle || name}<span class="cm-when"> · ${cmEsc(cmTimeAgo(p.created_at))}</span></div><div class="cm-time">${handle ? name : ''}${handle && kind ? ' · ' : ''}${kind ? `<span class="cm-kind">${kind}</span>` : ''}</div></div>
       </button>
       ${p.mine ? `<button class="cm-del" onclick="cmDeletePost('${id}')" aria-label="Delete post">${CM_TRASH}</button>` : (p.following ? '' : `<button class="cm-follow" onclick="cmToggleFollow('${uid}')">Follow</button>`)}
     </div>
