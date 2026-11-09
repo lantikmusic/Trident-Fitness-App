@@ -913,9 +913,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .summary-ex-name{font-size:13px;font-weight:600;}
 .summary-ex-sets{font-size:11px;color:var(--text3);margin-top:2px;}
 .summary-ex-best{font-size:14px;font-weight:700;color:var(--pink);}
-/* Share to socials (Macros) */
-.mx-share-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;margin-top:14px;padding:10px;border-radius:12px;border:0.5px solid var(--pink-border);background:var(--pink-dim);color:var(--pink);font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;}
-.mx-share-btn:active{transform:scale(.98);}
+/* Share a meal (Macros) */
 .shr-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:360;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;transition:opacity .3s;}
 .shr-overlay.open{opacity:1;}
 .shr-sheet{position:fixed;left:0;right:0;bottom:0;z-index:361;background:var(--bg3);border-radius:24px 24px 0 0;border-top:0.5px solid var(--pink-border);padding:0 20px calc(22px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .38s cubic-bezier(.32,0,.15,1);max-height:94vh;overflow-y:auto;}
@@ -927,15 +925,22 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Ne
 .shr-seg{display:flex;gap:4px;padding:4px;background:var(--bg4);border-radius:99px;margin-bottom:14px;}
 .shr-seg button{flex:1;padding:9px 0;border:none;border-radius:99px;background:transparent;color:var(--text2);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;transition:background .2s,color .2s;}
 .shr-seg button.active{background:var(--pink);color:#000;}
-.shr-preview{display:flex;align-items:center;justify-content:center;height:min(50vh,440px);border-radius:18px;margin-bottom:12px;overflow:hidden;background:#0a0a0a;}
-.shr-preview.clear{background-color:#2a2a2c;background-image:linear-gradient(45deg,#1c1c1e 25%,transparent 25%),linear-gradient(-45deg,#1c1c1e 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#1c1c1e 75%),linear-gradient(-45deg,transparent 75%,#1c1c1e 75%);background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0;}
-.shr-preview img{max-width:100%;max-height:100%;display:block;border-radius:12px;}
-.shr-preview.clear img{border-radius:0;max-width:92%;}
+.shr-preview{position:relative;display:flex;align-items:center;justify-content:center;height:min(42vh,340px);border-radius:18px;margin-bottom:12px;overflow:hidden;padding:16px;background:radial-gradient(60% 50% at 30% 30%,#c98a4a,transparent 70%),radial-gradient(60% 60% at 75% 70%,#7a3f1d,transparent 70%),radial-gradient(40% 40% at 60% 35%,#e9c47a,transparent 70%),linear-gradient(160deg,#5a3a24,#2a1a10);}
+.shr-preview img{max-width:100%;max-height:100%;display:block;}
+.shr-pv-note{position:absolute;left:0;right:0;bottom:8px;text-align:center;font-size:10.5px;font-weight:600;color:rgba(255,255,255,.7);text-shadow:0 1px 3px rgba(0,0,0,.6);}
 .shr-spin{width:26px;height:26px;border-radius:50%;border:3px solid rgba(255,255,255,.15);border-top-color:var(--pink);animation:shrSpin .8s linear infinite;}
 @keyframes shrSpin{to{transform:rotate(360deg);}}
 .shr-hint{font-size:12.5px;line-height:1.45;color:var(--text3);text-align:center;margin:0 6px 14px;}
 .shr-hint b{color:var(--text2);font-weight:600;}
 #shrSaveBtn:disabled,#shrCopyBtn:disabled{opacity:.5;}
+.meal-head-right{display:flex;align-items:center;gap:8px;margin-left:auto;}
+.mx-meal-share{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:99px;border:0.5px solid var(--pink-border);background:transparent;color:var(--pink);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.mx-meal-share:active{background:var(--pink-dim);}
+.shr-pick{display:flex;gap:6px;overflow-x:auto;margin:0 -20px 12px;padding:0 20px;scrollbar-width:none;}
+.shr-pick::-webkit-scrollbar{display:none;}
+.shr-chip{flex-shrink:0;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:8px 14px;border-radius:99px;border:0.5px solid var(--border2);background:var(--bg4);color:var(--text2);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;}
+.shr-chip.on{background:var(--pink-dim);border-color:var(--pink);color:var(--pink);}
+
 .summary-pr-badge{font-size:10px;font-weight:700;color:#FFD700;background:rgba(255,215,0,.12);border:0.5px solid rgba(255,215,0,.3);padding:2px 7px;border-radius:99px;margin-left:6px;}
 /* Food search modal */
 .food-search-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:160;flex-direction:column;align-items:center;justify-content:flex-start;padding:20px;overflow-y:auto;}
@@ -2461,7 +2466,6 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
     <div class="mx-sum" id="balanceHero">
       <div id="mxSumTop"></div>
       <div class="mx-bars" id="statsGrid"></div>
-      <button class="mx-share-btn" onclick="shrOpen()" aria-label="Share today's macros to socials"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Share to socials</button>
     </div>
     <!-- Meal tabs -->
     <div class="meal-tabs" role="tablist" aria-label="Meal">
@@ -2473,7 +2477,7 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
     <div class="meal-panel" id="mealPanel">
       <div class="meal-panel-header">
         <div class="meal-panel-title" id="mealPanelTitle">Breakfast</div>
-        <div class="meal-cal-badge" id="mealCalBadge">0 kcal</div>
+        <div class="meal-head-right"><div class="meal-cal-badge" id="mealCalBadge">0 kcal</div><button class="mx-meal-share" onclick="shrOpen()" aria-label="Share this meal to your story"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Share</button></div>
       </div>
       <div class="meal-macro-row" id="mealMacroRow">
         <div class="meal-macro-pill mx-p"><i></i><b><span id="meal-p-display">0</span>g</b><span class="mmp-lbl">Protein</span></div>
@@ -2817,19 +2821,20 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
   </div>
 </div>
 
-<!-- Share to socials (Macros): story-size picture to save and post -->
+<!-- Share a meal: see-through macro sticker for Instagram stories -->
 <div class="shr-overlay" id="shrOverlay" onclick="shrClose()"></div>
-<div class="shr-sheet" id="shrSheet" role="dialog" aria-modal="true" aria-label="Share to socials">
+<div class="shr-sheet" id="shrSheet" role="dialog" aria-modal="true" aria-label="Share meal">
   <div class="shr-handle"></div>
-  <div class="shr-head"><div class="shr-title">Share to socials</div><button class="shr-x" onclick="shrClose()" aria-label="Close">✕</button></div>
+  <div class="shr-head"><div class="shr-title" id="shrTitle">Share meal</div><button class="shr-x" onclick="shrClose()" aria-label="Close">✕</button></div>
+  <div class="shr-pick" id="shrPick" style="display:none;"></div>
   <div class="shr-seg" role="tablist">
-    <button data-s="card" class="active" onclick="shrSetStyle('card')">Card</button>
-    <button data-s="clear" onclick="shrSetStyle('clear')">See-through</button>
+    <button data-s="glass" class="active" onclick="shrSetStyle('glass')">Glass</button>
+    <button data-s="clear" onclick="shrSetStyle('clear')">Clear</button>
   </div>
   <div class="shr-preview" id="shrPreview"><div class="shr-spin"></div></div>
   <div class="shr-hint" id="shrHint"></div>
-  <button class="pink-btn" id="shrSaveBtn" onclick="shrSave()" disabled>Save to Photos</button>
-  <button class="ghost-btn" id="shrCopyBtn" onclick="shrCopy()" style="margin-top:8px;display:none;" disabled>Copy as sticker</button>
+  <button class="pink-btn" id="shrCopyBtn" onclick="shrCopy()" style="display:none;" disabled>Copy sticker</button>
+  <button class="ghost-btn" id="shrSaveBtn" onclick="shrSave()" style="margin-top:8px;" disabled>Save to Photos</button>
 </div>
 
 <!-- Food Search Modal -->
@@ -3959,22 +3964,16 @@ function renderMacroStats(){
   }).join('');
 }
 
-// ── Share to socials (Macros): draws a story-size picture (1080×1920) of the selected day's
-// macros. "Card" has the dark brand background; "See-through" has no background (cropped
-// around the stats) so it can sit on top of your own photo. Made on this device only.
-var SHR = { style: 'card', day: 0, blobs: {}, url: '', gen: 0 };
+// ── Share a meal: a see-through sticker with one meal's (or one food's) macros, to put on top of
+// your own food photo in an Instagram story. "Clear" = text only; "Glass" = dark see-through panel
+// so the numbers stay readable on bright photos. Made on this device only.
+var SHR = { style: 'glass', day: 0, meal: 'breakfast', pick: -1, blobs: {}, url: '', gen: 0 };
 var SHR_MARK = null;
 var SHR_FONT = "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif";
 function shrFont(w, px, italic) { return (italic ? 'italic ' : '') + w + ' ' + px + 'px ' + SHR_FONT; }
 function shrLoadMark() {
   if(!SHR_MARK) SHR_MARK = new Promise(res => { const im = new Image(); im.onload = () => res(im); im.onerror = () => res(null); im.src = 'Icons/trident-mark.png'; });
   return SHR_MARK;
-}
-function shrRGBA(color, a) {
-  const h = String(color || '').trim().replace('#', '');
-  const f = h.length === 3 ? h.split('').map(c => c + c).join('') : h;
-  const n = /^[0-9a-f]{6}$/i.test(f) ? parseInt(f, 16) : 0x32FCFD;
-  return 'rgba(' + (n >> 16 & 255) + ',' + (n >> 8 & 255) + ',' + (n & 255) + ',' + a + ')';
 }
 function shrRound(ctx, x, y, w, h, r) {
   r = Math.min(r, h / 2, w / 2);
@@ -3989,139 +3988,142 @@ function shrSpaced(ctx, text, x, y, sp) {
   ch.forEach((c, i) => { ctx.fillText(c, cx, y); cx += ws[i] + sp; });
   ctx.textAlign = 'center';
 }
-function shrDayText(i) {
-  const d = new Date(macroSlotDate(i) + 'T12:00:00');
-  return d.toLocaleDateString('en-US', { weekday: 'long' }) + ' · ' + d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+// Shortens text with "…" so it fits the width
+function shrFit(ctx, text, maxW) {
+  text = String(text || '');
+  if(ctx.measureText(text).width <= maxW) return text;
+  let t = text;
+  while(t.length > 1 && ctx.measureText(t + '…').width > maxW) t = t.slice(0, -1);
+  return t.trimEnd() + '…';
 }
-async function shrDraw(style, dayIdx) {
-  const W = 1080, H = 1920, clear = style === 'clear';
+function shrItems() { const m = macroData[SHR.day] && macroData[SHR.day].meals[SHR.meal]; return m && Array.isArray(m.items) ? m.items : []; }
+// What the sticker shows: the whole meal, or one food from it
+function shrSubject() {
+  const meal = macroData[SHR.day].meals[SHR.meal], items = shrItems(), label = MEAL_LABELS[SHR.meal] || 'Meal';
+  const it = SHR.pick >= 0 ? items[SHR.pick] : null;
+  if(it) return { title: it.name || label, label, cal: Number(it.cal) || 0, protein: Number(it.protein) || 0, carbs: Number(it.carbs) || 0, fat: Number(it.fat) || 0 };
+  if(items.length) {
+    const sum = k => items.reduce((s, x) => s + (Number(x[k]) || 0), 0);
+    return { title: items.length === 1 ? (items[0].name || label) : items.map(x => x.name).filter(Boolean).join(', '), label, cal: sum('cal'), protein: sum('protein'), carbs: sum('carbs'), fat: sum('fat') };
+  }
+  return { title: label, label, cal: calcMealCal(meal), protein: meal.protein || 0, carbs: meal.carbs || 0, fat: meal.fat || 0 };
+}
+async function shrDraw(style) {
+  const W = 1080, H = 720, glass = style === 'glass';
   const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
   const ctx = cv.getContext('2d');
-  const t = dayTotals(macroData[dayIdx]), goals = mxGoals();
+  const s = shrSubject();
   let acc = getAccentColor(); if(!/^#[0-9a-f]{3,6}$/i.test(acc)) acc = '#32FCFD';
-  const red = '#FF453A', over = t.cal > goals.cal;
-  const dim = clear ? 'rgba(255,255,255,.92)' : 'rgba(255,255,255,.55)';
-  const shadow = on => { ctx.shadowColor = on && clear ? 'rgba(0,0,0,.7)' : 'transparent'; ctx.shadowBlur = on && clear ? 26 : 0; ctx.shadowOffsetY = on && clear ? 3 : 0; };
+  const dim = glass ? 'rgba(255,255,255,.62)' : 'rgba(255,255,255,.92)';
+  const shadow = on => { const k = on && !glass; ctx.shadowColor = k ? 'rgba(0,0,0,.7)' : 'transparent'; ctx.shadowBlur = k ? 24 : 0; ctx.shadowOffsetY = k ? 3 : 0; };
   ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
-  if(!clear) {
-    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
-    let g = ctx.createRadialGradient(W * .92, H * .1, 0, W * .92, H * .1, W);
-    g.addColorStop(0, shrRGBA(acc, .30)); g.addColorStop(1, shrRGBA(acc, 0)); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-    g = ctx.createRadialGradient(W * .05, H * .95, 0, W * .05, H * .95, W * .95);
-    g.addColorStop(0, shrRGBA(acc, .16)); g.addColorStop(1, shrRGBA(acc, 0)); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  if(glass) {
+    shrRound(ctx, 24, 24, W - 48, H - 48, 72);
+    ctx.fillStyle = 'rgba(12,12,14,.58)'; ctx.fill();
+    ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(255,255,255,.16)'; ctx.stroke();
   }
   shadow(true);
-  // Logo + wordmark + date (kept below Instagram's top bar)
+  // Brand line: trident + TRIDENT FITNESS
   const mark = await shrLoadMark();
-  if(mark) { const mh = 128, mw = mark.width * mh / mark.height; ctx.drawImage(mark, (W - mw) / 2, 262, mw, mh); }
-  ctx.font = shrFont(900, 62, true);
-  const w1 = ctx.measureText('TRIDENT').width, gap = 62 * .28, w2 = ctx.measureText('FITNESS').width, x0 = (W - (w1 + gap + w2)) / 2;
-  ctx.textAlign = 'left'; ctx.fillStyle = '#fff'; ctx.fillText('TRIDENT', x0, 466);
-  ctx.fillStyle = acc; ctx.fillText('FITNESS', x0 + w1 + gap, 466); ctx.textAlign = 'center';
-  ctx.font = shrFont(700, 30); ctx.fillStyle = dim; shrSpaced(ctx, shrDayText(dayIdx).toUpperCase(), W / 2, 532, 6);
-  // Glass panel (Card only)
-  const px = 80, py = 590, pw = W - 160, ph = 950;
-  shadow(false);
-  if(!clear) {
-    shrRound(ctx, px, py, pw, ph, 64);
-    const pg = ctx.createLinearGradient(0, py, 0, py + ph);
-    pg.addColorStop(0, 'rgba(255,255,255,.09)'); pg.addColorStop(1, 'rgba(255,255,255,.035)');
-    ctx.fillStyle = pg; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(255,255,255,.13)'; ctx.stroke();
-  }
-  // Calorie ring
-  const cx = W / 2, cy = 815, R = 175, pct = goals.cal > 0 ? Math.min(t.cal / goals.cal, 1) : 0;
-  ctx.lineCap = 'round'; ctx.lineWidth = 36;
-  shadow(true);
-  ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.strokeStyle = clear ? 'rgba(255,255,255,.3)' : 'rgba(255,255,255,.09)'; ctx.stroke();
-  if(pct > 0) {
-    if(!clear) { ctx.shadowColor = shrRGBA(over ? red : acc, .55); ctx.shadowBlur = 34; }
-    ctx.beginPath(); ctx.arc(cx, cy, R, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * pct);
-    ctx.strokeStyle = over ? red : acc; ctx.stroke();
-  }
-  shadow(true);
-  ctx.fillStyle = '#fff'; ctx.font = shrFont(800, 104); ctx.fillText(Math.round(t.cal).toLocaleString(), cx, cy + 26);
-  ctx.font = shrFont(600, 32); ctx.fillStyle = dim; ctx.fillText('of ' + goals.cal.toLocaleString() + ' kcal', cx, cy + 82);
-  // Left / burned / net
-  const left = Math.round(goals.cal - t.cal), net = Math.round(t.cal - t.burned);
-  [[over ? 'KCAL OVER' : 'KCAL LEFT', Math.abs(left).toLocaleString(), over ? red : acc],
-   ['KCAL BURNED', Math.round(t.burned).toLocaleString(), '#fff'],
-   ['NET KCAL', (net > 0 ? '+' : net < 0 ? '−' : '') + Math.abs(net).toLocaleString(), '#fff']].forEach((c, i) => {
-    const x = px + pw * (i * 2 + 1) / 6;
-    ctx.font = shrFont(800, 54); ctx.fillStyle = c[2]; ctx.fillText(c[1], x, 1100);
-    ctx.font = shrFont(700, 22); ctx.fillStyle = dim; shrSpaced(ctx, c[0], x, 1140, 3);
-  });
-  if(!clear) { shadow(false); ctx.fillStyle = 'rgba(255,255,255,.08)'; ctx.fillRect(px + 60, 1186, pw - 120, 2); }
-  // Protein / carbs / fat bars
-  const bx = px + 60, bw = pw - 120;
-  [['Protein', 'protein'], ['Carbs', 'carbs'], ['Fat', 'fat']].forEach(([name, k], i) => {
-    const y = 1258 + i * 90, val = Math.round(t[k]), goal = goals[k], p = goal > 0 ? Math.min(val / goal, 1) : 0;
+  ctx.font = shrFont(900, 38, true);
+  const w1 = ctx.measureText('TRIDENT').width, gap = 38 * .28, w2 = ctx.measureText('FITNESS').width;
+  const mh = 58, mw = mark ? mark.width * mh / mark.height : 0, gapM = mark ? 14 : 0;
+  let x = (W - (mw + gapM + w1 + gap + w2)) / 2;
+  if(mark) ctx.drawImage(mark, x, 78, mw, mh);
+  x += mw + gapM;
+  ctx.textAlign = 'left'; ctx.fillStyle = '#fff'; ctx.fillText('TRIDENT', x, 122);
+  ctx.fillStyle = acc; ctx.fillText('FITNESS', x + w1 + gap, 122); ctx.textAlign = 'center';
+  // Meal + what it is
+  ctx.font = shrFont(800, 30); ctx.fillStyle = acc; shrSpaced(ctx, s.label.toUpperCase(), W / 2, 196, 6);
+  ctx.font = shrFont(700, 50); ctx.fillStyle = '#fff'; ctx.fillText(shrFit(ctx, s.title, W - 200), W / 2, 262);
+  // Calories
+  const calTxt = Math.round(s.cal).toLocaleString();
+  ctx.font = shrFont(900, 150); const cw = ctx.measureText(calTxt).width;
+  ctx.font = shrFont(700, 46); const kw = ctx.measureText(' kcal').width;
+  const cx0 = (W - cw - kw) / 2;
+  ctx.textAlign = 'left';
+  ctx.font = shrFont(900, 150); ctx.fillStyle = '#fff'; ctx.fillText(calTxt, cx0, 430);
+  ctx.font = shrFont(700, 46); ctx.fillStyle = dim; ctx.fillText(' kcal', cx0 + cw, 430);
+  ctx.textAlign = 'center';
+  // Protein / carbs / fat
+  if(glass) { shadow(false); ctx.fillStyle = 'rgba(255,255,255,.1)'; ctx.fillRect(110, 478, W - 220, 2); }
+  [['PROTEIN', 'protein'], ['CARBS', 'carbs'], ['FAT', 'fat']].forEach(([lbl, k], i) => {
+    const mx = 110 + (W - 220) * (i * 2 + 1) / 6;
     shadow(true);
-    ctx.beginPath(); ctx.arc(bx + 9, y - 12, 9, 0, Math.PI * 2); ctx.fillStyle = mxColor(k); ctx.fill();
-    ctx.textAlign = 'left'; ctx.font = shrFont(700, 34); ctx.fillStyle = '#fff'; ctx.fillText(name, bx + 30, y);
-    ctx.textAlign = 'right'; ctx.font = shrFont(600, 32); ctx.fillStyle = dim;
-    const tail = ' / ' + goal + 'g'; ctx.fillText(tail, bx + bw, y);
-    const tw = ctx.measureText(tail).width;
-    ctx.font = shrFont(800, 34); ctx.fillStyle = val > goal ? red : '#fff'; ctx.fillText(String(val), bx + bw - tw, y);
+    ctx.font = shrFont(800, 68); ctx.fillStyle = '#fff';
+    const v = Math.round(s[k]) + '', vw = ctx.measureText(v).width;
+    ctx.font = shrFont(700, 36); const gw = ctx.measureText('g').width;
+    ctx.textAlign = 'left';
+    ctx.font = shrFont(800, 68); ctx.fillText(v, mx - (vw + gw) / 2, 590);
+    ctx.font = shrFont(700, 36); ctx.fillStyle = dim; ctx.fillText('g', mx - (vw + gw) / 2 + vw, 590);
     ctx.textAlign = 'center';
-    shrRound(ctx, bx, y + 22, bw, 16, 8); ctx.fillStyle = clear ? 'rgba(255,255,255,.3)' : 'rgba(255,255,255,.08)'; ctx.fill();
-    shadow(false);
-    if(p > 0) { shrRound(ctx, bx, y + 22, Math.max(16, bw * p), 16, 8); ctx.fillStyle = mxColor(k); ctx.fill(); }
+    ctx.font = shrFont(800, 28);
+    const lw = ctx.measureText(lbl).width + 3 * (lbl.length - 1);
+    ctx.beginPath(); ctx.arc(mx - lw / 2 - 18, 633, 10, 0, Math.PI * 2); ctx.fillStyle = mxColor(k); ctx.fill();
+    ctx.fillStyle = dim; shrSpaced(ctx, lbl, mx + 4, 643, 3);
   });
-  if(!clear) return cv;
-  // See-through: crop to the stats so it's easy to place as a sticker
-  const top = 236, h = 1300, out = document.createElement('canvas');
-  out.width = W; out.height = h;
-  out.getContext('2d').drawImage(cv, 0, top, W, h, 0, 0, W, h);
-  return out;
+  return cv;
 }
 function shrIsNative() { try { return !!(window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform()); } catch(e) { return false; } }
-function shrCanCopy() { return !!(window.ClipboardItem && navigator.clipboard && navigator.clipboard.write); }
-function shrFileName(style) { return 'trident-macros-' + macroSlotDate(SHR.day) + (style === 'clear' ? '-sticker' : '') + '.png'; }
+function shrWebCopy() { return !shrIsNative() && !!(window.ClipboardItem && navigator.clipboard && navigator.clipboard.write); }
+function shrFileName() {
+  const it = SHR.pick >= 0 ? shrItems()[SHR.pick] : null;
+  const what = String(it ? it.name : SHR.meal).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 30) || 'meal';
+  return 'trident-' + what + '-' + macroSlotDate(SHR.day) + '.png';
+}
+function shrKey(style) { return style + ':' + SHR.pick; }
 async function shrRender(style) {
-  if(SHR.blobs[style]) return SHR.blobs[style];
-  const cv = await shrDraw(style, SHR.day);
+  const key = shrKey(style);
+  if(SHR.blobs[key]) return SHR.blobs[key];
+  const cv = await shrDraw(style);
   const blob = await new Promise(r => cv.toBlob(r, 'image/png'));
   if(!blob) throw new Error('no image');
-  SHR.blobs[style] = { blob, file: new File([blob], shrFileName(style), { type: 'image/png' }) };
-  return SHR.blobs[style];
+  SHR.blobs[key] = { blob, file: new File([blob], shrFileName(), { type: 'image/png' }) };
+  return SHR.blobs[key];
+}
+function shrPickHTML() {
+  const items = shrItems();
+  if(items.length < 2) return '';
+  const chip = (i, label) => `<button class="shr-chip${SHR.pick === i ? ' on' : ''}" onclick="shrSetPick(${i})">${cmEsc(label)}</button>`;
+  return chip(-1, 'Whole ' + (MEAL_LABELS[SHR.meal] || 'meal').toLowerCase()) + items.map((it, i) => chip(i, it.name || 'Food')).join('');
 }
 function shrShow() {
-  const style = SHR.style, item = SHR.blobs[style];
-  document.querySelectorAll('#shrSheet .shr-seg button').forEach(b => b.classList.toggle('active', b.dataset.s === style));
+  const item = SHR.blobs[shrKey(SHR.style)];
+  document.querySelectorAll('#shrSheet .shr-seg button').forEach(b => b.classList.toggle('active', b.dataset.s === SHR.style));
+  document.getElementById('shrTitle').textContent = 'Share ' + (MEAL_LABELS[SHR.meal] || 'meal').toLowerCase();
+  const pk = document.getElementById('shrPick'); pk.innerHTML = shrPickHTML(); pk.style.display = pk.innerHTML ? '' : 'none';
   const pv = document.getElementById('shrPreview');
-  pv.classList.toggle('clear', style === 'clear');
   if(SHR.url) { URL.revokeObjectURL(SHR.url); SHR.url = ''; }
-  if(item) { SHR.url = URL.createObjectURL(item.blob); pv.innerHTML = '<img alt="Preview of your share picture" src="' + SHR.url + '">'; }
+  if(item) { SHR.url = URL.createObjectURL(item.blob); pv.innerHTML = '<img alt="Preview of your meal sticker" src="' + SHR.url + '"><span class="shr-pv-note">Sample photo · the sticker is see-through</span>'; }
   else pv.innerHTML = '<div class="shr-spin"></div>';
   const save = document.getElementById('shrSaveBtn'), copy = document.getElementById('shrCopyBtn');
   save.disabled = !item; copy.disabled = !item;
-  const native = shrIsNative();
+  const native = shrIsNative(), canCopy = native || shrWebCopy();
   const canShareFiles = !native && item && navigator.canShare && navigator.canShare({ files: [item.file] });
+  copy.style.display = canCopy ? '' : 'none';
   save.textContent = native ? 'Save to Photos' : canShareFiles ? 'Save or share image' : 'Download image';
-  copy.style.display = style === 'clear' && shrCanCopy() ? '' : 'none';
-  const how = native ? '' : canShareFiles ? ' Tap <b>Save Image</b> in the menu to put it in Photos.' : '';
-  document.getElementById('shrHint').innerHTML = style === 'clear'
-    ? 'No background, so it sits on top of your own photo or video.' + how + (shrCanCopy() ? ' Or tap <b>Copy as sticker</b>, then paste it on your Instagram story.' : '')
-    : 'A story-size picture of your day.' + how + ' Then post it from your photos to your story.';
+  document.getElementById('shrHint').innerHTML = canCopy
+    ? 'Tap <b>Copy sticker</b>, open Instagram, add your meal photo to your story, then tap <b>Add sticker</b> (or press and hold → <b>Paste</b>). Move and pinch it to size.'
+    : 'Save it, then in your Instagram story add it on top of your meal photo.' + (canShareFiles ? ' Tap <b>Save Image</b> in the menu to put it in Photos.' : '');
 }
-async function shrOpen() {
+async function shrRefresh() {
+  const gen = SHR.gen, style = SHR.style, pick = SHR.pick;
+  shrShow();
+  try { await shrRender(style); } catch(e) { if(gen === SHR.gen) { showToast('Couldn\'t make the sticker. Please try again.'); shrClose(); } return; }
+  if(gen === SHR.gen && SHR.style === style && SHR.pick === pick) shrShow();
+}
+function shrOpen() {
   if(typeof saveMealInputs === 'function') { try { saveMealInputs(); } catch(e) {} }
-  const t = dayTotals(macroData[cur]);
-  if(!t.cal) { showToast('Log some food first, then share your day'); return; }
-  SHR.day = cur; SHR.blobs = {}; const gen = ++SHR.gen;
+  const meal = macroData[cur] && macroData[cur].meals[curMeal];
+  if(!meal || !calcMealCal(meal) && !(meal.items || []).length) { showToast('Log some food for ' + (MEAL_LABELS[curMeal] || 'this meal').toLowerCase() + ' first'); return; }
+  SHR.day = cur; SHR.meal = curMeal; SHR.pick = -1; SHR.blobs = {}; SHR.gen++;
   const ov = document.getElementById('shrOverlay'), sh = document.getElementById('shrSheet');
   ov.style.display = 'block';
   requestAnimationFrame(() => { ov.classList.add('open'); sh.classList.add('open'); });
-  shrShow();
-  try {
-    await shrRender(SHR.style); if(gen !== SHR.gen) return; shrShow();
-    await shrRender(SHR.style === 'card' ? 'clear' : 'card');
-  } catch(e) { if(gen === SHR.gen) { showToast('Couldn\'t make the picture. Please try again.'); shrClose(); } }
+  shrRefresh();
 }
-async function shrSetStyle(style) {
-  SHR.style = style; shrShow();
-  if(!SHR.blobs[style]) { const gen = SHR.gen; try { await shrRender(style); } catch(e) {} if(gen === SHR.gen && SHR.style === style) shrShow(); }
-}
+function shrSetStyle(style) { SHR.style = style; shrRefresh(); }
+function shrSetPick(i) { SHR.pick = i; shrRefresh(); }
 function shrClose() {
   SHR.gen++;
   const ov = document.getElementById('shrOverlay'), sh = document.getElementById('shrSheet');
@@ -4136,19 +4138,19 @@ function shrDownload(item) {
   a.href = u; a.download = item.file.name; document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(u), 4000);
 }
+function shrNativeError(e) {
+  const code = String((e && (e.code || e.message)) || '');
+  if(/DENIED/i.test(code)) showToast('Allow Photos: iPhone Settings → Trident Fitness → Photos', 4200);
+  else if(/UNIMPLEMENTED|not implemented/i.test(code)) showToast('Update the app to use this', 3200);
+  else showToast('Something went wrong. Please try again.');
+}
 async function shrSave() {
-  const item = SHR.blobs[SHR.style]; if(!item) return;
+  const item = SHR.blobs[shrKey(SHR.style)]; if(!item) return;
   if(shrIsNative()) {
     const btn = document.getElementById('shrSaveBtn'); btn.disabled = true;
-    try {
-      await Capacitor.nativePromise('PhotoSaver', 'savePng', { data: await shrB64(item.blob) });
-      showToast('Saved to Photos ✓');
-    } catch(e) {
-      const code = String((e && (e.code || e.message)) || '');
-      if(/DENIED/i.test(code)) showToast('Allow Photos: iPhone Settings → Trident Fitness → Photos', 4200);
-      else if(/UNIMPLEMENTED|not implemented/i.test(code)) showToast('Update the app to save pictures', 3200);
-      else showToast('Couldn\'t save the picture. Please try again.');
-    } finally { btn.disabled = false; }
+    try { await Capacitor.nativePromise('PhotoSaver', 'savePng', { data: await shrB64(item.blob) }); showToast('Saved to Photos ✓'); }
+    catch(e) { shrNativeError(e); }
+    finally { btn.disabled = false; }
     return;
   }
   if(navigator.canShare && navigator.canShare({ files: [item.file] })) {
@@ -4159,11 +4161,12 @@ async function shrSave() {
   shrDownload(item);
 }
 async function shrCopy() {
-  const item = SHR.blobs.clear; if(!item || !shrCanCopy()) return;
+  const item = SHR.blobs[shrKey(SHR.style)]; if(!item) return;
   try {
-    await navigator.clipboard.write([new ClipboardItem({ 'image/png': item.blob })]);
-    showToast('Copied! Paste it on your Instagram story', 2800);
-  } catch(e) { showToast('Couldn\'t copy. Use Save instead.'); }
+    if(shrIsNative()) await Capacitor.nativePromise('PhotoSaver', 'copyPng', { data: await shrB64(item.blob) });
+    else await navigator.clipboard.write([new ClipboardItem({ 'image/png': item.blob })]);
+    showToast('Sticker copied! Paste it on your Instagram story', 3000);
+  } catch(e) { if(shrIsNative()) shrNativeError(e); else showToast('Couldn\'t copy. Use Save instead.'); }
 }
 
 function renderWeekBars(containerId='wbars', labelId='wlabels'){
@@ -15284,7 +15287,7 @@ function wnList() {
       items: [
         { ic: '📸', t: 'A brand-new Community', d: 'Photos now show full size, edge to edge, even tall 9:16 shots. Double-tap a photo to like it, tap it to see it full screen, and find recent members in the row at the top.' },
         { ic: '🔲', t: 'Profile grid', d: 'Profiles show posts in a photo grid. Tap the list icon to see them as full posts.' },
-        { ic: '📤', t: 'Share your macros', d: 'Tap Share to socials on the Macros tab to make a story-size picture of your day, with a see-through version to put on your own photo. Save it and post it to your story.' }
+        { ic: '📤', t: 'Share your meals', d: 'Tap Share on a meal in the Macros tab to make a see-through sticker with its calories and macros. Put it on top of your food photo in your Instagram story.' }
       ]
     },
     {
