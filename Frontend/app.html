@@ -672,7 +672,7 @@ body:not([data-page="dashboard"]) .settings-btn{display:none;}
 .food-log-empty{font-size:12px;color:var(--text3);text-align:center;padding:14px 0;font-style:italic;}
 .food-log-item{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--bg4);border-radius:var(--radius);margin-bottom:6px;gap:8px;}
 .food-log-item-left{flex:1;min-width:0;}
-.food-log-item-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.food-log-item-name{font-size:13px;font-weight:600;overflow-wrap:anywhere;}
 .food-log-item-time{font-size:10px;color:var(--text3);margin-top:2px;}
 .food-log-item-macros{display:flex;gap:6px;margin-top:4px;flex-wrap:wrap;}
 .food-log-macro{font-size:10px;font-weight:500;color:var(--text3);background:var(--bg3);padding:2px 6px;border-radius:99px;}
@@ -983,7 +983,7 @@ body:not([data-page="dashboard"]) .settings-btn{display:none;}
 .mx-meal-share:active{background:var(--pink-dim);}
 .shr-pick{display:flex;gap:6px;overflow-x:auto;margin:0 -20px 12px;padding:0 20px;scrollbar-width:none;}
 .shr-pick::-webkit-scrollbar{display:none;}
-.shr-chip{flex-shrink:0;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:8px 14px;border-radius:99px;border:0.5px solid var(--border2);background:var(--bg4);color:var(--text2);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;}
+.shr-chip{flex-shrink:0;white-space:nowrap;padding:8px 14px;border-radius:99px;border:0.5px solid var(--border2);background:var(--bg4);color:var(--text2);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;}
 .shr-chip.on{background:var(--pink-dim);border-color:var(--pink);color:var(--pink);}
 
 .summary-pr-badge{font-size:10px;font-weight:700;color:#FFD700;background:rgba(255,215,0,.12);border:0.5px solid rgba(255,215,0,.3);padding:2px 7px;border-radius:99px;margin-left:6px;}
@@ -1731,7 +1731,7 @@ body:not([data-page="dashboard"]) .settings-btn{display:none;}
 .cm-attach-wo{background:linear-gradient(135deg,var(--pink-dim),rgba(191,90,242,0.08)),var(--bg4);border-color:var(--pink-border);}
 .cm-attach-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px;}
 .cm-attach-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--pink);}
-.cm-attach-prog{font-size:11px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
+.cm-attach-prog{font-size:11px;color:var(--text3);min-width:0;text-align:right;overflow-wrap:anywhere;}
 .cm-attach-title{font-size:17px;font-weight:700;letter-spacing:-0.01em;}
 .cm-attach-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0;}
 .cm-attach-stats div{background:rgba(0,0,0,0.28);border-radius:10px;padding:7px 4px;text-align:center;}
@@ -2252,18 +2252,18 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
   font-size:calc(var(--s, .62) * 24px);font-size:calc(var(--s, .62) * 100cqw / 15);padding:.8em .95em .85em;border-radius:1.05em;color:#fff;text-align:left;line-height:1.2;pointer-events:none;
   background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.03)),rgba(10,10,12,.5);border:1px solid rgba(255,255,255,.18);
   backdrop-filter:blur(14px) saturate(150%);-webkit-backdrop-filter:blur(14px) saturate(150%);box-shadow:0 .5em 1.6em rgba(0,0,0,.35);}
-.cm-ovc-top{display:flex;align-items:center;gap:.45em;font-size:.62em;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--pink);white-space:nowrap;overflow:hidden;}
+.cm-ovc-top{display:flex;align-items:center;flex-wrap:wrap;gap:.2em .45em;font-size:.62em;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--pink);}
 .cm-ovc-top img{width:1.7em;height:1.7em;object-fit:contain;flex-shrink:0;}
-.cm-ovc-top i{margin-left:auto;padding-left:.6em;font-style:normal;font-weight:600;letter-spacing:0;text-transform:none;color:rgba(255,255,255,.6);overflow:hidden;text-overflow:ellipsis;min-width:0;}
+.cm-ovc-top i{margin-left:auto;padding-left:.6em;font-style:normal;font-weight:600;letter-spacing:0;text-transform:none;color:rgba(255,255,255,.6);text-align:right;overflow-wrap:anywhere;}
 .cm-ovc-top span{flex-shrink:0;}
 .cm-ovc-rows{margin-top:.7em;padding-top:.45em;border-top:1px solid rgba(255,255,255,.14);}
 .cm-ovc-row{display:flex;justify-content:space-between;gap:.8em;font-size:.66em;line-height:1.5;}
-.cm-ovc-row span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:rgba(255,255,255,.82);}
-.cm-ovc-row em{flex-shrink:0;max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-style:normal;font-weight:700;}
+.cm-ovc-row span{min-width:0;overflow-wrap:anywhere;color:rgba(255,255,255,.82);}
+.cm-ovc-row em{flex-shrink:0;max-width:55%;text-align:right;overflow-wrap:anywhere;font-style:normal;font-weight:700;}
 .cm-ovc-more{font-size:.6em;color:rgba(255,255,255,.55);margin-top:.2em;}
 .cm-ovc-prs{display:flex;align-items:center;gap:.45em;margin-top:.65em;padding:.4em .55em;border-radius:.6em;background:rgba(255,199,44,.14);border:1px solid rgba(255,199,44,.32);font-size:.64em;color:#FFE08A;}
 .cm-ovc-prs .cm-medal{width:1.6em;height:1.9em;}
-.cm-ovc-prs span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cm-ovc-prs span{flex:1;min-width:0;overflow-wrap:anywhere;}
 .cm-ovc-prs b{color:#fff;}
 .cm-ovc-prs em{flex-shrink:0;font-style:normal;font-weight:800;color:#FFC72C;}
 .cm-ovc-prs i{flex-shrink:0;font-style:normal;font-weight:800;color:rgba(255,199,44,.75);}
@@ -2272,11 +2272,11 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
 .cm-ov-guide.v{left:50%;top:0;bottom:0;width:1.5px;margin-left:-.75px;}
 .cm-ov-guide.h{top:50%;left:0;right:0;height:1.5px;margin-top:-.75px;}
 .cm-ov-guide.on{opacity:.9;}
-.cm-ovc-title{font-size:1.12em;font-weight:800;letter-spacing:-.01em;margin:.35em 0 .6em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
-.cm-ovc-stats{display:flex;gap:.8em;}
-.cm-ovc-stats div{flex:1;min-width:0;}
-.cm-ovc-stats b{display:block;font-size:1.3em;font-weight:800;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.cm-ovc-stats span{display:block;font-size:.58em;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.62);margin-top:.15em;white-space:nowrap;}
+.cm-ovc-title{font-size:1.12em;font-weight:800;letter-spacing:-.01em;margin:.35em 0 .6em;overflow-wrap:anywhere;}
+.cm-ovc-stats{display:flex;flex-wrap:wrap;gap:.5em .8em;}
+.cm-ovc-stats div{flex:1 1 auto;}
+.cm-ovc-stats b{display:block;font-size:1.3em;font-weight:800;letter-spacing:-.02em;overflow-wrap:break-word;line-height:1.1;}
+.cm-ovc-stats span{display:block;font-size:.58em;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.62);margin-top:.15em;}
 .cm-ovc-pr{font-size:2.2em;font-weight:900;letter-spacing:-.03em;line-height:1;}
 .cm-ovc-pr small{font-size:.38em;font-weight:700;color:rgba(255,255,255,.62);margin-left:.25em;letter-spacing:0;}
 .cm-ovc.edit{pointer-events:auto;cursor:grab;touch-action:none;transition:box-shadow .15s;}
@@ -4321,12 +4321,25 @@ function shrSpaced(ctx, text, x, y, sp) {
   ctx.textAlign = 'center';
 }
 // Shortens text with "…" so it fits the width
-function shrFit(ctx, text, maxW) {
-  text = String(text || '');
-  if(ctx.measureText(text).width <= maxW) return text;
-  let t = text;
-  while(t.length > 1 && ctx.measureText(t + '…').width > maxW) t = t.slice(0, -1);
-  return t.trimEnd() + '…';
+// Splits text into lines that fit maxW (long words are broken, nothing is cut off)
+function shrWrap(ctx, text, maxW) {
+  const words = String(text || '').trim().split(/\s+/).filter(Boolean);
+  const lines = [];
+  let line = '';
+  words.forEach(w => {
+    const test = line ? line + ' ' + w : w;
+    if(ctx.measureText(test).width <= maxW) { line = test; return; }
+    if(line) lines.push(line);
+    line = '';
+    while(w.length > 1 && ctx.measureText(w).width > maxW) {   // a single word wider than the line
+      let n = w.length - 1;
+      while(n > 1 && ctx.measureText(w.slice(0, n)).width > maxW) n--;
+      lines.push(w.slice(0, n)); w = w.slice(n);
+    }
+    line = w;
+  });
+  if(line) lines.push(line);
+  return lines.length ? lines : [''];
 }
 function shrItems() { const m = macroData[SHR.day] && macroData[SHR.day].meals[SHR.meal]; return m && Array.isArray(m.items) ? m.items : []; }
 // What the sticker shows: the whole meal, or one food from it
@@ -4341,10 +4354,16 @@ function shrSubject() {
   return { title: label, label, cal: calcMealCal(meal), protein: meal.protein || 0, carbs: meal.carbs || 0, fat: meal.fat || 0 };
 }
 async function shrDraw(style) {
-  const W = 1080, H = 720, glass = style === 'glass';
+  const s = shrSubject();
+  // The food/meal name can take several lines; everything below moves down and the sticker grows
+  const TITLE_LH = 60;
+  const meas = document.createElement('canvas').getContext('2d');
+  meas.font = shrFont(700, 50);
+  const titleLines = shrWrap(meas, s.title, 1080 - 200);
+  const dy = (titleLines.length - 1) * TITLE_LH;
+  const W = 1080, H = 720 + dy, glass = style === 'glass';
   const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
   const ctx = cv.getContext('2d');
-  const s = shrSubject();
   let acc = getAccentColor(); if(!/^#[0-9a-f]{3,6}$/i.test(acc)) acc = '#32FCFD';
   const dim = glass ? 'rgba(255,255,255,.62)' : 'rgba(255,255,255,.92)';
   const shadow = on => { const k = on && !glass; ctx.shadowColor = k ? 'rgba(0,0,0,.7)' : 'transparent'; ctx.shadowBlur = k ? 24 : 0; ctx.shadowOffsetY = k ? 3 : 0; };
@@ -4367,7 +4386,9 @@ async function shrDraw(style) {
   ctx.fillStyle = acc; ctx.fillText('FITNESS', x + w1 + gap, 122); ctx.textAlign = 'center';
   // Meal + what it is
   ctx.font = shrFont(800, 30); ctx.fillStyle = acc; shrSpaced(ctx, s.label.toUpperCase(), W / 2, 196, 6);
-  ctx.font = shrFont(700, 50); ctx.fillStyle = '#fff'; ctx.fillText(shrFit(ctx, s.title, W - 200), W / 2, 262);
+  ctx.font = shrFont(700, 50); ctx.fillStyle = '#fff';
+  titleLines.forEach((ln, i) => ctx.fillText(ln, W / 2, 262 + i * TITLE_LH));
+  ctx.translate(0, dy);                                  // the rest sits below the last title line
   // Calories
   const calTxt = Math.round(s.cal).toLocaleString();
   ctx.font = shrFont(900, 150); const cw = ctx.measureText(calTxt).width;
@@ -12938,7 +12959,7 @@ function hyFinish() {
 function hySharePayload(w, sess, sid, always) {
   if(!w || !sess) return null;
   const t = hyTotals(w, sess);
-  const lifts = t.exercises.map(e => ({ name: String(e.name).slice(0, 60), sets: e.sets.slice(0, 8) }));
+  const lifts = t.exercises.map(e => ({ name: String(e.name).slice(0, 100), sets: e.sets.slice(0, 10) }));
   const liftIds = new Set(t.exercises.map(e => 'main.' + e.id));
   const work = [];
   (w.sections || []).forEach(section => {
@@ -12951,11 +12972,11 @@ function hySharePayload(w, sess, sid, always) {
       const done = (st.sets || []).filter(x => x && x.done);
       if(!done.length && !st.done) return;
       const text = done.length ? done.map(x => hySetText(ex, x)).join(' · ') : 'Done';
-      work.push({ name: String(hyExName(w.id, key, ex)).slice(0, 60), sets: [], text: text.slice(0, 60) });
+      work.push({ name: String(hyExName(w.id, key, ex)).slice(0, 100), sets: [], text: text.slice(0, 160) });
     });
   });
   const games = [];
-  (sess.games || []).forEach((g, i) => { if(g && g.done) games.push({ name: 'Game ' + (i + 1), sets: [], text: ([g.result, g.duration ? g.duration + ' min' : ''].filter(Boolean).join(' · ') || 'Played').slice(0, 60) }); });
+  (sess.games || []).forEach((g, i) => { if(g && g.done) games.push({ name: 'Game ' + (i + 1), sets: [], text: ([g.result, g.duration ? g.duration + ' min' : ''].filter(Boolean).join(' · ') || 'Played').slice(0, 160) }); });
   if(!lifts.length && !work.length && !games.length && !sess.duration && !always) return null;
   let stats;
   if(lifts.length) {
@@ -12966,7 +12987,7 @@ function hySharePayload(w, sess, sid, always) {
     if(w.games) stats.push([`${games.length}/${w.games}`, 'games']);
     else if(work.length) stats.push([String(work.length), work.length === 1 ? 'drill' : 'drills']);
     if(sess.duration) stats.push([String(sess.duration), 'min']);
-    if(sess.intensity) stats.push([String(sess.intensity).slice(0, 12), 'intensity']);
+    if(sess.intensity) stats.push([String(sess.intensity).slice(0, 40), 'intensity']);
     if(sess.rpe) stats.push([String(sess.rpe), 'RPE']);
     stats = stats.slice(0, 3);
   }
@@ -13254,12 +13275,10 @@ function cmQuick(kind) {
 function cmSetsText(ex) {
   if(ex && typeof ex.text === 'string' && ex.text) return ex.text;
   const sets = Array.isArray(ex && ex.sets) ? ex.sets : [];
-  const parts = sets.slice(0, 4).map(st => {
+  return sets.map(st => {
     const w = cmNum(st && st.w), r = cmNum(st && st.r);
     return w ? `${w}×${r}` : `${r} reps`;
-  });
-  if(sets.length > 4) parts.push(`+${sets.length - 4}`);
-  return parts.join(', ');
+  }).join(', ');
 }
 
 // Workout badge by session type (field training, game day, sport, recovery, or a lift)
@@ -13269,7 +13288,7 @@ function cmWoBadge(payload) {
 // The three headline numbers a newer workout carries (older posts: null, so the lifting numbers show)
 function cmWoStats(payload) {
   const st = payload && Array.isArray(payload.stats) ? payload.stats.filter(x => Array.isArray(x) && x.length === 2).slice(0, 3) : [];
-  return st.length ? st.map(x => [String(x[0]).slice(0, 14), String(x[1]).slice(0, 14)]) : null;
+  return st.length ? st.map(x => [String(x[0]).slice(0, 40), String(x[1]).slice(0, 30)]) : null;
 }
 // Workout / PR card placed on top of the photo. ov = { x, y } (card centre, 0–1 across and down the
 // photo) and s (card width as a share of the photo's width). It scales with the photo.
@@ -13311,7 +13330,7 @@ function cmOvMore(btn) { const box = btn.nextElementSibling; if(box) box.hidden 
 // PRs a workout carries: up to 6, newest data only (older posts have none)
 function cmCleanPRs(list) {
   return (Array.isArray(list) ? list : []).filter(x => x && x.name && cmNum(x.weight) > 0)
-    .map(x => ({ name: String(x.name).slice(0, 60), weight: cmNum(x.weight), prev: cmNum(x.prev) })).slice(0, 6);
+    .map(x => ({ name: String(x.name).slice(0, 100), weight: cmNum(x.weight), prev: cmNum(x.prev) })).slice(0, 6);
 }
 const CM_MEDAL = `<svg class="cm-medal" viewBox="0 0 32 38" aria-hidden="true"><path d="M7 1h7l4 9h-7z" fill="#D99A00"/><path d="M25 1h-7l-4 9h7z" fill="#F2B705"/><circle cx="16" cy="24" r="12.5" fill="#FFC72C" stroke="#C98A00" stroke-width="2"/><text x="16" y="28.6" text-anchor="middle" font-size="12" font-weight="900" fill="#6B4500" font-family="-apple-system,'Helvetica Neue',Arial,sans-serif">PR</text></svg>`;
 // "Logan's heaviest Back Squat ever!" banners, like Strava's achievements
@@ -15270,7 +15289,7 @@ function cmBuildWorkoutPayload(prog, day, week, log, logKey) {
       .filter(st => st.w || st.r);
     if(!logged.length) return;
     logged.forEach(st => { volume += st.w * st.r; setCount++; });
-    exercises.push({ name: String(ex.name).slice(0, 60), sets: logged.slice(0, 8) });
+    exercises.push({ name: String(ex.name).slice(0, 100), sets: logged.slice(0, 10) });
   });
   if(!exercises.length) return null;
   let prs = [];
