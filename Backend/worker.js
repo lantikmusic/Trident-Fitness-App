@@ -1531,25 +1531,27 @@ async function bioOf(DB, userId) {
 }
 
 // ── Completed workouts on profiles ──
-// Each member chooses whether every workout they finish shows on their profile (not just the ones
-// they post). Off: nothing is stored here, and turning it off deletes what was stored.
-// Apple Health data is never sent here: these are workouts logged in the app.
-const WORKOUTS_SHOWN_BY_DEFAULT = false;
+// A member's profile lists the finished workouts they chose to add: one at a time ("Add to my
+// profile" after a workout) or every workout automatically (their auto-add setting, off by default).
+// Only what they add is stored here, and they can remove any of it. Apple Health data is never sent
+// here: these are workouts logged in the app.
+const WORKOUTS_AUTO_BY_DEFAULT = false;
 const WORKOUT_KEY_RE = /^[A-Za-z0-9_:.-]{1,100}$/;
 const WORKOUT_MAX_PER_USER = 1000;
 const WORKOUTS_PAGE = 100;
 
-async function workoutsShown(DB, userId) {
+// Whether every finished workout is added to this member's profile automatically
+async function workoutsAuto(DB, userId) {
   const row = await DB.prepare('SELECT show_workouts FROM community_prefs WHERE user_id = ?').bind(userId).first();
-  return row ? !!row.show_workouts : WORKOUTS_SHOWN_BY_DEFAULT;
+  return row ? !!row.show_workouts : WORKOUTS_AUTO_BY_DEFAULT;
 }
 
 async function communityWorkoutPrefs(request, DB) {
   const session = await validateSession(request, DB);
   if (!session) return error('Unauthorized', 401);
-  const shown = await workoutsShown(DB, session.user_id);
+  const auto = await workoutsAuto(DB, session.user_id);
   const n = await DB.prepare('SELECT COUNT(*) AS n FROM community_workouts WHERE user_id = ?').bind(session.user_id).first();
-  return json({ show_workouts: shown, stored: (n && n.n) || 0 });
+  return json({ show_workouts: auto, stored: (n && n.n) || 0 });
 }
 
 async function communitySetWorkoutPrefs(request, DB) {
@@ -1558,13 +1560,11 @@ async function communitySetWorkoutPrefs(request, DB) {
   let data;
   try { data = await request.json(); } catch (e) { return error('Invalid request'); }
   if (!data || typeof data.show_workouts !== 'boolean') return error('Invalid request');
-  const now = new Date().toISOString();
-  const stmts = [DB.prepare(
+  // Turning auto-add off keeps what is already on the profile (members remove workouts one by one)
+  await DB.prepare(
     `INSERT INTO community_prefs (user_id, show_workouts, updated_at) VALUES (?, ?, ?)
      ON CONFLICT(user_id) DO UPDATE SET show_workouts = excluded.show_workouts, updated_at = excluded.updated_at`
-  ).bind(session.user_id, data.show_workouts ? 1 : 0, now)];
-  if (!data.show_workouts) stmts.push(DB.prepare('DELETE FROM community_workouts WHERE user_id = ?').bind(session.user_id));
-  await DB.batch(stmts);
+  ).bind(session.user_id, data.show_workouts ? 1 : 0, new Date().toISOString()).run();
   return json({ success: true, show_workouts: data.show_workouts });
 }
 
@@ -1578,7 +1578,6 @@ async function communitySaveWorkouts(request, DB) {
   const upsert = Array.isArray(data.upsert) ? data.upsert : [];
   const remove = Array.isArray(data.remove) ? data.remove : [];
   if (upsert.length > 50 || remove.length > 100) return error('Too many at once', 413);
-  if (!(await workoutsShown(DB, session.user_id))) return error('Showing your workouts is turned off', 403);
 
   const now = new Date().toISOString();
   const stmts = [];
@@ -1606,8 +1605,7 @@ async function communitySaveWorkouts(request, DB) {
   return json({ success: true });
 }
 
-// A member's completed workouts, newest first: yours always; someone else's only when they show
-// them and neither of you has blocked the other.
+// The workouts a member added to their profile, newest first (not shown when either of you blocked the other).
 async function communityWorkouts(request, DB) {
   const session = await validateSession(request, DB);
   if (!session) return error('Unauthorized', 401);
@@ -1616,7 +1614,7 @@ async function communityWorkouts(request, DB) {
   const me = session.user_id;
   if (userId !== me) {
     const blocked = await DB.prepare('SELECT 1 AS x FROM dm_blocks WHERE (blocker_id = ?1 AND blocked_id = ?2) OR (blocker_id = ?2 AND blocked_id = ?1)').bind(me, userId).first();
-    if (blocked || !(await workoutsShown(DB, userId))) return json({ shown: false, workouts: [] });
+    if (blocked) return json({ shown: false, workouts: [] });
   }
   const rows = await DB.prepare(
     `SELECT wkey, done_on, payload_json FROM community_workouts WHERE user_id = ?
@@ -1626,7 +1624,7 @@ async function communityWorkouts(request, DB) {
   for (const r of rows.results || []) {
     try { workouts.push({ key: r.wkey, date: r.done_on, payload: JSON.parse(r.payload_json) }); } catch (e) {}
   }
-  return json({ shown: userId === me ? await workoutsShown(DB, me) : true, workouts });
+  return json({ shown: true, auto: userId === me ? await workoutsAuto(DB, me) : undefined, workouts });
 }
 
 async function communitySetBio(request, DB) {

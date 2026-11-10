@@ -2289,6 +2289,10 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
 .cm-ov-btns{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
 .cm-wo-more{display:block;background:none;border:none;padding:2px 0 8px;font-family:inherit;font-size:13px;font-weight:600;color:var(--pink);cursor:pointer;}
 .cmp-wlocal{cursor:default;}
+.cm-wo-btn{margin-top:8px;}
+.cm-wo-btn.on{border-color:var(--pink-border);color:var(--pink);background:var(--pink-dim);}
+.cmp-wprof{padding:7px 13px;border-radius:99px;border:0.5px solid var(--border2);background:transparent;color:var(--text2);font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;margin-top:0;-webkit-tap-highlight-color:transparent;}
+.cmp-wprof.on{border-color:var(--pink-border);color:var(--pink);background:var(--pink-dim);}
 .cmp-woshow{display:flex;align-items:center;gap:12px;margin:0 0 14px;padding:12px 14px;border-radius:16px;background:var(--pink-dim);border:0.5px solid var(--pink-border);}
 .cmp-woshow div{flex:1;min-width:0;}
 .cmp-woshow b{display:block;font-size:14px;font-weight:700;}
@@ -2976,6 +2980,7 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
     <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">Exercise Breakdown</div>
     <div id="summaryExList"></div>
     <button class="pink-btn" onclick="closeSummary()" style="margin-top:16px;">Done 💪</button>
+    <div id="summaryProfileBtn"></div>
     <button class="ghost-btn" onclick="cmShareLastWorkout()" style="margin-top:8px;">Share to Community</button>
   </div>
 </div>
@@ -3407,8 +3412,8 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
   <div class="settings-section">
     <div class="settings-section-label">Community</div>
     <div class="settings-row">
-      <div style="min-width:0;padding-right:10px;"><div class="settings-row-label">Show all my workouts</div><div class="settings-row-sub" id="cmWoSub">Off: only the workouts you post show on your profile</div></div>
-      <label class="toggle-wrap" style="flex-shrink:0;"><input type="checkbox" id="cmWoToggle" onchange="cmWoSetShow(this.checked)"><span class="toggle-slider"></span></label>
+      <div style="min-width:0;padding-right:10px;"><div class="settings-row-label">Add every workout to my profile</div><div class="settings-row-sub" id="cmWoSub">Off: after each workout, you choose whether to add it</div></div>
+      <label class="toggle-wrap" style="flex-shrink:0;"><input type="checkbox" id="cmWoToggle" onchange="cmWoSetAuto(this.checked)"><span class="toggle-slider"></span></label>
     </div>
   </div>
 
@@ -7277,6 +7282,8 @@ function showWorkoutSummary(day, logKey, prs, phaseAdvanced) {
     </div>`;
   }).filter(Boolean).join('');
 
+  // "Add to my profile" for this workout (after the auto-add setting is known, it adds itself)
+  cmWoSummaryButton('summaryProfileBtn', 'wo:' + logKey);
   // Show sheet
   const overlay = document.getElementById('summaryOverlay');
   const sheet   = document.getElementById('summarySheet');
@@ -13008,8 +13015,10 @@ function hySummary(sid, extra) {
     ${stats.length ? `<div class="hy-stats">${stats.map(s => `<div><b>${hyEsc(s[0])}</b><span>${hyEsc(s[1])}</span></div>`).join('')}</div>` : ''}
     ${detail}${games ? `<div class="hy-sheet-sec">GAMES</div>${games}` : ''}
     ${sess.notes ? `<div class="hy-sheet-sec">NOTES</div><div class="hy-cue">${hyEsc(sess.notes)}</div>` : ''}
-    ${window._hyShare && sess.status === 'completed' && isLoggedIn() ? `<button class="ghost-btn" style="margin-top:14px;" onclick="hyShare()">Share to Community</button>` : ''}
+    ${sess.status === 'completed' && isLoggedIn() ? `<div id="hyProfileBtn" style="margin-top:14px;"></div>` : ''}
+    ${window._hyShare && sess.status === 'completed' && isLoggedIn() ? `<button class="ghost-btn" style="margin-top:8px;" onclick="hyShare()">Share to Community</button>` : ''}
     <button class="pink-btn" style="margin-top:8px;" onclick="${extra ? 'hySummaryDone()' : 'hySheetClose()'}">Done</button>`);
+  if(sess.status === 'completed') cmWoSummaryButton('hyProfileBtn', 'hy:' + sid);
 }
 // Done on the summary of a session just finished: back to the day, as the other programs do.
 function hySummaryDone() {
@@ -13663,17 +13672,30 @@ function cmLocalIsShared(lw, posts) {
     return diff > -1 && diff < 3;
   });
 }
-// ── All completed workouts on your profile (your choice; off unless you turn it on) ──
-// When on, workouts finished in the app are copied to your account so others see them on your
-// profile. Only what changed is sent. Apple Health workouts are never included.
-var cmWo = { show: null, at: 0, syncing: false, lastSync: 0 };
+// ── Workouts on your profile ──
+// Each finished workout is either on your profile (others can see it) or only on this phone.
+// You add them one at a time ("Add to my profile" after a workout, or on your Workouts tab), or turn
+// on "Add every workout to my profile" (cmWo.auto, saved on your account; off by default).
+// Only what changed is sent. Apple Health workouts are never included.
+var cmWo = { auto: null, at: 0, syncing: false, lastSync: 0, again: false };
 const WO_SYNC_KEY = 'trident_wo_synced_v1';   // { uid, items: { key: fingerprint } } — what the account already has
+const WO_PICK_KEY = 'trident_wo_pick_v1';     // { on: { key: 1 } added by hand, off: { key: 1 } removed by hand }
+function cmWoKey(k) { return String(k || '').replace(/[^A-Za-z0-9_:.-]/g, '_').slice(0, 100); }
+function cmWoPicks() {
+  const p = load(WO_PICK_KEY);
+  return p && typeof p === 'object' && p.on && p.off ? p : { on: {}, off: {} };
+}
+function cmWoOnProfile(key) {
+  key = cmWoKey(key);
+  const p = cmWoPicks();
+  return cmWo.auto ? !p.off[key] : !!p.on[key];
+}
 async function cmWoPrefs(force) {
   if(!isLoggedIn()) return null;
-  if(!force && cmWo.show !== null && Date.now() - cmWo.at < 30 * 60000) return cmWo.show;
+  if(!force && cmWo.auto !== null && Date.now() - cmWo.at < 30 * 60000) return cmWo.auto;
   const r = await cmApi('/community/workouts/prefs');
-  if(r.ok && r.data && typeof r.data.show_workouts === 'boolean') { cmWo.show = r.data.show_workouts; cmWo.at = Date.now(); }
-  return cmWo.show;
+  if(r.ok && r.data && typeof r.data.show_workouts === 'boolean') { cmWo.auto = r.data.show_workouts; cmWo.at = Date.now(); }
+  return cmWo.auto;
 }
 function cmWoHash(str) { let h = 5381; for(let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0; return (h >>> 0) + ':' + str.length; }
 async function cmWoMeId() {
@@ -13683,63 +13705,121 @@ async function cmWoMeId() {
   if(id) window._cmMeId = id;
   return id;
 }
+// Brings your account in line with your choices: adds/updates the workouts on your profile, removes the rest.
 async function cmWoSync(force) {
-  if(!isLoggedIn() || cmWo.syncing) return;
+  if(!isLoggedIn()) return;
+  if(cmWo.syncing) { if(force) cmWo.again = true; return; }
   if(!force && Date.now() - cmWo.lastSync < 10 * 60000) return;
   cmWo.syncing = true;
+  let ok = true;
   try {
-    if((await cmWoPrefs(force)) !== true) return;
+    if((await cmWoPrefs(force)) === null) return;       // unknown (offline): change nothing
     const uid = await cmWoMeId(); if(!uid) return;
     let map = load(WO_SYNC_KEY);
     if(!map || map.uid !== uid || !map.items || typeof map.items !== 'object') map = { uid, items: {} };
     const local = cmLocalWorkouts();
-    const want = {};
+    const want = {}, here = new Set();
     local.forEach(lw => {
-      const key = String(lw.key).replace(/[^A-Za-z0-9_:.-]/g, '_').slice(0, 100);
+      const key = cmWoKey(lw.key);
+      here.add(key);
+      if(!cmWoOnProfile(key)) return;
       const body = JSON.stringify(lw.payload);
       if(body.length > 5800) return;                      // too big for the account (very rare)
       want[key] = { key, date: /^\d{4}-\d{2}-\d{2}$/.test(lw.date) ? lw.date : '', payload: lw.payload, h: cmWoHash(lw.date + body) };
     });
     const upsert = Object.values(want).filter(w => map.items[w.key] !== w.h);
-    let remove = Object.keys(map.items).filter(k => !want[k]);
-    // Safety: never wipe the account because this phone's workouts haven't loaded
-    if(!local.length || remove.length > Math.max(3, Object.keys(map.items).length / 2)) remove = [];
-    remove = remove.slice(0, 100);
+    // Removing: a workout you took off your profile always goes. One that's no longer on this phone at
+    // all only goes if this phone's workouts clearly loaded (never wipe the account by accident).
+    const gone = Object.keys(map.items).filter(k => !want[k]);
+    const missing = gone.filter(k => !here.has(k));
+    const safe = local.length > 0 && missing.length <= Math.max(3, Object.keys(map.items).length / 2);
+    const remove = gone.filter(k => here.has(k) || safe).slice(0, 100);
     let i = 0;
     do {
       const chunk = upsert.slice(i, i + 25);
       const rm = i === 0 ? remove : [];
       if(!chunk.length && !rm.length) break;
       const r = await cmApi('/community/workouts', 'POST', { upsert: chunk.map(w => ({ key: w.key, date: w.date, payload: w.payload })), remove: rm });
-      if(!r.ok) { if(r.status === 403) cmWo.show = false; return; }
+      if(!r.ok) { ok = false; return; }
       chunk.forEach(w => { map.items[w.key] = w.h; });
       rm.forEach(k => { delete map.items[k]; });
       save(WO_SYNC_KEY, map);
       i += 25;
     } while(i < upsert.length);
     cmWo.lastSync = Date.now();
-  } catch(e) { console.warn('Workouts not synced:', e); }
-  finally { cmWo.syncing = false; }
+  } catch(e) { ok = false; console.warn('Workouts not synced:', e); }
+  finally {
+    cmWo.syncing = false;
+    if(cmWo.again) { cmWo.again = false; setTimeout(() => cmWoSync(true), 50); }
+  }
+  return ok;
 }
-async function cmWoSetShow(on) {
-  if(!isLoggedIn()) { showToast('Sign in first'); return; }
+// "Add to my profile" / "Remove from profile" for one workout
+async function cmWoToggle(key, btn) {
+  if(!isLoggedIn()) { showToast('Sign in to add workouts to your profile'); return; }
+  if(cmWo.auto === null) await cmWoPrefs(true);
+  if(cmWo.auto === null) { showToast("Couldn't reach your account. Try again."); return; }
+  key = cmWoKey(key);
+  const p = cmWoPicks(), on = cmWoOnProfile(key);
+  if(on) { if(cmWo.auto) p.off[key] = 1; else delete p.on[key]; }
+  else { if(cmWo.auto) delete p.off[key]; else p.on[key] = 1; }
+  save(WO_PICK_KEY, p);
+  cmWoPaintButtons();
+  if(cmState.view === 'profile') { const y = window.scrollY; cmDraw(); window.scrollTo(0, y); }
+  showToast(on ? 'Removed from your profile' : 'Added to your profile');
+  const ok = await cmWoSync(true);
+  if(ok === false) showToast("Saved on this phone. It'll update your profile when you're back online.");
+}
+// Button for the workout-complete screens and your Workouts tab
+function cmWoBtnHTML(key, cls) {
+  if(!isLoggedIn()) return '';
+  const on = cmWoOnProfile(key);
+  return `<button class="${cls || 'ghost-btn'} cm-wo-btn${on ? ' on' : ''}" data-wokey="${cmEsc(cmWoKey(key))}" onclick="cmWoToggle(this.dataset.wokey, this)">${on ? '✓ On your profile' : 'Add to my profile'}</button>`;
+}
+function cmWoPaintButtons() {
+  document.querySelectorAll('.cm-wo-btn').forEach(b => {
+    const on = cmWoOnProfile(b.dataset.wokey);
+    b.classList.toggle('on', on);
+    b.textContent = on ? '✓ On your profile' : 'Add to my profile';
+  });
+}
+async function cmWoSetAuto(on) {
+  if(!isLoggedIn()) { showToast('Sign in first'); cmWoRenderToggle(); return; }
   const r = await cmApi('/community/workouts/prefs', 'POST', { show_workouts: !!on });
   if(!r.ok) { if(r.status !== 401) showToast("Couldn't change that. Try again."); cmWoRenderToggle(); return; }
-  cmWo.show = !!on; cmWo.at = Date.now();
-  try { localStorage.removeItem(WO_SYNC_KEY); } catch(e) {}
-  showToast(on ? 'Your workouts now show on your profile' : 'Hidden. Only the workouts you post show now');
+  const p = cmWoPicks();
+  if(on) { p.off = {}; }
+  else {
+    // Turning it off keeps what's already on your profile: those become hand-picked
+    cmLocalWorkouts().forEach(lw => { const k = cmWoKey(lw.key); if(cmWoOnProfile(k)) p.on[k] = 1; });
+  }
+  save(WO_PICK_KEY, p);
+  cmWo.auto = !!on; cmWo.at = Date.now();
+  showToast(on ? 'Every workout you finish will be added to your profile' : "Off. New workouts won't be added unless you add them");
   cmWoRenderToggle();
+  cmWoPaintButtons();
   if(cmState.view === 'profile') cmDraw();
-  if(on) cmWoSync(true);
+  cmWoSync(true);
 }
 function cmWoRenderToggle() {
   const t = document.getElementById('cmWoToggle'), sub = document.getElementById('cmWoSub');
   if(!t) return;
-  t.checked = cmWo.show === true;
+  t.checked = cmWo.auto === true;
   t.disabled = !isLoggedIn();
-  if(sub) sub.textContent = !isLoggedIn() ? 'Sign in to use this' : (cmWo.show ? 'Everyone in Community can see every workout you finish' : 'Off: only the workouts you post show on your profile');
+  if(sub) sub.textContent = !isLoggedIn() ? 'Sign in to use this' : (cmWo.auto ? 'On: each workout you finish is added to your profile' : 'Off: after each workout, you choose whether to add it');
 }
 async function cmWoSettingsOpen() { cmWoRenderToggle(); await cmWoPrefs(true); cmWoRenderToggle(); }
+// Draws "Add to my profile" into a workout-complete screen once the auto-add setting is known
+async function cmWoSummaryButton(elId, key) {
+  const el = document.getElementById(elId);
+  if(!el || !isLoggedIn()) { if(el) el.innerHTML = ''; return; }
+  el.innerHTML = cmWo.auto === null ? '' : cmWoBtnHTML(key);
+  if(cmWo.auto === null) {
+    await cmWoPrefs();
+    const again = document.getElementById(elId);
+    if(again && cmWo.auto !== null) again.innerHTML = cmWoBtnHTML(key);
+  }
+}
 function cmShareLocalWorkout(i) {
   const lw = (window._cmLocalWo || [])[i];
   if(!lw) return;
@@ -13752,9 +13832,9 @@ function cmWorkoutsHTML(posts, mine) {
   const local = (mine ? cmLocalWorkouts() : (cmProf.workouts || [])).filter(lw => lw && lw.payload && !cmLocalIsShared(lw, shared));
   window._cmLocalWo = mine ? local : [];
   if(!shared.length && !local.length) return '';
-  const prompt = !mine || cmWo.show === null ? ''
-    : cmWo.show ? `<div class="cmp-woshow on"><span>All your workouts show on your profile.</span><button onclick="cmWoSetShow(false)">Hide</button></div>`
-    : `<div class="cmp-woshow"><div><b>Show all your workouts?</b><span>Right now only you can see the workouts you haven't posted.</span></div><button onclick="cmWoSetShow(true)">Show them</button></div>`;
+  const prompt = !mine || cmWo.auto === null ? ''
+    : cmWo.auto ? `<div class="cmp-woshow on"><span>Every workout you finish is added to your profile.</span><button onclick="cmWoSetAuto(false)">Turn off</button></div>`
+    : `<div class="cmp-woshow"><div><b>Add every workout automatically?</b><span>Or add them one at a time below, or after each workout.</span></div><button onclick="cmWoSetAuto(true)">Turn on</button></div>`;
   const when = x => x.post ? new Date(x.post.created_at).getTime() || 0 : (x.lw.date ? new Date(x.lw.date + 'T12:00:00').getTime() : -1e15 + (x.lw.sort || 0));
   const items = shared.map(p => ({ post: p })).concat(local.map((lw, i) => ({ lw, i }))).sort((a, b) => when(b) - when(a));
   // PRs: PR posts plus the PRs set inside the listed workouts
@@ -13768,10 +13848,11 @@ function cmWorkoutsHTML(posts, mine) {
       if(x.lw) {
         const lw = x.lw;
         const when = /^\d{4}-\d{2}-\d{2}$/.test(String(lw.date || '')) ? hyDateLabel(lw.date) : (lw.payload.program || 'Workout');
+        const onP = mine && cmWo.auto !== null && cmWoOnProfile(lw.key);
         return `<div class="cmp-wcard cmp-wlocal cm-attach-host">
-          <div class="cmp-wdate">${cmEsc(when)}<span>${mine ? (cmWo.show ? 'Not posted' : 'Only you can see this') : ''}</span></div>
+          <div class="cmp-wdate">${cmEsc(when)}<span>${mine ? (onP ? 'On your profile' : 'Only you can see this') : ''}</span></div>
           ${cmAttachHTML('workout', lw.payload, owner)}
-          ${mine ? `<div class="cmp-wfoot"><button class="cmp-wshare" onclick="cmShareLocalWorkout(${x.i})">Share to Community</button></div>` : ''}
+          ${mine ? `<div class="cmp-wfoot">${cmWo.auto !== null ? cmWoBtnHTML(lw.key, 'cmp-wprof') : ''}<button class="cmp-wshare" onclick="cmShareLocalWorkout(${x.i})">Share to Community</button></div>` : ''}
         </div>`;
       }
       const p = x.post;
@@ -16136,9 +16217,10 @@ function wnList() {
       id: '2026-11-11',
       version: '1.8',
       date: 'November 11, 2026',
-      title: 'Show all your workouts',
+      title: 'Workouts on your profile',
       items: [
-        { ic: '👀', t: 'Every workout on your profile', d: 'Want friends to see every workout you finish, not just the ones you post? Turn on Show all my workouts in Settings or on your profile. It\'s off unless you turn it on, and turning it off removes them again.' }
+        { ic: '👀', t: 'Add workouts to your profile', d: 'After a workout, tap Add to my profile so friends can see it on your profile, without making a post. Share to Community still makes a post.' },
+        { ic: '⚡', t: 'Or add every workout', d: 'Turn on Add every workout to my profile in Settings and each workout you finish is added for you. You can remove any of them from your profile.' }
       ]
     },
     {
