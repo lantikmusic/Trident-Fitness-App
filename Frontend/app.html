@@ -15766,20 +15766,38 @@ function ahSleepSummary(samples) {
   list.forEach(s => { const k = s.sourceId || s.sourceName || '?'; (by[k] = by[k] || []).push(s); });
   const stageOf = s => s.sleepState === 'light' ? 'core' : s.sleepState;
   const nameOf = arr => String(arr[0].sourceName || arr[0].sourceId || 'Unknown source');
-  const stagedOf = arr => ahUnionMinutes(arr.filter(s => ['rem', 'core', 'deep'].includes(stageOf(s))));
-  const asleepOf = arr => ahUnionMinutes(arr.filter(s => ['rem', 'core', 'deep', 'asleep'].includes(stageOf(s))));
+  // Some apps (Oura, for one) save parts of a night twice with different stages. Like the Health app,
+  // each moment gets ONE stage: where entries overlap, the one that started first wins (the longer one on a tie).
+  const resolve = arr => {
+    const list = arr.filter(s => ['rem', 'core', 'deep', 'asleep', 'awake'].includes(stageOf(s)))
+      .map(s => ({ stage: stageOf(s), start: new Date(s.startDate).getTime(), end: new Date(s.endDate).getTime() }))
+      .filter(g => isFinite(g.start) && isFinite(g.end) && g.end > g.start);
+    const pts = [...new Set(list.flatMap(g => [g.start, g.end]))].sort((a, b) => a - b);
+    const segs = [];
+    for(let i = 0; i < pts.length - 1; i++) {
+      const a = pts[i], b = pts[i + 1];
+      let win = null;
+      list.forEach(g => { if(g.start <= a && g.end >= b && (!win || g.start < win.start || (g.start === win.start && g.end - g.start > win.end - win.start))) win = g; });
+      if(!win) continue;
+      const last = segs[segs.length - 1];
+      if(last && last.stage === win.stage && last.end === a) last.end = b; else segs.push({ stage: win.stage, start: a, end: b });
+    }
+    const tot = { rem: 0, core: 0, deep: 0, awake: 0, asleep: 0 };
+    segs.forEach(g => { tot[g.stage] = (tot[g.stage] || 0) + (g.end - g.start) / 60000; });
+    return { segs, tot };
+  };
+  const cache = new Map(), res = arr => { if(!cache.has(arr)) cache.set(arr, resolve(arr)); return cache.get(arr); };
+  const stagedOf = arr => { const t = res(arr).tot; return t.rem + t.core + t.deep; };
+  const asleepOf = arr => { const t = res(arr).tot; return t.rem + t.core + t.deep + t.asleep; };
   const groups = Object.values(by);
   const pref = ahSleepSrcPref();
   let best = pref ? groups.find(arr => nameOf(arr) === pref && asleepOf(arr) > 0) : null;
   if(!best) best = groups.filter(arr => /watch/i.test(nameOf(arr)) && asleepOf(arr) > 0).sort((a, b) => asleepOf(b) - asleepOf(a))[0];
   if(!best) best = groups.slice().sort((a, b) => (stagedOf(b) * 1e6 + asleepOf(b)) - (stagedOf(a) * 1e6 + asleepOf(a)))[0];
-  const mins = st => ahUnionMinutes(best.filter(s => stageOf(s) === st));
-  const out = { rem: mins('rem'), core: mins('core'), deep: mins('deep'), awake: mins('awake'), plain: mins('asleep') };
+  const r = res(best);
+  const out = { rem: r.tot.rem, core: r.tot.core, deep: r.tot.deep, awake: r.tot.awake, plain: r.tot.asleep };
   out.hasStages = out.rem + out.core + out.deep > 0;
-  out.asleep = asleepOf(best);
-  // A stage total can't add up to more than the time asleep (e.g. an app saving both a stage and plain "asleep")
-  const stageSum = out.rem + out.core + out.deep + out.plain;
-  if(stageSum > out.asleep && stageSum > 0) { const f = out.asleep / stageSum; ['rem', 'core', 'deep', 'plain'].forEach(k => { out[k] *= f; }); }
+  out.asleep = out.rem + out.core + out.deep + out.plain;
   out.source = nameOf(best);
   out.sources = groups.map(arr => ({ name: nameOf(arr), asleep: asleepOf(arr) })).filter(x => x.asleep > 0).sort((a, b) => b.asleep - a.asleep);
   out.inBed = ahUnionMinutes(list.filter(s => s.sleepState === 'inBed'));   // time in bed from any source
@@ -15788,9 +15806,7 @@ function ahSleepSummary(samples) {
   out.from = new Date(Math.min(...times.map(t => t[0])));
   out.to = new Date(Math.max(...times.map(t => t[1])));
   // For the timeline: the chosen source's stages in time order, plus time in bed from any source
-  out.segments = best.filter(s => ['rem', 'core', 'deep', 'awake', 'asleep'].includes(stageOf(s)))
-    .map(s => ({ stage: stageOf(s), start: new Date(s.startDate).getTime(), end: new Date(s.endDate).getTime() }))
-    .filter(g => g.end > g.start).sort((a, b) => a.start - b.start);
+  out.segments = r.segs.map(g => ({ stage: g.stage, start: g.start, end: g.end }));
   out.inBedRanges = list.filter(s => s.sleepState === 'inBed').map(s => ({ start: new Date(s.startDate).getTime(), end: new Date(s.endDate).getTime() }));
   return out;
 }
@@ -16501,7 +16517,7 @@ function wnList() {
       date: 'November 2026',
       title: 'Sleep matches Apple Health',
       items: [
-        { ic: '😴', t: 'More accurate sleep', d: 'Sleep now comes from one source, your Apple Watch first, just like the Health app, and time is never counted twice.' },
+        { ic: '😴', t: 'More accurate sleep', d: 'Sleep now matches the Health app: one source at a time (Apple Watch first), and when a tracker like Oura saves part of a night twice, each moment gets one stage instead of being counted twice.' },
         { ic: '⌚️', t: 'Pick your sleep source', d: 'If more than one app or device saves your sleep, tap the Sleep card to see each one and choose which to use.' }
       ]
     },
