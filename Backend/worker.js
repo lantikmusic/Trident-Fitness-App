@@ -179,6 +179,8 @@ export default {
     if (path === '/food/scan'                 && request.method === 'POST') return handleFoodScan(request, env);
     if (path === '/food/lookup'               && request.method === 'POST') return handleFoodLookup(request, env);
     if (path === '/food/search'               && request.method === 'GET')  return handleFoodSearch(request, env);
+    if (path === '/food/barcode'              && request.method === 'GET')  return handleFoodBarcode(request, env);
+    if (path === '/food/autocomplete'         && request.method === 'GET')  return handleFoodAutocomplete(request, env);
 
     // ── LogMeal Proxy Routes ──
     if (path.startsWith('/v2/')) return handleLogMealProxy(request, path + url.search, env);
@@ -2364,7 +2366,10 @@ async function handleFoodLookup(request, env) {
 // Without them, /food/search answers 503 and the app just skips FatSecret.
 
 const FATSECRET_TOKEN_URL = 'https://oauth.fatsecret.com/connect/token';
-const FATSECRET_SEARCH_URL = 'https://platform.fatsecret.com/rest/foods/search/v1';
+const FATSECRET_SEARCH_URL = 'https://platform.fatsecret.com/rest/foods/search/v1';         // basic: one serving per food
+const FATSECRET_SEARCH_V6_URL = 'https://platform.fatsecret.com/rest/foods/search/v6';      // premier: every serving size
+const FATSECRET_BARCODE_URL = 'https://platform.fatsecret.com/rest/food/barcode/find-by-id/v2';
+const FATSECRET_AUTOCOMPLETE_URL = 'https://platform.fatsecret.com/rest/food/autocomplete/v2';
 let fatsecretToken = null;          // { value, expires } kept while this worker instance is alive
 // env.FATSECRET_TEST_BASE is only set when testing locally against a fake server.
 
@@ -2376,7 +2381,8 @@ async function fatsecretAccessToken(env, force) {
       'Authorization': 'Basic ' + btoa(`${env.FATSECRET_CLIENT_ID}:${env.FATSECRET_CLIENT_SECRET}`),
       'Content-Type': 'application/x-www-form-urlencoded',
     },
-    body: 'grant_type=client_credentials&scope=basic',
+    // No scope listed = every scope this FatSecret account has (basic, and premier + barcode on Premier Free)
+    body: 'grant_type=client_credentials',
   });
   if (!res.ok) {
     console.error('FatSecret token failed:', res.status, (await res.text().catch(() => '')).slice(0, 200));
@@ -2402,6 +2408,118 @@ function fatsecretParse(desc) {
   };
 }
 
+// Calls a FatSecret method with the cached token (one retry with a fresh token if it expired).
+// Returns { ok, status, data }. FatSecret reports some errors as HTTP 200 with data.error.
+async function fatsecretGet(env, realUrl, testPath, params) {
+  const base = env.FATSECRET_TEST_BASE ? env.FATSECRET_TEST_BASE + testPath : realUrl;
+  const qs = new URLSearchParams({ ...params, format: 'json' }).toString();
+  const call = token => fetch(`${base}?${qs}`, { headers: { 'Authorization': `Bearer ${token}` } });
+  let token = await fatsecretAccessToken(env, false);
+  if (!token) return { ok: false, status: 502, data: { error: { message: 'sign-in failed' } } };
+  let res = await call(token);
+  if (res.status === 401) {
+    token = await fatsecretAccessToken(env, true);
+    if (!token) return { ok: false, status: 502, data: { error: { message: 'sign-in failed' } } };
+    res = await call(token);
+  }
+  const data = await res.json().catch(() => ({}));
+  return { ok: res.ok && !data.error, status: res.status, data };
+}
+const fatsecretList = v => (v == null ? [] : Array.isArray(v) ? v : [v]);   // one item comes back as an object
+
+// One FatSecret food with all its serving sizes (Premier). The first serving is the default one.
+function fatsecretFoodOut(f) {
+  const link = String(f.food_url || '');
+  const servings = fatsecretList(f.servings && f.servings.serving).map(sv => {
+    const desc = foodScanText(sv.serving_description, 60);
+    const amt = Number(sv.metric_serving_amount), unit = foodScanText(sv.metric_serving_unit, 6).replace(/[^a-z]/gi, '');
+    const metric = amt > 0 && unit && !new RegExp('\\b' + unit + '\\b', 'i').test(desc) ? ` (${Math.round(amt * 10) / 10} ${unit})` : '';
+    return {
+      d: (desc + metric).slice(0, 80),
+      calories: Math.round(foodScanNum(sv.calories, 10000)),
+      protein: Math.round(foodScanNum(sv.protein, 1000) * 10) / 10,
+      carbs: Math.round(foodScanNum(sv.carbohydrate, 1000) * 10) / 10,
+      fat: Math.round(foodScanNum(sv.fat, 1000) * 10) / 10,
+      def: String(sv.is_default) === '1',
+    };
+  }).filter(sv => sv.d && (sv.calories > 0 || sv.protein > 0 || sv.carbs > 0 || sv.fat > 0));
+  servings.sort((a, b) => (b.def ? 1 : 0) - (a.def ? 1 : 0));
+  const first = servings[0] || { d: '', calories: 0, protein: 0, carbs: 0, fat: 0 };
+  return {
+    id: foodScanText(f.food_id, 20),
+    name: foodScanText(f.food_name, 100),
+    brand: f.food_type === 'Brand' ? foodScanText(f.brand_name, 60) : '',
+    serving: first.d, calories: first.calories, protein: first.protein, carbs: first.carbs, fat: first.fat,
+    servings: servings.slice(0, 12).map(({ def, ...sv }) => sv),
+    url: /^https:\/\/[a-z0-9.-]*fatsecret\.com\//i.test(link) ? link.slice(0, 300) : '',
+  };
+}
+
+// Barcode → GTIN-13, as FatSecret wants. UPC-E (8 digits starting with 0 or 1) is also tried as UPC-A.
+function fatsecretBarcodes(raw) {
+  const d = String(raw || '').replace(/\D/g, '');
+  if (d.length < 8 || d.length > 14) return [];
+  const out = [];
+  if (d.length === 14) { if (d[0] === '0') out.push(d.slice(1)); }
+  else out.push(d.padStart(13, '0'));
+  if (d.length === 8 && (d[0] === '0' || d[0] === '1')) {
+    const m = d.slice(1, 7), last = m[5];
+    let a;
+    if ('012'.includes(last)) a = m.slice(0, 2) + last + '0000' + m.slice(2, 5);
+    else if (last === '3') a = m.slice(0, 3) + '00000' + m.slice(3, 5);
+    else if (last === '4') a = m.slice(0, 4) + '00000' + m[4];
+    else a = m.slice(0, 5) + '0000' + last;
+    out.push(('0' + d[0] + a + d[7]).padStart(13, '0'));
+  }
+  return [...new Set(out)];
+}
+
+async function handleFoodBarcode(request, env) {
+  const session = await validateSession(request, env.DB);
+  if (!session) return error('Sign in to look up barcodes', 401);
+  if (!env.FATSECRET_CLIENT_ID || !env.FATSECRET_CLIENT_SECRET) return error('FatSecret is not set up on the server', 503);
+  const codes = fatsecretBarcodes(new URL(request.url).searchParams.get('code'));
+  if (!codes.length) return error('That barcode could not be read', 400);
+  try {
+    for (const barcode of codes) {
+      const r = await fatsecretGet(env, FATSECRET_BARCODE_URL, '/rest/food/barcode/find-by-id/v2', { barcode, flag_default_serving: 'true' });
+      const code = r.data && r.data.error && Number(r.data.error.code);
+      if (code === 211) continue;                                    // no food for this barcode
+      if (!r.ok) {
+        console.error('FatSecret barcode failed:', r.status, JSON.stringify(r.data.error || {}).slice(0, 200));
+        return error('FatSecret barcode lookup failed', 502);
+      }
+      const food = r.data.food ? fatsecretFoodOut(r.data.food) : null;
+      if (food && food.name && food.servings.length) return json({ food });
+    }
+    return error('Not found', 404);
+  } catch (e) {
+    console.error('FatSecret barcode error:', e && e.message);
+    return error('FatSecret barcode lookup failed', 502);
+  }
+}
+
+async function handleFoodAutocomplete(request, env) {
+  const session = await validateSession(request, env.DB);
+  if (!session) return error('Sign in to search foods', 401);
+  if (!env.FATSECRET_CLIENT_ID || !env.FATSECRET_CLIENT_SECRET) return error('FatSecret is not set up on the server', 503);
+  const q = foodScanText(new URL(request.url).searchParams.get('q'), 60);
+  if (q.length < 2) return json({ suggestions: [] });
+  try {
+    const r = await fatsecretGet(env, FATSECRET_AUTOCOMPLETE_URL, '/rest/food/autocomplete/v2', { expression: q, max_results: '6' });
+    if (!r.ok) {
+      console.error('FatSecret autocomplete failed:', r.status, JSON.stringify(r.data.error || {}).slice(0, 200));
+      return error('FatSecret suggestions failed', 502);
+    }
+    const list = fatsecretList(r.data.suggestions && r.data.suggestions.suggestion)
+      .map(x => foodScanText(String(x == null ? '' : x).replace(/<[^>]*>/g, ''), 60)).filter(Boolean).slice(0, 6);
+    return json({ suggestions: list });
+  } catch (e) {
+    console.error('FatSecret autocomplete error:', e && e.message);
+    return error('FatSecret suggestions failed', 502);
+  }
+}
+
 async function handleFoodSearch(request, env) {
   const session = await validateSession(request, env.DB);
   if (!session) return error('Sign in to search foods', 401);
@@ -2410,6 +2528,17 @@ async function handleFoodSearch(request, env) {
   const url = new URL(request.url);
   const query = foodScanText(url.searchParams.get('q'), 100);
   if (query.length < 2) return json({ results: [] });
+
+  // Premier: every serving size for each food
+  try {
+    const r = await fatsecretGet(env, FATSECRET_SEARCH_V6_URL, '/rest/foods/search/v6', { search_expression: query, max_results: '20', flag_default_serving: 'true' });
+    if (r.ok) {
+      const results = fatsecretList(r.data.foods_search && r.data.foods_search.results && r.data.foods_search.results.food)
+        .map(fatsecretFoodOut).filter(f => f.name && f.servings.length);
+      return json({ results });
+    }
+    console.warn('FatSecret v6 search unavailable, using basic search:', r.status, JSON.stringify(r.data.error || {}).slice(0, 160));
+  } catch (e) { console.warn('FatSecret v6 search error, using basic search:', e && e.message); }
 
   const search = async token => fetch(
     `${env.FATSECRET_TEST_BASE ? env.FATSECRET_TEST_BASE + '/rest/foods/search/v1' : FATSECRET_SEARCH_URL}?search_expression=${encodeURIComponent(query)}&max_results=20&format=json`,

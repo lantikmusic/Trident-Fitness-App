@@ -495,6 +495,15 @@ body:not([data-page="dashboard"]) .settings-btn{display:none;}
 .af-ai-msg{font-size:12px;color:var(--text3);margin-top:4px;line-height:1.4;}
 .af-ai-res .af-row{border-bottom-color:rgba(255,255,255,.07);}
 .af-row-mac a{color:var(--pink);text-decoration:none;font-weight:600;}
+.af-unit{position:relative;margin-bottom:8px;}
+.af-unit select{width:100%;height:38px;padding:0 34px 0 12px;border-radius:12px;background:var(--bg4);border:0.5px solid rgba(255,255,255,.08);color:var(--text);font-family:inherit;font-size:13px;font-weight:600;-webkit-appearance:none;appearance:none;outline:none;text-overflow:ellipsis;}
+.af-unit::after{content:'';position:absolute;right:14px;top:50%;width:7px;height:7px;margin-top:-6px;border-right:2px solid var(--text3);border-bottom:2px solid var(--text3);transform:rotate(45deg);pointer-events:none;}
+.af-unit-lbl{font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px;}
+.af-suggest{display:flex;flex-direction:column;margin-top:8px;border-radius:14px;overflow:hidden;background:var(--bg4);border:0.5px solid rgba(255,255,255,.08);}
+.af-sug{display:flex;align-items:center;gap:10px;width:100%;padding:11px 14px;border:0;border-top:0.5px solid rgba(255,255,255,.06);background:transparent;color:var(--text);font-family:inherit;font-size:14px;font-weight:500;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.af-sug:first-child{border-top:0;}
+.af-sug svg{flex-shrink:0;color:var(--text3);}
+.af-sug span{min-width:0;overflow-wrap:anywhere;}
 .af-credit{display:block;text-align:center;padding:12px 0 2px;font-size:11px;font-weight:600;color:var(--text3);text-decoration:none;}
 .af-field{min-width:0;margin-bottom:12px;}
 .af-field label{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;}
@@ -2760,6 +2769,10 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
           <div id="scanFoodBrand" style="font-size:12px;color:var(--text3);margin-bottom:14px;"></div>
           <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;" id="scanMacroPreview"></div>
           <div style="font-size:11px;color:var(--text3);margin-bottom:10px;" id="scanServingInfo"></div>
+          <div id="scanUnitWrap" style="display:none;">
+            <label class="af-unit-lbl" for="scanUnit">Serving size</label>
+            <div class="af-unit"><select id="scanUnit" onchange="scanPickServing(this.value)"></select></div>
+          </div>
           <div style="margin-bottom:12px;">
             <label style="font-size:11px;font-weight:600;color:var(--text2);display:block;margin-bottom:4px;">Servings</label>
             <div class="iw">
@@ -2768,6 +2781,7 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
           </div>
           <button onclick="addScannedFood()" style="display:block;width:100%;padding:12px;border-radius:var(--radius);border:none;background:var(--pink);font-family:inherit;font-size:14px;font-weight:700;color:#000;cursor:pointer;">Add to <span id="scanMealTarget"></span></button>
           <button onclick="retryScan()" style="display:block;width:100%;padding:10px;margin-top:8px;border-radius:var(--radius);border:0.5px solid var(--border2);background:transparent;font-family:inherit;font-size:13px;font-weight:500;color:var(--text3);cursor:pointer;">↻ Scan Another</button>
+          <a id="scanCredit" class="af-credit" href="https://www.fatsecret.com" target="_blank" rel="noopener noreferrer" style="display:none;">Powered by fatsecret</a>
         </div>
 
         <!-- Error state -->
@@ -2912,9 +2926,10 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
             <button class="af-pill" onclick="closeAddFoodSearch()"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
           </div>
           <div class="af-search-row">
-            <div class="af-search"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7.5"/><line x1="20.5" y1="20.5" x2="16.5" y2="16.5"/></svg><input type="text" id="addFoodInput" placeholder="e.g. Greek yogurt, Urbane Cafe So-Cal" enterkeyhint="search" onkeydown="if(event.key==='Enter')doAddFoodSearch()"></div>
+            <div class="af-search"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7.5"/><line x1="20.5" y1="20.5" x2="16.5" y2="16.5"/></svg><input type="text" id="addFoodInput" placeholder="e.g. Greek yogurt, Urbane Cafe So-Cal" enterkeyhint="search" autocomplete="off" oninput="afSuggestInput()" onkeydown="if(event.key==='Enter')doAddFoodSearch()"></div>
             <button class="af-go" onclick="doAddFoodSearch()">Search</button>
           </div>
+          <div id="afSuggest" class="af-suggest" style="display:none;"></div>
           <div id="afAskAI"></div>
           <div id="addFoodResults" class="af-list"></div>
         </div>
@@ -4783,6 +4798,17 @@ function normalizeOFF(p) {
   };
 }
 
+// FatSecret serving sizes ("1 cup (30 g)", "1 sandwich", "100 g"…) with the macros for each
+function fsServings(list) {
+  return (Array.isArray(list) ? list : []).map(x => ({
+    d: String((x && x.d) || '').slice(0, 80), cal: Number(x && x.calories) || 0,
+    protein: Number(x && x.protein) || 0, carbs: Number(x && x.carbs) || 0, fat: Number(x && x.fat) || 0
+  })).filter(x => x.d);
+}
+function fsUnitOptions(servings, si) {
+  return servings.map((x, i) => `<option value="${i}"${i === si ? ' selected' : ''}>${afEsc(x.d)} · ${Math.round(x.cal)} kcal</option>`).join('');
+}
+
 // ── Search USDA ──
 // Restaurant and brand foods through the Trident server (keys stay on the server).
 async function searchFatSecret(query) {
@@ -4793,7 +4819,8 @@ async function searchFatSecret(query) {
     return (data.results || []).map(f => ({
       name: f.brand ? `${f.brand} ${f.name}` : f.name,
       protein: Number(f.protein) || 0, carbs: Number(f.carbs) || 0, fat: Number(f.fat) || 0,
-      cal: Number(f.calories) || 0, serving: f.serving || '', source: 'FatSecret'
+      cal: Number(f.calories) || 0, serving: f.serving || '', source: 'FatSecret',
+      servings: fsServings(f.servings), si: 0
     }));
   } catch(e) {
     console.warn('FatSecret search error:', e);
@@ -5075,6 +5102,16 @@ async function lookupBarcode(barcode) {
   document.getElementById('scanResult').style.display = 'none';
   document.getElementById('scanError').style.display  = 'none';
 
+  if(isLoggedIn()) {
+    try {
+      const r = await fetch(`${WORKER_URL}/food/barcode?code=${encodeURIComponent(barcode)}`, { headers: logMealHeaders() });
+      if(r.ok) {
+        const d = await r.json();
+        const sv = fsServings(d.food && d.food.servings);
+        if(d.food && d.food.name && sv.length) { displayScanResultFS(d.food, sv); return; }
+      }
+    } catch(e) { console.warn('FatSecret barcode lookup skipped:', e); }
+  }
   try {
     // LogMeal barcode lookup via Cloudflare Worker
     const res = await fetch(`${LOGMEAL_PROXY}/v2/barcode_scan/${encodeURIComponent(barcode)}`, {
@@ -5199,7 +5236,28 @@ function scanMacroCards(calories, protein, carbs, fat) {
     </div>`).join('');
 }
 
+// A FatSecret barcode match: pick a serving size (default first), with the required credit.
+function displayScanResultFS(food, servings) {
+  const sv = servings[0];
+  displayScanResult(String(food.name), String(food.brand || ''), Math.round(sv.cal), sv.protein, sv.carbs, sv.fat);
+  window._scanFS = servings;   // after displayScanResult, which clears it
+  document.getElementById('scanServingInfo').textContent = `Per serving: ${sv.d} · ${Math.round(sv.cal)} kcal`;
+  const wrap = document.getElementById('scanUnitWrap'), sel = document.getElementById('scanUnit');
+  sel.innerHTML = fsUnitOptions(servings, 0);
+  wrap.style.display = servings.length > 1 ? '' : 'none';
+  document.getElementById('scanCredit').style.display = '';
+}
+function scanPickServing(i) {
+  const sv = (window._scanFS || [])[Number(i)]; if(!sv || !baseScanMacros) return;
+  baseScanMacros = { protein: sv.protein, carbs: sv.carbs, fat: sv.fat, calories: Math.round(sv.cal) };
+  document.getElementById('scanServingInfo').textContent = `Per serving: ${sv.d} · ${Math.round(sv.cal)} kcal`;
+  updateScanMacros();
+}
 function displayScanResult(foodName, brand, calories, protein, carbs, fat, servingG) {
+  // Serving sizes and the FatSecret credit only show for a FatSecret match (displayScanResultFS)
+  window._scanFS = null;
+  document.getElementById('scanUnitWrap').style.display = 'none';
+  document.getElementById('scanCredit').style.display = 'none';
   // Prepend brand to food name if not already included
   const displayName = (brand && !foodName.toLowerCase().includes(brand.toLowerCase()))
     ? `${brand} ${foodName}`
@@ -5265,6 +5323,9 @@ function resetScannerUI() {
   document.getElementById('scanResult').style.display = 'none';
   document.getElementById('scanError').style.display  = 'none';
   document.getElementById('manualBarcode').value = '';
+  document.getElementById('scanUnitWrap').style.display = 'none';
+  document.getElementById('scanCredit').style.display = 'none';
+  window._scanFS = null;
   scannedFoodData = null;
   setScanStatus('Point at a barcode');
 }
@@ -5652,11 +5713,45 @@ function closeAddFoodSearch() {
   document.getElementById('addFoodSearchPanel').style.display = 'none';
   document.getElementById('addFoodLibPanel').style.display = 'block';
   document.getElementById('addFoodResults').innerHTML = '';
+  afSuggestStop();
   afAskAIOffer('', 0);
   afSetTile('');
 }
 
+// Suggestions while typing (FatSecret autocomplete, through the Trident server; signed-in only)
+var AF_SUG = { t: 0, gen: 0, list: [] };
+const AF_SUG_ICON = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7.5"/><line x1="20.5" y1="20.5" x2="16.5" y2="16.5"/></svg>';
+function afSuggestShow(list) {
+  const box = document.getElementById('afSuggest'); if(!box) return;
+  AF_SUG.list = list || [];
+  box.innerHTML = AF_SUG.list.map((x, i) => `<button class="af-sug" onclick="afSuggestPick(${i})">${AF_SUG_ICON}<span>${afEsc(x)}</span></button>`).join('');
+  box.style.display = AF_SUG.list.length ? '' : 'none';
+}
+function afSuggestStop() { clearTimeout(AF_SUG.t); AF_SUG.gen++; afSuggestShow([]); }
+function afSuggestInput() {
+  clearTimeout(AF_SUG.t); AF_SUG.gen++;
+  const q = (document.getElementById('addFoodInput')?.value || '').trim();
+  if(q.length < 2 || !isLoggedIn()) { afSuggestShow([]); return; }
+  AF_SUG.t = setTimeout(() => afSuggestFetch(q), 220);
+}
+async function afSuggestFetch(q) {
+  const gen = ++AF_SUG.gen;
+  try {
+    const res = await fetch(`${WORKER_URL}/food/autocomplete?q=${encodeURIComponent(q)}`, { headers: logMealHeaders() });
+    const data = res.ok ? await res.json() : {};
+    if(gen !== AF_SUG.gen || (document.getElementById('addFoodInput')?.value || '').trim() !== q) return;
+    afSuggestShow(Array.isArray(data.suggestions) ? data.suggestions.map(String).slice(0, 6) : []);
+  } catch(e) { if(gen === AF_SUG.gen) afSuggestShow([]); }
+}
+function afSuggestPick(i) {
+  const x = AF_SUG.list[i], input = document.getElementById('addFoodInput');
+  if(!x || !input) return;
+  input.value = x; input.blur();
+  doAddFoodSearch();
+}
+
 async function doAddFoodSearch() {
+  afSuggestStop();
   const query = document.getElementById('addFoodInput').value.trim();
   if(!query) return;
   const el = document.getElementById('addFoodResults');
@@ -5690,10 +5785,11 @@ async function doAddFoodSearch() {
         <div class="af-res-top">
           <div class="af-row-main">
             <div class="af-row-name">${afEsc(f.name)}${badge}</div>
-            <div class="af-row-mac">${afMacros(f.protein, f.carbs, f.fat, f.serving)}</div>
+            <div class="af-row-mac" id="sr-mac-${ri}">${afMacros(f.protein, f.carbs, f.fat, f.serving)}</div>
           </div>
           <div class="af-row-cal" id="sr-cal-${ri}">${Math.round(f.cal)}<span>KCAL</span></div>
         </div>
+        ${f.servings && f.servings.length > 1 ? `<div class="af-unit"><select aria-label="Serving size" onchange="afPickServing(${ri}, this.value)">${fsUnitOptions(f.servings, f.si || 0)}</select></div>` : ''}
         <div class="af-res-bot">
           <div class="af-srv"><label for="srv-${ri}">Servings</label><input type="number" inputmode="decimal" id="srv-${ri}" value="1" min="0.25" step="0.25" oninput="afServingInput(${ri}, this.value)"></div>
           <button class="af-res-add" onclick="afAddSearchResult(${ri})">Add to ${MEAL_LABELS[curMeal] || 'meal'}</button>
@@ -5802,6 +5898,14 @@ function afAddAiResult(i) {
   addFoodFromSearch(name, f.protein * n, f.carbs * n, f.fat * n);
 }
 
+function afPickServing(ri, i) {
+  const f = (window._afResults || [])[ri], sv = f && f.servings && f.servings[Number(i)];
+  if(!sv) return;
+  f.si = Number(i); f.cal = sv.cal; f.protein = sv.protein; f.carbs = sv.carbs; f.fat = sv.fat; f.serving = sv.d;
+  const mac = document.getElementById('sr-mac-' + ri);
+  if(mac) mac.innerHTML = afMacros(f.protein, f.carbs, f.fat, f.serving);
+  afServingInput(ri, document.getElementById('srv-' + ri)?.value);
+}
 function afServingInput(ri, v) {
   const f = (window._afResults || [])[ri]; if(!f) return;
   const n = parseFloat(v) || 1;
@@ -16515,8 +16619,11 @@ function wnList() {
       id: '2026-11-14',
       version: '2.2',
       date: 'November 2026',
-      title: 'Sleep matches Apple Health',
+      title: 'Better food search and sleep',
       items: [
+        { ic: '🍽️', t: 'Pick your serving size', d: 'Search results now offer every serving size (1 cup, 1 sandwich, 100 g…) with the macros for each.' },
+        { ic: '🔎', t: 'Suggestions as you type', d: 'Food names pop up while you type in Search. Tap one to search it.' },
+        { ic: '📦', t: 'Better barcode scanning', d: 'Scanning a package now checks FatSecret\'s US food database first, with serving sizes to choose from.' },
         { ic: '😴', t: 'More accurate sleep', d: 'Sleep now matches the Health app: one source at a time (Apple Watch first), and when a tracker like Oura saves part of a night twice, each moment gets one stage instead of being counted twice.' },
         { ic: '⌚️', t: 'Pick your sleep source', d: 'If more than one app or device saves your sleep, tap the Sleep card to see each one and choose which to use.' }
       ]
