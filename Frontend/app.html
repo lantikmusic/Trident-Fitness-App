@@ -2279,6 +2279,22 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
 .cm-ovc-stats span{display:block;font-size:.58em;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.62);margin-top:.15em;}
 .cm-ovc-pr{font-size:2.2em;font-weight:900;letter-spacing:-.03em;line-height:1;}
 .cm-ovc-pr small{font-size:.38em;font-weight:700;color:rgba(255,255,255,.62);margin-left:.25em;letter-spacing:0;}
+/* Landscape card: 24em wide, the exercises in a second column */
+.cm-ovc.land{font-size:calc(var(--s, .9) * 15px);font-size:calc(var(--s, .9) * 100cqw / 24);display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);column-gap:1.1em;align-items:start;}
+.cm-ovc.land.single{grid-template-columns:minmax(0,1fr);}
+.cm-ovc.land .cm-ovc-side{border-left:1px solid rgba(255,255,255,.14);padding-left:1.1em;align-self:stretch;display:flex;flex-direction:column;justify-content:center;}
+.cm-ovc.land .cm-ovc-rows{margin-top:0;padding-top:0;border-top:0;display:flex;flex-direction:column;gap:.35em;}
+.cm-ovc.land .cm-ovc-row{flex-direction:column;gap:0;line-height:1.3;}
+.cm-ovc.land .cm-ovc-row em{max-width:none;text-align:left;}
+.cm-ovc.land .cm-ovc-pr{font-size:2.6em;}
+.cm-ov-shape{display:flex;gap:8px;margin:0 0 10px;}
+.cm-ov-shape button{flex:1;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px 8px;padding:9px 10px;border-radius:14px;border:0.5px solid var(--border2);background:transparent;color:var(--text2);font-family:inherit;font-size:13.5px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.cm-ov-shape button.on{border-color:var(--pink-border);background:var(--pink-dim);color:var(--pink);}
+.cm-ov-shape small{flex-basis:100%;font-size:10.5px;font-weight:600;color:var(--text3);}
+.cm-ov-shape button.on small{color:var(--pink);opacity:.75;}
+.cm-ov-shape-ic{display:inline-block;border:2px solid currentColor;border-radius:3px;}
+.cm-ov-shape-ic.v{width:10px;height:15px;}
+.cm-ov-shape-ic.h{width:16px;height:10px;}
 .cm-ovc.edit{pointer-events:auto;cursor:grab;touch-action:none;transition:box-shadow .15s;}
 .cm-ovc.edit.grab{cursor:grabbing;box-shadow:0 0 0 2px var(--pink),0 .6em 1.8em rgba(0,0,0,.45);}
 .cm-ov-stage{position:relative;margin:0 auto 10px;border-radius:16px;overflow:hidden;background:#0d0d0f;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;}
@@ -13295,30 +13311,35 @@ function cmWoStats(payload) {
 const CM_OV_ROWS = 6;   // exercise rows shown on the photo card; the rest are one tap away below the photo
 function cmOvOk(ov) {
   return !!ov && typeof ov === 'object' && [ov.x, ov.y, ov.s].every(n => typeof n === 'number' && isFinite(n))
-    && ov.x >= 0 && ov.x <= 1 && ov.y >= 0 && ov.y <= 1 && ov.s >= 0.25 && ov.s <= 1;
+    && ov.x >= 0 && ov.x <= 1 && ov.y >= 0 && ov.y <= 1 && ov.s >= 0.25 && ov.s <= 1
+    && (ov.l === undefined || ov.l === 'h' || ov.l === 'v');
 }
+// Card shape: landscape ('h', wide and short, exercises in a second column) or vertical ('v')
+const CM_OV_SIZE = { v: 0.62, h: 0.9 };
+function cmOvShapeFor(aspect) { return aspect >= 1 ? 'h' : 'v'; }
 function cmOvCardHTML(type, payload, ov, editable) {
   if(!payload || !cmOvOk(ov)) return '';
   const pos = `left:${(ov.x * 100).toFixed(2)}%;top:${(ov.y * 100).toFixed(2)}%;--s:${ov.s.toFixed(3)}`;
   const mark = `<img src="Icons/trident-mark.png" alt="" onerror="this.remove()">`;
   let inner;
   if(type === 'pr') {
-    inner = `<div class="cm-ovc-top">${mark}<span>🏆 New PR</span></div>
-      <div class="cm-ovc-title">${cmEsc(payload.exercise || 'Lift')}</div>
-      <div class="cm-ovc-pr">${cmNum(payload.weight)}<small>lbs</small></div>`;
+    inner = `<div class="cm-ovc-main"><div class="cm-ovc-top">${mark}<span>🏆 New PR</span></div>
+      <div class="cm-ovc-title">${cmEsc(payload.exercise || 'Lift')}</div></div>
+      <div class="cm-ovc-side"><div class="cm-ovc-pr">${cmNum(payload.weight)}<small>lbs</small></div></div>`;
   } else {
     const nEx = Array.isArray(payload.exercises) ? payload.exercises.length : 0, vol = cmNum(payload.volume);
     const stats = cmWoStats(payload) || [[String(nEx), 'exercises'], [String(cmNum(payload.sets) || '—'), 'sets'], [vol ? (vol >= 10000 ? (Math.round(vol / 100) / 10) + 'k' : vol.toLocaleString()) : '—', 'lbs lifted']];
     const exs = Array.isArray(payload.exercises) ? payload.exercises : [];
     const rows = exs.slice(0, CM_OV_ROWS).map(ex => `<div class="cm-ovc-row"><span>${cmEsc(ex && ex.name)}</span><em>${cmEsc(cmSetsText(ex))}</em></div>`).join('')
       + (exs.length > CM_OV_ROWS ? `<div class="cm-ovc-more">+${exs.length - CM_OV_ROWS} more</div>` : '');
-    inner = `<div class="cm-ovc-top">${mark}<span>${cmEsc(cmWoBadge(payload))}</span>${payload.program ? `<i>${cmEsc(payload.program)}</i>` : ''}</div>
+    inner = `<div class="cm-ovc-main"><div class="cm-ovc-top">${mark}<span>${cmEsc(cmWoBadge(payload))}</span>${payload.program ? `<i>${cmEsc(payload.program)}</i>` : ''}</div>
       <div class="cm-ovc-title">${cmEsc(payload.day || 'Workout')}</div>
       <div class="cm-ovc-stats">${stats.map(x => `<div><b>${cmEsc(x[0])}</b><span>${cmEsc(x[1])}</span></div>`).join('')}</div>
-      ${cmOvPRsHTML(payload)}
-      ${rows ? `<div class="cm-ovc-rows">${rows}</div>` : ''}`;
+      ${cmOvPRsHTML(payload)}</div>
+      ${rows ? `<div class="cm-ovc-side"><div class="cm-ovc-rows">${rows}</div></div>` : ''}`;
   }
-  return `<div class="cm-ovc${editable ? ' edit' : ''}"${editable ? ' id="cmOvCard"' : ''} style="${pos}">${inner}</div>`;
+  const land = ov.l === 'h', single = !/cm-ovc-side/.test(inner);
+  return `<div class="cm-ovc${land ? ' land' : ''}${land && single ? ' single' : ''}${editable ? ' edit' : ''}"${editable ? ' id="cmOvCard"' : ''} style="${pos}">${inner}</div>`;
 }
 function cmOvPRsHTML(payload) {
   const prs = cmCleanPRs(payload && payload.prs);
@@ -15123,17 +15144,24 @@ function cmDrawDraft() {
       if(!cmDraft.aspect || cmDraft.aspectOf !== cmDraft.photo) {
         // Photo shape first (same limits as the feed), then draw
         const src = cmDraft.photo, im = new Image();
-        im.onload = () => { if(cmDraft.photo !== src) return; cmDraft.aspectOf = src; cmDraft.aspect = Math.round(cmClampAspect(im.naturalWidth / im.naturalHeight || 0.8) * 1000) / 1000; cmDrawDraft(); };
-        im.onerror = () => { if(cmDraft.photo !== src) return; cmDraft.aspectOf = src; cmDraft.aspect = 0.8; cmDrawDraft(); };
+        // A new photo starts the card at its normal size (it may have been shrunk to fit the last one)
+        const fresh = a => { if(cmDraft.photo !== src) return; cmDraft.aspectOf = src; cmDraft.aspect = a; const o = cmDraft.ov; if(o) o.s = CM_OV_SIZE[o.picked ? o.l : cmOvShapeFor(a)] || 0.62; cmDrawDraft(); };
+        im.onload = () => fresh(Math.round(cmClampAspect(im.naturalWidth / im.naturalHeight || 0.8) * 1000) / 1000);
+        im.onerror = () => fresh(0.8);
         im.src = src;
         document.getElementById('cmAttachPreview').innerHTML = '';
         return;
       }
-      const a = cmDraft.aspect;
+      const a = cmDraft.aspect, ov = cmDraft.ov, best = cmOvShapeFor(a);
+      if(!ov.picked && ov.l !== best) { ov.l = best; ov.s = CM_OV_SIZE[best]; }   // suggested for this photo until you choose
       document.getElementById('cmAttachPreview').innerHTML = `<div class="cm-ov-stage" id="cmOvStage" style="aspect-ratio:${a};width:min(100%, calc(60vh * ${a}))">
           <img src="${cmDraft.photo}" alt="Selected photo" draggable="false">
           <div class="cm-ov-guide v" id="cmOvGuideV"></div><div class="cm-ov-guide h" id="cmOvGuideH"></div>
           ${cmOvCardHTML(kind, cmDraft.attach.payload, cmDraft.ov, true)}
+        </div>
+        <div class="cm-ov-shape" role="radiogroup" aria-label="Card shape">
+          ${['v', 'h'].map(k => `<button role="radio" aria-checked="${ov.l === k}" class="${ov.l === k ? 'on' : ''}" onclick="cmOvSetShape('${k}')">
+            <i class="cm-ov-shape-ic ${k}"></i>${k === 'v' ? 'Vertical' : 'Landscape'}${k === best ? '<small>Fits this photo</small>' : ''}</button>`).join('')}
         </div>
         <div class="cm-ov-tools">
           <div class="cm-ov-hint">Drag the card to move it. It locks to the middle. Pinch or use the slider to resize.</div>
@@ -15171,6 +15199,12 @@ function cmHaptic() {
   try { if(window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform()) Capacitor.nativePromise('Haptic', 'impact', {}).catch(() => {}); } catch(e) {}
 }
 function cmOvToggle(on) { if(cmDraft.ov) cmDraft.ov.on = !!on; cmDrawDraft(); }
+function cmOvSetShape(l) {
+  const ov = cmDraft.ov; if(!ov || (l !== 'h' && l !== 'v')) return;
+  ov.picked = true;
+  if(ov.l !== l) { ov.l = l; ov.s = CM_OV_SIZE[l]; }
+  cmDrawDraft();
+}
 function cmOvSetSize(v) { if(!cmDraft.ov) return; cmDraft.ov.s = Math.min(0.95, Math.max(0.35, Number(v) / 100 || 0.62)); cmOvApply(); }
 // Puts the card where cmDraft.ov says, kept fully inside the photo (and no taller than it).
 function cmOvApply() {
@@ -15399,6 +15433,7 @@ function cmDraftPayload() {
   if(cmDraft.photo && ov && ov.on) {
     const r3 = n => Math.round(n * 1000) / 1000;
     const o = { x: r3(ov.x), y: r3(ov.y), s: r3(ov.s) };
+    if(ov.l === 'h') o.l = 'h';
     if(cmOvOk(o)) payload.overlay = o;
   }
   return payload;
@@ -16232,6 +16267,16 @@ document.addEventListener('visibilitychange', () => {
 // ══════════════════════════════════════
 function wnList() {
   return [
+    {
+      id: '2026-11-11b',
+      version: '1.9',
+      date: 'November 11, 2026',
+      title: 'Landscape workout cards',
+      items: [
+        { ic: '🖼️', t: 'Vertical or landscape', d: 'When you put a workout card on a photo, pick Vertical or Landscape. The app suggests the one that fits your photo, and landscape cards list your exercises in a second column.' },
+        { ic: '📝', t: 'Full names everywhere', d: 'Long food and exercise names no longer get cut off with "…" on meal stickers, the food list and workout cards.' }
+      ]
+    },
     {
       id: '2026-11-11',
       version: '1.8',
