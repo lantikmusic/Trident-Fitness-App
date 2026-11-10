@@ -33,6 +33,202 @@ async function hashPassword(password) {
   return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
+// ── Password storage ──
+// New format: "pbkdf2$<iterations>$<salt hex>$<hash hex>" (PBKDF2-SHA256, random salt per password).
+// Older passwords used hashPassword() above; they still work and are upgraded on the next login.
+// Iterations are kept within the free Workers plan's CPU limit and stored with each hash, so they can be raised later.
+// A hash starting with "!" can't be used to log in (Google accounts that never set a password).
+const PBKDF2_ITERATIONS = 50000;
+const NO_PASSWORD = '!no-password';
+const toHex = buf => Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+const fromHex = h => new Uint8Array((h.match(/../g) || []).map(x => parseInt(x, 16)));
+async function pbkdf2Hex(password, salt, iterations) {
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits']);
+  return toHex(await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt, iterations }, key, 256));
+}
+async function makePasswordHash(password) {
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  return `pbkdf2$${PBKDF2_ITERATIONS}$${toHex(salt)}$${await pbkdf2Hex(password, salt, PBKDF2_ITERATIONS)}`;
+}
+function sameText(a, b) {                 // compares without stopping at the first difference
+  a = String(a); b = String(b);
+  let diff = a.length ^ b.length;
+  for (let i = 0; i < Math.max(a.length, b.length); i++) diff |= (a.charCodeAt(i) || 0) ^ (b.charCodeAt(i) || 0);
+  return diff === 0;
+}
+// Returns { ok, upgrade } — upgrade is true when the stored hash is the old kind.
+async function checkPassword(password, stored) {
+  stored = String(stored || '');
+  if (!stored || stored[0] === '!') return { ok: false, upgrade: false };
+  if (stored.startsWith('pbkdf2$')) {
+    const [, it, saltHex, hash] = stored.split('$');
+    const iterations = Number(it);
+    if (!(iterations > 0 && iterations <= 100000) || !saltHex || !hash) return { ok: false, upgrade: false };
+    return { ok: sameText(await pbkdf2Hex(password, fromHex(saltHex), iterations), hash), upgrade: iterations < PBKDF2_ITERATIONS };
+  }
+  return { ok: sameText(await hashPassword(password), stored), upgrade: true };
+}
+
+// ── Email (Resend) ──
+// Needs the Cloudflare secret RESEND_API_KEY. Without it, nothing is sent and the app says email isn't set up.
+// env.EMAIL_TEST_BASE is only set when testing locally against a fake server.
+const EMAIL_FROM = 'Trident Fitness <no-reply@tridentfitnessapp.com>';
+const EMAIL_REPLY_TO = 'info@tridentfitnessapp.com';
+function emailReady(env) { return !!env.RESEND_API_KEY; }
+async function sendEmail(env, to, subject, html, text) {
+  if (!emailReady(env)) return false;
+  try {
+    const res = await fetch(`${env.EMAIL_TEST_BASE || 'https://api.resend.com'}/emails`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from: env.EMAIL_FROM || EMAIL_FROM, to: [to], reply_to: EMAIL_REPLY_TO, subject, html, text }),
+    });
+    if (!res.ok) console.error('Email failed:', res.status, (await res.text().catch(() => '')).slice(0, 200));
+    return res.ok;
+  } catch (e) {
+    console.error('Email error:', e && e.message);
+    return false;
+  }
+}
+const escHtml = v => String(v == null ? '' : v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+function emailLayout(title, body) {
+  return `<!doctype html><html><body style="margin:0;padding:0;background:#f4f5f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#111;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:32px 12px;"><tr><td align="center">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:460px;background:#ffffff;border-radius:16px;padding:32px 28px;">
+<tr><td style="font-size:15px;font-weight:900;font-style:italic;letter-spacing:.02em;">TRIDENT <span style="color:#00B8C4;">FITNESS</span></td></tr>
+<tr><td style="padding-top:22px;font-size:22px;font-weight:700;">${escHtml(title)}</td></tr>
+<tr><td style="padding-top:12px;font-size:15px;line-height:1.55;color:#333;">${body}</td></tr>
+</table>
+<div style="max-width:460px;padding:16px 8px 0;font-size:12px;color:#888;line-height:1.5;">Questions? Reply to this email or write to ${EMAIL_REPLY_TO}.</div>
+</td></tr></table></body></html>`;
+}
+function codeEmail(purpose, name, code) {
+  const hi = name ? `Hi ${escHtml(String(name).split(' ')[0])},` : 'Hi,';
+  const what = purpose === 'reset' ? 'reset your Trident Fitness password' : 'confirm your email for Trident Fitness';
+  const title = purpose === 'reset' ? 'Reset your password' : 'Confirm your email';
+  const html = emailLayout(title, `${hi}<br><br>Use this code to ${what}:
+    <div style="margin:20px 0;padding:16px;border-radius:12px;background:#f0fbfc;text-align:center;font-size:34px;font-weight:800;letter-spacing:10px;color:#111;">${code}</div>
+    It expires in 15 minutes. If you didn't ask for this, you can ignore this email${purpose === 'reset' ? ' — your password stays the same' : ''}.`);
+  const text = `${title}\n\nUse this code to ${what}: ${code}\n\nIt expires in 15 minutes. If you didn't ask for this, you can ignore this email.`;
+  return { subject: purpose === 'reset' ? `${code} is your Trident Fitness reset code` : `${code} is your Trident Fitness code`, html, text };
+}
+
+// ── One-time codes (email confirmation and password reset) ──
+// 6 digits, valid 15 minutes, 5 tries. Only a hash is stored. One live code per account and purpose.
+const CODE_TTL_MS = 15 * 60 * 1000, CODE_MAX_TRIES = 5, CODE_RESEND_MS = 45 * 1000;
+function newCode() {
+  const a = new Uint32Array(1);
+  do { crypto.getRandomValues(a); } while (a[0] >= 4294000000);    // no bias toward low numbers
+  return String(a[0] % 1000000).padStart(6, '0');
+}
+async function codeHash(userId, purpose, code) {
+  return toHex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${purpose}:${userId}:${code}`)));
+}
+// Simple fixed-window counters. Returns true when the action is allowed (and counts it).
+async function allowAction(DB, key, max, windowMs) {
+  const now = Date.now();
+  if (Math.random() < 0.02) await DB.prepare('DELETE FROM auth_limits WHERE window_start < ?').bind(now - 2 * 86400000).run();   // tidy up old counters
+  const row = await DB.prepare('SELECT window_start, count FROM auth_limits WHERE key = ?').bind(key).first();
+  if (!row || now - row.window_start >= windowMs) {
+    await DB.prepare('INSERT OR REPLACE INTO auth_limits (key, window_start, count) VALUES (?, ?, 1)').bind(key, now).run();
+    return true;
+  }
+  if (row.count >= max) return false;
+  await DB.prepare('UPDATE auth_limits SET count = count + 1 WHERE key = ?').bind(key).run();
+  return true;
+}
+// Makes and emails a code. Returns 'sent', 'wait' (asked again too soon), 'limit' (too many today) or 'failed'.
+async function sendCode(env, user, purpose) {
+  const DB = env.DB;
+  const last = await DB.prepare('SELECT sent_at FROM auth_codes WHERE user_id = ? AND purpose = ?').bind(user.id, purpose).first();
+  if (last && Date.now() - last.sent_at < CODE_RESEND_MS) return 'wait';
+  if (!(await allowAction(DB, `send:${purpose}:${user.id}`, 6, 60 * 60 * 1000))) return 'limit';
+  const code = newCode();
+  await DB.prepare('INSERT OR REPLACE INTO auth_codes (user_id, purpose, code_hash, expires_at, attempts, sent_at) VALUES (?, ?, ?, ?, 0, ?)')
+    .bind(user.id, purpose, await codeHash(user.id, purpose, code), Date.now() + CODE_TTL_MS, Date.now()).run();
+  const m = codeEmail(purpose, user.name, code);
+  return (await sendEmail(env, user.email, m.subject, m.html, m.text)) ? 'sent' : 'failed';
+}
+// Checks a code. Returns 'ok', 'wrong', or 'expired' (no code, too old, or too many tries). A right code is used up.
+async function useCode(DB, userId, purpose, code) {
+  const row = await DB.prepare('SELECT code_hash, expires_at, attempts FROM auth_codes WHERE user_id = ? AND purpose = ?').bind(userId, purpose).first();
+  if (!row || row.expires_at < Date.now() || row.attempts >= CODE_MAX_TRIES) return 'expired';
+  if (!/^\d{6}$/.test(String(code || '')) || !sameText(await codeHash(userId, purpose, String(code)), row.code_hash)) {
+    await DB.prepare('UPDATE auth_codes SET attempts = attempts + 1 WHERE user_id = ? AND purpose = ?').bind(userId, purpose).run();
+    return row.attempts + 1 >= CODE_MAX_TRIES ? 'expired' : 'wrong';
+  }
+  await DB.prepare('DELETE FROM auth_codes WHERE user_id = ? AND purpose = ?').bind(userId, purpose).run();
+  return 'ok';
+}
+async function newSession(DB, userId) {
+  const token = generateToken();
+  const expiresAt = new Date(Date.now() + SESSION_DURATION_DAYS * 24 * 60 * 60 * 1000).toISOString();
+  await DB.prepare('INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, ?)').bind(token, userId, expiresAt).run();
+  return token;
+}
+const clientIp = request => request.headers.get('CF-Connecting-IP') || 'unknown';
+async function authRoute(handler, request, env) {
+  try { return await handler(request, env); }
+  catch (e) { console.error('Auth error:', e && e.message); return error('Something went wrong. Please try again.', 500); }
+}
+
+// Sends (or re-sends) the email confirmation code to the signed-in account.
+async function handleVerifySend(request, env) {
+  const session = await validateSession(request, env.DB);
+  if (!session) return error('Unauthorized', 401);
+  if (session.email_verified) return json({ ok: true, verified: true });
+  if (!emailReady(env)) return error("Email isn't set up yet", 503);
+  const r = await sendCode(env, { id: session.user_id, email: session.email, name: session.name }, 'verify');
+  if (r === 'wait') return error('A code was just sent. Wait a moment before asking for another.', 429);
+  if (r === 'limit') return error('Too many codes asked for. Try again in an hour.', 429);
+  if (r === 'failed') return error("Couldn't send the email. Please try again.", 502);
+  return json({ ok: true, sent: true, email: session.email });
+}
+async function handleVerify(request, env) {
+  const session = await validateSession(request, env.DB);
+  if (!session) return error('Unauthorized', 401);
+  if (session.email_verified) return json({ ok: true, verified: true });
+  const { code } = await request.json().catch(() => ({}));
+  const r = await useCode(env.DB, session.user_id, 'verify', String(code || '').replace(/\D/g, ''));
+  if (r === 'wrong') return error("That code isn't right. Check the email and try again.", 400);
+  if (r === 'expired') return error('That code has expired. Ask for a new one.', 400);
+  await env.DB.prepare('UPDATE users SET email_verified = 1 WHERE id = ?').bind(session.user_id).run();
+  return json({ ok: true, verified: true });
+}
+// Always answers the same way whether or not the email has an account, so it can't be used to find out who uses the app.
+async function handleResetSend(request, env) {
+  if (!emailReady(env)) return error("Password reset isn't available yet", 503);
+  const { email } = await request.json().catch(() => ({}));
+  const addr = String(email || '').trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(addr) || addr.length > 254) return error('Enter a valid email address');
+  if (!(await allowAction(env.DB, `reset-ip:${clientIp(request)}`, 20, 60 * 60 * 1000))) return error('Too many requests. Try again later.', 429);
+  const user = await env.DB.prepare('SELECT id, email, name FROM users WHERE email = ?').bind(addr).first();
+  if (user) await sendCode(env, user, 'reset');           // 'wait' / 'limit' are not shown, so the answer never changes
+  return json({ ok: true });
+}
+async function handleReset(request, env) {
+  const DB = env.DB;
+  const { email, code, password } = await request.json().catch(() => ({}));
+  const addr = String(email || '').trim().toLowerCase();
+  if (typeof password !== 'string' || password.length < 8) return error('Password must be at least 8 characters');
+  if (password.length > 200) return error('That password is too long');
+  if (!(await allowAction(DB, `reset-try-ip:${clientIp(request)}`, 30, 60 * 60 * 1000))) return error('Too many tries. Try again later.', 429);
+  const user = addr ? await DB.prepare('SELECT id, email, name FROM users WHERE email = ?').bind(addr).first() : null;
+  const r = user ? await useCode(DB, user.id, 'reset', String(code || '').replace(/\D/g, '')) : 'wrong';
+  if (r === 'wrong') return error("That code isn't right. Check the email and try again.", 400);
+  if (r === 'expired') return error('That code has expired. Ask for a new one.', 400);
+  // The code proves they own the email: new password, email confirmed, and every other device signed out.
+  await DB.prepare('UPDATE users SET password_hash = ?, email_verified = 1 WHERE id = ?').bind(await makePasswordHash(password), user.id).run();
+  await DB.prepare('DELETE FROM sessions WHERE user_id = ?').bind(user.id).run();
+  await DB.prepare('DELETE FROM auth_limits WHERE key = ?').bind(`login:${user.email}`).run();
+  const token = await newSession(DB, user.id);
+  const when = new Date().toUTCString();
+  await sendEmail(env, user.email, 'Your Trident Fitness password was changed',
+    emailLayout('Your password was changed', `Your Trident Fitness password was just changed (${escHtml(when)}), and all your other devices were signed out.<br><br>If this wasn't you, reset your password again right away from the login screen and reply to this email to let us know.`),
+    `Your Trident Fitness password was just changed (${when}), and all your other devices were signed out. If this wasn't you, reset your password again from the login screen and reply to this email.`);
+  return json({ token, user: { id: user.id, email: user.email, name: user.name, email_verified: true } });
+}
+
 // ── Generate random token ──
 function generateToken() {
   const array = new Uint8Array(32);
@@ -52,7 +248,7 @@ async function validateSession(request, DB) {
   const token = auth.replace('Bearer ', '');
 
   const session = await DB.prepare(
-    'SELECT s.user_id, s.expires_at, u.email, u.name FROM sessions s JOIN users u ON s.user_id = u.id WHERE s.token = ?'
+    'SELECT s.user_id, s.expires_at, u.email, u.name, u.email_verified FROM sessions s JOIN users u ON s.user_id = u.id WHERE s.token = ?'
   ).bind(token).first();
 
   if (!session) return null;
@@ -78,8 +274,12 @@ export default {
     }
 
     // ── Auth Routes ──
-    if (path === '/auth/signup' && request.method === 'POST') return handleSignup(request, env.DB);
+    if (path === '/auth/signup' && request.method === 'POST') return handleSignup(request, env.DB, env);
     if (path === '/auth/login'  && request.method === 'POST') return handleLogin(request, env.DB);
+    if (path === '/auth/verify/send' && request.method === 'POST') return authRoute(handleVerifySend, request, env);
+    if (path === '/auth/verify'      && request.method === 'POST') return authRoute(handleVerify, request, env);
+    if (path === '/auth/reset/send'  && request.method === 'POST') return authRoute(handleResetSend, request, env);
+    if (path === '/auth/reset'       && request.method === 'POST') return authRoute(handleReset, request, env);
     if (path === '/auth/google' && request.method === 'POST') return handleGoogleAuth(request, env.DB, env);
     if (path === '/auth/logout' && request.method === 'POST') return handleLogout(request, env.DB);
     if (path === '/auth/me'     && request.method === 'GET')  return handleMe(request, env.DB);
@@ -270,15 +470,26 @@ async function handleGoogleAuth(request, DB, env) {
     if(!email) return error('No email from Google');
 
     // Check if user exists
-    let user = await DB.prepare('SELECT id, email, name FROM users WHERE email = ?').bind(email).first();
+    let user = await DB.prepare('SELECT id, email, name, password_hash, email_verified FROM users WHERE email = ?').bind(email).first();
     let isNewUser = false;
 
-    if(!user) {
-      // Create new user from Google
+    if(user) {
+      // Google has confirmed this email belongs to the person signing in.
+      const oldGooglePw = user.password_hash === await hashPassword(googleId + '_google_oauth');
+      if(!user.email_verified) {
+        // An email+password account nobody confirmed: someone may have signed up with this address first.
+        // Its password stops working and other devices are signed out; the owner can set a new one with "Forgot password".
+        await DB.prepare('UPDATE users SET email_verified = 1, password_hash = ? WHERE id = ?').bind(NO_PASSWORD, user.id).run();
+        await DB.prepare('DELETE FROM sessions WHERE user_id = ?').bind(user.id).run();
+      } else if(oldGooglePw) {
+        // Older Google accounts had a password made from the Google ID; that can no longer be used to log in.
+        await DB.prepare('UPDATE users SET password_hash = ? WHERE id = ?').bind(NO_PASSWORD, user.id).run();
+      }
+    } else {
+      // Create new user from Google (no password: they sign in with Google, or set one with "Forgot password")
       const userId = generateId();
-      const passwordHash = await hashPassword(googleId + '_google_oauth');
-      await DB.prepare('INSERT INTO users (id, email, password_hash, name) VALUES (?, ?, ?, ?)')
-        .bind(userId, email, passwordHash, name).run();
+      await DB.prepare('INSERT INTO users (id, email, password_hash, name, email_verified) VALUES (?, ?, ?, ?, 1)')
+        .bind(userId, email, NO_PASSWORD, name).run();
       await DB.prepare('INSERT INTO user_settings (user_id, name) VALUES (?, ?)').bind(userId, name).run();
       user = { id: userId, email, name };
       isNewUser = true;
@@ -292,7 +503,7 @@ async function handleGoogleAuth(request, DB, env) {
     const expiresAt = new Date(Date.now() + SESSION_DURATION_DAYS * 24 * 60 * 60 * 1000).toISOString();
     await DB.prepare('INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, ?)').bind(token, user.id, expiresAt).run();
 
-    return json({ token, user: { id: user.id, email: user.email, name: user.name }, isNewUser });
+    return json({ token, user: { id: user.id, email: user.email, name: user.name, email_verified: true }, isNewUser });
 
   } catch(e) {
     console.error('Google auth error:', e);
@@ -300,13 +511,15 @@ async function handleGoogleAuth(request, DB, env) {
   }
 }
 
-async function handleSignup(request, DB) {
+async function handleSignup(request, DB, env) {
   try {
     const { email, password, name } = await request.json();
 
     if (!email || !password) return error('Email and password required');
-    if (password.length < 8) return error('Password must be at least 8 characters');
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return error('Invalid email address');
+    if (typeof password !== 'string' || password.length < 8) return error('Password must be at least 8 characters');
+    if (password.length > 200) return error('That password is too long');
+    if (typeof email !== 'string' || email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return error('Invalid email address');
+    if (!(await allowAction(DB, `signup-ip:${clientIp(request)}`, 10, 60 * 60 * 1000))) return error('Too many new accounts from here. Try again later.', 429);
 
     // Check if email already exists
     const existing = await DB.prepare('SELECT id FROM users WHERE email = ?').bind(email.toLowerCase()).first();
@@ -314,11 +527,13 @@ async function handleSignup(request, DB) {
 
     // Create user
     const userId = generateId();
-    const passwordHash = await hashPassword(password);
+    const passwordHash = await makePasswordHash(password);
+    // Until email sending is set up there's no way to confirm, so new accounts count as confirmed (as before).
+    const needsConfirm = emailReady(env);
 
     await DB.prepare(
-      'INSERT INTO users (id, email, password_hash, name) VALUES (?, ?, ?, ?)'
-    ).bind(userId, email.toLowerCase(), passwordHash, name || '').run();
+      'INSERT INTO users (id, email, password_hash, name, email_verified) VALUES (?, ?, ?, ?, ?)'
+    ).bind(userId, email.toLowerCase(), passwordHash, name || '', needsConfirm ? 0 : 1).run();
 
     // Create default settings
     await DB.prepare(
@@ -333,7 +548,13 @@ async function handleSignup(request, DB) {
       'INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, ?)'
     ).bind(token, userId, expiresAt).run();
 
-    return json({ token, user: { id: userId, email: email.toLowerCase(), name: name || '' } }, 201);
+    // Email confirmation code (the account works right away; Community posting waits for it)
+    let codeSent = false;
+    if (needsConfirm) {
+      try { codeSent = (await sendCode(env, { id: userId, email: email.toLowerCase(), name: name || '' }, 'verify')) === 'sent'; }
+      catch (e) { console.error('Signup code error:', e && e.message); }
+    }
+    return json({ token, user: { id: userId, email: email.toLowerCase(), name: name || '', email_verified: !needsConfirm }, codeSent }, 201);
 
   } catch (e) {
     console.error('Signup error:', e);
@@ -347,16 +568,26 @@ async function handleLogin(request, DB) {
 
     if (!email || !password) return error('Email and password required');
 
+    if (typeof email !== 'string' || typeof password !== 'string' || password.length > 200) return error('Invalid email or password', 401);
+    const addr = email.trim().toLowerCase();
+    // At most 10 wrong passwords per account per 15 minutes (a password reset clears this)
+    const limitRow = await DB.prepare('SELECT window_start, count FROM auth_limits WHERE key = ?').bind(`login:${addr}`).first();
+    if (limitRow && Date.now() - limitRow.window_start < 15 * 60 * 1000 && limitRow.count >= 10)
+      return error('Too many wrong passwords. Try again in 15 minutes, or reset your password.', 429);
+
     // Find user
     const user = await DB.prepare(
-      'SELECT id, email, name, password_hash FROM users WHERE email = ?'
-    ).bind(email.toLowerCase()).first();
+      'SELECT id, email, name, password_hash, email_verified FROM users WHERE email = ?'
+    ).bind(addr).first();
 
-    if (!user) return error('Invalid email or password', 401);
-
-    // Check password
-    const passwordHash = await hashPassword(password);
-    if (passwordHash !== user.password_hash) return error('Invalid email or password', 401);
+    // Check password (old-style hashes are upgraded to the stronger kind now that we have the password)
+    const check = user ? await checkPassword(password, user.password_hash) : { ok: false };
+    if (!check.ok) {
+      await allowAction(DB, `login:${addr}`, 1e9, 15 * 60 * 1000);
+      if (user && String(user.password_hash || '')[0] === '!') return error('This account uses Google sign-in. Tap Continue with Google, or use Forgot password to set a password.', 401);
+      return error('Invalid email or password', 401);
+    }
+    if (check.upgrade) await DB.prepare('UPDATE users SET password_hash = ? WHERE id = ?').bind(await makePasswordHash(password), user.id).run();
 
     // Update last login
     await DB.prepare('UPDATE users SET last_login = ? WHERE id = ?')
@@ -370,7 +601,7 @@ async function handleLogin(request, DB) {
       'INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, ?)'
     ).bind(token, user.id, expiresAt).run();
 
-    return json({ token, user: { id: user.id, email: user.email, name: user.name } });
+    return json({ token, user: { id: user.id, email: user.email, name: user.name, email_verified: !!user.email_verified } });
 
   } catch (e) {
     console.error('Login error:', e);
@@ -390,7 +621,7 @@ async function handleLogout(request, DB) {
 async function handleMe(request, DB) {
   const session = await validateSession(request, DB);
   if (!session) return error('Unauthorized', 401);
-  return json({ user: { id: session.user_id, email: session.email, name: session.name, username: await usernameOf(DB, session.user_id) } });
+  return json({ user: { id: session.user_id, email: session.email, name: session.name, username: await usernameOf(DB, session.user_id), email_verified: !!session.email_verified } });
 }
 
 // ══════════════════════════════════════════════════════
@@ -1000,6 +1231,7 @@ async function communityRemoveMyTag(request, DB) {
 async function communityCreatePost(request, DB, env, ctx) {
   const session = await validateSession(request, DB);
   if (!session) return error('Unauthorized', 401);
+  if (!session.email_verified) return json({ error: 'Confirm your email to post in Community', code: 'verify_email' }, 403);
 
   let data;
   try { data = await request.json(); } catch (e) { return error('Invalid request'); }
@@ -1141,6 +1373,7 @@ async function communityComments(request, DB) {
 async function communityAddComment(request, DB, env, ctx) {
   const session = await validateSession(request, DB);
   if (!session) return error('Unauthorized', 401);
+  if (!session.email_verified) return json({ error: 'Confirm your email to post in Community', code: 'verify_email' }, 403);
 
   let data;
   try { data = await request.json(); } catch (e) { return error('Invalid request'); }
@@ -1788,6 +2021,7 @@ async function dmMessages(request, DB) {
 async function dmSend(request, DB, env, ctx) {
   const session = await validateSession(request, DB);
   if (!session) return error('Unauthorized', 401);
+  if (!session.email_verified) return json({ error: 'Confirm your email to post in Community', code: 'verify_email' }, 403);
   let data;
   try { data = await request.json(); } catch (e) { return error('Invalid request'); }
   const to = data && data.to;

@@ -282,6 +282,8 @@ body {
   margin-top: -6px;
 }
 .forgot-link:active { color: var(--pink); }
+.code-input { font-size: 26px !important; font-weight: 800; letter-spacing: .45em; text-indent: .45em; text-align: center; }
+.auth-note { font-size: 12.5px; line-height: 1.45; color: var(--text3); margin: -4px 2px 14px; }
 
 /* ── Toast ── */
 .toast {
@@ -589,6 +591,103 @@ body {
       <div class="auth-switch">
         Already have an account? <a onclick="showScreen('screen-login')">Log in</a>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- CONFIRM EMAIL (right after signing up)  -->
+<!-- ══════════════════════════════════════ -->
+<div class="screen" id="screen-verify">
+  <div class="auth-scroll">
+    <div class="auth-header">
+      <div class="auth-eyebrow">One More Step</div>
+      <div class="auth-title">Check your email</div>
+      <div class="auth-sub" id="verify-sub">We sent you a 6-digit code.</div>
+    </div>
+    <div class="auth-form">
+      <div class="field">
+        <label>Code</label>
+        <div class="iw">
+          <input type="text" id="verify-code" class="code-input" placeholder="••••••" inputmode="numeric" autocomplete="one-time-code" maxlength="6" oninput="this.value=this.value.replace(/\D/g,'').slice(0,6)">
+        </div>
+        <div class="field-error" id="verify-code-error">Enter the 6-digit code</div>
+      </div>
+      <div class="auth-note">Don't see it? Check your spam folder. The code works for 15 minutes.</div>
+      <button class="pink-btn" id="verify-btn" onclick="handleVerifyCode()">Confirm Email</button>
+      <div class="forgot-link" style="text-align:center;margin-top:14px;" onclick="resendVerifyCode()">Send a new code</div>
+      <div style="flex:1; min-height: 12px;"></div>
+      <div class="auth-switch"><a onclick="skipVerify()">Do this later</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- RESET PASSWORD                         -->
+<!-- ══════════════════════════════════════ -->
+<div class="screen" id="screen-reset">
+  <div class="auth-scroll">
+    <button class="auth-back" onclick="showScreen('screen-login')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+    </button>
+
+    <div class="auth-header">
+      <div class="auth-eyebrow">Forgot Password</div>
+      <div class="auth-title">Reset your password</div>
+      <div class="auth-sub" id="reset-sub">Enter your account's email and we'll send you a code.</div>
+    </div>
+
+    <div class="auth-form" id="reset-step1">
+      <div class="field">
+        <label>Email Address</label>
+        <div class="iw">
+          <input type="email" id="reset-email" placeholder="you@example.com" autocomplete="email" inputmode="email">
+        </div>
+        <div class="field-error" id="reset-email-error">Please enter a valid email address</div>
+      </div>
+      <div style="flex:1; min-height: 12px;"></div>
+      <button class="pink-btn" id="reset-send-btn" onclick="handleResetSend()">Send Code</button>
+    </div>
+
+    <div class="auth-form" id="reset-step2" style="display:none;">
+      <div class="field">
+        <label>Code</label>
+        <div class="iw">
+          <input type="text" id="reset-code" class="code-input" placeholder="••••••" inputmode="numeric" autocomplete="one-time-code" maxlength="6" oninput="this.value=this.value.replace(/\D/g,'').slice(0,6)">
+        </div>
+        <div class="field-error" id="reset-code-error">Enter the 6-digit code</div>
+      </div>
+      <div class="field">
+        <label>New Password</label>
+        <div class="iw">
+          <input type="password" id="reset-password" placeholder="Min. 8 characters" autocomplete="new-password">
+          <button class="pw-toggle" onclick="togglePassword('reset-password', this)" type="button">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+        <div class="field-error" id="reset-password-error">Password must be at least 8 characters</div>
+      </div>
+      <div class="field">
+        <label>Confirm New Password</label>
+        <div class="iw">
+          <input type="password" id="reset-confirm" placeholder="Repeat password" autocomplete="new-password">
+          <button class="pw-toggle" onclick="togglePassword('reset-confirm', this)" type="button">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+        <div class="field-error" id="reset-confirm-error">Passwords don't match</div>
+      </div>
+      <div class="auth-note">Don't see the email? Check your spam folder. The code works for 15 minutes.</div>
+      <button class="pink-btn" id="reset-btn" onclick="handleReset()">Reset Password</button>
+      <div class="forgot-link" style="text-align:center;margin-top:14px;" onclick="handleResetSend(true)">Send a new code</div>
     </div>
   </div>
 </div>
@@ -964,8 +1063,14 @@ async function handleSignup() {
     obData.name = name;
     // Brand-new account: the app skips its "What's new" pop-up (there's nothing new to them yet)
     try { localStorage.setItem('trident_new_account', '1'); } catch(e) {}
-    showToast('✓ Account created! Let\'s set up your profile.');
-    setTimeout(() => showScreen('screen-onboarding'), 600);
+    if (data.codeSent) {
+      document.getElementById('verify-sub').textContent = 'We sent a 6-digit code to ' + email.toLowerCase() + '.';
+      showToast('✓ Account created!');
+      setTimeout(() => { showScreen('screen-verify'); document.getElementById('verify-code').focus(); }, 500);
+    } else {
+      showToast('✓ Account created! Let\'s set up your profile.');
+      setTimeout(() => showScreen('screen-onboarding'), 600);
+    }
 
   } catch(e) {
     showToast('Connection error — please try again');
@@ -1076,8 +1181,88 @@ async function handleGoogleCredential(response) {
   }
 }
 
+// ── Confirm email (right after signing up) ──
+async function handleVerifyCode() {
+  const code = document.getElementById('verify-code').value.replace(/\D/g, '');
+  showError('verify-code-error', code.length !== 6);
+  if (code.length !== 6) return;
+  const btn = document.getElementById('verify-btn');
+  btn.innerHTML = '<div class="spinner"></div>'; btn.disabled = true;
+  try {
+    const { ok, data } = await api('/auth/verify', 'POST', { code });
+    if (!ok) { showToast(data.error || 'That code didn\'t work. Please try again.', 3200); document.getElementById('verify-code').value = ''; return; }
+    showToast('✓ Email confirmed!');
+    setTimeout(() => showScreen('screen-onboarding'), 500);
+  } catch (e) {
+    showToast('Connection error — please try again');
+  } finally {
+    btn.innerHTML = 'Confirm Email'; btn.disabled = false;
+  }
+}
+async function resendVerifyCode() {
+  try {
+    const { ok, data } = await api('/auth/verify/send', 'POST', {});
+    showToast(ok ? 'New code sent ✓' : (data.error || 'Couldn\'t send a new code. Please try again.'), 3200);
+  } catch (e) { showToast('Connection error — please try again'); }
+}
+function skipVerify() {
+  showToast('You can confirm it later from the Home screen', 2800);
+  showScreen('screen-onboarding');
+}
+
+// ── Forgot password: email → code → new password ──
+let resetEmail = '';
 function showForgotPassword() {
-  showToast('Password reset coming soon!');
+  const typed = document.getElementById('login-email').value.trim();
+  document.getElementById('reset-email').value = typed;
+  document.getElementById('reset-step1').style.display = '';
+  document.getElementById('reset-step2').style.display = 'none';
+  document.getElementById('reset-sub').textContent = 'Enter your account\'s email and we\'ll send you a code.';
+  ['reset-email-error', 'reset-code-error', 'reset-password-error', 'reset-confirm-error'].forEach(id => showError(id, false));
+  showScreen('screen-reset');
+}
+async function handleResetSend(again) {
+  const email = again ? resetEmail : document.getElementById('reset-email').value.trim();
+  if (!again) { showError('reset-email-error', !validateEmail(email)); if (!validateEmail(email)) return; }
+  const btn = document.getElementById('reset-send-btn');
+  if (!again) { btn.innerHTML = '<div class="spinner"></div>'; btn.disabled = true; }
+  try {
+    const { ok, data } = await api('/auth/reset/send', 'POST', { email });
+    if (!ok) { showToast(data.error || 'Couldn\'t send the code. Please try again.', 3200); return; }
+    resetEmail = email;
+    document.getElementById('reset-sub').textContent = 'If ' + email.toLowerCase() + ' has an account, we sent it a 6-digit code. Enter it with your new password.';
+    document.getElementById('reset-step1').style.display = 'none';
+    document.getElementById('reset-step2').style.display = '';
+    if (again) showToast('New code sent ✓'); else document.getElementById('reset-code').focus();
+  } catch (e) {
+    showToast('Connection error — please try again');
+  } finally {
+    if (!again) { btn.innerHTML = 'Send Code'; btn.disabled = false; }
+  }
+}
+async function handleReset() {
+  const code = document.getElementById('reset-code').value.replace(/\D/g, '');
+  const password = document.getElementById('reset-password').value;
+  const confirm = document.getElementById('reset-confirm').value;
+  let valid = true;
+  if (code.length !== 6) { showError('reset-code-error', true); valid = false; } else showError('reset-code-error', false);
+  if (password.length < 8) { showError('reset-password-error', true); valid = false; } else showError('reset-password-error', false);
+  if (password !== confirm) { showError('reset-confirm-error', true); valid = false; } else showError('reset-confirm-error', false);
+  if (!valid) return;
+  const btn = document.getElementById('reset-btn');
+  btn.innerHTML = '<div class="spinner"></div>'; btn.disabled = true;
+  try {
+    const { ok, data } = await api('/auth/reset', 'POST', { email: resetEmail, code, password });
+    if (!ok) { showToast(data.error || 'That didn\'t work. Please try again.', 3200); return; }
+    saveToken(data.token);
+    currentUser = data.user;
+    showToast('✓ Password updated. You\'re signed in!');
+    setTimeout(() => redirectToApp(), 900);
+  } catch (e) {
+    showToast('Connection error — please try again');
+  } finally {
+    btn.innerHTML = 'Reset Password'; btn.disabled = false;
+  }
 }
 
 // ══════════════════════════════════════

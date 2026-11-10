@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS users (
   email TEXT UNIQUE NOT NULL,
   password_hash TEXT NOT NULL,
   name TEXT,
+  email_verified INTEGER NOT NULL DEFAULT 0,   -- 1 once the email is confirmed (Google sign-ins count as confirmed)
   created_at TEXT DEFAULT (datetime('now')),
   last_login TEXT
 );
@@ -264,3 +265,25 @@ CREATE TABLE IF NOT EXISTS community_prefs (
   show_workouts INTEGER NOT NULL,
   updated_at TEXT NOT NULL
 );
+
+-- ── Email confirmation and password reset codes (only a hash of each 6-digit code is kept) ──
+CREATE TABLE IF NOT EXISTS auth_codes (
+  user_id TEXT NOT NULL,
+  purpose TEXT NOT NULL,          -- 'verify' or 'reset'
+  code_hash TEXT NOT NULL,
+  expires_at INTEGER NOT NULL,    -- ms since 1970
+  attempts INTEGER NOT NULL DEFAULT 0,
+  sent_at INTEGER NOT NULL,
+  PRIMARY KEY (user_id, purpose)
+);
+
+-- ── Rate limits for sign-up, login, codes and resets (fixed windows) ──
+CREATE TABLE IF NOT EXISTS auth_limits (
+  key TEXT PRIMARY KEY,
+  window_start INTEGER NOT NULL,
+  count INTEGER NOT NULL
+);
+
+-- Live database, run once before deploying the worker that uses email_verified (2026-11):
+--   ALTER TABLE users ADD COLUMN email_verified INTEGER NOT NULL DEFAULT 0;
+--   UPDATE users SET email_verified = 1;   -- accounts made before email confirmation existed count as confirmed
