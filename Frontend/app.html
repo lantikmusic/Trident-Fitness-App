@@ -959,9 +959,9 @@ body:not([data-page="dashboard"]) .settings-btn{display:none;}
 .summary-ex-sets{font-size:11px;color:var(--text3);margin-top:2px;}
 .summary-ex-best{font-size:14px;font-weight:700;color:var(--pink);}
 /* Share a meal (Macros) */
-.shr-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:360;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;transition:opacity .3s;}
+.shr-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:410;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;transition:opacity .3s;}
 .shr-overlay.open{opacity:1;}
-.shr-sheet{position:fixed;left:0;right:0;bottom:0;z-index:361;background:var(--bg3);border-radius:24px 24px 0 0;border-top:0.5px solid var(--pink-border);padding:0 20px calc(22px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .38s cubic-bezier(.32,0,.15,1);max-height:94vh;overflow-y:auto;}
+.shr-sheet{position:fixed;left:0;right:0;bottom:0;z-index:411;background:var(--bg3);border-radius:24px 24px 0 0;border-top:0.5px solid var(--pink-border);padding:0 20px calc(22px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .38s cubic-bezier(.32,0,.15,1);max-height:94vh;overflow-y:auto;}
 .shr-sheet.open{transform:translateY(0);}
 .shr-handle{width:36px;height:4px;background:var(--border2);border-radius:99px;margin:12px auto 0;}
 .shr-head{display:flex;align-items:center;justify-content:space-between;padding:12px 0;}
@@ -972,6 +972,9 @@ body:not([data-page="dashboard"]) .settings-btn{display:none;}
 .shr-seg button.active{background:var(--pink);color:#000;}
 .shr-preview{position:relative;display:flex;align-items:center;justify-content:center;height:min(42vh,340px);border-radius:18px;margin-bottom:12px;overflow:hidden;padding:16px;background:radial-gradient(60% 50% at 30% 30%,#c98a4a,transparent 70%),radial-gradient(60% 60% at 75% 70%,#7a3f1d,transparent 70%),radial-gradient(40% 40% at 60% 35%,#e9c47a,transparent 70%),linear-gradient(160deg,#5a3a24,#2a1a10);}
 .shr-preview img{max-width:100%;max-height:100%;display:block;}
+.shr-preview.wo{background:radial-gradient(55% 45% at 25% 25%,#6d7480,transparent 70%),radial-gradient(60% 60% at 80% 75%,#2c3440,transparent 70%),radial-gradient(35% 35% at 65% 30%,#9aa3ad,transparent 70%),linear-gradient(160deg,#3b4049,#15181d);}
+.cmp-wsticker{width:32px;height:32px;flex-shrink:0;margin-left:auto;border-radius:50%;border:0.5px solid var(--border2);background:transparent;color:var(--text2);display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.cmp-wsticker + .cmp-wshare{margin-left:0;}
 .shr-pv-note{position:absolute;left:0;right:0;bottom:8px;text-align:center;font-size:10.5px;font-weight:600;color:rgba(255,255,255,.7);text-shadow:0 1px 3px rgba(0,0,0,.6);}
 .shr-spin{width:26px;height:26px;border-radius:50%;border:3px solid rgba(255,255,255,.15);border-top-color:var(--pink);animation:shrSpin .8s linear infinite;}
 @keyframes shrSpin{to{transform:rotate(360deg);}}
@@ -2998,6 +3001,7 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
     <button class="pink-btn" onclick="closeSummary()" style="margin-top:16px;">Done 💪</button>
     <div id="summaryProfileBtn"></div>
     <button class="ghost-btn" onclick="cmShareLastWorkout()" style="margin-top:8px;">Share to Community</button>
+    <button class="ghost-btn" onclick="cmStickerLastWorkout()" style="margin-top:8px;">Share to socials</button>
   </div>
 </div>
 
@@ -4315,7 +4319,7 @@ function renderMacroStats(){
 // ── Share a meal: a see-through sticker with one meal's (or one food's) macros, to put on top of
 // your own food photo in an Instagram story. "Clear" = text only; "Glass" = dark see-through panel
 // so the numbers stay readable on bright photos. Made on this device only.
-var SHR = { style: 'glass', day: 0, meal: 'breakfast', pick: -1, blobs: {}, url: '', gen: 0 };
+var SHR = { style: 'glass', kind: 'meal', wo: null, woDate: '', day: 0, meal: 'breakfast', pick: -1, blobs: {}, url: '', gen: 0 };
 var SHR_MARK = null;
 var SHR_FONT = "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif";
 function shrFont(w, px, italic) { return (italic ? 'italic ' : '') + w + ' ' + px + 'px ' + SHR_FONT; }
@@ -4369,7 +4373,115 @@ function shrSubject() {
   }
   return { title: label, label, cal: calcMealCal(meal), protein: meal.protein || 0, carbs: meal.carbs || 0, fat: meal.fat || 0 };
 }
+// Workout sticker: program, day, the headline numbers, PRs and (unless "Stats only") every exercise
+// with its sets. Nothing is shortened: long names wrap and the sticker grows to fit.
+function shrMedal(ctx, cx, cy, r) {
+  ctx.fillStyle = '#D99A00'; ctx.beginPath(); ctx.moveTo(cx - r * .7, cy - r * 1.75); ctx.lineTo(cx - r * .15, cy - r * 1.75); ctx.lineTo(cx + r * .2, cy - r * .9); ctx.lineTo(cx - r * .35, cy - r * .9); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#F2B705'; ctx.beginPath(); ctx.moveTo(cx + r * .7, cy - r * 1.75); ctx.lineTo(cx + r * .15, cy - r * 1.75); ctx.lineTo(cx - r * .2, cy - r * .9); ctx.lineTo(cx + r * .35, cy - r * .9); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fillStyle = '#FFC72C'; ctx.fill();
+  ctx.lineWidth = r * .16; ctx.strokeStyle = '#C98A00'; ctx.stroke();
+  ctx.fillStyle = '#6B4500'; ctx.font = shrFont(900, Math.round(r * .95)); ctx.textAlign = 'center'; ctx.fillText('PR', cx, cy + r * .34);
+}
+async function shrDrawWorkout(style) {
+  const p = SHR.wo || {}, glass = style === 'glass', full = SHR.pick !== 0;
+  const W = 1080, PAD = 110, IW = W - PAD * 2;
+  const mark = await shrLoadMark();
+  let acc = getAccentColor(); if(!/^#[0-9a-f]{3,6}$/i.test(acc)) acc = '#32FCFD';
+  const dim = glass ? 'rgba(255,255,255,.62)' : 'rgba(255,255,255,.92)';
+  const exs = Array.isArray(p.exercises) ? p.exercises.filter(e => e && e.name) : [];
+  const nEx = exs.length, vol = cmNum(p.volume);
+  const stats = cmWoStats(p) || [[String(nEx), 'exercises'], [String(cmNum(p.sets) || '—'), 'sets'], [vol ? vol.toLocaleString() : '—', 'lbs lifted']];
+  const prs = cmCleanPRs(p.prs);
+  const badge = cmWoBadge(p).replace(/^[^A-Za-z]+/, '').trim() || 'Workout';
+  const when = /^\d{4}-\d{2}-\d{2}$/.test(String(SHR.woDate || '')) ? hyDateLabel(SHR.woDate) : '';
+  // Drawn twice: once to measure the height, then for real.
+  const paint = (ctx, H) => {
+    const draw = H > 0;
+    const shadow = on => { const k = on && !glass && draw; ctx.shadowColor = k ? 'rgba(0,0,0,.7)' : 'transparent'; ctx.shadowBlur = k ? 24 : 0; ctx.shadowOffsetY = k ? 3 : 0; };
+    const text = (t, x, y) => { if(draw) ctx.fillText(t, x, y); };
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    if(draw && glass) {
+      shrRound(ctx, 24, 24, W - 48, H - 48, 72);
+      ctx.fillStyle = 'rgba(12,12,14,.58)'; ctx.fill();
+      ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(255,255,255,.16)'; ctx.stroke();
+    }
+    shadow(true);
+    // Brand line
+    ctx.font = shrFont(900, 38, true);
+    const w1 = ctx.measureText('TRIDENT').width, gap = 38 * .28, w2 = ctx.measureText('FITNESS').width;
+    const mh = 58, mw = mark ? mark.width * mh / mark.height : 0, gapM = mark ? 14 : 0;
+    let x = (W - (mw + gapM + w1 + gap + w2)) / 2;
+    if(draw && mark) ctx.drawImage(mark, x, 78, mw, mh);
+    x += mw + gapM;
+    ctx.textAlign = 'left'; ctx.fillStyle = '#fff'; text('TRIDENT', x, 122);
+    ctx.fillStyle = acc; text('FITNESS', x + w1 + gap, 122); ctx.textAlign = 'center';
+    // Type · date, the day's name, the program
+    let y = 196;
+    ctx.font = shrFont(800, 30); ctx.fillStyle = acc;
+    shrWrap(ctx, (badge + (when ? ' · ' + when : '')).toUpperCase(), IW).forEach((ln, i) => { if(i) y += 40; if(draw) shrSpaced(ctx, ln, W / 2, y, 6); });
+    y += 66;
+    ctx.font = shrFont(700, 54); ctx.fillStyle = '#fff';
+    shrWrap(ctx, p.day || 'Workout', IW).forEach((ln, i) => { if(i) y += 64; text(ln, W / 2, y); });
+    if(p.program) {
+      y += 50; ctx.font = shrFont(600, 32); ctx.fillStyle = dim;
+      shrWrap(ctx, p.program, IW).forEach((ln, i) => { if(i) y += 42; text(ln, W / 2, y); });
+    }
+    // Headline numbers
+    y += 118;
+    const colW = IW / stats.length;
+    stats.forEach((st, i) => {
+      const mx = PAD + colW * (i + .5);
+      let px = 76; ctx.font = shrFont(800, px);
+      while(px > 34 && ctx.measureText(st[0]).width > colW - 24) { px -= 4; ctx.font = shrFont(800, px); }
+      shadow(true); ctx.fillStyle = '#fff'; text(st[0], mx, y);
+      ctx.font = shrFont(800, 24); ctx.fillStyle = dim;
+      shrWrap(ctx, st[1].toUpperCase(), colW - 16).forEach((ln, j) => { if(draw) shrSpaced(ctx, ln, mx, y + 44 + j * 30, 3); });
+    });
+    y += 44 + 30 * Math.max(0, ...stats.map(st => { ctx.font = shrFont(800, 24); return shrWrap(ctx, st[1].toUpperCase(), colW - 16).length - 1; }));
+    // PRs
+    if(prs.length) {
+      y += 30;
+      ctx.textAlign = 'left';
+      prs.forEach(pr => {
+        y += 62;
+        if(draw) { shadow(false); shrMedal(ctx, PAD + 28, y - 12, 26); ctx.textAlign = 'left'; }
+        shadow(true);
+        ctx.font = shrFont(800, 38); ctx.fillStyle = '#fff';
+        const lines = shrWrap(ctx, 'New ' + pr.name + ' PR', IW - 84);
+        lines.forEach((ln, i) => { if(i) y += 46; text(ln, PAD + 84, y); });
+        y += 40; ctx.font = shrFont(600, 30); ctx.fillStyle = dim;
+        text(pr.weight.toLocaleString() + ' lbs' + (pr.prev ? ' · up ' + (Math.round((pr.weight - pr.prev) * 10) / 10).toLocaleString() + ' lbs' : ''), PAD + 84, y);
+      });
+      ctx.textAlign = 'center';
+    }
+    // Every exercise and its sets
+    if(full && exs.length) {
+      y += 48;
+      if(draw) { shadow(false); ctx.fillStyle = glass ? 'rgba(255,255,255,.12)' : 'rgba(255,255,255,.5)'; ctx.fillRect(PAD, y, IW, 2); }
+      y += 14;
+      const nameW = IW * .54, setsW = IW * .43;
+      exs.forEach(ex => {
+        shadow(true);
+        ctx.font = shrFont(700, 36); const nl = shrWrap(ctx, ex.name, nameW);
+        ctx.font = shrFont(600, 31); const sl = shrWrap(ctx, cmSetsText(ex), setsW);
+        const top = y + 48;
+        ctx.textAlign = 'left'; ctx.font = shrFont(700, 36); ctx.fillStyle = '#fff';
+        nl.forEach((ln, i) => text(ln, PAD, top + i * 44));
+        ctx.textAlign = 'right'; ctx.font = shrFont(600, 31); ctx.fillStyle = dim;
+        sl.forEach((ln, i) => text(ln, W - PAD, top + i * 40));
+        y = top + Math.max((nl.length - 1) * 44, (sl.length - 1) * 40) + 16;
+      });
+      ctx.textAlign = 'center';
+    }
+    return y + 92;
+  };
+  const H = Math.ceil(paint(document.createElement('canvas').getContext('2d'), 0));
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  paint(cv.getContext('2d'), H);
+  return cv;
+}
 async function shrDraw(style) {
+  if(SHR.kind === 'workout') return shrDrawWorkout(style);
   const s = shrSubject();
   // The food/meal name can take several lines; everything below moves down and the sticker grows
   const TITLE_LH = 60;
@@ -4436,6 +4548,10 @@ async function shrDraw(style) {
 function shrIsNative() { try { return !!(window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform()); } catch(e) { return false; } }
 function shrWebCopy() { return !shrIsNative() && !!(window.ClipboardItem && navigator.clipboard && navigator.clipboard.write); }
 function shrFileName() {
+  if(SHR.kind === 'workout') {
+    const what = String((SHR.wo && SHR.wo.day) || 'workout').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 30) || 'workout';
+    return 'trident-' + what + '-' + (SHR.woDate || localISO(new Date())) + '.png';
+  }
   const it = SHR.pick >= 0 ? shrItems()[SHR.pick] : null;
   const what = String(it ? it.name : SHR.meal).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 30) || 'meal';
   return 'trident-' + what + '-' + macroSlotDate(SHR.day) + '.png';
@@ -4451,19 +4567,23 @@ async function shrRender(style) {
   return SHR.blobs[key];
 }
 function shrPickHTML() {
+  const chip = (i, label) => `<button class="shr-chip${SHR.pick === i ? ' on' : ''}" onclick="shrSetPick(${i})">${cmEsc(label)}</button>`;
+  if(SHR.kind === 'workout') return (SHR.wo && (SHR.wo.exercises || []).length) ? chip(-1, 'Full workout') + chip(0, 'Stats only') : '';
   const items = shrItems();
   if(items.length < 2) return '';
-  const chip = (i, label) => `<button class="shr-chip${SHR.pick === i ? ' on' : ''}" onclick="shrSetPick(${i})">${cmEsc(label)}</button>`;
   return chip(-1, 'Whole ' + (MEAL_LABELS[SHR.meal] || 'meal').toLowerCase()) + items.map((it, i) => chip(i, it.name || 'Food')).join('');
 }
 function shrShow() {
   const item = SHR.blobs[shrKey(SHR.style)];
   document.querySelectorAll('#shrSheet .shr-seg button').forEach(b => b.classList.toggle('active', b.dataset.s === SHR.style));
-  document.getElementById('shrTitle').textContent = 'Share ' + (MEAL_LABELS[SHR.meal] || 'meal').toLowerCase();
+  const wo = SHR.kind === 'workout';
+  document.getElementById('shrTitle').textContent = wo ? 'Share workout' : 'Share ' + (MEAL_LABELS[SHR.meal] || 'meal').toLowerCase();
+  document.getElementById('shrSheet').setAttribute('aria-label', wo ? 'Share workout' : 'Share meal');
   const pk = document.getElementById('shrPick'); pk.innerHTML = shrPickHTML(); pk.style.display = pk.innerHTML ? '' : 'none';
   const pv = document.getElementById('shrPreview');
+  pv.classList.toggle('wo', wo);
   if(SHR.url) { URL.revokeObjectURL(SHR.url); SHR.url = ''; }
-  if(item) { SHR.url = URL.createObjectURL(item.blob); pv.innerHTML = '<img alt="Preview of your meal sticker" src="' + SHR.url + '"><span class="shr-pv-note">Sample photo · the sticker is see-through</span>'; }
+  if(item) { SHR.url = URL.createObjectURL(item.blob); pv.innerHTML = '<img alt="Preview of your ' + (wo ? 'workout' : 'meal') + ' sticker" src="' + SHR.url + '"><span class="shr-pv-note">Sample photo · the sticker is see-through</span>'; }
   else pv.innerHTML = '<div class="shr-spin"></div>';
   const save = document.getElementById('shrSaveBtn'), copy = document.getElementById('shrCopyBtn');
   save.disabled = !item; copy.disabled = !item;
@@ -4472,8 +4592,8 @@ function shrShow() {
   copy.style.display = canCopy ? '' : 'none';
   save.textContent = native ? 'Save to Photos' : canShareFiles ? 'Save or share image' : 'Download image';
   document.getElementById('shrHint').innerHTML = canCopy
-    ? 'Tap <b>Copy sticker</b>, open Instagram, add your meal photo to your story, then tap <b>Add sticker</b> (or press and hold → <b>Paste</b>). Move and pinch it to size.'
-    : 'Save it, then in your Instagram story add it on top of your meal photo.' + (canShareFiles ? ' Tap <b>Save Image</b> in the menu to put it in Photos.' : '');
+    ? 'Tap <b>Copy sticker</b>, open Instagram, add your ' + (wo ? 'gym' : 'meal') + ' photo to your story, then tap <b>Add sticker</b> (or press and hold → <b>Paste</b>). Move and pinch it to size.'
+    : 'Save it, then in your Instagram story add it on top of your ' + (wo ? 'gym' : 'meal') + ' photo.' + (canShareFiles ? ' Tap <b>Save Image</b> in the menu to put it in Photos.' : '');
 }
 async function shrRefresh() {
   const gen = SHR.gen, style = SHR.style, pick = SHR.pick;
@@ -4485,7 +4605,17 @@ function shrOpen() {
   if(typeof saveMealInputs === 'function') { try { saveMealInputs(); } catch(e) {} }
   const meal = macroData[cur] && macroData[cur].meals[curMeal];
   if(!meal || !calcMealCal(meal) && !(meal.items || []).length) { showToast('Log some food for ' + (MEAL_LABELS[curMeal] || 'this meal').toLowerCase() + ' first'); return; }
-  SHR.day = cur; SHR.meal = curMeal; SHR.pick = -1; SHR.blobs = {}; SHR.gen++;
+  SHR.kind = 'meal'; SHR.day = cur; SHR.meal = curMeal; SHR.pick = -1; SHR.blobs = {}; SHR.gen++;
+  shrOpenSheet();
+}
+// Share a finished workout (the same details as a Community post) as a see-through sticker.
+function shrOpenWorkout(payload, date) {
+  if(!payload) { showToast('Nothing logged to share yet'); return; }
+  SHR.kind = 'workout'; SHR.wo = payload; SHR.woDate = date || payload.date || localISO(new Date());
+  SHR.pick = -1; SHR.blobs = {}; SHR.gen++;
+  shrOpenSheet();
+}
+function shrOpenSheet() {
   const ov = document.getElementById('shrOverlay'), sh = document.getElementById('shrSheet');
   ov.style.display = 'block';
   requestAnimationFrame(() => { ov.classList.add('open'); sh.classList.add('open'); });
@@ -13080,6 +13210,7 @@ function hySummary(sid, extra) {
     ${sess.notes ? `<div class="hy-sheet-sec">NOTES</div><div class="hy-cue">${hyEsc(sess.notes)}</div>` : ''}
     ${sess.status === 'completed' && isLoggedIn() ? `<div id="hyProfileBtn" style="margin-top:14px;"></div>` : ''}
     ${window._hyShare && sess.status === 'completed' && isLoggedIn() ? `<button class="ghost-btn" style="margin-top:8px;" onclick="hyShare()">Share to Community</button>` : ''}
+    ${window._hyShare && sess.status === 'completed' ? `<button class="ghost-btn" style="margin-top:8px;" onclick="shrOpenWorkout(window._hyShare.payload)">Share to socials</button>` : ''}
     <button class="pink-btn" style="margin-top:8px;" onclick="${extra ? 'hySummaryDone()' : 'hySheetClose()'}">Done</button>`);
   if(sess.status === 'completed') cmWoSummaryButton('hyProfileBtn', 'hy:' + sid);
 }
@@ -13886,6 +14017,10 @@ async function cmWoSummaryButton(elId, key) {
     if(again && cmWo.auto !== null) again.innerHTML = cmWoBtnHTML(key);
   }
 }
+function cmStickerLocalWorkout(i) {
+  const lw = (window._cmLocalWo || [])[i];
+  if(lw) shrOpenWorkout(lw.payload, lw.date);
+}
 function cmShareLocalWorkout(i) {
   const lw = (window._cmLocalWo || [])[i];
   if(!lw) return;
@@ -13918,7 +14053,7 @@ function cmWorkoutsHTML(posts, mine) {
         return `<div class="cmp-wcard cmp-wlocal cm-attach-host">
           <div class="cmp-wdate">${cmEsc(when)}<span>${mine ? (onP ? 'On your profile' : 'Only you can see this') : ''}</span></div>
           ${cmAttachHTML('workout', lw.payload, owner)}
-          ${mine ? `<div class="cmp-wfoot">${cmWo.auto !== null ? cmWoBtnHTML(lw.key, 'cmp-wprof') : ''}<button class="cmp-wshare" onclick="cmShareLocalWorkout(${x.i})">Share to Community</button></div>` : ''}
+          ${mine ? `<div class="cmp-wfoot">${cmWo.auto !== null ? cmWoBtnHTML(lw.key, 'cmp-wprof') : ''}<button class="cmp-wsticker" onclick="cmStickerLocalWorkout(${x.i})" aria-label="Share to socials"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button><button class="cmp-wshare" onclick="cmShareLocalWorkout(${x.i})">Share to Community</button></div>` : ''}
         </div>`;
       }
       const p = x.post;
@@ -15489,6 +15624,15 @@ async function cmSubmitPost() {
 }
 
 // From the "Workout Complete" sheet: opens a new post with that workout attached.
+function cmStickerLastWorkout() {
+  const prog = getProgram(selectedProgram);
+  const day = prog && prog.days[workoutDayIdx];
+  const payload = (day && Array.isArray(day.exercises))
+    ? cmBuildWorkoutPayload(prog, day, workoutWeek, workoutState.logs[getLogKey()], getLogKey())
+    : null;
+  if(!payload) { showToast('Nothing logged to share yet'); return; }
+  shrOpenWorkout(payload, localISO(new Date()));
+}
 function cmShareLastWorkout() {
   const prog = getProgram(selectedProgram);
   const day = prog && prog.days[workoutDayIdx];
@@ -16293,6 +16437,16 @@ document.addEventListener('visibilitychange', () => {
 // ══════════════════════════════════════
 function wnList() {
   return [
+    {
+      id: '2026-11-13',
+      version: '2.1',
+      date: 'November 2026',
+      title: 'Workout stickers',
+      items: [
+        { ic: '📲', t: 'Share to socials', d: 'After a workout, tap Share to socials to make a see-through sticker with your workout, sets and PRs. Copy it and paste it on your Instagram story, or save it to Photos.' },
+        { ic: '🎛️', t: 'Full workout or stats only', d: 'Pick the full workout with every exercise, or just the headline numbers and PRs, in Glass or Clear.' }
+      ]
+    },
     {
       id: '2026-11-12',
       version: '2.0',
