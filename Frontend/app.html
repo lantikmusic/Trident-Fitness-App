@@ -6860,6 +6860,7 @@ function renderWorkoutPreview() {
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
         ${alreadyStarted ? 'Continue Workout' : 'Start Workout'}
       </button>
+      <button class="wo-change-prog-btn" onclick="showAllDays()">Do a different day →</button>
     </div>
     `}
 
@@ -8526,7 +8527,7 @@ function mgCollect() {
     Object.keys(sessions).forEach(sid => {
       const sess = sessions[sid];
       if(!sess || sess.restDay || !sess.ex) return;
-      const p = String(sess.date || sid.slice(0, 10)).split('-').map(Number);
+      const p = hyDoneDay(sess, sid).split('-').map(Number);
       const t = new Date(p[0], (p[1] || 1) - 1, p[2] || 1).getTime();
       if(!Number.isFinite(t)) return;
       const w = hyWorkout(sess.workoutId);
@@ -9171,7 +9172,8 @@ function gymDaysFromLantik() {
       if(!w || w.category !== 'strength' || s.restDay || s.status === 'skipped') return;
       const logged = s.status === 'completed' ||
         Object.keys(s.ex || {}).some(k => ((s.ex[k] && s.ex[k].sets) || []).some(t => t && t.done));
-      if(logged && /^\d{4}-\d{2}-\d{2}$/.test(String(s.date))) out.push(s.date);
+      const day = hyDoneDay(s, id);
+      if(logged && /^\d{4}-\d{2}-\d{2}$/.test(day)) out.push(day);
     });
   } catch(e) {} // LANTIK not loaded yet
   return out;
@@ -11853,6 +11855,7 @@ function hyNormalize(raw) {
     const wantGames = HY_WORKOUTS[s.workoutId].games || 0;
     d.sessions[sid] = {
       id: sid, workoutId: s.workoutId, date: sid.slice(0, 10), slot: sid.slice(11),
+      doneOn: /^\d{4}-\d{2}-\d{2}$/.test(String(s.doneOn || '')) && s.doneOn !== sid.slice(0, 10) ? s.doneOn : '',
       status: ['in_progress', 'completed', 'skipped'].includes(s.status) ? s.status : 'in_progress',
       startedAt: Number(s.startedAt) || 0, finishedAt: Number(s.finishedAt) || 0,
       blockWeek: [1, 2, 3, 4].includes(s.blockWeek) ? s.blockWeek : 0,
@@ -12029,7 +12032,29 @@ function hyCtx() {
   const sess = hyState.sessions[sid] || null;
   const workoutId = sess ? sess.workoutId : hySlotWorkoutId(dayIdx, slot);
   if(!workoutId) return null;
-  return { dayIdx, slot, sid, sess, workoutId, workout: hyWorkout(workoutId), future: dayIdx > hyDow(new Date()) };
+  const later = dayIdx > hyDow(new Date());
+  return { dayIdx, slot, sid, sess, workoutId, workout: hyWorkout(workoutId), later, future: later && !sess && hyView.early !== sid };
+}
+// The day a session was really done: today for a later day's workout done early, otherwise its own day.
+function hyDoneDay(sess, sid) {
+  if(sess && /^\d{4}-\d{2}-\d{2}$/.test(String(sess.doneOn || ''))) return sess.doneOn;
+  return String((sess && sess.date) || String(sid || '').slice(0, 10));
+}
+// "Skip to this workout?" — lets the athlete do a later day's workout today.
+function hyEarlySheet() {
+  const c = hyCtx(); if(!c || !c.future) return;
+  const todayName = HY_DAYS[hyDow(new Date())];
+  hySheet(`<div class="cm-sheet-title">Skip to this workout?</div>
+    <div class="hy-muted" style="margin-bottom:12px;">Do ${hyEsc(HY_DAYS[c.dayIdx])}'s ${hyEsc(c.workout.short || c.workout.name)} today. It's saved as done on ${hyEsc(todayName)}, and ${hyEsc(HY_DAYS[c.dayIdx])} will show it as complete. The rest of the week stays the same.</div>
+    <button class="pink-btn" onclick="hyStartEarly()">Skip to this workout</button>
+    <button class="ghost-btn" style="margin-top:8px;" onclick="hySheetClose()">Cancel</button>`);
+}
+function hyStartEarly() {
+  const c = hyCtx(); if(!c) return;
+  hyView.early = c.sid;
+  hySheetClose();
+  hyRender();
+  showToast(`${c.workout.short || c.workout.name} is ready — log it like any other day`);
 }
 // Creates the session on the first real action (a logged set, a tick, a note), never on viewing.
 function hyEnsureSession() {
@@ -12037,7 +12062,7 @@ function hyEnsureSession() {
   if(!c || c.future) return null;
   if(c.sess) return c.sess;
   const sess = {
-    id: c.sid, workoutId: c.workoutId, date: c.sid.slice(0, 10), slot: c.slot.key, status: 'in_progress',
+    id: c.sid, workoutId: c.workoutId, date: c.sid.slice(0, 10), doneOn: c.later ? hyISO(new Date()) : '', slot: c.slot.key, status: 'in_progress',
     startedAt: Date.now(), finishedAt: 0, blockWeek: hyBlockWeek(),
     // A lift starts as the lighter version when fatigue is flagged.
     lighter: c.workout.category === 'strength' && hyState.readiness.status === 'reduced',
@@ -12236,7 +12261,7 @@ function hyWeekHTML() {
     const workout = hyWorkout(wid);
     const prog2 = sess ? hySessionProgress(workout, sess) : null;
     const when = [slot.legacy ? 'Earlier plan' : slot.time, workout.tag].filter(Boolean).join(' · ');
-    let why = '';
+    let why = sess && sess.doneOn ? `Done early on ${hyDateLabel(sess.doneOn)}` : '';
     if(dayIdx < today && slot.gym) {
       if(!sess) why = 'Nothing was logged. If you did it, open it to log it late.';
       else if(sess.status === 'in_progress') why = 'Not finished. If you did it, open it and tap Finish.';
@@ -12287,7 +12312,7 @@ function hyWeekHTML() {
       ${history.map(x => {
         const w = hyWorkout(x.workoutId), t = hyTotals(w, x);
         const bits = [x.status === 'skipped' ? 'Skipped' : (x.restDay ? 'Rest day' : (t.sets ? `${t.sets} working sets` : 'Completed')), x.rpe ? `RPE ${x.rpe}` : ''].filter(Boolean).join(' · ');
-        return `<button class="hy-hist" onclick="hySummary('${x.id}')"><span>${hyEsc(hyDateLabel(x.date))} · ${hyEsc(w.short || w.name)}</span><span class="hy-muted">${hyEsc(bits)}</span></button>`;
+        return `<button class="hy-hist" onclick="hySummary('${x.id}')"><span>${hyEsc(hyDateLabel(hyDoneDay(x, x.id)))} · ${hyEsc(w.short || w.name)}</span><span class="hy-muted">${hyEsc(bits)}</span></button>`;
       }).join('')}
     </div>` : ''}
     <button class="wo-change-prog-btn" onclick="changeProgram()">Change program</button>`;
@@ -12460,7 +12485,8 @@ function hySessionHTML() {
   const hasImpact = (w.sections || []).some(sec => sec.items.some(e => e.impact));
   const training = w.category === 'strength' || w.category === 'field' || w.category === 'competition';
   const banners = [];
-  if(c.future) banners.push(`<div class="hy-banner">Preview — this is planned for ${HY_DAYS[c.dayIdx]}. You can log it on the day.</div>`);
+  if(c.future) banners.push(`<div class="hy-banner">This is planned for ${HY_DAYS[c.dayIdx]}. Want to do it today instead?<button class="pink-btn" style="margin-top:10px;" onclick="hyEarlySheet()">Skip to this workout</button></div>`);
+  else if(c.later || (sess && sess.doneOn)) banners.push(`<div class="hy-banner">${HY_DAYS[c.dayIdx]}'s workout, ${done ? 'done' : 'doing it'} early${sess && sess.doneOn ? ' on ' + hyEsc(hyDateLabel(sess.doneOn)) : ' today'}.</div>`);
   if(skipped) banners.push(`<div class="hy-banner">Skipped. <button class="hy-link" onclick="hyUndoSkip()">Undo skip</button></div>`);
   if(sess && sess.restDay) banners.push(`<div class="hy-banner">Recorded as a complete rest day.</div>`);
   if(week && (w.category === 'strength' || w.category === 'field')) banners.push(`<div class="hy-banner"><strong>Week ${week} of 4 — ${HY_BLOCK[week].name}.</strong> ${hyEsc(HY_BLOCK[week].tip)}</div>`);
@@ -12527,7 +12553,7 @@ function hyToggleSection(key) { hyView.collapsed[key] = !hyView.collapsed[key]; 
 function hyGuard() {
   const c = hyCtx();
   if(!c) return null;
-  if(c.future) { showToast(`Planned for ${HY_DAYS[c.dayIdx]} — log it on the day`); return null; }
+  if(c.future) { hyEarlySheet(); return null; }
   return c;
 }
 // True when an exercise is left out of this session (restricted, lighter session, recovery-only):
@@ -13016,13 +13042,13 @@ function hySharePayload(w, sess, sid, always) {
       t.exercises.filter(e => e.record).forEach(e => {
         const best = Math.max(0, ...e.sets.map(x => x.w));
         const rec = prData[e.name.toLowerCase().replace(/[^a-z0-9]/g, '_')];
-        if(best > 0 && rec && Number(rec.weight) === best && rec.ts && localISO(new Date(rec.ts)) === String(sess.date)) prs.push({ name: e.name, weight: best, prev: Number(rec.prev) || 0 });
+        if(best > 0 && rec && Number(rec.weight) === best && rec.ts && localISO(new Date(rec.ts)) === hyDoneDay(sess, sid)) prs.push({ name: e.name, weight: best, prev: Number(rec.prev) || 0 });
       });
     } catch(e) {}
   }
   return { program: 'LANTIK Hybrid Athlete', day: String(w.name).slice(0, 80), week: sess.blockWeek || 1, cat: w.category || 'strength',
     volume: t.volume, sets: t.sets, exercises: lifts.concat(work, games).slice(0, 12), stats, prs: cmCleanPRs(prs),
-    date: String(sess.date || '').slice(0, 10), sid: String(sid || sess.id || '').slice(0, 40) };
+    date: hyDoneDay(sess, sid).slice(0, 10), sid: String(sid || sess.id || '').slice(0, 40) };
 }
 function hySummary(sid, extra) {
   const sess = hyState.sessions[sid]; if(!sess) return;
@@ -13048,7 +13074,7 @@ function hySummary(sid, extra) {
   }).join('') + hyRetiredLines(w, sess);
   const games = (sess.games || []).map((g, i) => g.done ? `<div class="hy-kv top"><span>Game ${i + 1}</span><span>${hyEsc([g.result, g.duration ? g.duration + ' min' : '', g.rpe ? 'RPE ' + g.rpe : ''].filter(Boolean).join(' · ') || 'Played')}${g.notes ? `<br><span class="hy-muted">${hyEsc(g.notes)}</span>` : ''}</span></div>` : '').join('');
   hySheet(`<div class="cm-sheet-title">${sess.status === 'skipped' ? 'Skipped' : (extra ? 'Session saved' : 'Session')} — ${hyEsc(w.short || w.name)}</div>
-    <div class="hy-muted" style="margin-bottom:12px;">${hyEsc(hyDateLabel(sess.date))}${sess.restDay ? ' · complete rest day' : ''}${(sess.types || []).length ? ' · ' + hyEsc(sess.types.join(', ')) : ''}${sess.intensity ? ' · ' + hyEsc(sess.intensity) + ' intensity' : ''}${sess.lighter ? ' · lighter session' : ''}${sess.recoveryOnly ? ' · recovery-only' : ''}${sess.restricted ? ' · impact work locked' : ''}${sess.check === 'tired' ? ' · felt tired' : sess.check === 'pain' ? ' · reported pain' : ''}</div>
+    <div class="hy-muted" style="margin-bottom:12px;">${hyEsc(hyDateLabel(hyDoneDay(sess, sid)))}${sess.doneOn ? ' · ' + hyEsc(HY_DAYS[hyDow(new Date(sess.date + 'T12:00:00'))]) + "'s workout, done early" : ''}${sess.restDay ? ' · complete rest day' : ''}${(sess.types || []).length ? ' · ' + hyEsc(sess.types.join(', ')) : ''}${sess.intensity ? ' · ' + hyEsc(sess.intensity) + ' intensity' : ''}${sess.lighter ? ' · lighter session' : ''}${sess.recoveryOnly ? ' · recovery-only' : ''}${sess.restricted ? ' · impact work locked' : ''}${sess.check === 'tired' ? ' · felt tired' : sess.check === 'pain' ? ' · reported pain' : ''}</div>
     ${stats.length ? `<div class="hy-stats">${stats.map(s => `<div><b>${hyEsc(s[0])}</b><span>${hyEsc(s[1])}</span></div>`).join('')}</div>` : ''}
     ${detail}${games ? `<div class="hy-sheet-sec">GAMES</div>${games}` : ''}
     ${sess.notes ? `<div class="hy-sheet-sec">NOTES</div><div class="hy-cue">${hyEsc(sess.notes)}</div>` : ''}
@@ -13685,7 +13711,7 @@ function cmLocalWorkouts() {
       if(!sess || sess.status !== 'completed' || sess.restDay) return;
       const w = hyWorkout(sess.workoutId); if(!w) return;
       const payload = hySharePayload(w, sess, sid, true); if(!payload) return;
-      out.push({ key: 'hy:' + sid, date: String(sess.date || sid.slice(0, 10)), payload });
+      out.push({ key: 'hy:' + sid, date: hyDoneDay(sess, sid), payload });
     });
   } catch(e) {}
   try {
@@ -15354,7 +15380,7 @@ function cmHybridWorkoutOptions() {
       const sum = payload.stats.map(x => x[0] + ' ' + x[1]).join(' · ');
       out.push({
         label: w.name,
-        sub: `${hyDateLabel(sess.date)}${sum ? ' · ' + sum : ''}${sess.status === 'completed' ? '' : ' · not finished'}`,
+        sub: `${hyDateLabel(hyDoneDay(sess, sid))}${sum ? ' · ' + sum : ''}${sess.status === 'completed' ? '' : ' · not finished'}`,
         payload,
         sort: String(sess.date || sid.slice(0, 10)) + sid
       });
@@ -16267,6 +16293,16 @@ document.addEventListener('visibilitychange', () => {
 // ══════════════════════════════════════
 function wnList() {
   return [
+    {
+      id: '2026-11-12',
+      version: '2.0',
+      date: 'November 2026',
+      title: 'Do any day\'s workout',
+      items: [
+        { ic: '⏭️', t: 'Skip ahead', d: 'In LANTIK Hybrid, open a later day and tap "Skip to this workout" to do it today. It\'s saved as done today, and that day shows it as complete.' },
+        { ic: '📅', t: 'Pick a different day', d: 'In the other programs, tap "Do a different day" under today\'s workout to choose any day.' }
+      ]
+    },
     {
       id: '2026-11-11b',
       version: '1.9',
