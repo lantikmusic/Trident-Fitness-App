@@ -16078,6 +16078,7 @@ function ahOpenSleep() {
     ${n.hasStages ? '' : '<div class="ah-note" style="margin:8px 2px 0;">Sleep stages (REM, Core, Deep) need an Apple Watch or a sleep tracker that saves to Apple Health.</div>'}
     ${ahSleepSourcesHTML(n)}
     <div class="ah-note" style="margin:10px 2px 14px;">From Apple Health · read-only · stays on this iPhone.</div>
+    <button class="ghost-btn" style="margin-bottom:8px;" onclick="ahCopySleepDetails()">Copy sleep details</button>
     <button class="ghost-btn" onclick="ahSheetClose()">Close</button>`);
 }
 
@@ -16088,6 +16089,27 @@ function ahSleepSourcesHTML(n) {
   return `<div class="tc-chart-label" style="margin-top:16px;">Sleep sources</div>
     <div class="ah-src-list">${list.map((x, i) => `<button class="ah-src-row${x.name === n.source ? ' on' : ''}" onclick="ahSetSleepSource(${i})"><span>${cmEsc(x.name)}</span><em>${ahDur(x.asleep)}</em><i>${x.name === n.source ? '✓' : ''}</i></button>`).join('')}</div>
     <div class="ah-note" style="margin:6px 2px 0;">More than one app or device saved sleep for this night. The Health app uses the one at the top of its list (Health → Sleep → Data Sources &amp; Access). Tap the one to use.</div>`;
+}
+// Copies this night's raw Apple Health sleep entries as plain text (times, stage, source), only when
+// the person taps the button, so they can compare with the Health app. Nothing is sent anywhere.
+function ahCopySleepDetails() {
+  const k = ahSelKey('sleep'), raw = (ahState.sleepRaw[k] || []).slice(), n = ahState.nights[k];
+  if(!raw.length) { showToast('No sleep entries for this night'); return; }
+  const tm = v => { const d = new Date(v); return isNaN(d) ? '?' : [d.getHours(), d.getMinutes(), d.getSeconds()].map(x => String(x).padStart(2, '0')).join(':'); };
+  const stage = st => st === 'light' ? 'core' : st;
+  raw.sort((a, b) => new Date(a.startDate) - new Date(b.startDate) || new Date(a.endDate) - new Date(b.endDate));
+  const lines = raw.map(x => `${tm(x.startDate)}-${tm(x.endDate)} ${stage(x.sleepState)} ${x.sourceName || x.sourceId || '?'} ${String(x.platformId || '').slice(0, 8)}`);
+  const head = n ? `Trident sleep ${k}: asleep ${Math.round(n.asleep)} in bed ${Math.round(n.inBed)} awake ${Math.round(n.awake)} rem ${Math.round(n.rem)} core ${Math.round(n.core)} deep ${Math.round(n.deep)} (min), ${raw.length} entries` : `Trident sleep ${k}`;
+  const text = head + '\n' + lines.join('\n');
+  const done = () => showToast('Copied, paste it in your message', 2600);
+  const fallback = () => {
+    const ta = document.createElement('textarea'); ta.value = text; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;';
+    document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, text.length);
+    let ok = false; try { ok = document.execCommand('copy'); } catch(e) {}
+    ta.remove(); ok ? done() : showToast("Couldn't copy. Please try again.");
+  };
+  try { if(navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(text).then(done, fallback); return; } } catch(e) {}
+  fallback();
 }
 function ahSetSleepSource(i) {
   const n = ahState.nights[ahSelKey('sleep')], x = n && n.sources && n.sources[i];
