@@ -1353,6 +1353,12 @@ body:not([data-page="dashboard"]) .settings-btn{display:none;}
 .ah-hyp{background:var(--bg4);border:0.5px solid var(--border);border-radius:16px;padding:12px 10px 8px;margin-bottom:14px;}
 .ah-hyp svg{display:block;width:100%;height:auto;overflow:visible;}
 .ah-stage-rows{display:grid;gap:6px;margin-bottom:6px;}
+.ah-src-list{display:flex;flex-direction:column;gap:6px;}
+.ah-src-row{display:flex;align-items:center;gap:10px;width:100%;background:var(--bg4);border:0.5px solid var(--border);border-radius:12px;padding:11px 12px;font-family:inherit;color:var(--text);text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.ah-src-row span{flex:1;min-width:0;font-size:13.5px;font-weight:600;overflow-wrap:anywhere;}
+.ah-src-row em{font-style:normal;font-size:13px;color:var(--text2);font-weight:600;}
+.ah-src-row i{font-style:normal;width:16px;color:var(--pink);font-weight:800;}
+.ah-src-row.on{border-color:var(--pink-border);background:var(--pink-dim);}
 .ah-stage-row{display:flex;align-items:center;gap:10px;background:var(--bg4);border:0.5px solid var(--border);border-radius:12px;padding:10px 12px;}
 .ah-stage-row i{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
 .ah-stage-row b{flex:1;font-size:14px;font-weight:600;}
@@ -15664,7 +15670,7 @@ const AH_STAGE = {                                                 // Apple Heal
 };
 // steps / burned / nights are keyed by local date 'YYYY-MM-DD' (a night is keyed by the morning it ends)
 let ahState = { status: 'off', loadedAt: 0, fullAt: 0, histAt: 0, connecting: false, loading: false, histLoading: false,
-  steps: {}, burned: {}, nights: {}, sel: { steps: 0, sleep: 0 }, needsMore: false };   // needsMore = workouts/heart not asked yet   // sel = how many days back the card shows
+  steps: {}, burned: {}, nights: {}, sleepRaw: {}, sel: { steps: 0, sleep: 0 }, needsMore: false };   // needsMore = workouts/heart not asked yet   // sel = how many days back the card shows
 const AH_HISTORY_DAYS = 30;
 
 // True only inside the iPhone app. On the website (and Android) nothing here runs.
@@ -15747,23 +15753,35 @@ function ahUnionMinutes(ranges) {
   if(cs !== null) total += ce - cs;
   return total / 60000;
 }
-// One night's sleep: picks the source with stage data (e.g. Apple Watch), else the one with the most sleep.
+// Which sleep source to use when there are several (only its name is kept, on this iPhone; no sleep data).
+const AH_SLEEP_SRC_KEY = 'trident_ah_sleep_source_v1';
+function ahSleepSrcPref() { try { return localStorage.getItem(AH_SLEEP_SRC_KEY) || ''; } catch(e) { return ''; } }
+// One night's sleep from ONE source, like the Health app: the source picked in the sleep sheet if
+// there is one, else the Apple Watch, else the source with sleep stages, else the one with the most sleep.
+// Time asleep is the time covered by any asleep sample of that source, so overlaps are never counted twice.
 function ahSleepSummary(samples) {
   const list = (samples || []).filter(s => s && s.startDate && s.endDate);
   if(!list.length) return null;
   const by = {};
   list.forEach(s => { const k = s.sourceId || s.sourceName || '?'; (by[k] = by[k] || []).push(s); });
   const stageOf = s => s.sleepState === 'light' ? 'core' : s.sleepState;
-  const score = arr => {
-    const staged = ahUnionMinutes(arr.filter(s => ['rem', 'core', 'deep'].includes(stageOf(s))));
-    const asleep = ahUnionMinutes(arr.filter(s => ['rem', 'core', 'deep', 'asleep'].includes(stageOf(s))));
-    return staged * 1e6 + asleep;
-  };
-  const best = Object.values(by).sort((a, b) => score(b) - score(a))[0];
+  const nameOf = arr => String(arr[0].sourceName || arr[0].sourceId || 'Unknown source');
+  const stagedOf = arr => ahUnionMinutes(arr.filter(s => ['rem', 'core', 'deep'].includes(stageOf(s))));
+  const asleepOf = arr => ahUnionMinutes(arr.filter(s => ['rem', 'core', 'deep', 'asleep'].includes(stageOf(s))));
+  const groups = Object.values(by);
+  const pref = ahSleepSrcPref();
+  let best = pref ? groups.find(arr => nameOf(arr) === pref && asleepOf(arr) > 0) : null;
+  if(!best) best = groups.filter(arr => /watch/i.test(nameOf(arr)) && asleepOf(arr) > 0).sort((a, b) => asleepOf(b) - asleepOf(a))[0];
+  if(!best) best = groups.slice().sort((a, b) => (stagedOf(b) * 1e6 + asleepOf(b)) - (stagedOf(a) * 1e6 + asleepOf(a)))[0];
   const mins = st => ahUnionMinutes(best.filter(s => stageOf(s) === st));
   const out = { rem: mins('rem'), core: mins('core'), deep: mins('deep'), awake: mins('awake'), plain: mins('asleep') };
   out.hasStages = out.rem + out.core + out.deep > 0;
-  out.asleep = out.rem + out.core + out.deep + out.plain;
+  out.asleep = asleepOf(best);
+  // A stage total can't add up to more than the time asleep (e.g. an app saving both a stage and plain "asleep")
+  const stageSum = out.rem + out.core + out.deep + out.plain;
+  if(stageSum > out.asleep && stageSum > 0) { const f = out.asleep / stageSum; ['rem', 'core', 'deep', 'plain'].forEach(k => { out[k] *= f; }); }
+  out.source = nameOf(best);
+  out.sources = groups.map(arr => ({ name: nameOf(arr), asleep: asleepOf(arr) })).filter(x => x.asleep > 0).sort((a, b) => b.asleep - a.asleep);
   out.inBed = ahUnionMinutes(list.filter(s => s.sleepState === 'inBed'));   // time in bed from any source
   if(out.asleep <= 0 && out.inBed <= 0) return null;
   const times = list.map(s => [new Date(s.startDate), new Date(s.endDate)]);
@@ -15812,7 +15830,7 @@ async function ahFetchRange(from, nights, basalLimit) {
       const inNight = all.filter(s => { const t = new Date(s.startDate); return t >= start && t < end; });
       const k = ahKey(new Date(end.getFullYear(), end.getMonth(), end.getDate()));
       const sum = ahSleepSummary(inNight);
-      if(sum) ahState.nights[k] = sum; else delete ahState.nights[k];
+      if(sum) { ahState.nights[k] = sum; ahState.sleepRaw[k] = inNight; } else { delete ahState.nights[k]; delete ahState.sleepRaw[k]; }
     }
   }
   return true;
@@ -16058,8 +16076,26 @@ function ahOpenSleep() {
     <div class="ah-hyp">${ahHypnogramSVG(n)}</div>
     <div class="ah-stage-rows">${parts.filter(k => n[k] > 0 || k !== 'plain').map(k => `<div class="ah-stage-row"><i style="background:${colors[k]};"></i><b>${names[k]}</b><em>${ahDur(n[k] || 0)}</em><small>${Math.round((n[k] || 0) / total * 100)}%</small></div>`).join('')}</div>
     ${n.hasStages ? '' : '<div class="ah-note" style="margin:8px 2px 0;">Sleep stages (REM, Core, Deep) need an Apple Watch or a sleep tracker that saves to Apple Health.</div>'}
+    ${ahSleepSourcesHTML(n)}
     <div class="ah-note" style="margin:10px 2px 14px;">From Apple Health · read-only · stays on this iPhone.</div>
     <button class="ghost-btn" onclick="ahSheetClose()">Close</button>`);
+}
+
+// Several apps or devices can save sleep to Apple Health. Lists them so the right one can be picked.
+function ahSleepSourcesHTML(n) {
+  const list = Array.isArray(n.sources) ? n.sources : [];
+  if(list.length < 2) return n.source ? `<div class="ah-note" style="margin:12px 2px 0;">Sleep from ${cmEsc(n.source)}.</div>` : '';
+  return `<div class="tc-chart-label" style="margin-top:16px;">Sleep sources</div>
+    <div class="ah-src-list">${list.map((x, i) => `<button class="ah-src-row${x.name === n.source ? ' on' : ''}" onclick="ahSetSleepSource(${i})"><span>${cmEsc(x.name)}</span><em>${ahDur(x.asleep)}</em><i>${x.name === n.source ? '✓' : ''}</i></button>`).join('')}</div>
+    <div class="ah-note" style="margin:6px 2px 0;">More than one app or device saved sleep for this night. The Health app uses the one at the top of its list (Health → Sleep → Data Sources &amp; Access). Tap the one to use.</div>`;
+}
+function ahSetSleepSource(i) {
+  const n = ahState.nights[ahSelKey('sleep')], x = n && n.sources && n.sources[i];
+  if(!x) return;
+  try { localStorage.setItem(AH_SLEEP_SRC_KEY, x.name); } catch(e) {}
+  Object.keys(ahState.sleepRaw).forEach(k => { const sum = ahSleepSummary(ahState.sleepRaw[k]); if(sum) ahState.nights[k] = sum; });
+  try { renderSleepCard(); } catch(e) {}
+  ahOpenSleep();
 }
 
 // How the night compares with the 8-hour sleep goal (the same goal the Sleep card's ring uses).
@@ -16437,6 +16473,16 @@ document.addEventListener('visibilitychange', () => {
 // ══════════════════════════════════════
 function wnList() {
   return [
+    {
+      id: '2026-11-14',
+      version: '2.2',
+      date: 'November 2026',
+      title: 'Sleep matches Apple Health',
+      items: [
+        { ic: '😴', t: 'More accurate sleep', d: 'Sleep now comes from one source, your Apple Watch first, just like the Health app, and time is never counted twice.' },
+        { ic: '⌚️', t: 'Pick your sleep source', d: 'If more than one app or device saves your sleep, tap the Sleep card to see each one and choose which to use.' }
+      ]
+    },
     {
       id: '2026-11-13',
       version: '2.1',
