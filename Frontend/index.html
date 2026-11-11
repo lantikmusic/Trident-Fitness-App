@@ -924,8 +924,8 @@ const OB_STEPS = 5;
 const WORKER_URL = 'https://logmeal-proxy.tridentfitness.workers.dev';
 
 // ── Session token storage ──
-function saveToken(token, user, isNewAccount) {
-  if (user && user.id) acctSwitchData(user.id, !!isNewAccount);
+async function saveToken(token, user, isNewAccount) {
+  if (user && user.id) { try { await acctPrepare(user.id, !!isNewAccount); } catch (e) { console.warn('Account data check skipped:', e); } }
   localStorage.setItem('trident_session_token', token);
 }
 
@@ -933,9 +933,11 @@ function saveToken(token, user, isNewAccount) {
 // The app keeps workouts, macros, photos and settings on the phone. When a different account logs in,
 // the previous account's data is set aside on the phone (not deleted, not uploaded) and comes back
 // when that account logs in again. Keys listed here belong to the phone, not to an account.
-const ACCT_OWNER_KEY = 'trident_data_owner_v1';
+const ACCT_OWNER_KEY = 'trident_data_owner_v2';
+const ACCT_OWNER_OLD = 'trident_data_owner_v1';   // early builds (2026-11-10) set this without marking guesses
+const ACCT_GUESS_KEY = 'trident_data_owner_guess_v1';   // '1' when the owner was a guess (data from before this was tracked)
 const ACCT_STASH = 'trident_stash_v1:';
-const ACCT_DEVICE_KEYS = ['trident_session_token', ACCT_OWNER_KEY, 'trident_whats_new_seen_v1', 'trident_new_account',
+const ACCT_DEVICE_KEYS = ['trident_session_token', ACCT_OWNER_KEY, ACCT_OWNER_OLD, ACCT_GUESS_KEY, 'trident_whats_new_seen_v1', 'trident_new_account',
   'trident_health_asked_v1', 'trident_health_card_hidden_v1', 'trident_health_gym_v1', 'trident_ah_sleep_source_v1',
   'trident_push_on_v1', 'trident_usda_key', 'trident_cm_aspect_v1', 'trident_macro_week_fix_v1', 'trident_macro_week_fix_v2'];
 function acctKeys(prefix) {
@@ -944,7 +946,17 @@ function acctKeys(prefix) {
   return out;
 }
 // isNew: a brand-new account always starts empty, whatever is on the phone.
+// An owner set by an early build may have been a wrong guess: treat it as a guess.
+function acctMigrate() {
+  try {
+    const old = localStorage.getItem(ACCT_OWNER_OLD);
+    if (old === null) return;
+    if (old && !localStorage.getItem(ACCT_OWNER_KEY)) { localStorage.setItem(ACCT_OWNER_KEY, old); localStorage.setItem(ACCT_GUESS_KEY, '1'); }
+    localStorage.removeItem(ACCT_OWNER_OLD);
+  } catch (e) {}
+}
 function acctSwitchData(newId, isNew) {
+  acctMigrate();
   try {
     newId = String(newId || '');
     if (!/^[A-Za-z0-9-]{1,64}$/.test(newId)) return;
@@ -952,8 +964,10 @@ function acctSwitchData(newId, isNew) {
     if (owner === newId) return;
     const mine = acctKeys('trident_').filter(k => !k.startsWith(ACCT_STASH) && !ACCT_DEVICE_KEYS.includes(k));
     if (!owner && mine.length && !isNew) {
-      // Data saved before accounts were kept apart, and an existing account logs in: it stays with them (as it always did)
+      // Data saved before accounts were kept apart, and an existing account logs in: it stays with them (as it always did),
+      // but only as a guess — if a different account logs in later, they're asked whose it is.
       localStorage.setItem(ACCT_OWNER_KEY, newId);
+      localStorage.setItem(ACCT_GUESS_KEY, '1');
       return;
     }
     // Set the data on the phone aside, one item at a time (so the phone's storage never fills up).
@@ -964,7 +978,41 @@ function acctSwitchData(newId, isNew) {
     const pre = ACCT_STASH + newId + ':';
     acctKeys(pre).forEach(k => { try { localStorage.setItem(k.slice(pre.length), localStorage.getItem(k)); localStorage.removeItem(k); } catch (e) {} });
     localStorage.setItem(ACCT_OWNER_KEY, newId);
+    localStorage.removeItem(ACCT_GUESS_KEY);
   } catch (e) { console.warn('Account data switch skipped:', e); }
+}
+// Before switching: if the phone's data was only guessed to belong to someone, an existing account logging in
+// is asked whether it's theirs. New accounts are never asked: they always start empty.
+async function acctPrepare(newId, isNew) {
+  acctMigrate();
+  const owner = localStorage.getItem(ACCT_OWNER_KEY) || '';
+  const guessed = localStorage.getItem(ACCT_GUESS_KEY) === '1';
+  const hasData = acctKeys('trident_').some(k => !k.startsWith(ACCT_STASH) && !ACCT_DEVICE_KEYS.includes(k));
+  if (!isNew && owner && owner !== String(newId) && guessed && hasData) {
+    let name = '';
+    try { name = String((JSON.parse(localStorage.getItem('trident_settings_v1') || '{}') || {}).name || '').trim().slice(0, 40); } catch (e) {}
+    if (await acctAsk(name)) {
+      localStorage.setItem(ACCT_OWNER_KEY, String(newId));
+      localStorage.removeItem(ACCT_GUESS_KEY);
+      return;
+    }
+  }
+  acctSwitchData(newId, isNew);
+}
+function acctAsk(name) {
+  return new Promise(resolve => {
+    const esc = v => String(v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const ov = document.createElement('div');
+    ov.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.72);display:flex;align-items:flex-end;justify-content:center;';
+    ov.innerHTML = `<div role="dialog" aria-modal="true" style="width:100%;max-width:480px;background:#161616;border-top:0.5px solid rgba(255,255,255,.12);border-radius:24px 24px 0 0;padding:24px 22px calc(26px + env(safe-area-inset-bottom));font-family:inherit;color:#fff;">
+      <div style="font-size:21px;font-weight:700;letter-spacing:-0.02em;margin-bottom:8px;">Is this your data?</div>
+      <div style="font-size:14.5px;line-height:1.5;color:rgba(255,255,255,.65);margin-bottom:20px;">This phone has workouts, meals and other data from before you logged in${name ? `, under the name <b style="color:#fff;">${esc(name)}</b>` : ''}. If it's yours, keep it with this account. If it belongs to someone else, start fresh — their data stays safe on this phone.</div>
+      <button class="pink-btn" data-a="yes">Yes, it's mine</button>
+      <button data-a="no" style="display:block;width:100%;margin-top:10px;height:52px;border-radius:16px;border:0.5px solid rgba(255,255,255,.18);background:transparent;color:#fff;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;">No, start fresh</button>
+    </div>`;
+    ov.addEventListener('click', e => { const a = e.target && e.target.getAttribute && e.target.getAttribute('data-a'); if (!a) return; ov.remove(); resolve(a === 'yes'); });
+    document.body.appendChild(ov);
+  });
 }
 function getToken() { return localStorage.getItem('trident_session_token'); }
 function clearToken() { localStorage.removeItem('trident_session_token'); }
@@ -1057,7 +1105,7 @@ async function handleLogin() {
       return;
     }
 
-    saveToken(data.token, data.user);
+    await saveToken(data.token, data.user);
     currentUser = data.user;
     showToast('✓ Welcome back, ' + (data.user.name || data.user.email) + '!');
     setTimeout(() => redirectToApp(), 800);
@@ -1099,7 +1147,7 @@ async function handleSignup() {
       return;
     }
 
-    saveToken(data.token, data.user, true);
+    await saveToken(data.token, data.user, true);
     currentUser = data.user;
     obData.name = name;
     // Brand-new account: the app skips its "What's new" pop-up (there's nothing new to them yet)
@@ -1203,7 +1251,7 @@ async function handleGoogleCredential(response) {
       return;
     }
 
-    saveToken(data.token, data.user, !!data.isNewUser);
+    await saveToken(data.token, data.user, !!data.isNewUser);
     currentUser = data.user;
 
     if(data.isNewUser) {
@@ -1295,7 +1343,7 @@ async function handleReset() {
   try {
     const { ok, data } = await api('/auth/reset', 'POST', { email: resetEmail, code, password });
     if (!ok) { showToast(data.error || 'That didn\'t work. Please try again.', 3200); return; }
-    saveToken(data.token, data.user);
+    await saveToken(data.token, data.user);
     currentUser = data.user;
     showToast('✓ Password updated. You\'re signed in!');
     setTimeout(() => redirectToApp(), 900);
