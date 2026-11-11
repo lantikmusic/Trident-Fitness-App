@@ -15896,7 +15896,8 @@ async function ahInit() {
   // "readAuthorized" means iOS already showed its permission screen for that type (iOS never says what was chosen)
   const st = await ahSafe(ahCall('checkAuthorization', { read: AH_READ, write: [] }));
   const seen = st.ok && st.v && Array.isArray(st.v.readAuthorized) ? st.v.readAuthorized : null;
-  if(!asked && seen && seen.length) { asked = true; ahSetAsked(); }
+  // Each account connects Apple Health itself (the flag is kept per account on this phone), even when iOS
+  // already allowed Trident for an earlier account: a new account sees the Connect card first.
   if(!asked) { ahState.status = 'connect'; ahRender(); return; }
   ahState.needsMore = !!seen && AH_FIT_TYPES.some(t => !seen.includes(t));   // connected before workouts/heart were added
   ahLoad(false, true);
