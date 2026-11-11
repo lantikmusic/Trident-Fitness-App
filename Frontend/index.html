@@ -937,7 +937,7 @@ const ACCT_OWNER_KEY = 'trident_data_owner_v2';
 const ACCT_OWNER_OLD = 'trident_data_owner_v1';   // early builds (2026-11-10) set this without marking guesses
 const ACCT_GUESS_KEY = 'trident_data_owner_guess_v1';   // '1' when the owner was a guess (data from before this was tracked)
 const ACCT_STASH = 'trident_stash_v1:';
-const ACCT_DEVICE_KEYS = ['trident_session_token', ACCT_OWNER_KEY, ACCT_OWNER_OLD, ACCT_GUESS_KEY, 'trident_whats_new_seen_v1', 'trident_new_account',
+const ACCT_DEVICE_KEYS = ['trident_session_token', ACCT_OWNER_KEY, ACCT_OWNER_OLD, ACCT_GUESS_KEY, 'trident_acct_repair_v1', 'trident_whats_new_seen_v1', 'trident_new_account',
   'trident_health_asked_v1', 'trident_health_card_hidden_v1', 'trident_health_gym_v1', 'trident_ah_sleep_source_v1',
   'trident_push_on_v1', 'trident_usda_key', 'trident_cm_aspect_v1', 'trident_macro_week_fix_v1', 'trident_macro_week_fix_v2'];
 function acctKeys(prefix) {
@@ -983,9 +983,21 @@ function acctSwitchData(newId, isNew) {
 }
 // Before switching: if the phone's data was only guessed to belong to someone, an existing account logging in
 // is asked whether it's theirs. New accounts are never asked: they always start empty.
+// One-time repair (2026-11-10): on Logan's phone his main account's data ended up filed under his test
+// account while the account separation was being built. When the main account logs in, it gets it back.
+// Safe to delete this list later; it only matches those two accounts.
+const ACCT_REPAIRS = [{ from: '58662dac-ebac-4c31-bf83-b8cd39cacd94', to: '29e22db9-4e12-46c9-903b-64ce5fa5268c' }];
+const ACCT_REPAIR_DONE = 'trident_acct_repair_v1';   // set once the repair has run on this phone (it must never run twice)
 async function acctPrepare(newId, isNew) {
   acctMigrate();
   const owner = localStorage.getItem(ACCT_OWNER_KEY) || '';
+  if (!isNew && !localStorage.getItem(ACCT_REPAIR_DONE) && ACCT_REPAIRS.some(r => r.from === owner && r.to === String(newId))) {
+    localStorage.setItem(ACCT_REPAIR_DONE, '1');
+    acctKeys(ACCT_STASH + String(newId) + ':').forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });   // an older partial copy
+    localStorage.setItem(ACCT_OWNER_KEY, String(newId));
+    localStorage.removeItem(ACCT_GUESS_KEY);
+    return;
+  }
   const guessed = localStorage.getItem(ACCT_GUESS_KEY) === '1';
   const hasData = acctKeys('trident_').some(k => !k.startsWith(ACCT_STASH) && !ACCT_DEVICE_KEYS.includes(k));
   if (!isNew && owner && owner !== String(newId) && guessed && hasData) {
