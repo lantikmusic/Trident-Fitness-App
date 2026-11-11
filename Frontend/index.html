@@ -924,8 +924,8 @@ const OB_STEPS = 5;
 const WORKER_URL = 'https://logmeal-proxy.tridentfitness.workers.dev';
 
 // ── Session token storage ──
-function saveToken(token, user) {
-  if (user && user.id) acctSwitchData(user.id);
+function saveToken(token, user, isNewAccount) {
+  if (user && user.id) acctSwitchData(user.id, !!isNewAccount);
   localStorage.setItem('trident_session_token', token);
 }
 
@@ -943,20 +943,23 @@ function acctKeys(prefix) {
   for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.startsWith(prefix)) out.push(k); }
   return out;
 }
-function acctSwitchData(newId) {
+// isNew: a brand-new account always starts empty, whatever is on the phone.
+function acctSwitchData(newId, isNew) {
   try {
     newId = String(newId || '');
     if (!/^[A-Za-z0-9-]{1,64}$/.test(newId)) return;
     const owner = localStorage.getItem(ACCT_OWNER_KEY) || '';
     if (owner === newId) return;
     const mine = acctKeys('trident_').filter(k => !k.startsWith(ACCT_STASH) && !ACCT_DEVICE_KEYS.includes(k));
-    if (!owner && mine.length) {
-      // Data saved before accounts were kept apart: it stays with whoever logs in now (as it always did)
+    if (!owner && mine.length && !isNew) {
+      // Data saved before accounts were kept apart, and an existing account logs in: it stays with them (as it always did)
       localStorage.setItem(ACCT_OWNER_KEY, newId);
       return;
     }
-    // Set the previous account's data aside, one item at a time (so the phone's storage never fills up)
-    if (owner) mine.forEach(k => { try { localStorage.setItem(ACCT_STASH + owner + ':' + k, localStorage.getItem(k)); localStorage.removeItem(k); } catch (e) {} });
+    // Set the data on the phone aside, one item at a time (so the phone's storage never fills up).
+    // Data with no known owner is kept as "unclaimed" so nothing is lost.
+    const holder = owner || 'unclaimed';
+    mine.forEach(k => { try { localStorage.setItem(ACCT_STASH + holder + ':' + k, localStorage.getItem(k)); localStorage.removeItem(k); } catch (e) {} });
     // Bring back this account's own data, if it was set aside earlier
     const pre = ACCT_STASH + newId + ':';
     acctKeys(pre).forEach(k => { try { localStorage.setItem(k.slice(pre.length), localStorage.getItem(k)); localStorage.removeItem(k); } catch (e) {} });
@@ -1096,7 +1099,7 @@ async function handleSignup() {
       return;
     }
 
-    saveToken(data.token, data.user);
+    saveToken(data.token, data.user, true);
     currentUser = data.user;
     obData.name = name;
     // Brand-new account: the app skips its "What's new" pop-up (there's nothing new to them yet)
@@ -1200,7 +1203,7 @@ async function handleGoogleCredential(response) {
       return;
     }
 
-    saveToken(data.token, data.user);
+    saveToken(data.token, data.user, !!data.isNewUser);
     currentUser = data.user;
 
     if(data.isNewUser) {

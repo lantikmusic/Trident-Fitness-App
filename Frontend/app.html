@@ -13556,6 +13556,8 @@ async function evCheck(force) {
   const u = r.ok && r.data && r.data.user;
   if(!u) return;
   EV.at = Date.now(); EV.email = String(u.email || '');
+  // Data on this phone from before accounts were kept apart belongs to whoever is signed in now
+  try { if(!localStorage.getItem('trident_data_owner_v1') && /^[A-Za-z0-9-]{1,64}$/.test(String(u.id || ''))) localStorage.setItem('trident_data_owner_v1', String(u.id)); } catch(e) {}
   if(u.email_verified === true) EV.verified = true;
   else if(u.email_verified === false) EV.verified = false;      // an older server doesn't say: show nothing
   evRenderHomeCard();
