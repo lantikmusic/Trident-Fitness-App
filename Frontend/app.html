@@ -7126,6 +7126,7 @@ function beginWorkout() {
   _workoutScreen = 'active';
   showWorkoutScreen('active');
   renderActiveWorkout();
+  try { if(!hyActive() && wtClassicParse(getLogKey())) wtStartWatch('c:' + getLogKey()); } catch(e) {}
   // Scroll to top of workout content
   setTimeout(() => {
     document.getElementById('activeWorkout')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -7329,6 +7330,7 @@ function renderActiveWorkout(){
   document.getElementById('finishWorkoutWrap').style.display = anyDone ? 'block' : 'none';
   const finishBtn = document.getElementById('finishWorkoutBtn');
   if(finishBtn) finishBtn.classList.toggle('glow', allExDone);
+  try { wtSoon(); } catch(e) {}
 }
 
 function selectExercise(ei, event) {
@@ -7386,6 +7388,7 @@ function updateWorkoutButtons() {
   document.getElementById('finishWorkoutWrap').style.display = anyDone ? 'block' : 'none';
   const finishBtn = document.getElementById('finishWorkoutBtn');
   if(finishBtn) finishBtn.classList.toggle('glow', allExDone);
+  try { wtSoon(); } catch(e) {}
 }
 
 function nextWorkout(event) {
@@ -7524,6 +7527,7 @@ function finishWorkout() {
   cloudPost('/workout', { program: workoutState.program, state: workoutCloudState() });
   cloudPost('/prs', prData);
 
+  try { wtClassicFinished(logKey); } catch(e) {}
   // Show summary with phase advancement option if applicable
   showWorkoutSummary(day, logKey, sessionPRs, phaseAdvanced);
 }
@@ -9937,7 +9941,7 @@ function updateRestTimerDisplay() {
 }
 
 function restTimerDone(late) {
-  if(!late) {
+  if(!late && !wtQuiet()) {
     restAlarm();
     if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
   }
@@ -10014,6 +10018,7 @@ function restPushSend(body) {
 }
 function restPushSync() {
   clearTimeout(restPushTimer);
+  try { wtSoon(); } catch(e) {}
   if(lnAvailable()) { lnRestSync(); return; }   // iPhone app: alert scheduled on the phone
   const ready = restPushReady();
   if(!ready) return;
@@ -12160,6 +12165,7 @@ function hySave(sync) {
   try { save(HY_KEY, hyState); } catch(e) { console.warn('Hybrid program state not saved:', e); }
   try { gymDaysAll(); } catch(e) {}
   if(sync && isLoggedIn()) cloudPost('/workout', { program: workoutState.program, state: workoutCloudState() });
+  try { wtSoon(); } catch(e) {}
 }
 // The account copy replaces the local one only when it is strictly newer.
 function hyAdoptCloud(remote) {
@@ -12325,6 +12331,7 @@ function hyEnsureSession() {
   };
   if(c.workout && c.workout.games) for(let i = 0; i < c.workout.games; i++) sess.games.push({ done: false, duration: '', rpe: null, result: '', notes: '' });
   hyState.sessions[c.sid] = sess;
+  try { wtStartWatch('h:' + c.sid); } catch(e) {}
   return sess;
 }
 // Impact work (sprints, jumps, bounds, cutting) is locked while return-to-impact is restricted,
@@ -12484,6 +12491,7 @@ function hyRender() {
   if(!root) return;
   if(hyView.dayIdx < 0 || hyView.dayIdx > 6) hyView.dayIdx = hyDow(new Date());
   root.innerHTML = hyView.open && hyCtx() ? hySessionHTML() : hyWeekHTML();
+  try { wtSoon(); } catch(e) {}
 }
 function hyStatusChip(workout, sess, future, past) {
   if(sess && sess.status === 'completed') return `<span class="hy-chip done">✓ Completed</span>`;
@@ -13216,14 +13224,15 @@ function hyPending(workout, sess) {
   if(workout.games) n += workout.games - hyGamesProgress(workout, sess).done;
   return n;
 }
-function hyFinish() {
+function hyFinish(opts) {
   const c = hyGuard(); if(!c) return;
   const w = c.workout;
   if(!c.sess && w.category !== 'sport') { showToast('Nothing logged yet'); return; }
   const sess = hyEnsureSession();
   const pending = hyPending(w, sess);
   // Finishing never ticks anything off: unfinished items stay unfinished.
-  if(pending > 0 && !confirm(`${pending} item${pending > 1 ? 's are' : ' is'} not done. Finish anyway? ${pending > 1 ? 'They stay' : 'It stays'} marked as not done.`)) return;
+  // Finishing from the Apple Watch: the watch already asked.
+  if(pending > 0 && !(opts && opts.force) && !confirm(`${pending} item${pending > 1 ? 's are' : ' is'} not done. Finish anyway? ${pending > 1 ? 'They stay' : 'It stays'} marked as not done.`)) return;
   const first = sess.status !== 'completed';
   if(first) sess.restricted = hyImpactBlocked(sess);
   sess.status = 'completed';
@@ -15056,7 +15065,8 @@ async function lnSchedule(n) {
 function lnRestSync() { if(lnAvailable()) lnQueued(lnRestSyncNow); }
 async function lnRestSyncNow() {
   try {
-    if(!restTimer.endsAt) { await lnCall('cancel', { notifications: [{ id: LN_REST_ID }] }); return; }
+    // No alert while the Apple Watch is recording the workout: it buzzes on the wrist instead.
+    if(!restTimer.endsAt || wtQuiet()) { await lnCall('cancel', { notifications: [{ id: LN_REST_ID }] }); return; }
     const endsAt = restTimer.endsAt;
     if(await lnPermission(true) !== 'granted' || restTimer.endsAt !== endsAt) return;
     const label = restPushLabel();
@@ -15108,6 +15118,398 @@ async function lnSendTest() {
     await lnSchedule({ id: LN_TEST_ID, title: 'Trident Fitness', body: 'Phone alerts are working ✅', schedule: { at: new Date(Date.now() + 5000), allowWhileIdle: true }, foreground: true });
     showToast('Test alert in 5 seconds — try locking your phone');
   } catch(e) { showToast("Couldn't send a test alert"); }
+}
+
+// ══════════════════════════════════════
+// APPLE WATCH (iPhone app only) — `wt*` functions.
+// The page sends the watch today's workouts, the workout in progress and the rest timer; the watch
+// sends back what was done on the wrist (a logged set, next exercise, rest +15 / skip, finish).
+// Nothing here runs on the website or when no Trident watch app is installed: the phone works as before.
+// Health data (heart rate, calories) stays on the watch and in Apple Health — it's never sent here.
+// ══════════════════════════════════════
+var WT = { info: null, rev: 0, lastSent: '', timer: null, activeId: null, finished: {}, cur: {}, applying: false, pulling: null, lastSeq: 0 };
+function wtNative() {
+  try { const c = window.Capacitor; return !!(c && typeof c.isNativePlatform === 'function' && c.isNativePlatform() && typeof c.nativePromise === 'function'); }
+  catch(e) { return false; }
+}
+function wtCall(method, options) { return window.Capacitor.nativePromise('Watch', method, options || {}); }
+// A Trident watch app is installed on a paired watch.
+function wtOn() { return typeof WT !== "undefined" && !!(WT && WT.info && WT.info.paired && WT.info.installed); }
+// The watch is recording a workout, so it buzzes when rest is over: the phone stays quiet.
+function wtQuiet() { return wtOn() && !!WT.info.running; }
+async function wtRefreshInfo() {
+  if(!wtNative()) return null;
+  try { WT.info = await wtCall('info'); } catch(e) { WT.info = null; }
+  return WT.info;
+}
+function wtSoon() {
+  if(typeof WT === 'undefined' || !WT || !wtOn()) return;
+  clearTimeout(WT.timer);
+  WT.timer = setTimeout(wtPush, 300);
+}
+function wtPush() {
+  if(!wtOn()) return;
+  let state;
+  try { state = wtSnapshot(); } catch(e) { console.warn('Watch update skipped:', e); return; }
+  const json = JSON.stringify(state);
+  if(json === WT.lastSent) return;
+  WT.lastSent = json;
+  state.rev = ++WT.rev;
+  wtCall('send', { state: JSON.stringify(state) }).catch(() => {});
+}
+
+// ── What the watch shows ──
+function wtSnapshot() {
+  const today = [];
+  let active = null;
+  if(hyActive()) {
+    const d = hyDow(new Date());
+    const sids = hyDaySlots(d).map(sl => hySid(d, sl.key));
+    if(hyView.early && !sids.includes(hyView.early)) sids.push(hyView.early);
+    sids.forEach(sid => {
+      const sess = hyState.sessions[sid];
+      if(sess && (sess.status === 'completed' || sess.status === 'skipped' || sess.restDay)) return;
+      const w = wtHyWorkout(sid);
+      if(w) today.push(w);
+    });
+    // An open session that has been started also counts as the workout in progress.
+    if(!WT.activeId) { const c = hyCtx(); if(c && c.sess && c.sess.status === 'in_progress') WT.activeId = 'h:' + c.sid; }
+  } else if(selectedProgram) {
+    const w = wtClassicWorkout(getLogKey());
+    if(w && !w.finished) today.push(w);
+  }
+  if(WT.activeId) active = WT.activeId.startsWith('h:') ? wtHyWorkout(WT.activeId.slice(2)) : wtClassicWorkout(WT.activeId.slice(2));
+  return { v: 1, today, active, rest: wtRestState() };
+}
+function wtRestState() {
+  const overlay = document.getElementById('restOverlay');
+  if(!overlay || !overlay.classList.contains('show')) return null;
+  if(!restTimer.endsAt && !restTimer.paused) return null;
+  return { endsAt: restTimer.endsAt || 0, duration: restTimer.duration || 60, remaining: restTimer.remaining || 0,
+    paused: !!restTimer.paused, label: restPushLabel() };
+}
+function wtField(f) { return f ? { label: f.label, unit: String(f.unit || '').trim(), step: parseFloat(f.step) || 1 } : null; }
+
+// Regular programs: one program day (its log key).
+function wtClassicParse(logKey) {
+  const m = /^(.*)_w(\d+)_d(\d+)$/.exec(String(logKey || ''));
+  if(!m) return null;
+  const prog = getProgram(m[1]);
+  const dayIdx = Number(m[3]);
+  const day = prog && prog.days[dayIdx];
+  if(!day || !day.exercises || !day.exercises.length || day.type === 'recovery' || day.name === 'Recovery' || day.name === 'Rest') return null;
+  return { prog, dayIdx, day, exercises: getDayExercises(prog, dayIdx) };
+}
+function wtClassicWorkout(logKey) {
+  const p = wtClassicParse(logKey);
+  if(!p) return null;
+  const visible = logKey === getLogKey();
+  const items = p.exercises.map((ex, ei) => {
+    const log = (workoutState.logs[logKey] && workoutState.logs[logKey][ei]) || [];
+    const bw = isBodyweight(ex.name);
+    const total = log.length > 0 ? log.length : (Number(ex.sets) || 1);
+    const sets = log.map(s => ({ w: String((s && s.weight) || ''), r: String((s && s.reps) || ''), done: !!(s && (bw ? s.reps : (s.weight || s.reps))) }));
+    const done = sets.filter(s => s.done).length;
+    const tw = !bw && visible ? getSuggestedWeight(ei) : null;
+    return { key: String(ei), name: ex.name, check: false, f1: bw ? null : wtField({ label: 'Weight (lbs)', unit: '', step: '2.5' }),
+      f2: wtField({ label: 'Reps', unit: '', step: '1' }), req: true, rest: (hyRest ? hyRest.duration : restTimer.duration) || 60,
+      target: `${ex.sets} × ${ex.reps}`, tw: tw || null, total, sets, status: done >= total ? 'done' : '' };
+  });
+  const cur = visible ? activeExerciseIdx : (WT.cur['c:' + logKey] || 0);
+  return { id: 'c:' + logKey, title: p.day.name, sub: `${p.prog.name} · ${items.length} exercises`, activity: 'strength',
+    cur: Math.max(0, Math.min(cur, items.length - 1)), items, finished: !!WT.finished['c:' + logKey] };
+}
+
+// LANTIK Hybrid: one session (its sid, e.g. 2026-11-11_gym).
+function wtHyCtxFor(sid) {
+  sid = String(sid || '');
+  const iso = sid.slice(0, 10), key = sid.slice(11);
+  let dayIdx = -1;
+  for(let d = 0; d < 7; d++) if(hyISO(hyDayDate(d)) === iso) dayIdx = d;
+  if(dayIdx < 0) return null;
+  const slot = hyDaySlots(dayIdx).find(sl => sl.key === key);
+  if(!slot) return null;
+  const sess = hyState.sessions[sid] || null;
+  const workoutId = sess ? sess.workoutId : hySlotWorkoutId(dayIdx, slot);
+  const workout = workoutId ? hyWorkout(workoutId) : null;
+  if(!workout || !hyConfigured(workoutId)) return null;
+  return { dayIdx, slot, sid, sess, workoutId, workout };
+}
+function wtHyActivity(w) {
+  if(w.category === 'strength') return 'strength';
+  if(w.category === 'field' || w.category === 'competition') return 'football';
+  if(w.category === 'sport') return /muay|box|kick|mma|martial/i.test(w.name) ? 'martial' : 'cardio';
+  if(w.category === 'recovery') return 'recovery';
+  return 'functional';
+}
+function wtHyWorkout(sid) {
+  const c = wtHyCtxFor(sid);
+  if(!c) return null;
+  const w = c.workout, sess = c.sess;
+  const items = [];
+  (w.sections || []).forEach(section => section.items.forEach(ex => {
+    const key = section.key + '.' + ex.id;
+    const info = hyExStatus(w, section, ex, sess);
+    const f = hyFields(ex);
+    const st = sess && sess.ex[key];
+    const check = (!f.f1 && !f.f2) || (!!section.checkable && !f.f1);
+    let tw = null;
+    if(f.f1 === HY_F.lbs) {
+      const last = hyHistory(ex.id, section.key, sid)[0];
+      const n = last && parseFloat((last.sets[0] || {}).w);
+      if(n > 0) tw = n;
+    }
+    items.push({ key, name: info.rx.alt || hyExName(w.id, key, ex), check, f1: wtField(f.f1), f2: wtField(f.f2), req: !!f.required,
+      rest: Number(ex.rest) || 0, target: hyRxText(ex, info.rx.sets) || '', tw, total: Math.max(1, info.rx.sets || 1),
+      sets: ((st && st.sets) || []).map(x => ({ w: String((x && x.w) || ''), r: String((x && x.r) || ''), done: !!(x && x.done) })),
+      status: info.status, section: section.title || section.key });
+  }));
+  for(let i = 0; i < (w.games || 0); i++) {
+    const g = sess && sess.games[i];
+    items.push({ key: 'game.' + i, name: `Game ${i + 1}`, check: true, f1: null, f2: null, req: false, rest: 0, target: 'Tap when the game is done',
+      tw: null, total: 1, sets: [], status: g && g.done ? 'done' : '', section: 'GAMES' });
+  }
+  const id = 'h:' + sid;
+  let cur = WT.cur[id];
+  const ctx = hyCtx();
+  if(ctx && ctx.sid === sid && hyView.exOpen) { const i = items.findIndex(it => it.key === hyView.exOpen); if(i >= 0) cur = i; }
+  if(cur == null) { cur = items.findIndex(it => !['done', 'skipped', 'omitted'].includes(it.status)); if(cur < 0) cur = 0; }
+  return { id, title: w.short || w.name, sub: `${w.tag || 'LANTIK Hybrid'} · ${items.length} items`, activity: wtHyActivity(w),
+    cur: Math.max(0, Math.min(cur, Math.max(0, items.length - 1))), items, finished: !!(sess && sess.status === 'completed') };
+}
+// Points the LANTIK screen at a session, so the normal hy* functions work on it.
+function wtHyFocus(sid) {
+  const c = wtHyCtxFor(sid);
+  if(!c) return null;
+  const changed = hyView.dayIdx !== c.dayIdx || hyView.open !== c.slot.key;
+  hyView.dayIdx = c.dayIdx;
+  hyView.open = c.slot.key;
+  if(c.dayIdx > hyDow(new Date()) && !c.sess) hyView.early = sid;
+  if(changed) hyView.exOpen = null;
+  return hyCtx();
+}
+
+// ── Starting the workout on the watch ──
+function wtActivityFor(id) {
+  if(String(id).startsWith('h:')) { const c = wtHyCtxFor(id.slice(2)); return c ? wtHyActivity(c.workout) : 'strength'; }
+  return 'strength';
+}
+// Called when a workout starts on the phone: the watch opens it and starts recording.
+function wtStartWatch(id) {
+  if(typeof WT === 'undefined' || !WT || WT.applying || !id) return;
+  WT.activeId = id;
+  delete WT.finished[id];
+  wtSoon();
+  if(!wtOn()) return;
+  (async () => {
+    await wtRefreshInfo();
+    if(!wtOn() || WT.info.running) { wtSoon(); return; }
+    try {
+      const r = await wtCall('start', { activity: wtActivityFor(id) });
+      if(r && r.ok === false) console.warn('Watch workout not started:', r.error);
+    } catch(e) { console.warn('Watch workout not started:', e); }
+    wtPush();
+  })();
+}
+// A regular-program workout was finished on the phone.
+function wtClassicFinished(logKey) {
+  const id = 'c:' + logKey;
+  if(WT.activeId === id || !WT.activeId) { WT.activeId = id; WT.finished[id] = true; }
+  wtSoon();
+}
+
+// ── Applying what was done on the watch ──
+async function wtPull() {
+  if(!wtNative() || WT.pulling) return WT.pulling;
+  WT.pulling = (async () => {
+    try {
+      await wtRefreshInfo();
+      if(!WT.info) return;
+      const r = await wtCall('pending');
+      const list = JSON.parse((r && r.actions) || '[]');
+      let last = 0;
+      list.forEach(a => {
+        if(!a || !(a.seq > 0)) return;
+        last = Math.max(last, a.seq);
+        try { wtApply(a); } catch(e) { console.warn('Watch action skipped:', a && a.t, e); }
+      });
+      if(last) await wtCall('ack', { seq: last });
+      WT.lastSent = '';
+      wtPush();
+    } catch(e) { console.warn('Watch sync skipped:', e); }
+    finally { WT.pulling = null; }
+  })();
+  return WT.pulling;
+}
+function wtApply(a) {
+  const id = String(a.id || '');
+  const lantik = id.startsWith('h:');
+  if(a.t === 'log') WT.lastLog = { id, key: String(a.key), set: Number(a.set) };
+  if(a.t === 'rest') return wtApplyRest(a);
+  if(!id) return;
+  if(a.t === 'start' || !WT.activeId) WT.activeId = id;
+  WT.applying = true;
+  try {
+    if(lantik) wtApplyHy(a, id.slice(2));
+    else wtApplyClassic(a, id.slice(2));
+  } finally { WT.applying = false; }
+}
+function wtApplyClassic(a, logKey) {
+  const p = wtClassicParse(logKey);
+  if(!p) return;
+  const visible = logKey === getLogKey() && !hyActive();
+  if(a.t === 'start') {
+    delete WT.finished['c:' + logKey];
+    if(visible && currentPage === 'workout' && _workoutScreen !== 'active') beginWorkout();
+    return;
+  }
+  if(a.t === 'goto') {
+    WT.cur['c:' + logKey] = a.cur || 0;
+    if(visible) { activeExerciseIdx = Math.max(0, Math.min(a.cur || 0, p.exercises.length - 1)); renderActiveWorkout(); }
+    return;
+  }
+  if(a.t === 'log') {
+    const ei = Number(a.key), s = Number(a.set);
+    const ex = p.exercises[ei];
+    if(!ex || !(s >= 0) || s > 30) return;
+    const weight = String(a.w || '').slice(0, 10), reps = String(a.r || '').slice(0, 10);
+    if(!weight && !reps) return;
+    if(!workoutState.logs[logKey]) workoutState.logs[logKey] = {};
+    if(!workoutState.logs[logKey][ei]) workoutState.logs[logKey][ei] = Array.from({ length: Number(ex.sets) || 1 }, () => ({ weight: '', reps: '' }));
+    const log = workoutState.logs[logKey][ei];
+    while(log.length <= s) log.push({ weight: '', reps: '' });
+    log[s] = { weight, reps };
+    save(WORKOUT_KEY, workoutState);
+    if(visible) { renderActiveWorkout(); updateWorkoutButtons(); }
+    return;
+  }
+  if(a.t === 'finish') {
+    if(WT.finished['c:' + logKey]) return;
+    if(visible) {
+      const overlay = document.getElementById('restOverlay');
+      if(overlay && overlay.classList.contains('show')) closeRest();
+      finishWorkout();
+    }
+    WT.finished['c:' + logKey] = true;
+  }
+}
+function wtApplyHy(a, sid) {
+  if(!hyActive()) return;
+  const c = wtHyFocus(sid);
+  if(!c) return;
+  if(a.t === 'start') {
+    hyEnsureSession();
+    hySave();
+    hyRender();
+    return;
+  }
+  if(a.t === 'goto') {
+    const w = wtHyWorkout(sid);
+    const it = w && w.items[a.cur || 0];
+    WT.cur['h:' + sid] = a.cur || 0;
+    if(it && !it.key.startsWith('game.')) hyView.exOpen = it.key;
+    hyRender();
+    return;
+  }
+  if(a.t === 'check') {
+    if(String(a.key).startsWith('game.')) {
+      const i = Number(String(a.key).slice(5));
+      const sess = hyEnsureSession();
+      if(!sess || !sess.games[i]) return;
+      sess.games[i].done = a.done !== false;
+    } else {
+      if(hyLeftOut(c, a.key)) return;
+      const st = hyExState(hyEnsureSession(), a.key);
+      st.done = a.done !== false;
+      if(st.done) st.skipped = false;
+    }
+    hySave(); hyRender();
+    return;
+  }
+  if(a.t === 'log') {
+    const found = hyFind(c.workout, a.key);
+    if(!found || hyLeftOut(c, a.key)) return;
+    const s = Number(a.set);
+    if(!(s >= 0) || s > 20) return;
+    const f = hyFields(found.ex);
+    const sess = hyEnsureSession(), st = hyExState(sess, a.key);
+    while(st.sets.length <= s) st.sets.push({ w: '', r: '', done: false });
+    const w = String(a.w || '').slice(0, 10), r = String(a.r || '').slice(0, 10);
+    const empty = !w && !r;
+    st.sets[s] = (empty && f.required) ? { w: '', r: '', done: false } : { w, r, done: true };
+    const logged = st.sets.filter(x => x && x.done).length;
+    if(logged) st.skipped = false;
+    const target = hyRx(c.workout, found.section, found.ex, sess).sets;
+    if(found.section.checkable && logged >= target) st.done = true;
+    hyView.exOpen = a.key;
+    hySave();
+    hyRender();
+    if(!(empty && f.required) && logged >= target) {
+      const pr = hyCheckPR(c.workout, a.key, sess);
+      if(pr) showToast(`New PR: ${pr.name} ${pr.weight} lbs 🏆`);
+    }
+    return;
+  }
+  if(a.t === 'finish') {
+    if(c.sess && c.sess.status === 'completed') return;
+    const overlay = document.getElementById('restOverlay');
+    if(overlay && overlay.classList.contains('show')) closeRest();
+    hyFinish({ force: true });
+  }
+}
+// The rest timer: the watch's start / +15 / pause / skip, applied to the phone's timer.
+function wtApplyRest(a) {
+  const overlay = document.getElementById('restOverlay');
+  const open = overlay && overlay.classList.contains('show');
+  if(a.op === 'start') {
+    const left = Math.round(((Number(a.endsAt) || 0) - Date.now()) / 1000);
+    if(left < 2) return; // already over (the phone was asleep)
+    if(!open) {
+      // Open the phone's timer on the set that was just logged on the watch.
+      const id = WT.activeId || '';
+      const last = wtLastLogged(id);
+      if(!last) return;
+      if(id.startsWith('h:')) {
+        if(!hyActive() || !wtHyFocus(id.slice(2))) return;
+        const found = hyFind(hyCtx().workout, last.key);
+        if(!found || !found.ex.rest) return;
+        hyLogSet(last.key, last.set);
+      } else {
+        const logKey = id.slice(2);
+        const p = wtClassicParse(logKey);
+        if(!p || logKey !== getLogKey() || hyActive()) return;
+        const ex = p.exercises[Number(last.key)];
+        if(!ex) return;
+        startRest(Number(last.key), last.set, ex.name, getSuggestedWeight(Number(last.key)) || 0);
+      }
+    }
+    if(!document.getElementById('restOverlay').classList.contains('show')) return;
+    restTimer.duration = Math.max(5, Number(a.duration) || left);
+    restTimer.remaining = left;
+    restTimer.paused = false;
+    stopRestCountdown();
+    startRestCountdown();
+    updateRestTimerDisplay();
+    return;
+  }
+  if(!open) return;
+  if(a.op === 'add') adjustRest(Number(a.secs) || 15);
+  else if(a.op === 'pause' && restTimer.endsAt) toggleRestPause();
+  else if(a.op === 'resume' && !restTimer.endsAt && restTimer.paused) toggleRestPause();
+  else if(a.op === 'skip') {
+    const w = document.getElementById('restLogWeight').value.trim(), r = document.getElementById('restLogReps').value.trim();
+    if(hyRest ? ((w || r) || !hyRest.required) : (w || r)) saveRestLog();
+    else closeRest();
+  }
+}
+// The set most recently logged on the watch (actions are applied in order, so it's the last one seen).
+function wtLastLogged(id) { return WT.lastLog && WT.lastLog.id === id ? WT.lastLog : null; }
+
+// Start listening once the page has loaded (never blocks the app from starting).
+if(wtNative()) {
+  window.addEventListener('tridentwatch', () => { wtPull(); });
+  document.addEventListener('visibilitychange', () => { if(!document.hidden) wtPull(); });
+  setTimeout(() => { wtPull(); }, 1500);
 }
 
 function pushSupported() { return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window; }
