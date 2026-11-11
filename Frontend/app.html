@@ -9055,6 +9055,7 @@ const FOCUS_CONFIG = {
   fat_loss:    { label:'Fat Loss 🔥',     deficit:-500,  proteinMult:1.0, carbPct:0.35, fatPct:0.25 },
   muscle_gain: { label:'Muscle Gain 💪',  deficit:250,   proteinMult:0.9, carbPct:0.45, fatPct:0.25 },
   recomp:      { label:'Body Recomp ⚡',  deficit:0,     proteinMult:1.0, carbPct:0.40, fatPct:0.30 },
+  maintain:    { label:'Maintain ⚖️',     deficit:0,     proteinMult:0.9, carbPct:0.40, fatPct:0.30 },   // offered at sign-up
 };
 
 function selectGoalFocus(focus) {
@@ -9117,7 +9118,7 @@ function calcTDEE() {
   const targetCal = Math.max(1200, tdee - dailyAdjustment);
 
   // Step 3: Macros
-  const cfg = FOCUS_CONFIG[focus];
+  const cfg = FOCUS_CONFIG[focus] || FOCUS_CONFIG.maintain || FOCUS_CONFIG.recomp;
   const proteinG = Math.round(wtLbs * cfg.proteinMult);
   const fatG     = Math.round((targetCal * cfg.fatPct) / 9);
   const carbG    = Math.max(0, Math.round((targetCal - proteinG * 4 - fatG * 9) / 4));
@@ -9508,7 +9509,7 @@ function renderDashboard(){
   // ── Goal Progress Card ──
   const gpEl = document.getElementById('dashGoalProgress');
   if(g.focus && g.goalWeight && g.currentWeight) {
-    const cfg = FOCUS_CONFIG[g.focus];
+    const cfg = FOCUS_CONFIG[g.focus] || FOCUS_CONFIG.maintain || FOCUS_CONFIG.recomp;   // an unknown goal never breaks Home
     const checkins = load(CHECKIN_KEY) || [];
     const r1 = n => Math.round(n * 10) / 10;
     const startWt  = Number(g.startWeight || g.currentWeight);
