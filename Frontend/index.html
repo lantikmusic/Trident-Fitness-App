@@ -924,7 +924,45 @@ const OB_STEPS = 5;
 const WORKER_URL = 'https://logmeal-proxy.tridentfitness.workers.dev';
 
 // ── Session token storage ──
-function saveToken(token) { localStorage.setItem('trident_session_token', token); }
+function saveToken(token, user) {
+  if (user && user.id) acctSwitchData(user.id);
+  localStorage.setItem('trident_session_token', token);
+}
+
+// ── Each account keeps its own data on this phone ──
+// The app keeps workouts, macros, photos and settings on the phone. When a different account logs in,
+// the previous account's data is set aside on the phone (not deleted, not uploaded) and comes back
+// when that account logs in again. Keys listed here belong to the phone, not to an account.
+const ACCT_OWNER_KEY = 'trident_data_owner_v1';
+const ACCT_STASH = 'trident_stash_v1:';
+const ACCT_DEVICE_KEYS = ['trident_session_token', ACCT_OWNER_KEY, 'trident_whats_new_seen_v1', 'trident_new_account',
+  'trident_health_asked_v1', 'trident_health_card_hidden_v1', 'trident_health_gym_v1', 'trident_ah_sleep_source_v1',
+  'trident_push_on_v1', 'trident_usda_key', 'trident_cm_aspect_v1', 'trident_macro_week_fix_v1', 'trident_macro_week_fix_v2'];
+function acctKeys(prefix) {
+  const out = [];
+  for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.startsWith(prefix)) out.push(k); }
+  return out;
+}
+function acctSwitchData(newId) {
+  try {
+    newId = String(newId || '');
+    if (!/^[A-Za-z0-9-]{1,64}$/.test(newId)) return;
+    const owner = localStorage.getItem(ACCT_OWNER_KEY) || '';
+    if (owner === newId) return;
+    const mine = acctKeys('trident_').filter(k => !k.startsWith(ACCT_STASH) && !ACCT_DEVICE_KEYS.includes(k));
+    if (!owner && mine.length) {
+      // Data saved before accounts were kept apart: it stays with whoever logs in now (as it always did)
+      localStorage.setItem(ACCT_OWNER_KEY, newId);
+      return;
+    }
+    // Set the previous account's data aside, one item at a time (so the phone's storage never fills up)
+    if (owner) mine.forEach(k => { try { localStorage.setItem(ACCT_STASH + owner + ':' + k, localStorage.getItem(k)); localStorage.removeItem(k); } catch (e) {} });
+    // Bring back this account's own data, if it was set aside earlier
+    const pre = ACCT_STASH + newId + ':';
+    acctKeys(pre).forEach(k => { try { localStorage.setItem(k.slice(pre.length), localStorage.getItem(k)); localStorage.removeItem(k); } catch (e) {} });
+    localStorage.setItem(ACCT_OWNER_KEY, newId);
+  } catch (e) { console.warn('Account data switch skipped:', e); }
+}
 function getToken() { return localStorage.getItem('trident_session_token'); }
 function clearToken() { localStorage.removeItem('trident_session_token'); }
 
@@ -1016,7 +1054,7 @@ async function handleLogin() {
       return;
     }
 
-    saveToken(data.token);
+    saveToken(data.token, data.user);
     currentUser = data.user;
     showToast('✓ Welcome back, ' + (data.user.name || data.user.email) + '!');
     setTimeout(() => redirectToApp(), 800);
@@ -1058,7 +1096,7 @@ async function handleSignup() {
       return;
     }
 
-    saveToken(data.token);
+    saveToken(data.token, data.user);
     currentUser = data.user;
     obData.name = name;
     // Brand-new account: the app skips its "What's new" pop-up (there's nothing new to them yet)
@@ -1162,7 +1200,7 @@ async function handleGoogleCredential(response) {
       return;
     }
 
-    saveToken(data.token);
+    saveToken(data.token, data.user);
     currentUser = data.user;
 
     if(data.isNewUser) {
@@ -1254,7 +1292,7 @@ async function handleReset() {
   try {
     const { ok, data } = await api('/auth/reset', 'POST', { email: resetEmail, code, password });
     if (!ok) { showToast(data.error || 'That didn\'t work. Please try again.', 3200); return; }
-    saveToken(data.token);
+    saveToken(data.token, data.user);
     currentUser = data.user;
     showToast('✓ Password updated. You\'re signed in!');
     setTimeout(() => redirectToApp(), 900);
