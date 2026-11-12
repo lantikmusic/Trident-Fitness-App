@@ -3145,6 +3145,7 @@ body.ef-on:not(.ef-edit) #restOverlay{display:none !important;}
       <button class="meal-tab active" onclick="switchMeal('breakfast')"><span class="meal-icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></span>Breakfast<div class="meal-cals" id="tab-cals-breakfast">0 kcal</div></button>
       <button class="meal-tab" onclick="switchMeal('lunch')"><span class="meal-icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M12 2a5 5 0 0 1 5 5 5 5 0 0 1-.1 1A4 4 0 1 1 13 17H7a5 5 0 0 1 0-10 5 5 0 0 1 5-5z"/></svg></span>Lunch<div class="meal-cals" id="tab-cals-lunch">0 kcal</div></button>
       <button class="meal-tab" onclick="switchMeal('dinner')"><span class="meal-icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>Dinner<div class="meal-cals" id="tab-cals-dinner">0 kcal</div></button>
+      <button class="meal-tab" onclick="switchMeal('snacks')"><span class="meal-icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 3v9h9"/></svg></span>Snacks<div class="meal-cals" id="tab-cals-snacks">0 kcal</div></button>
     </div>
     <!-- Meal panel -->
     <div class="meal-panel" id="mealPanel">
@@ -4351,7 +4352,7 @@ async function loadFromCloud() {
       // Recalculate aggregated meal totals from items so dashboard hero shows correct values
       Object.values(storedMacros).forEach(day => {
         if(!day || !day.meals) return;
-        ['breakfast','lunch','dinner'].forEach(m => {
+        MEALS.forEach(m => {
           if(!day.meals[m]) return;
           const items = day.meals[m].items || [];
           day.meals[m].protein = Math.round(items.reduce((s,it)=>s+(it.protein||0),0)*10)/10;
@@ -4466,13 +4467,13 @@ function navTo(page) {
 // MACROS DATA
 // ══════════════════════════════════════
 const DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-const MEALS=['breakfast','lunch','dinner'];
-const MEAL_LABELS={breakfast:'Breakfast',lunch:'Lunch',dinner:'Dinner'};
+const MEALS=['breakfast','lunch','dinner','snacks'];
+const MEAL_LABELS={breakfast:'Breakfast',lunch:'Lunch',dinner:'Dinner',snacks:'Snacks'};
 const CIRC=201.06;
 const getTodayIdx=()=>{const d=new Date().getDay();return d===0?6:d-1;};
 
 function emptyMeal(){return{protein:0,carbs:0,fat:0,items:[]};}
-function emptyDay(){return{meals:{breakfast:emptyMeal(),lunch:emptyMeal(),dinner:emptyMeal()},burned:0,notes:''};}
+function emptyDay(){return{meals:{breakfast:emptyMeal(),lunch:emptyMeal(),dinner:emptyMeal(),snacks:emptyMeal()},burned:0,notes:''};}
 function emptyWeek(){return DAYS.map(()=>emptyDay());}
 function calcMealCal(m){return Math.round((m.protein||0)*4+(m.carbs||0)*4+(m.fat||0)*9);}
 function dayTotals(day){
@@ -6157,7 +6158,7 @@ function addSavedMeal(id) { if(mxBusy()) return;
 // ADD FOOD SCREEN
 // ══════════════════════════════════════
 function openAddFood() { if(mxBusy()) return;
-  const labels = { breakfast:'Breakfast', lunch:'Lunch', dinner:'Dinner' };
+  const labels = MEAL_LABELS;
   const el = document.getElementById('addFoodMealLabel');
   if(el) el.textContent = 'Adding to ' + (labels[curMeal] || curMeal);
   // Reset to default state: show lib, hide search panel
@@ -7860,6 +7861,7 @@ function selectExercise(ei, event) {
   if(event && event.target.closest('button,input,select,.swap-btn,.ex-upload-btn,.rest-btn,.add-set-btn')) return;
   activeExerciseIdx = ei;
   renderActiveWorkout();
+  try { if(!hyActive() && wtClassicParse(getLogKey())) { efOpen('c:' + getLogKey()); return; } } catch(e) {}
   setTimeout(()=>{
     const card = document.getElementById(`ex-card-${ei}`);
     if(card) card.scrollIntoView({behavior:'smooth', block:'start'});
@@ -13586,7 +13588,7 @@ function hyExerciseHTML(c, section, ex) {
     </div>`;
   }
   return `<div class="hy-ex${open ? ' open' : ''}${info.status ? ' ' + info.status : ''}" id="hyex-${key.replace('.', '-')}">
-    <div class="hy-ex-head" onclick="hyToggleEx('${key}')">
+    <div class="hy-ex-head" onclick="hyExTap('${key}')">
       ${lead}
       <div class="hy-ex-title"><div class="hy-ex-name">${name}${tags}</div>${rxLine ? `<div class="hy-ex-rx">${hyEsc(rxLine)}</div>` : ''}${tools}</div>
       ${right}<span class="hy-chev">›</span>
@@ -13803,6 +13805,17 @@ function hySessionHTML() {
       ${done ? `<button class="wo-start-btn" style="margin:10px 0 8px;" onclick="hyReopen()">Continue Workout</button>` : ''}
       ${w.restDayOption && !done && !skipped ? `<button class="ghost-btn" style="margin-bottom:8px;" onclick="hyRestDay()">Record a complete rest day</button>` : ''}
       <div class="finish-workout-wrap"><button class="pink-btn finish-workout-btn" onclick="hyFinish()">${done ? 'Update Finished Session' : (w.category === 'sport' ? 'Save Practice' : w.category === 'competition' ? 'Finish Game Day' : w.category === 'recovery' ? 'Finish Recovery' : 'Finish Workout')}</button></div>`}`;
+}
+function hyExTap(key) {
+  const c = hyCtx();
+  const w = c && c.workout;
+  if(!c || c.future || (w && w.placeholder && !w.configured) || w.category === 'sport' || (c.sess && c.sess.status !== 'in_progress')) { hyToggleEx(key); return; }
+  try {
+    hyEnsureSession(); hySave();
+    efOpen('h:' + c.sid);
+    const M = efModel(), i = M ? M.items.findIndex(it => it.key === key) : -1;
+    if(i >= 0) efGoto(i);
+  } catch(e) { console.warn('Exercise screen not opened:', e); hyToggleEx(key); }
 }
 function hyToggleEx(key) { hyView.exOpen = hyView.exOpen === key ? null : key; hyRender(); }
 function hyToggleSection(key) { hyView.collapsed[key] = !hyView.collapsed[key]; hyRender(); }
@@ -16312,11 +16325,13 @@ function laSoon() {
   LA.timer = setTimeout(laPush, 400);
 }
 function laStarted(id) {
-  if(LA.started[id]) return LA.started[id];
+  if(LA.started[id] && Date.now() - LA.started[id] < 8 * 3600e3) return LA.started[id];
   let all = load(LA_KEY) || {};
+  // A start time from more than 8 hours ago (a session opened the night before) starts fresh.
+  if(all[id] && Date.now() - all[id] > 8 * 3600e3) delete all[id];
   if(!all[id]) {
     let t = Date.now();
-    try { if(id.startsWith('h:')) { const sess = hyState.sessions[id.slice(2)]; if(sess && sess.startedAt) t = sess.startedAt; } } catch(e) {}
+    try { if(id.startsWith('h:')) { const sess = hyState.sessions[id.slice(2)]; if(sess && sess.startedAt && Date.now() - sess.startedAt < 8 * 3600e3) t = sess.startedAt; } } catch(e) {}
     all = { [id]: t };                     // only the current workout is kept
     save(LA_KEY, all);
   }
