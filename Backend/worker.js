@@ -2252,7 +2252,7 @@ async function saveProfilePic(request, DB) {
 }
 
 // ── Profile cover photo (the wide banner on a Community profile) ──
-const COVER_MAX = 700000; // characters of the data URL (the app sends a 1200×400 JPEG)
+const COVER_MAX = 700000; // characters of the data URL (the app sends a 1200×675 JPEG)
 async function saveCoverPhoto(request, DB) {
   const session = await validateSession(request, DB);
   if (!session) return error('Unauthorized', 401);

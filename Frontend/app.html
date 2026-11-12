@@ -2940,7 +2940,7 @@ body.e-set-on .e-set-sb{display:block;}
 .cmp-cover+.cmp-head .cmp-top{margin-top:-44px;align-items:flex-end;position:relative;z-index:2;}
 .cmp-cover+.cmp-head .cmp-ring{background:#0D0E10;border-radius:50%;}
 .cmp-cover+.cmp-head .cmp-stats{padding-bottom:6px;}
-.cm-cover-frame{position:relative;width:100%;aspect-ratio:3/1;border-radius:16px;overflow:hidden;background:#000;touch-action:none;cursor:grab;}
+.cm-cover-frame{position:relative;width:100%;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:#000;touch-action:none;cursor:grab;}
 .cm-cover-frame img{width:100%;height:100%;object-fit:cover;display:block;user-select:none;-webkit-user-select:none;pointer-events:none;}
 .cm-cover-hint{text-align:center;font-size:13px;color:#9BA0A8;margin-top:10px;}
 .cmp-cover-remove{color:#FF453A !important;}
@@ -2966,6 +2966,13 @@ body.e-set-on .e-set-sb{display:block;}
 body.th-on .bottom-nav,body.th-on .nav-bar{visibility:hidden;}
 .ah-hyp-card{background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.07);margin:0 0 14px;}
 .ah-hyp-card svg{display:block;width:100%;height:auto;}
+.cmp-bar.over{background:linear-gradient(180deg,rgba(0,0,0,0.62),rgba(0,0,0,0.28) 60%,rgba(0,0,0,0));border-bottom-color:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;transition:background .25s;}
+.cmp-bar.over .cmp-bar-title{text-shadow:0 1px 8px rgba(0,0,0,0.6);}
+.cmp-bar.over:not(.solid){border-bottom:0 !important;box-shadow:none !important;}
+.cmp-bar.over.solid{background:linear-gradient(180deg,rgba(0,0,0,.82),rgba(0,0,0,.55));backdrop-filter:blur(20px) saturate(160%);-webkit-backdrop-filter:blur(20px) saturate(160%);border-bottom-color:rgba(255,255,255,.07);}
+.cmp-bar.over.solid .cmp-bar-title{text-shadow:none;}
+.cmp-bar.over+.cmp-cover{margin-top:calc(-6px - env(safe-area-inset-top) - 58px);height:auto;aspect-ratio:16/9;min-height:calc(env(safe-area-inset-top) + 150px);}
+.cmp-bar.over+.cmp-cover .cmp-cover-btn{top:auto;bottom:12px;}
 /* Line icons that replaced emoji */
 .wn-ic,.ah-wo-ic{color:var(--pink);font-size:0;}
 .ah-home-item i{display:flex;justify-content:center;color:var(--pink);font-style:normal;}
@@ -16114,7 +16121,8 @@ function cmProfilePageHTML() {
       ${pr.is_me ? `<button class="cmp-cover-btn" onclick="cmCoverPick()" aria-label="${coverSrc ? 'Change' : 'Add'} cover photo"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/></svg>${coverSrc ? 'Edit cover' : 'Add cover'}</button>` : ''}
     </div>`;
 
-  return bar + cover + `<div class="cmp-head">
+  setTimeout(cmBarScroll, 0);
+  return bar.replace('class="cmp-bar"', 'class="cmp-bar over"') + cover + `<div class="cmp-head">
       <div class="cmp-top">
         ${pr.is_me
           ? `<button class="cm-ring cmp-ring cmp-ring-me" onclick="openProfilePic()" aria-label="Change your profile picture">${avatar}<span class="cmp-av-plus" aria-hidden="true">+</span></button>`
@@ -16138,8 +16146,14 @@ function cmProfilePageHTML() {
     ${postsHTML}`;
 }
 
+// Profile top bar over the cover photo: a soft fade at the top, solid again once you scroll past the cover
+function cmBarScroll() {
+  const b = document.querySelector('#page-community .cmp-bar.over');
+  if(b) b.classList.toggle('solid', (window.scrollY || document.documentElement.scrollTop || 0) > 110);
+}
+window.addEventListener('scroll', () => { try { cmBarScroll(); } catch(e) {} }, { passive: true });
 // ══════════════════════════════════════
-// COVER PHOTO — the wide banner on your Community profile (1200×400 JPEG on the server)
+// COVER PHOTO — the banner on your Community profile (1200×675 JPEG on the server)
 // ══════════════════════════════════════
 const CM_COVER = { src: '', img: null, px: 0.5, py: 0.5 };
 function cmCoverPick() {
@@ -16199,13 +16213,14 @@ function cmCoverPaint() {
   const im = document.getElementById('cmCoverImg');
   if(im) im.style.objectPosition = `${(CM_COVER.px * 100).toFixed(1)}% ${(CM_COVER.py * 100).toFixed(1)}%`;
 }
-// Crops exactly what the frame shows (object-fit: cover with the same position) to a 3:1 JPEG
+// Crops exactly what the frame shows (object-fit: cover with the same position) to a 16:9 JPEG
 function cmCoverCrop() {
   const img = CM_COVER.img, w = img.naturalWidth, h = img.naturalHeight;
+  const R = 16 / 9;   // same shape as the banner on the profile
   let cw, ch;
-  if(w / h > 3) { ch = h; cw = h * 3; } else { cw = w; ch = w / 3; }
+  if(w / h > R) { ch = h; cw = h * R; } else { cw = w; ch = w / R; }
   const sx = (w - cw) * CM_COVER.px, sy = (h - ch) * CM_COVER.py;
-  const outW = Math.round(Math.min(1200, cw)), outH = Math.round(outW / 3);
+  const outW = Math.round(Math.min(1200, cw)), outH = Math.round(outW / R);
   const c = document.createElement('canvas'); c.width = outW; c.height = outH;
   c.getContext('2d').drawImage(img, sx, sy, cw, ch, 0, 0, outW, outH);
   let q = 0.82, out = c.toDataURL('image/jpeg', q);
