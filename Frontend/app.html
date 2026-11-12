@@ -15421,18 +15421,19 @@ function laState() {
   const done = items.filter(finishedItem).length;
   let next = '';
   for(let k = 1; k < items.length; k++) { const x = items[(cur + k) % items.length]; if(!finishedItem(x)) { next = x.name; break; } }
-  let detail = '';
+  let detail = '', setsDone = 0, setsTotal = 0;
   if(a.finished) detail = `${done}/${items.length} exercises done`;
   else if(it.check) detail = it.target || '';
   else {
-    const logged = (it.sets || []).filter(x => x.done).length, total = Math.max(1, it.total || 1);
-    detail = [logged >= total ? `${logged}/${total} sets done` : `Set ${logged + 1} of ${total}`, it.target, it.tw ? `${it.tw} lb` : ''].filter(Boolean).join(' · ');
+    setsDone = (it.sets || []).filter(x => x.done).length;
+    setsTotal = Math.max(1, it.total || 1, setsDone);
+    detail = [it.target, it.tw ? `${it.tw} lb` : ''].filter(Boolean).join(' · ');   // sets show as "SET 2/3" on the card
   }
   const r = snap.rest;
   return {
     id: a.id, title: String(a.title || 'Workout').slice(0, 60), started: laStarted(a.id),
     exercise: String(it.name || '').slice(0, 80), detail: detail.slice(0, 100), next: String(next).slice(0, 80),
-    done, total: items.length,
+    setsDone, setsTotal, done, total: items.length,
     restEnd: r && !r.paused ? (r.endsAt || 0) : 0, restLeft: r ? Math.max(0, Math.round(r.paused ? r.remaining : (r.endsAt - Date.now()) / 1000)) : 0,
     restTotal: r ? (r.duration || 60) : 0, restPaused: !!(r && r.paused),
     finished: !!a.finished, accent: snap.accent || '#32FCFD'
