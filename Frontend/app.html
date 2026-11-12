@@ -304,6 +304,7 @@ body:not([data-page="dashboard"]) .settings-btn{display:none;}
 .wo-start-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:16px;border-radius:var(--radius-xl);border:none;background:var(--pink);font-family:inherit;font-size:16px;font-weight:700;color:#000;cursor:pointer;box-shadow:0 4px 24px var(--pink-glow);transition:filter .15s,transform .1s;}
 .wo-start-btn:hover{filter:brightness(1.08);}
 .wo-start-btn:active{transform:scale(.99);}
+.hy-slot-btn{margin-top:12px;padding:13px;font-size:15px;}
 .wo-change-prog-btn{display:block;width:100%;margin-top:10px;padding:12px;border-radius:var(--radius-lg);border:0.5px solid var(--border2);background:transparent;font-family:inherit;font-size:13px;font-weight:500;color:var(--text3);cursor:pointer;text-align:center;transition:all .15s;}
 .wo-change-prog-btn:hover{border-color:var(--pink);color:var(--pink);}
 
@@ -7135,6 +7136,7 @@ function renderWorkoutPreview() {
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
         ${alreadyStarted ? 'Continue Workout' : 'Start Workout'}
       </button>
+      ${alreadyStarted ? `<button class="wo-change-prog-btn" onclick="restartWorkoutDay()">Restart this workout</button>` : ''}
       <button class="wo-change-prog-btn" onclick="showAllDays()">Do a different day →</button>
     </div>
     `}
@@ -7142,6 +7144,21 @@ function renderWorkoutPreview() {
     <!-- Change program link -->
     <button class="wo-change-prog-btn" onclick="changeProgram()">Change program</button>
   `;
+}
+
+// Clears every set logged on the current day so it starts fresh (PR records already set are kept).
+function restartWorkoutDay() {
+  const prog = getProgram(selectedProgram), day = prog && prog.days[workoutDayIdx];
+  if(!day) return;
+  if(!confirm(`Restart ${day.name}? Every set logged for it this week is cleared.`)) return;
+  const key = getLogKey();
+  delete workoutState.logs[key];
+  try { const all = wtStatsAll(); if(all['c:' + key]) { delete all['c:' + key]; save(WT_STATS_KEY, all); } } catch(e) {}
+  save(WORKOUT_KEY, workoutState);
+  if(isLoggedIn()) cloudPost('/workout', { program: workoutState.program, state: workoutCloudState() });
+  setTimeout(() => { try { cmWoSync(true); } catch(e) {} }, 1500);
+  renderWorkoutPreview();
+  showToast('Workout restarted');
 }
 
 function beginWorkout() {
@@ -12563,6 +12580,7 @@ function hyWeekHTML() {
       ${why ? `<div class="hy-slot-meta" style="color:var(--text2);">${hyEsc(why)}</div>` : ''}
       ${slot.gym && workout.body === 'lower' && dayIdx === 4 && !(sess && sess.status !== 'in_progress') ? `<div class="hy-warn-line">Lower-body lift close to Sunday's games — keep it light, or move it.</div>` : ''}
       ${prog2 && sess.status === 'in_progress' ? `<div class="hy-bar"><div style="width:${prog2.pct}%"></div></div>` : ''}
+      ${hySlotBtnHTML(slot.key, sess, dayIdx > today)}
     </div>`;
   }).join('');
   // The four lifts of this week, one per gym day, with what happened to each.
@@ -12615,6 +12633,50 @@ function hyOpen(slotKey) {
   if(top && top.scrollIntoView) top.scrollIntoView({ block: 'start' });
 }
 function hyBack() { hyView.open = null; hyView.exOpen = null; hyRender(); }
+// Anything entered in a session yet (sets, ticks, skips, games, practice details, notes)?
+function hyHasData(sess) {
+  if(!sess) return false;
+  if(sess.restDay || (sess.notes || '').trim() || sess.rpe || sess.duration || sess.intensity || (sess.types || []).length) return true;
+  if((sess.games || []).some(g => g && g.done)) return true;
+  return Object.keys(sess.ex || {}).some(k => {
+    const st = sess.ex[k];
+    return st && (st.done || st.skipped || (st.sets || []).some(x => x && (x.done || x.w || x.r)));
+  });
+}
+// The big button on a day's workout card: Start (nothing entered yet) or Continue (started, not finished).
+function hySlotBtnHTML(slotKey, sess, future) {
+  if(future || (sess && (sess.status === 'completed' || sess.status === 'skipped'))) return '';
+  const label = hyHasData(sess) ? 'Continue Workout' : 'Start Workout';
+  return `<button class="wo-start-btn hy-slot-btn" onclick="event.stopPropagation();hyOpen('${slotKey}')">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>${label}</button>`;
+}
+// A finished session back to in progress, with everything you logged kept.
+function hyReopen() {
+  const c = hyCtx(); if(!c || !c.sess || c.sess.status !== 'completed') return;
+  const sess = c.sess;
+  sess.status = 'in_progress'; sess.finishedAt = 0; sess.restDay = false;
+  // sess.advanced stays, so finishing again doesn't move the rotation a second time.
+  hySave(true); hyRender();
+  try { wtStartWatch('h:' + sess.id); } catch(e) {}
+  showToast('Workout reopened — keep logging');
+}
+// Wipe this session and start it from scratch (PR records already set are kept).
+function hyRestart() {
+  const c = hyCtx(); if(!c || !c.sess) return;
+  if(!confirm(`Restart ${c.workout.short || c.workout.name}? Everything logged in this session is cleared and it starts fresh.`)) return;
+  const sess = c.sess;
+  // Step the rotation back if this session moved it and nothing has moved it since (as Undo skip does).
+  if(sess.advanced && HY_ROTATION[(HY_ROTATION.indexOf(sess.workoutId) + 1) % HY_ROTATION.length] === HY_ROTATION[hyState.rotationIdx]) {
+    hyState.rotationIdx = HY_ROTATION.indexOf(sess.workoutId);
+    hyRotationNote('restarted', sess.workoutId, sess.id);
+  }
+  delete hyState.sessions[c.sid];
+  try { const all = wtStatsAll(); if(all['h:' + c.sid]) { delete all['h:' + c.sid]; save(WT_STATS_KEY, all); } } catch(e) {}
+  hyView.exOpen = null;
+  hySave(true); hyRender();
+  setTimeout(() => { try { cmWoSync(true); } catch(e) {} }, 1500);
+  showToast('Workout restarted');
+}
 
 // ── Screen: one session ──────────────────────────────────────────────────────
 function hyRpeHTML(value, handler) {
@@ -12832,7 +12894,9 @@ function hySessionHTML() {
         ${w.recoveryOnlyOption && !done ? `<button onclick="hyToggleRecoveryOnly()">${sess && sess.recoveryOnly ? 'Back to the full session' : 'Make it recovery-only'}</button>` : ''}
         ${w.placeholder ? `<button onclick="hyEditor('${w.id}')">Edit exercises</button>` : ''}
         ${!done && !skipped ? `<button onclick="hySkipSheet()">Skip…</button>` : ''}
+        ${sess && !skipped ? `<button onclick="hyRestart()">Restart workout</button>` : ''}
       </div>
+      ${done ? `<button class="wo-start-btn" style="margin:10px 0 8px;" onclick="hyReopen()">Continue Workout</button>` : ''}
       ${w.restDayOption && !done && !skipped ? `<button class="ghost-btn" style="margin-bottom:8px;" onclick="hyRestDay()">Record a complete rest day</button>` : ''}
       <div class="finish-workout-wrap"><button class="pink-btn finish-workout-btn" onclick="hyFinish()">${done ? 'Update Finished Session' : (w.category === 'sport' ? 'Save Practice' : w.category === 'competition' ? 'Finish Game Day' : w.category === 'recovery' ? 'Finish Recovery' : 'Finish Workout')}</button></div>`}`;
 }
@@ -13508,7 +13572,7 @@ function hyDashNextSlot(dayIdx) {
 function hyDashStartHTML(dayIdx) {
   try {
     const next = hyDashNextSlot(dayIdx);
-    if(next.slot) return dashStartBtnHTML(hyEsc((next.sess ? 'Continue ' : 'Start ') + (next.w.short || next.w.name)));
+    if(next.slot) return dashStartBtnHTML(hyEsc((hyHasData(next.sess) ? 'Continue ' : 'Start ') + (next.w.short || next.w.name)));
     if(next.any) return `<button class="dwc-start done" onclick="event.stopPropagation();dashStartWorkout()">✓ Done for today</button>`;
   } catch(e) { console.warn('Start button skipped:', e); }
   return '';
