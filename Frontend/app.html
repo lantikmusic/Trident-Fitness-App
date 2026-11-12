@@ -16,6 +16,8 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="shortcut icon" href="icons/apple-touch-icon.png">
 <link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script>
   // TEMPORARY startup diagnostics: shows the error on screen only when the app fails to start.
   window.__tfDiag = function(msg) {
@@ -967,7 +969,7 @@ body:not([data-page="dashboard"]) .settings-btn{display:none;}
 .wtst-wait{font-size:13px;color:var(--text2);}
 .wtst-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
 .wtst-tiles div{background:var(--bg3);border-radius:var(--radius);padding:8px 4px;text-align:center;min-width:0;}
-.wtst-tiles i{display:block;font-style:normal;font-size:14px;line-height:1;margin-bottom:4px;}
+.wtst-tiles i{display:flex;justify-content:center;font-style:normal;line-height:1;margin-bottom:5px;color:var(--pink);}
 .wtst-tiles b{display:block;font-size:18px;font-weight:800;letter-spacing:-.02em;color:var(--text);}
 .wtst-tiles span{display:block;font-size:10px;color:var(--text3);margin-top:2px;}
 .wtst-chart{margin-top:10px;}
@@ -2393,6 +2395,89 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
 .cm-mbtn{margin-left:auto;flex-shrink:0;width:34px;height:34px;border-radius:50%;border:none;background:rgba(0,0,0,.3);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
 .cm-mbtn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
 #page-community.cm-prof-mode .cm-mfollow{display:none;}
+
+/* ════════════════════════════════════════════════════════════
+   TRIDENT DESIGN "E" (Nov 2026): sleek and professional.
+   One clean font (Plus Jakarta Sans), charcoal background, quiet glass cards,
+   pill buttons, the accent colour only where it means something, and no glow
+   except on "live" things (rest ring, recording dot). Everything works as before.
+════════════════════════════════════════════════════════════ */
+:root{
+  --bg:#0D0E10; --bg2:#111215; --bg3:#17181B; --bg4:#202226; --bg5:#2A2C31;
+  --border:rgba(255,255,255,0.08); --border2:rgba(255,255,255,0.13);
+  --text2:rgba(255,255,255,0.62); --text3:rgba(255,255,255,0.42);
+  --pink-glow:rgba(50,252,253,0.0);
+  --radius:14px; --radius-lg:22px; --radius-xl:28px;
+  --tf-font:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif;
+}
+body{font-family:var(--tf-font);background:var(--bg);letter-spacing:-0.005em;}
+button,input,select,textarea{font-family:inherit;}
+/* Titles: bold, tight, sentence case */
+.page-title{font-size:32px;font-weight:800;letter-spacing:-0.03em;}
+.section-title{font-size:20px;font-weight:800;letter-spacing:-0.02em;}
+.eyebrow,.dwc-eyebrow,.wo-preview-prog-eyebrow,.wo-preview-day-eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;}
+.panel-title{font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--text3);}
+/* Cards: quiet glass, no glow blobs */
+.panel,.card,.dash-stat,.stat-card,.hy-card,.wo-preview-program-card,.balance-hero{background:rgba(255,255,255,0.045);border:0.5px solid var(--border);border-radius:var(--radius-lg);}
+.wo-preview-program-card::after,.balance-hero::after{display:none;}
+.hy-slot,.wo-preview-day-card,.dash-workout-card{border-color:var(--border);}
+/* Buttons: pills, no glow */
+.pink-btn,.wo-start-btn,.dwc-start,.ob-next{border-radius:999px;font-weight:700;box-shadow:none;letter-spacing:-0.005em;}
+.pink-btn{padding:15px;}
+.ghost-btn{border-radius:999px;border-color:var(--border2);color:var(--text);background:rgba(255,255,255,0.04);font-weight:600;}
+.ghost-btn:hover{border-color:var(--border2);color:var(--text);background:rgba(255,255,255,0.08);}
+.finish-workout-btn{box-shadow:none;}
+.finish-workout-btn.glow{box-shadow:0 0 0 3px var(--pink-dim) !important;}
+.toast{border-radius:999px;font-weight:700;}
+/* Tab bar: glass pill, active tab in your colour (no glow) */
+.bottom-nav{background:rgba(36,38,42,0.6);box-shadow:0 12px 32px rgba(0,0,0,0.45),inset 0 1px 0 rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.13);}
+.nav-pill{background:rgba(255,255,255,0.1);box-shadow:none;}
+.nav-label{font-weight:600;color:rgba(255,255,255,0.62);}
+.nav-icon svg{stroke:rgba(255,255,255,0.62);}
+.nav-item.active .nav-icon svg{filter:none;}
+/* Home: logo + upright wordmark on the left, profile picture with a thin ring */
+.home-bar{display:flex;align-items:center;justify-content:flex-start;gap:10px;height:44px;margin:0 0 18px;}
+.home-logo{width:30px;height:30px;object-fit:contain;flex-shrink:0;}
+.home-wordmark{text-align:left;font-size:16px;font-weight:800;font-style:normal;letter-spacing:.16em;}
+.home-wordmark span{margin-left:.45em;}
+@media(max-width:374px){.home-wordmark{font-size:15px;}}
+.home-hello-time{font-size:16px;font-weight:600;color:var(--text3);letter-spacing:0;}
+.home-hello-name{font-size:32px;font-weight:800;letter-spacing:-0.03em;}
+.home-av-btn{padding:2.5px;background:conic-gradient(var(--pink) 0 25%,rgba(255,255,255,0.12) 25% 100%);}
+.home-av{width:72px;height:72px;border-width:3px;}
+/* Home: today's workout as a hero card (the Trident mark sits large and faint behind it) */
+.dash-workout-card{border-radius:var(--radius-xl);padding:20px;background:
+  radial-gradient(140% 90% at 100% 0%,rgba(255,255,255,0.06),transparent 55%),rgba(255,255,255,0.045);}
+.dash-workout-card::before{content:'';position:absolute;right:-28px;top:-18px;width:190px;height:190px;background:url('Icons/trident-mark.png') center/contain no-repeat;opacity:.05;pointer-events:none;}
+.dwc-title{font-size:24px;font-weight:800;letter-spacing:-0.025em;line-height:1.15;margin-bottom:6px;}
+.dwc-sub{font-size:14px;color:var(--text2);}
+.dwc-ex{font-size:14px;color:var(--text2);}
+.dwc-ex::before{opacity:1;width:4px;height:4px;}
+.dwc-start{padding:15px;margin-top:16px;box-shadow:none;}
+/* Workout tab */
+.wo-preview-day-card{border-radius:var(--radius-xl);}
+.wo-preview-day-name{font-size:28px;font-weight:800;letter-spacing:-0.03em;}
+.wo-preview-prog-name{font-weight:800;letter-spacing:-0.02em;}
+.wo-start-btn{padding:16px;}
+/* Rest timer: keep the ring's glow (it's live), calm everything else */
+.rest-timer-card .rest-timer-circle svg{filter:drop-shadow(0 0 7px currentColor);}
+.rt-play{box-shadow:none;}
+.rt-set.cur{box-shadow:none;}
+.summary-title{font-weight:800;letter-spacing:-0.02em;}
+/* Cards that used a bright accent border: neutral glass now */
+.dmc,.dpr,.gyc,.goal-progress-card,.activity-panel,.hy-slot,.wtst,.cm-push-card{background:rgba(255,255,255,0.045);border-color:var(--border);border-radius:var(--radius-lg);}
+.dmc,.dpr,.gyc,.goal-progress-card{border-radius:24px;}
+.dmc-eyebrow,.gyc-eyebrow,.dpr-eyebrow{letter-spacing:.08em;font-weight:700;}
+/* More pill buttons, no glow */
+.log-weight-btn,.next-workout-btn,.af-primary,.rest-log-save,.cbc-log-weight-btn{border-radius:999px;box-shadow:none;font-weight:700;}
+/* Workout tab: the open exercise gets a quiet outline; target banner is neutral glass */
+#page-workout .exercise-card,.exercise-card{background:rgba(255,255,255,0.045);border-radius:var(--radius-lg);}
+#page-workout .exercise-card.active-ex,.exercise-card.active-ex{border-color:rgba(255,255,255,0.22);box-shadow:none;}
+.ex-target-banner{background:rgba(255,255,255,0.05);border-color:var(--border);border-radius:16px;}
+.wo-change-prog-btn{border-radius:999px;}
+/* Splash and other italic text: upright */
+.splash-name{font-style:normal;font-weight:800;letter-spacing:.14em;font-size:24px;}
+.cal-note,.food-log-empty,.wday-tab.rest,.food-search-empty{font-style:normal;}
 </style>
 <script>/* No zooming: block iOS pinch-zoom (double-tap and tap-in-a-box zoom are stopped by the viewport + touch-action) */try{['gesturestart','gesturechange','gestureend'].forEach(function(t){document.addEventListener(t,function(e){e.preventDefault();},{passive:false});});}catch(e){}</script>
 </head>
@@ -2424,7 +2509,7 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
     <!-- Step 0: Welcome -->
     <div class="ob-step active" id="ob-step-0">
       <div class="ob-eyebrow">Welcome</div>
-      <div class="ob-title">Let's set up your profile 💪</div>
+      <div class="ob-title">Let's set up your profile</div>
       <div class="ob-sub">It only takes a minute. We'll personalise your programs, calorie targets, and dashboard based on your answers.</div>
       <div style="background:var(--bg4);border-radius:var(--radius-lg);padding:16px 18px;margin-bottom:8px;">
         <div style="display:flex;flex-direction:column;gap:10px;">
@@ -2512,7 +2597,7 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
       </div>
       <div class="ob-nav">
         <button class="ob-back" onclick="obBack()">Back</button>
-        <button class="ob-next" id="ob-next-3" disabled onclick="obFinish()">Let's Go 🚀</button>
+        <button class="ob-next" id="ob-next-3" disabled onclick="obFinish()">Let's go</button>
       </div>
     </div>
 
@@ -2532,9 +2617,8 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
 <div class="page active" id="page-dashboard">
   <div class="page-header home-header">
     <div class="home-bar">
-      <span aria-hidden="true"></span>
+      <img class="home-logo" src="Icons/trident-mark.png" alt="" aria-hidden="true">
       <div class="home-wordmark" aria-label="Trident Fitness">TRIDENT<span>FITNESS</span></div>
-      <span aria-hidden="true"></span>
     </div>
     <div class="home-hello">
       <div class="home-hello-text">
@@ -2722,7 +2806,7 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           Add Food
         </button>
-        <button class="saved-meals-btn" onclick="openSavedMeals()">🍽️ Saved Meals</button>
+        <button class="saved-meals-btn" onclick="openSavedMeals()">Saved meals</button>
       </div>
     </div>
     <!-- Activity -->
@@ -3056,7 +3140,7 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
     <div id="summaryWatch"></div>
     <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">Exercise Breakdown</div>
     <div id="summaryExList"></div>
-    <button class="pink-btn" onclick="closeSummary()" style="margin-top:16px;">Done 💪</button>
+    <button class="pink-btn" onclick="closeSummary()" style="margin-top:16px;">Done</button>
     <div id="summaryProfileBtn"></div>
     <button class="ghost-btn" onclick="cmShareLastWorkout()" style="margin-top:8px;">Share to Community</button>
     <button class="ghost-btn" onclick="cmStickerLastWorkout()" style="margin-top:8px;">Share to socials</button>
@@ -3109,7 +3193,7 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
     <div class="progress-stat-row" id="progressStats"></div>
     <!-- Muscle growth -->
     <div class="panel" style="margin-bottom:12px;" id="muscleGrowthPanel">
-      <div class="mg-head"><div class="panel-title" style="margin:0;">Muscle Growth 💪</div></div>
+      <div class="mg-head"><div class="panel-title" style="margin:0;">Muscle Growth</div></div>
       <div class="mg-sub">Based on how your lifts have progressed over the last 8 weeks</div>
       <div id="muscleGrowth"></div>
     </div>
@@ -3141,7 +3225,7 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
     <!-- Progress Photos -->
     <div class="panel" style="margin-top:12px;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-        <div class="panel-title" style="margin:0;">Progress Photos 📸</div>
+        <div class="panel-title" style="margin:0;">Progress Photos</div>
         <button onclick="openProgressPhoto()" style="padding:6px 14px;border-radius:99px;border:0.5px solid var(--pink-border);background:var(--pink-dim);font-family:inherit;font-size:12px;font-weight:600;color:var(--pink);cursor:pointer;">+ Add</button>
       </div>
       <div id="progressPhotosGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"></div>
@@ -3636,14 +3720,14 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
     <div style="font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--pink);margin-bottom:8px;">Personal Record</div>
     <div id="prExName" style="font-size:22px;font-weight:700;letter-spacing:-0.02em;margin-bottom:6px;"></div>
     <div id="prWeightDisplay" style="font-size:42px;font-weight:700;letter-spacing:-0.04em;color:var(--pink);line-height:1;"></div>
-    <div style="font-size:14px;color:rgba(255,255,255,0.45);margin-top:4px;margin-bottom:20px;">new best weight 🔥</div>
+    <div style="font-size:14px;color:rgba(255,255,255,0.45);margin-top:4px;margin-bottom:20px;">New best weight</div>
     <div id="prPrevBest" style="font-size:12px;color:rgba(255,255,255,0.3);margin-bottom:20px;"></div>
     <button onclick="closePRPopup()" style="
       background:var(--pink);border:none;border-radius:99px;
       padding:12px 36px;font-family:inherit;font-size:15px;font-weight:700;
       color:#000;cursor:pointer;width:100%;
       transition:filter .15s;
-    " onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter=''">Let's go! 💪</button>
+    " onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter=''">Continue</button>
   </div>
   <!-- Confetti canvas -->
   <canvas id="prConfetti" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;"></canvas>
@@ -4987,7 +5071,7 @@ async function searchFood() {
     if(merged.length === 0) {
       el.innerHTML = `<div class="food-search-empty">
         No results found for "${query}".<br>
-        Try a different spelling or scan the barcode 📷
+        Try a different spelling or scan the barcode.
       </div>`;
       return;
     }
@@ -6902,9 +6986,9 @@ function advancePhase() {
   const current = getPhase();
   if (current < 3) {
     setPhase(current + 1);
-    showToast(`🎉 Phase ${current + 1} unlocked! New exercises and rep ranges!`, 3000);
+    showToast(`Phase ${current + 1} unlocked: new exercises and rep ranges`, 3000);
   } else {
-    showToast('🏆 You\'ve completed all 3 phases! Starting fresh.', 3000);
+    showToast('All 3 phases complete. Starting fresh.', 3000);
     setPhase(1);
   }
 }
@@ -7108,7 +7192,7 @@ function renderWorkoutPreview() {
     ${isRest ? `
     <div class="wo-preview-day-card" style="border-color:var(--border);">
       <div class="wo-preview-day-eyebrow" style="color:var(--text3);">Today</div>
-      <div class="wo-preview-day-name">Rest Day 😴</div>
+      <div class="wo-preview-day-name">Rest day</div>
       <div class="wo-preview-day-meta">Recovery is just as important as training</div>
       <div class="wo-preview-rest-card">
         <div class="wo-preview-rest-icon">🛌</div>
@@ -7595,7 +7679,7 @@ function showWorkoutSummary(day, logKey, prs, phaseAdvanced) {
   document.getElementById('summaryStats').innerHTML = [
     [Math.round(totalWeight).toLocaleString(),'lbs lifted'],
     [totalSets,'sets done'],
-    [prs.length,'PRs set 🏆'],
+    [prs.length,'PRs set'],
     [`${sessionsCompleted}/${sessionsNeeded}`,'phase progress']
   ].map(([v,l])=>`<div class="summary-stat"><div class="summary-stat-val">${v}</div><div class="summary-stat-lbl">${l}</div></div>`).join('');
 
@@ -9096,10 +9180,10 @@ let checkinData = load(CHECKIN_KEY) || [];
 
 // ── Goal Focus ──
 const FOCUS_CONFIG = {
-  fat_loss:    { label:'Fat Loss 🔥',     deficit:-500,  proteinMult:1.0, carbPct:0.35, fatPct:0.25 },
-  muscle_gain: { label:'Muscle Gain 💪',  deficit:250,   proteinMult:0.9, carbPct:0.45, fatPct:0.25 },
-  recomp:      { label:'Body Recomp ⚡',  deficit:0,     proteinMult:1.0, carbPct:0.40, fatPct:0.30 },
-  maintain:    { label:'Maintain ⚖️',     deficit:0,     proteinMult:0.9, carbPct:0.40, fatPct:0.30 },   // offered at sign-up
+  fat_loss:    { label:'Fat Loss',     deficit:-500,  proteinMult:1.0, carbPct:0.35, fatPct:0.25 },
+  muscle_gain: { label:'Muscle Gain',  deficit:250,   proteinMult:0.9, carbPct:0.45, fatPct:0.25 },
+  recomp:      { label:'Body Recomp',  deficit:0,     proteinMult:1.0, carbPct:0.40, fatPct:0.30 },
+  maintain:    { label:'Maintain',     deficit:0,     proteinMult:0.9, carbPct:0.40, fatPct:0.30 },   // offered at sign-up
 };
 
 function selectGoalFocus(focus) {
@@ -9446,7 +9530,7 @@ function renderDashPRs() {
   }).join('');
   el.innerHTML = `<div class="dpr" onclick="navTo('progress')">
     <div class="dpr-head"><div class="dpr-eyebrow">Recent PRs</div><div class="dpr-count">${list.length ? `${thisWeek} this week · ${list.length} total` : ''}</div></div>
-    ${rows || '<div class="dpr-empty">No PRs yet — hit a new best weight on a lift and it shows up here 🏆</div>'}
+    ${rows || '<div class="dpr-empty">No PRs yet — hit a new best weight on a lift and it shows up here.</div>'}
   </div>`;
 }
 
@@ -9578,7 +9662,7 @@ function renderDashboard(){
       <div class="gpc-header">
         <div>
           <div class="gpc-title">${cfg.label}</div>
-          <div class="gpc-focus">${reached ? 'Goal reached 🎉' : lbsLeft + (lbsLeft === 1 ? ' lb' : ' lbs') + ' to go'}${onTrack !== undefined ? ` · <span style="color:${onTrack?'var(--green)':'var(--red)'}">${onTrack?'On Track':'Off Track'}</span>` : ''}</div>
+          <div class="gpc-focus">${reached ? 'Goal reached' : lbsLeft + (lbsLeft === 1 ? ' lb' : ' lbs') + ' to go'}${onTrack !== undefined ? ` · <span style="color:${onTrack?'var(--green)':'var(--red)'}">${onTrack?'On Track':'Off Track'}</span>` : ''}</div>
         </div>
         <div style="font-size:22px;font-weight:700;color:var(--pink);">${pct}%</div>
       </div>
@@ -9610,7 +9694,7 @@ function renderDashboard(){
     dashWo.innerHTML=`<div class="dash-workout-card" style="border-color:var(--pink-border);">
       <div class="dwc-eyebrow" style="color:var(--pink);">Custom Workout</div>
       <div class="dwc-title">${customWo.name}</div>
-      <div class="dwc-sub">🔥 ${customWo.calories} kcal burned · ${customWo.duration} min</div>
+      <div class="dwc-sub">${customWo.calories} kcal burned · ${customWo.duration} min</div>
       <button onclick="openCustomWorkout()" style="margin-top:10px;width:100%;padding:8px;border-radius:var(--radius);border:0.5px solid var(--border2);background:transparent;font-family:inherit;font-size:12px;color:var(--text3);cursor:pointer;">Edit / Change</button>
     </div>`;
   } else if(workoutState.program && getProgram(workoutState.program) && getProgram(workoutState.program).hybrid){
@@ -10638,7 +10722,7 @@ function renderSleepCard() {
     if(pctEl) pctEl.textContent = today.hrs + 'h';
     if(el('sleepHoursDisplay')) el('sleepHoursDisplay').textContent = today.hrs + 'h';
 
-    const qualLabels = ['','Poor 😴','Fair 😐','Okay 🙂','Good 😊','Great 🌟'];
+    const qualLabels = ['','Poor','Fair','Okay','Good','Great'];
     if(el('sleepQualLabel')) el('sleepQualLabel').textContent = today.quality ? `Quality: ${qualLabels[today.quality]}` : 'Quality: Not rated';
 
     // Stars display
@@ -10866,11 +10950,11 @@ function obFinish() {
 
   // ── Show summary step ──
   const focusLabels = {
-    fat_loss:    'Fat Loss 🔥',
-    muscle_gain: 'Muscle Gain 💪',
-    recomp:      'Body Recomp ⚡',
+    fat_loss:    'Fat Loss',
+    muscle_gain: 'Muscle Gain',
+    recomp:      'Body Recomp',
   };
-  const genderLabel = obGender === 'male' ? 'Male ⚡' : 'Female 🌸';
+  const genderLabel = obGender === 'male' ? 'Male' : 'Female';
   document.getElementById('ob-summary').innerHTML = `
     <div class="ob-summary-row"><span class="ob-summary-lbl">Name</span><span class="ob-summary-val">${name || '—'}</span></div>
     <div class="ob-summary-row"><span class="ob-summary-lbl">Gender</span><span class="ob-summary-val">${genderLabel}</span></div>
@@ -11515,7 +11599,7 @@ function aiAddToMeal() {
     const name = it.portion ? `${it.name} (${it.portion})` : it.name;
     aiLogFood(name, Math.round(it.calories), aiR1(it.protein), aiR1(it.carbs), aiR1(it.fat));
   });
-  aiFinishAdd(on.length === 1 ? `✨ ${on[0].name} added!` : `✨ ${on.length} foods added!`);
+  aiFinishAdd(on.length === 1 ? `${on[0].name} added` : `${on.length} foods added`);
 }
 
 // One combined entry, e.g. "Chicken, rice & broccoli".
@@ -11528,7 +11612,7 @@ function aiAddAsOne() {
   if(name.length > 60) name = name.slice(0, 57) + '…';
   const t = on.reduce((a, it) => ({ cal: a.cal + it.calories, p: a.p + it.protein, c: a.c + it.carbs, f: a.f + it.fat }), { cal: 0, p: 0, c: 0, f: 0 });
   aiLogFood(name, Math.round(t.cal), aiR1(t.p), aiR1(t.c), aiR1(t.f));
-  aiFinishAdd(`✨ ${name} added!`);
+  aiFinishAdd(`${name} added`);
 }
 
 // ══════════════════════════════════════
@@ -15169,7 +15253,7 @@ async function lnRestSyncNow() {
     const endsAt = restTimer.endsAt;
     if(await lnPermission(true) !== 'granted' || restTimer.endsAt !== endsAt) return;
     const label = restPushLabel();
-    await lnSchedule({ id: LN_REST_ID, title: 'Rest is over 💪', body: label ? `Time for your next set of ${label}.` : 'Time for your next set.',
+    await lnSchedule({ id: LN_REST_ID, title: 'Rest is over', body: label ? `Time for your next set of ${label}.` : 'Time for your next set.',
       schedule: { at: new Date(endsAt), allowWhileIdle: true }, foreground: false });
   } catch(e) { console.warn('Rest alert not scheduled:', e); }
 }
@@ -15621,7 +15705,7 @@ function wtApplyHy(a, sid) {
     hyRender();
     if(!(empty && f.required) && logged >= target) {
       const pr = hyCheckPR(c.workout, a.key, sess);
-      if(pr) showToast(`New PR: ${pr.name} ${pr.weight} lbs 🏆`);
+      if(pr) showToast(`New PR: ${pr.name} ${pr.weight} lbs`);
     }
     return;
   }
@@ -15691,6 +15775,13 @@ if(wtNative()) {
 // When a workout recorded on the watch is saved, the watch sends its totals (calories, heart rate, time).
 // They are kept on this phone only. They go to Community or your profile only when you switch on
 // "Share watch stats" (on the summary, or for one post in the composer). Off by default.
+// Small line icons (used instead of emoji)
+const TF_IC = {
+  flame: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22a7 7 0 0 0 7-7c0-4-3-6-4-9-1 2-2 3-4 4 0-2-1-4-2-6-2 3-4 6-4 11a7 7 0 0 0 7 7z"/></svg>',
+  heart: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 5.6a5.5 5.5 0 0 0-7.8 0L12 6.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 22l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/></svg>',
+  up: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>',
+  clock: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>'
+};
 const WT_STATS_KEY = 'trident_watch_stats_v1';   // { 'c:<logKey>' | 'h:<sid>': { cal, avg, max, min, dur, end, hr:[[s,bpm]], share } }
 function wtStatsAll() { const a = load(WT_STATS_KEY); return a && typeof a === 'object' ? a : {}; }
 function wtStatsFor(id) {
@@ -15734,10 +15825,10 @@ function wtStatsHTML(id) {
   if(!s) return `<div class="wtst">${head}<div class="wtst-wait">Waiting for your watch to save the workout…</div></div>`;
   const mins = Math.round((s.dur || 0) / 60);
   const tiles = [
-    ['🔥', (s.cal || 0).toLocaleString(), 'Calories'],
-    ['❤️', s.avg ? String(s.avg) : '—', 'Avg BPM'],
-    ['⬆️', s.max ? String(s.max) : '—', 'Max BPM'],
-    ['⏱️', mins ? String(mins) : '<1', 'Minutes']
+    [TF_IC.flame, (s.cal || 0).toLocaleString(), 'Calories'],
+    [TF_IC.heart, s.avg ? String(s.avg) : '—', 'Avg BPM'],
+    [TF_IC.up, s.max ? String(s.max) : '—', 'Max BPM'],
+    [TF_IC.clock, mins ? String(mins) : '<1', 'Minutes']
   ];
   const signedIn = (() => { try { return isLoggedIn(); } catch(e) { return false; } })();
   return `<div class="wtst">${head}
@@ -15814,8 +15905,8 @@ function cmWatchHTML(payload) {
   const w = cmWatchStatsOf(payload);
   if(!w) return '';
   const parts = [];
-  if(w.cal) parts.push(`<span>🔥 <b>${w.cal.toLocaleString()}</b> cal</span>`);
-  if(w.avg) parts.push(`<span>❤️ <b>${w.avg}</b> avg bpm</span>`);
+  if(w.cal) parts.push(`<span><b>${w.cal.toLocaleString()}</b> cal</span>`);
+  if(w.avg) parts.push(`<span><b>${w.avg}</b> avg bpm</span>`);
   if(w.max) parts.push(`<span>max <b>${w.max}</b></span>`);
   if(w.min) parts.push(`<span><b>${w.min}</b> min</span>`);
   return `<div class="cm-watch"><em>⌚ Apple Watch</em>${parts.join('')}</div>`;
@@ -15823,7 +15914,7 @@ function cmWatchHTML(payload) {
 function cmOvWatchHTML(payload) {
   const w = cmWatchStatsOf(payload);
   if(!w) return '';
-  return `<div class="cm-ovc-watch">${w.cal ? `🔥 <b>${w.cal.toLocaleString()}</b> cal` : ''}${w.cal && w.avg ? ' · ' : ''}${w.avg ? `❤️ <b>${w.avg}</b> bpm` : ''}</div>`;
+  return `<div class="cm-ovc-watch">${w.cal ? `<b>${w.cal.toLocaleString()}</b> cal` : ''}${w.cal && w.avg ? ' · ' : ''}${w.avg ? `<b>${w.avg}</b> bpm` : ''}</div>`;
 }
 
 function pushSupported() { return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window; }
