@@ -2958,11 +2958,14 @@ body.e-set-on .e-set-sb{display:block;}
 .th-w-bar i{display:block;height:100%;width:0;border-radius:3px;background:var(--pink);box-shadow:0 0 8px var(--pink);transition:width .5s ease;}
 .th-page{position:fixed;inset:0;z-index:290;background:#0D0E10;overflow-y:auto;-webkit-overflow-scrolling:touch;transform:translateX(100%);transition:transform .34s cubic-bezier(.32,0,.15,1);visibility:hidden;}
 .th-page.open{transform:none;visibility:visible;}
-.th-bar{position:sticky;top:0;z-index:2;display:grid;grid-template-columns:44px 1fr 44px;align-items:center;padding:calc(env(safe-area-inset-top) + 8px) 16px 10px;background:linear-gradient(180deg,#0D0E10 70%,rgba(13,14,16,0));}
+.th-bar{position:sticky;top:0;z-index:2;display:grid;grid-template-columns:44px 1fr 44px;align-items:center;padding:calc(env(safe-area-inset-top) + 8px) 16px 10px;background:#0D0E10;}
+.th-bar::after{content:"";position:absolute;left:0;right:0;top:100%;height:14px;background:linear-gradient(180deg,#0D0E10,rgba(13,14,16,0));pointer-events:none;}
 .th-title{text-align:center;font-size:17px;font-weight:800;}
 .th-body{padding:6px 16px calc(40px + env(safe-area-inset-bottom));}
 .th-body .tracker-card{background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.08);border-radius:28px;}
 body.th-on .bottom-nav,body.th-on .nav-bar{visibility:hidden;}
+.ah-hyp-card{background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.07);margin:0 0 14px;}
+.ah-hyp-card svg{display:block;width:100%;height:auto;}
 /* Line icons that replaced emoji */
 .wn-ic,.ah-wo-ic{color:var(--pink);font-size:0;}
 .ah-home-item i{display:flex;justify-content:center;color:var(--pink);font-style:normal;}
@@ -3161,21 +3164,6 @@ body.th-on .bottom-nav,body.th-on .nav-bar{visibility:hidden;}
     <div id="dashWorkout"></div>
     <!-- Today's macros (+ goal progress when a goal is set) -->
     <div id="dashGoalProgress"></div>
-    <!-- Gym days this year -->
-    <div id="gymYearCard"></div>
-    <!-- Recent PRs -->
-    <div id="dashPRs"></div>
-    <!-- Weekly net -->
-    <div class="section-head" style="margin-top:8px;"><div class="section-title">This Week</div><div class="section-sub" id="dashWeekNet"></div></div>
-    <div class="week-panel">
-      <div class="legend">
-        <span><span class="ldot" style="background:var(--pink);opacity:.9;"></span>Intake</span>
-        <span><span class="ldot" style="background:rgba(255,255,255,.18);"></span>Burned</span>
-      </div>
-      <div class="wbars" id="dashBars"></div>
-      <div class="wlabels" id="dashDayLabels"></div>
-    </div>
-
     <!-- ══ STEPS + SLEEP WIDGETS (tap for the full page) ══ -->
     <div class="th-grid">
       <button class="th-w" id="thStepsW" onclick="thOpen('steps')" aria-label="Steps, open details">
@@ -3191,6 +3179,21 @@ body.th-on .bottom-nav,body.th-on .nav-bar{visibility:hidden;}
         <span class="th-w-bar"><i id="thSleepBar"></i></span>
       </button>
     </div>
+    <!-- Gym days this year -->
+    <div id="gymYearCard"></div>
+    <!-- Recent PRs -->
+    <div id="dashPRs"></div>
+    <!-- Weekly net -->
+    <div class="section-head" style="margin-top:8px;"><div class="section-title">This Week</div><div class="section-sub" id="dashWeekNet"></div></div>
+    <div class="week-panel">
+      <div class="legend">
+        <span><span class="ldot" style="background:var(--pink);opacity:.9;"></span>Intake</span>
+        <span><span class="ldot" style="background:rgba(255,255,255,.18);"></span>Burned</span>
+      </div>
+      <div class="wbars" id="dashBars"></div>
+      <div class="wlabels" id="dashDayLabels"></div>
+    </div>
+
 
   </div>
 </div>
@@ -18405,6 +18408,9 @@ function ahDecorateSleep(night) {
   if(top) { top.onclick = night ? () => ahOpenSleep() : null; top.style.cursor = night ? 'pointer' : ''; }
   if(!night) { ahShow('sleepAhStages', !!(anyNights && (ahState.sel.sleep || 0) > 0), '<div class="ah-stages"><div class="ah-note">No sleep recorded in Apple Health for this night.</div></div>'); return; }
   let html = '<div class="ah-stages">';
+  // The full sleep timeline right on the card, so it doesn't take another tap
+  const hyp = ahHypnogramSVG(night);
+  if(hyp) html += `<div class="tc-chart-label">Sleep timeline</div><div class="ah-hyp ah-hyp-card">${hyp}</div>`;
   if(night.hasStages) {
     const parts = ['awake', 'rem', 'core', 'deep'];
     const total = parts.reduce((t, k) => t + night[k], 0) || 1;
@@ -18414,7 +18420,7 @@ function ahDecorateSleep(night) {
   } else {
     html += `<div class="ah-note">Sleep stages (REM, Core, Deep) need an Apple Watch or a sleep tracker that saves to Apple Health.</div>`;
   }
-  html += `<button class="ah-tl-btn" onclick="ahOpenSleep()">View sleep timeline ›</button>`;
+  html += `<button class="ah-tl-btn" onclick="ahOpenSleep()">Sleep details and sources ›</button>`;
   ahShow('sleepAhStages', true, html + '</div>');
 }
 // Macros Activity: Apple Health's total in place of the manual "Calories burned" box.
