@@ -3489,7 +3489,6 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
     <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:12px;">
       <div class="settings-row-label">Choose your color</div>
       <div class="color-swatches" id="colorSwatches">
-        <div class="color-swatch" style="background:#32FCFD;" data-color="#32FCFD" data-rgb="255,16,160" onclick="setAccentColor('#32FCFD','255,16,160')"></div>
         <div class="color-swatch" style="background:#BF5AF2;" data-color="#BF5AF2" data-rgb="191,90,242" onclick="setAccentColor('#BF5AF2','191,90,242')"></div>
         <div class="color-swatch" style="background:#FF6B9D;" data-color="#FF6B9D" data-rgb="255,107,157" onclick="setAccentColor('#FF6B9D','255,107,157')"></div>
         <div class="color-swatch" style="background:#32FCFD;" data-color="#32FCFD" data-rgb="50,252,253" onclick="setAccentColor('#32FCFD','50,252,253')" class="color-swatch active"></div>
@@ -10330,6 +10329,10 @@ function executeResetAll() {
   location.reload();
 }
 
+// The removed duplicate cyan swatch saved a pink glow ('255,16,160') with the cyan colour: use the real cyan glow.
+// (In memory only; the next settings save keeps it.)
+if(appSettings.color === '#32FCFD' && appSettings.colorRgb === '255,16,160') appSettings.colorRgb = '50,252,253';
+
 // Apply saved color on load — must happen BEFORE any render so rings/charts use correct color
 if(appSettings.color && appSettings.colorRgb) {
   const root = document.documentElement;
@@ -17099,6 +17102,19 @@ document.addEventListener('visibilitychange', () => {
 // ══════════════════════════════════════
 function wnList() {
   return [
+    {
+      id: '2026-11-16',
+      version: '2.4',
+      date: 'November 2026',
+      title: 'Trident on Apple Watch',
+      items: [
+        { ic: '⌚️', t: 'Trident on your wrist', d: 'Start a workout on your iPhone and Trident opens on your Apple Watch by itself, showing your exercise, sets, reps and target weight. You can also start today\'s workout from the watch.' },
+        { ic: '💪', t: 'Log sets from your watch', d: 'Turn the Digital Crown to set the weight and reps, tap Log set, and move to the next exercise. Everything stays in sync with your phone.' },
+        { ic: '⏱️', t: 'One rest timer, both devices', d: 'Start, add 15 seconds, pause or skip on either device. Your watch taps your wrist when rest is over, so your phone stays quiet.' },
+        { ic: '❤️', t: 'Heart rate and Activity rings', d: 'See your heart rate, calories and workout time live. Finished workouts save to Apple Health and count toward your rings.' },
+        { ic: '🎨', t: 'Your color, everywhere', d: 'The watch uses the accent color you pick in Settings.' }
+      ]
+    },
     {
       id: '2026-11-15',
       version: '2.3',
