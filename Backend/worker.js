@@ -382,6 +382,9 @@ export default {
     if (path === '/food/barcode'              && request.method === 'GET')  return handleFoodBarcode(request, env);
     if (path === '/food/autocomplete'         && request.method === 'GET')  return handleFoodAutocomplete(request, env);
 
+    // ── AI program pick (onboarding) ──
+    if (path === '/ai/program'                && request.method === 'POST') return handleProgramPick(request, env);
+
     // ── LogMeal Proxy Routes ──
     if (path.startsWith('/v2/')) return handleLogMealProxy(request, path + url.search, env);
 
@@ -2589,6 +2592,109 @@ async function handleFoodLookup(request, env) {
   }));
 
   return json({ results, message: foodScanText(call.input.message, 240) });
+}
+
+// ══════════════════════════════════════════════════════
+// AI PROGRAM PICK — onboarding asks Claude which program to start with
+// ══════════════════════════════════════════════════════
+// The app sends the person's answers and the programs it can offer (name, days, exercises).
+// Claude picks one of those programs and explains why. Nothing is stored.
+const PROGRAM_PICK_MODEL = 'claude-sonnet-5-5';
+const PROGRAM_PICK_DAILY_LIMIT = 10;
+const PROGRAM_PICK_SYSTEM = `You are the coach inside the Trident Fitness app. A new member just answered a few setup questions.
+Pick the ONE program from the list that is the best place for them to start, based on their goal, the equipment they can use, how active they are, and their body stats.
+Every program was written for a full gym. If they train at home or with no gym, pick the program that needs the least equipment or adapts best, and say which kinds of exercises they should swap (the app has a swap button on every exercise).
+Write the reason to the member in 2 short, plain sentences (under 45 words in total). No hype, no emoji, no medical claims.
+Also give a short headline of 2 to 5 words, like "Built for steady fat loss".`;
+const PROGRAM_PICK_TOOL = {
+  name: 'pick_program',
+  description: 'Report the program you picked. Call this exactly once.',
+  strict: true,
+  input_schema: {
+    type: 'object',
+    additionalProperties: false,
+    properties: {
+      program_id: { type: 'string', description: 'The id of the chosen program, exactly as listed' },
+      headline:   { type: 'string' },
+      reason:     { type: 'string' },
+      runner_up_id: { type: 'string', description: 'The id of the second-best program, or an empty string' },
+    },
+    required: ['program_id', 'headline', 'reason', 'runner_up_id'],
+  },
+};
+
+async function handleProgramPick(request, env) {
+  const session = await validateSession(request, env.DB);
+  if (!session) return error('Sign in to get a program pick', 401);
+  if (!env.ANTHROPIC_API_KEY) return error('AI program picks are not set up on the server', 503);
+
+  let body;
+  try { body = await request.json(); } catch (e) { return error('Invalid request', 400); }
+  const t = (v, n) => foodScanText(v, n);
+  const programs = (Array.isArray(body.programs) ? body.programs : []).slice(0, 20).map(p => ({
+    id: t(p && p.id, 40),
+    name: t(p && p.name, 80),
+    days: t(p && p.days, 40),
+    desc: t(p && p.desc, 300),
+    exercises: (Array.isArray(p && p.exercises) ? p.exercises : []).slice(0, 40).map(x => t(x, 50)).filter(Boolean),
+  })).filter(p => p.id && p.name);
+  if (!programs.length) return error('No programs to choose from', 400);
+
+  if (!(await aiUsageAllowed(env.DB, session.user_id, 'program', PROGRAM_PICK_DAILY_LIMIT))) {
+    return error('Too many program picks today. Try again tomorrow.', 429);
+  }
+
+  const a = body.answers || {};
+  const goals = { fat_loss: 'lose fat', muscle_gain: 'build muscle', recomp: 'lose fat and build muscle at the same time (recomp)' };
+  const gyms = { full: 'a full commercial gym', home: 'a home gym (dumbbells, a bench, maybe a rack and bands)', none: 'no gym equipment (bodyweight only)' };
+  const acts = { 1.2: 'mostly sitting, little exercise', 1.375: 'lightly active (1–3 workouts a week)', 1.55: 'moderately active (3–5 workouts a week)', 1.725: 'very active (6–7 hard workouts a week)', 1.9: 'extremely active (hard training plus a physical job)' };
+  const lines = [
+    `Goal: ${goals[a.goal] || 'not given'}`,
+    `Equipment: ${gyms[a.gym] || 'not given'}`,
+    `Activity: ${acts[a.activity] || 'not given'}`,
+    `Programs shown for: ${a.gender === 'male' ? 'men' : a.gender === 'female' ? 'women' : 'not given'}`,
+    a.age ? `Age: ${foodScanNum(a.age, 120)}` : '',
+    a.heightIn ? `Height: ${Math.floor(foodScanNum(a.heightIn, 120) / 12)} ft ${Math.round(foodScanNum(a.heightIn, 120) % 12)} in` : '',
+    a.weightLb ? `Weight: ${Math.round(foodScanNum(a.weightLb, 1000))} lb` : '',
+  ].filter(Boolean).join('\n');
+  const list = programs.map(p => `- id: ${p.id}\n  name: ${p.name}\n  schedule: ${p.days}\n  about: ${p.desc}\n  exercises: ${p.exercises.join(', ')}`).join('\n');
+
+  const client = new Anthropic({
+    apiKey: env.ANTHROPIC_API_KEY,
+    baseURL: env.ANTHROPIC_BASE_URL || undefined, // only set when testing locally
+    maxRetries: 1,
+    timeout: 45 * 1000,
+  });
+
+  let response;
+  try {
+    response = await client.messages.create({
+      model: PROGRAM_PICK_MODEL,
+      max_tokens: 1000,
+      system: PROGRAM_PICK_SYSTEM,
+      tools: [PROGRAM_PICK_TOOL],
+      tool_choice: { type: 'tool', name: 'pick_program' },
+      messages: [{ role: 'user', content: `About the member:\n${lines}\n\nPrograms:\n${list}` }],
+    });
+  } catch (e) {
+    if (e instanceof Anthropic.AuthenticationError || e instanceof Anthropic.PermissionDeniedError) {
+      console.error('Program pick: Claude API key rejected');
+      return error('AI program picks are not set up on the server', 503);
+    }
+    if (e instanceof Anthropic.RateLimitError) return error('The coach is busy. Try again in a minute.', 429);
+    console.error('Program pick failed:', e && e.message);
+    return error('The coach is not responding. Try again.', 502);
+  }
+
+  const call = (response.content || []).find(b => b.type === 'tool_use' && b.name === 'pick_program');
+  const ids = programs.map(p => p.id);
+  if (!call || !call.input || !ids.includes(call.input.program_id)) return error('Could not pick a program. Try again.', 502);
+  return json({
+    program: call.input.program_id,
+    headline: t(call.input.headline, 60),
+    reason: t(call.input.reason, 320),
+    runnerUp: ids.includes(call.input.runner_up_id) && call.input.runner_up_id !== call.input.program_id ? call.input.runner_up_id : '',
+  });
 }
 
 // ══════════════════════════════════════════════════════

@@ -1158,7 +1158,7 @@ async function handleSignup() {
       setTimeout(() => { showScreen('screen-verify'); document.getElementById('verify-code').focus(); }, 500);
     } else {
       showToast('✓ Account created! Let\'s set up your profile.');
-      setTimeout(() => showScreen('screen-onboarding'), 600);
+      setTimeout(() => goAppOnboarding(), 600);
     }
 
   } catch(e) {
@@ -1257,7 +1257,7 @@ async function handleGoogleCredential(response) {
     if(data.isNewUser) {
       obData.name = data.user.name;
       showToast(`✓ Welcome, ${data.user.name.split(' ')[0]}!`);
-      setTimeout(() => showScreen('screen-onboarding'), 600);
+      setTimeout(() => goAppOnboarding(), 600);
     } else {
       showToast(`✓ Welcome back, ${data.user.name.split(' ')[0]}!`);
       setTimeout(() => redirectToApp(), 800);
@@ -1281,7 +1281,7 @@ async function handleVerifyCode() {
     const { ok, data } = await api('/auth/verify', 'POST', { code });
     if (!ok) { showToast(data.error || 'That code didn\'t work. Please try again.', 3200); document.getElementById('verify-code').value = ''; return; }
     showToast('✓ Email confirmed!');
-    setTimeout(() => showScreen('screen-onboarding'), 500);
+    setTimeout(() => goAppOnboarding(), 500);
   } catch (e) {
     showToast('Connection error — please try again');
   } finally {
@@ -1296,7 +1296,7 @@ async function resendVerifyCode() {
 }
 function skipVerify() {
   showToast('You can confirm it later from the Home screen', 2800);
-  showScreen('screen-onboarding');
+  goAppOnboarding();
 }
 
 // ── Forgot password: email → code → new password ──
@@ -1548,6 +1548,17 @@ async function finishOnboarding() {
   settings.name   = currentUser?.name || '';
   localStorage.setItem('trident_settings_v1', JSON.stringify(settings));
 
+  redirectToApp();
+}
+
+// A brand-new account sets up its profile inside the app (the new step-by-step onboarding there)
+function goAppOnboarding() {
+  try {
+    localStorage.setItem('trident_onboard_pending_v1', '1');
+    const settings = JSON.parse(localStorage.getItem('trident_settings_v1') || '{}');
+    const name = currentUser?.name || obData.name || '';
+    if(name && !settings.name) { settings.name = name; localStorage.setItem('trident_settings_v1', JSON.stringify(settings)); }
+  } catch(e) {}
   redirectToApp();
 }
 
