@@ -959,6 +959,28 @@ body:not([data-page="dashboard"]) .settings-btn{display:none;}
 .summary-sub{font-size:13px;color:var(--text3);margin-top:4px;}
 .summary-body{padding:16px 20px;}
 .summary-stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+/* Apple Watch block on workout summaries */
+.wtst{background:var(--bg4);border:0.5px solid var(--pink-border);border-radius:var(--radius-lg);padding:12px 12px 10px;margin:0 0 16px;box-shadow:0 0 24px var(--pink-dim);}
+.wtst-head{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--pink);margin-bottom:10px;}
+.wtst-watch{font-size:13px;letter-spacing:0;}
+.wtst-wait{font-size:13px;color:var(--text2);}
+.wtst-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+.wtst-tiles div{background:var(--bg3);border-radius:var(--radius);padding:8px 4px;text-align:center;min-width:0;}
+.wtst-tiles i{display:block;font-style:normal;font-size:14px;line-height:1;margin-bottom:4px;}
+.wtst-tiles b{display:block;font-size:18px;font-weight:800;letter-spacing:-.02em;color:var(--text);}
+.wtst-tiles span{display:block;font-size:10px;color:var(--text3);margin-top:2px;}
+.wtst-chart{margin-top:10px;}
+.wtst-chart-lbl{display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:4px;}
+.wtst-chart svg{display:block;width:100%;height:64px;}
+.wtst-share{display:flex;gap:10px;align-items:flex-start;margin-top:12px;cursor:pointer;}
+.wtst-share input{width:18px;height:18px;accent-color:var(--pink);flex-shrink:0;margin-top:1px;}
+.wtst-share b{display:block;font-size:13px;color:var(--text);}
+.wtst-share small{display:block;font-size:11.5px;color:var(--text3);line-height:1.35;margin-top:2px;}
+.cm-watch{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;font-size:12px;color:var(--text2);margin:2px 0 10px;}
+.cm-watch em{font-style:normal;font-weight:700;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--pink);}
+.cm-watch b{color:var(--text);font-weight:700;}
+.cm-ovc-watch{font-size:.85em;margin-top:.45em;opacity:.95;}
+.cm-ovc-watch b{font-weight:800;}
 .summary-stat{background:var(--bg4);border-radius:var(--radius);padding:12px 10px;text-align:center;}
 .summary-stat-val{font-size:20px;font-weight:700;letter-spacing:-0.03em;color:var(--pink);}
 .summary-stat-lbl{font-size:10px;font-weight:500;color:var(--text3);margin-top:3px;text-transform:uppercase;letter-spacing:.05em;}
@@ -3030,6 +3052,7 @@ textarea.hy-input{resize:vertical;line-height:1.45;}
   </div>
   <div class="summary-body">
     <div class="summary-stat-row" id="summaryStats"></div>
+    <div id="summaryWatch"></div>
     <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;">Exercise Breakdown</div>
     <div id="summaryExList"></div>
     <button class="pink-btn" onclick="closeSummary()" style="margin-top:16px;">Done 💪</button>
@@ -7532,6 +7555,7 @@ function finishWorkout() {
 }
 
 function showWorkoutSummary(day, logKey, prs, phaseAdvanced) {
+  try { wtStatsFill('summaryWatch', 'c:' + logKey); } catch(e) {}
   // Calculate totals
   let totalWeight = 0, totalSets = 0, totalReps = 0;
   day.exercises.forEach((ex,ei) => {
@@ -13328,7 +13352,7 @@ function hySummary(sid, extra) {
   if(sess.duration) stats.push([sess.duration, 'Minutes']);
   if(sess.rpe) stats.push([sess.rpe, 'Session RPE']);
   const sharePayload = hySharePayload(w, sess, sid);
-  window._hyShare = sharePayload ? { type: 'workout', payload: sharePayload } : null;
+  window._hyShare = sharePayload ? { type: 'workout', payload: Object.assign({ _wid: 'h:' + sid }, sharePayload) } : null;
   const detail = (w.sections || []).map(section => {
     const lines = section.items.map(ex => {
       const st = sess.ex[section.key + '.' + ex.id];
@@ -13343,6 +13367,7 @@ function hySummary(sid, extra) {
   hySheet(`<div class="cm-sheet-title">${sess.status === 'skipped' ? 'Skipped' : (extra ? 'Session saved' : 'Session')} — ${hyEsc(w.short || w.name)}</div>
     <div class="hy-muted" style="margin-bottom:12px;">${hyEsc(hyDateLabel(hyDoneDay(sess, sid)))}${sess.doneOn ? ' · ' + hyEsc(HY_DAYS[hyDow(new Date(sess.date + 'T12:00:00'))]) + "'s workout, done early" : ''}${sess.restDay ? ' · complete rest day' : ''}${(sess.types || []).length ? ' · ' + hyEsc(sess.types.join(', ')) : ''}${sess.intensity ? ' · ' + hyEsc(sess.intensity) + ' intensity' : ''}${sess.lighter ? ' · lighter session' : ''}${sess.recoveryOnly ? ' · recovery-only' : ''}${sess.restricted ? ' · impact work locked' : ''}${sess.check === 'tired' ? ' · felt tired' : sess.check === 'pain' ? ' · reported pain' : ''}</div>
     ${stats.length ? `<div class="hy-stats">${stats.map(s => `<div><b>${hyEsc(s[0])}</b><span>${hyEsc(s[1])}</span></div>`).join('')}</div>` : ''}
+    <div id="hyWatchStats"></div>
     ${detail}${games ? `<div class="hy-sheet-sec">GAMES</div>${games}` : ''}
     ${sess.notes ? `<div class="hy-sheet-sec">NOTES</div><div class="hy-cue">${hyEsc(sess.notes)}</div>` : ''}
     ${sess.status === 'completed' && isLoggedIn() ? `<div id="hyProfileBtn" style="margin-top:14px;"></div>` : ''}
@@ -13350,6 +13375,7 @@ function hySummary(sid, extra) {
     ${window._hyShare && sess.status === 'completed' ? `<button class="ghost-btn" style="margin-top:8px;" onclick="shrOpenWorkout(window._hyShare.payload)">Share to socials</button>` : ''}
     <button class="pink-btn" style="margin-top:8px;" onclick="${extra ? 'hySummaryDone()' : 'hySheetClose()'}">Done</button>`);
   if(sess.status === 'completed') cmWoSummaryButton('hyProfileBtn', 'hy:' + sid);
+  try { wtStatsFill('hyWatchStats', 'h:' + sid); } catch(e) {}
 }
 // Done on the summary of a session just finished: back to the day, as the other programs do.
 function hySummaryDone() {
@@ -13693,7 +13719,7 @@ function cmOvCardHTML(type, payload, ov, editable) {
     inner = `<div class="cm-ovc-main"><div class="cm-ovc-top">${mark}<span>${cmEsc(cmWoBadge(payload))}</span>${payload.program ? `<i>${cmEsc(payload.program)}</i>` : ''}</div>
       <div class="cm-ovc-title">${cmEsc(payload.day || 'Workout')}</div>
       <div class="cm-ovc-stats">${stats.map(x => `<div><b>${cmEsc(x[0])}</b><span>${cmEsc(x[1])}</span></div>`).join('')}</div>
-      ${cmOvPRsHTML(payload)}</div>
+      ${cmOvWatchHTML(payload)}${cmOvPRsHTML(payload)}</div>
       ${rows ? `<div class="cm-ovc-side"><div class="cm-ovc-rows">${rows}</div></div>` : ''}`;
   }
   const land = ov.l === 'h', single = !/cm-ovc-side/.test(inner);
@@ -13742,6 +13768,7 @@ function cmAttachHTML(type, payload, who) {
         <div><b>${cmNum(payload.sets) || '—'}</b><span>sets</span></div>
         <div><b>${vol ? (vol >= 10000 ? (Math.round(vol / 100) / 10) + 'k' : vol.toLocaleString()) : '—'}</b><span>lbs lifted</span></div>
       </div>`}
+      ${cmWatchHTML(payload)}
       ${cmPRsHTML(payload, who)}
       ${exs.map(ex => `<div class="cm-attach-row"><span>${cmEsc(ex && ex.name)}</span><span>${cmEsc(cmSetsText(ex))}</span></div>`).join('')}
     </div>`;
@@ -14043,6 +14070,7 @@ function cmLocalWorkouts() {
       if(!sess || sess.status !== 'completed' || sess.restDay) return;
       const w = hyWorkout(sess.workoutId); if(!w) return;
       const payload = hySharePayload(w, sess, sid, true); if(!payload) return;
+      try { const st = wtStatsFor('h:' + sid); if(st && st.share) payload.watch = wtStatsPayload('h:' + sid); } catch(e) {}
       out.push({ key: 'hy:' + sid, date: hyDoneDay(sess, sid), payload });
     });
   } catch(e) {}
@@ -14053,6 +14081,7 @@ function cmLocalWorkouts() {
       const prog = getProgram(m[1]); const day = prog && prog.days[Number(m[3])];
       if(!day || !Array.isArray(day.exercises)) return;
       const payload = cmBuildWorkoutPayload(prog, day, Number(m[2]), logs[key], key);
+      if(payload) { try { const st = wtStatsFor('c:' + key); if(st && st.share) payload.watch = wtStatsPayload('c:' + key); } catch(e) {} }
       if(payload) out.push({ key: 'wo:' + key, date: '', payload, sort: Number(m[2]) * 100 + Number(m[3]) });
     });
   } catch(e) {}
@@ -14225,7 +14254,9 @@ function cmStickerLocalWorkout(i) {
 function cmShareLocalWorkout(i) {
   const lw = (window._cmLocalWo || [])[i];
   if(!lw) return;
-  cmOpenCompose({ type: 'workout', payload: lw.payload });
+  const payload = Object.assign({ _wid: wtIdForLocalKey(lw.key) }, lw.payload);
+  delete payload.watch;   // the composer's switch decides (it starts on when "Share watch stats" is on)
+  cmOpenCompose({ type: 'workout', payload });
 }
 // Workouts tab: the workouts and PRs this person shared, newest first (tap one for the full post).
 // On your own profile it also lists the workouts you finished but didn't share; only you see those.
@@ -15352,6 +15383,7 @@ function wtApply(a) {
   const lantik = id.startsWith('h:');
   if(a.t === 'log') WT.lastLog = { id, key: String(a.key), set: Number(a.set) };
   if(a.t === 'rest') return wtApplyRest(a);
+  if(a.t === 'stats') return wtStatsStore(id, a.stats);
   if(!id) return;
   if(a.t === 'start' || !WT.activeId) WT.activeId = id;
   WT.applying = true;
@@ -15516,6 +15548,145 @@ if(wtNative()) {
   window.addEventListener('tridentwatch', () => { wtPull(); });
   document.addEventListener('visibilitychange', () => { if(!document.hidden) wtPull(); });
   setTimeout(() => { wtPull(); }, 1500);
+}
+
+// ── Apple Watch stats on workout summaries and shared workouts ──
+// When a workout recorded on the watch is saved, the watch sends its totals (calories, heart rate, time).
+// They are kept on this phone only. They go to Community or your profile only when you switch on
+// "Share watch stats" (on the summary, or for one post in the composer). Off by default.
+const WT_STATS_KEY = 'trident_watch_stats_v1';   // { 'c:<logKey>' | 'h:<sid>': { cal, avg, max, min, dur, end, hr:[[s,bpm]], share } }
+function wtStatsAll() { const a = load(WT_STATS_KEY); return a && typeof a === 'object' ? a : {}; }
+function wtStatsFor(id) {
+  const s = id ? wtStatsAll()[id] : null;
+  return s && typeof s === 'object' && isFinite(Number(s.dur)) ? s : null;
+}
+function wtStatsStore(id, raw) {
+  if(!id || !raw || typeof raw !== 'object') return;
+  const n = v => { v = Number(v); return isFinite(v) && v >= 0 ? Math.round(v) : 0; };
+  const all = wtStatsAll(), old = all[id] || {};
+  const hr = (Array.isArray(raw.hr) ? raw.hr : []).slice(0, 60)
+    .map(p => Array.isArray(p) ? [n(p[0]), n(p[1])] : null).filter(p => p && p[1] > 0 && p[1] < 260);
+  all[id] = { cal: n(raw.cal), avg: n(raw.avg), max: n(raw.max), min: n(raw.min), dur: n(raw.dur),
+    end: n(raw.end) || Date.now(), hr, share: !!old.share };
+  // Keep the newest 60 workouts
+  const ids = Object.keys(all).sort((a, b) => (all[b].end || 0) - (all[a].end || 0));
+  ids.slice(60).forEach(k => { delete all[k]; });
+  save(WT_STATS_KEY, all);
+  wtStatsRefresh(id);
+}
+// What a shared workout shows: totals only (never the heart-rate trace).
+function wtStatsPayload(id) {
+  const s = wtStatsFor(id);
+  if(!s) return null;
+  return { cal: s.cal || 0, avg: s.avg || 0, max: s.max || 0, min: Math.round((s.dur || 0) / 60) };
+}
+// The phone's id for a profile workout key ('hy:<sid>' / 'wo:<logKey>').
+function wtIdForLocalKey(key) {
+  key = String(key || '');
+  return key.startsWith('hy:') ? 'h:' + key.slice(3) : key.startsWith('wo:') ? 'c:' + key.slice(3) : '';
+}
+function wtSafeDomId(id) { return 'wtst-' + String(id).replace(/[^A-Za-z0-9_-]/g, '_'); }
+
+// The "Apple Watch" block on a workout summary. Empty when the workout wasn't recorded on a watch.
+function wtStatsHTML(id) {
+  const s = wtStatsFor(id);
+  // Waiting only when the watch was recording this very workout.
+  const waiting = !s && wtOn() && !!WT.info && WT.info.workoutId === id;
+  if(!s && !waiting) return '';
+  const head = `<div class="wtst-head"><span class="wtst-watch">⌚</span>Apple Watch</div>`;
+  if(!s) return `<div class="wtst">${head}<div class="wtst-wait">Waiting for your watch to save the workout…</div></div>`;
+  const mins = Math.round((s.dur || 0) / 60);
+  const tiles = [
+    ['🔥', (s.cal || 0).toLocaleString(), 'Calories'],
+    ['❤️', s.avg ? String(s.avg) : '—', 'Avg BPM'],
+    ['⬆️', s.max ? String(s.max) : '—', 'Max BPM'],
+    ['⏱️', mins ? String(mins) : '<1', 'Minutes']
+  ];
+  const signedIn = (() => { try { return isLoggedIn(); } catch(e) { return false; } })();
+  return `<div class="wtst">${head}
+    <div class="wtst-tiles">${tiles.map(t => `<div><i>${t[0]}</i><b>${cmEsc(t[1])}</b><span>${t[2]}</span></div>`).join('')}</div>
+    ${wtHrChartHTML(s)}
+    ${signedIn ? `<label class="wtst-share"><input type="checkbox" ${s.share ? 'checked' : ''} onchange="wtStatsSetShare('${cmEsc(id)}', this.checked)">
+      <span><b>Share watch stats</b><small>Show calories and heart rate when you post this workout or add it to your profile.</small></span></label>` : ''}
+  </div>`;
+}
+// Heart rate over the workout as a small line chart (stays on the phone).
+function wtHrChartHTML(s) {
+  const pts = (s.hr || []).filter(p => p[1] > 0);
+  if(pts.length < 3) return '';
+  const W = 300, H = 64, t0 = pts[0][0], t1 = pts[pts.length - 1][0] || 1;
+  const lo = Math.min(...pts.map(p => p[1])) - 5, hi = Math.max(...pts.map(p => p[1])) + 5;
+  const x = t => ((t - t0) / Math.max(1, t1 - t0)) * W, y = v => H - ((v - lo) / Math.max(1, hi - lo)) * H;
+  const line = pts.map((p, i) => `${i ? 'L' : 'M'}${x(p[0]).toFixed(1)},${y(p[1]).toFixed(1)}`).join(' ');
+  return `<div class="wtst-chart"><div class="wtst-chart-lbl"><span>Heart rate</span><span>${Math.round(lo + 5)}–${Math.round(hi - 5)} bpm</span></div>
+    <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">
+      <path d="${line} L${W},${H} L0,${H} Z" fill="var(--pink-dim)"/>
+      <path d="${line}" fill="none" stroke="var(--pink)" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>
+    </svg></div>`;
+}
+// Fills a summary's watch block (and keeps refilling it until the stats arrive).
+function wtStatsFill(elId, id) {
+  const el = document.getElementById(elId);
+  if(!el) return;
+  el.dataset.wtWid = id;
+  el.innerHTML = wtStatsHTML(id);
+}
+function wtStatsRefresh(id) {
+  document.querySelectorAll('[data-wt-wid]').forEach(el => {
+    if(el.dataset.wtWid === id) el.innerHTML = wtStatsHTML(id);
+  });
+}
+function wtStatsSetShare(id, on) {
+  const all = wtStatsAll();
+  if(!all[id]) return;
+  all[id].share = !!on;
+  save(WT_STATS_KEY, all);
+  // Profile workouts carry the stats only while this is on.
+  try { setTimeout(() => cmWoSync(true), 300); } catch(e) {}
+  showToast(on ? 'Watch stats will show when you share this workout' : 'Watch stats stay on this phone');
+}
+// Composer: the watch stats switch for the attached workout (only when that workout has stats).
+function wtDraftInit() {
+  const a = cmDraft.attach;
+  if(!a || a.type !== 'workout' || a._wtInit) return;
+  a._wtInit = true;
+  const st = wtStatsFor(a.payload && a.payload._wid);
+  if(st && st.share) a.payload.watch = wtStatsPayload(a.payload._wid);
+}
+function wtDraftChipHTML(style) {
+  const a = cmDraft.attach;
+  if(!a || a.type !== 'workout' || !wtStatsFor(a.payload && a.payload._wid)) return '';
+  const on = !!a.payload.watch;
+  return `<button class="cm-chip${on ? ' on' : ''}"${style ? ` style="${style}"` : ''} onclick="wtDraftToggle()" aria-pressed="${on}">⌚ ${on ? 'Watch stats on' : 'Add watch stats'}</button>`;
+}
+function wtDraftToggle() {
+  const a = cmDraft.attach;
+  if(!a || !a.payload) return;
+  if(a.payload.watch) delete a.payload.watch;
+  else a.payload.watch = wtStatsPayload(a.payload._wid);
+  cmDrawDraft();
+}
+// "🔥 412 cal · ❤️ 128 avg bpm" on shared workout cards
+function cmWatchStatsOf(payload) {
+  const w = payload && payload.watch;
+  if(!w || typeof w !== 'object') return null;
+  const cal = cmNum(w.cal), avg = cmNum(w.avg), max = cmNum(w.max), min = cmNum(w.min);
+  return (cal || avg) ? { cal, avg, max, min } : null;
+}
+function cmWatchHTML(payload) {
+  const w = cmWatchStatsOf(payload);
+  if(!w) return '';
+  const parts = [];
+  if(w.cal) parts.push(`<span>🔥 <b>${w.cal.toLocaleString()}</b> cal</span>`);
+  if(w.avg) parts.push(`<span>❤️ <b>${w.avg}</b> avg bpm</span>`);
+  if(w.max) parts.push(`<span>max <b>${w.max}</b></span>`);
+  if(w.min) parts.push(`<span><b>${w.min}</b> min</span>`);
+  return `<div class="cm-watch"><em>⌚ Apple Watch</em>${parts.join('')}</div>`;
+}
+function cmOvWatchHTML(payload) {
+  const w = cmWatchStatsOf(payload);
+  if(!w) return '';
+  return `<div class="cm-ovc-watch">${w.cal ? `🔥 <b>${w.cal.toLocaleString()}</b> cal` : ''}${w.cal && w.avg ? ' · ' : ''}${w.avg ? `❤️ <b>${w.avg}</b> bpm` : ''}</div>`;
 }
 
 function pushSupported() { return 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window; }
@@ -15891,6 +16062,7 @@ function cmUpdateCount() {
   document.getElementById('cmCount').textContent = document.getElementById('cmText').value.length + ' / 1000';
 }
 function cmDrawDraft() {
+  try { wtDraftInit(); } catch(e) {}
   const kind = cmDraft.attach ? cmDraft.attach.type : null;
   document.getElementById('cmChipPhoto').classList.toggle('on', !!cmDraft.photo);
   document.getElementById('cmChipWorkout').classList.toggle('on', kind === 'workout');
@@ -15925,6 +16097,7 @@ function cmDrawDraft() {
           <input type="range" class="cm-ov-size" id="cmOvSize" min="35" max="95" step="1" value="${Math.round(cmDraft.ov.s * 100)}" oninput="cmOvSetSize(this.value)" aria-label="Card size">
         </div>
         <div class="cm-ov-btns">
+          ${wtDraftChipHTML()}
           <button class="cm-chip" onclick="cmOvToggle(false)">Show card below photo</button>
           <button class="cm-chip" onclick="cmClearAttach()">Remove ${kind === 'pr' ? 'PR' : 'workout'}</button>
           <button class="cm-chip" onclick="cmClearPhoto()">Remove photo</button>
@@ -15937,7 +16110,8 @@ function cmDrawDraft() {
   let html = '';
   if(cmDraft.attach) {
     html += cmAttachHTML(cmDraft.attach.type, cmDraft.attach.payload)
-      + `<button class="cm-chip" style="margin-bottom:10px;" onclick="cmClearAttach()">Remove ${kind === 'pr' ? 'PR' : 'workout'}</button>`;
+      + `<button class="cm-chip" style="margin-bottom:10px;" onclick="cmClearAttach()">Remove ${kind === 'pr' ? 'PR' : 'workout'}</button>`
+      + wtDraftChipHTML('margin:0 0 10px 6px;');
   }
   if(cmDraft.photo) {
     html += `<img class="cm-photo" src="${cmDraft.photo}" alt="Selected photo">`
@@ -16112,7 +16286,7 @@ function cmHybridWorkoutOptions() {
       out.push({
         label: w.name,
         sub: `${hyDateLabel(hyDoneDay(sess, sid))}${sum ? ' · ' + sum : ''}${sess.status === 'completed' ? '' : ' · not finished'}`,
-        payload,
+        payload: Object.assign({ _wid: 'h:' + sid }, payload),
         sort: String(sess.date || sid.slice(0, 10)) + sid
       });
     });
@@ -16132,7 +16306,7 @@ function cmWorkoutOptions() {
     const day = prog && prog.days[dayIdx];
     if(!day || !Array.isArray(day.exercises)) return;
     const payload = cmBuildWorkoutPayload(prog, day, week, logs[key], key);
-    if(payload) out.push({ label: `${day.name}`, sub: `${prog.name} · Week ${week + 1}`, payload, sort: week * 100 + dayIdx });
+    if(payload) out.push({ label: `${day.name}`, sub: `${prog.name} · Week ${week + 1}`, payload: Object.assign({ _wid: 'c:' + key }, payload), sort: week * 100 + dayIdx });
   });
   out.sort((a, b) => b.sort - a.sort);
   // The program in use comes first
@@ -16186,6 +16360,7 @@ function cmDraftPayload() {
   if(!cmDraft.attach) return null;
   const payload = Object.assign({}, cmDraft.attach.payload);
   delete payload.overlay;
+  delete payload._wid;
   const ov = cmDraft.ov;
   if(cmDraft.photo && ov && ov.on) {
     const r3 = n => Math.round(n * 1000) / 1000;
@@ -16236,6 +16411,7 @@ function cmShareLastWorkout() {
     ? cmBuildWorkoutPayload(prog, day, workoutWeek, workoutState.logs[getLogKey()], getLogKey())
     : null;
   if(!payload) { showToast('Nothing logged to share yet'); return; }
+  payload._wid = 'c:' + getLogKey();
   closeSummary();
   navTo('community');
   cmOpenCompose({ type: 'workout', payload });
@@ -17102,19 +17278,6 @@ document.addEventListener('visibilitychange', () => {
 // ══════════════════════════════════════
 function wnList() {
   return [
-    {
-      id: '2026-11-16',
-      version: '2.4',
-      date: 'November 2026',
-      title: 'Trident on Apple Watch',
-      items: [
-        { ic: '⌚️', t: 'Trident on your wrist', d: 'Start a workout on your iPhone and Trident opens on your Apple Watch by itself, showing your exercise, sets, reps and target weight. You can also start today\'s workout from the watch.' },
-        { ic: '💪', t: 'Log sets from your watch', d: 'Turn the Digital Crown to set the weight and reps, tap Log set, and move to the next exercise. Everything stays in sync with your phone.' },
-        { ic: '⏱️', t: 'One rest timer, both devices', d: 'Start, add 15 seconds, pause or skip on either device. Your watch taps your wrist when rest is over, so your phone stays quiet.' },
-        { ic: '❤️', t: 'Heart rate and Activity rings', d: 'See your heart rate, calories and workout time live. Finished workouts save to Apple Health and count toward your rings.' },
-        { ic: '🎨', t: 'Your color, everywhere', d: 'The watch uses the accent color you pick in Settings.' }
-      ]
-    },
     {
       id: '2026-11-15',
       version: '2.3',
