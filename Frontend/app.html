@@ -15242,6 +15242,7 @@ async function wtRefreshInfo() {
   return WT.info;
 }
 function wtSoon() {
+  try { laSoon(); } catch(e) {}   // the Lock Screen Live Activity follows the same workout (watch or not)
   if(typeof WT === 'undefined' || !WT || !wtOn()) return;
   clearTimeout(WT.timer);
   WT.timer = setTimeout(wtPush, 300);
@@ -15388,6 +15389,77 @@ function wtHyFocus(sid) {
   if(c.dayIdx > hyDow(new Date()) && !c.sess) hyView.early = sid;
   if(changed) hyView.exOpen = null;
   return hyCtx();
+}
+
+// ── Live Activity: the workout on the iPhone's Lock Screen and Dynamic Island (iPhone app only) ──
+// Shows the workout in progress: current exercise and set, workout time, and the rest countdown.
+// The timers tick by themselves; the app only sends an update when something changes.
+var LA = { timer: null, last: '', id: null, started: {} };
+const LA_KEY = 'trident_live_activity_v1';   // { [workout id]: start time (ms) }
+function laSoon() {
+  if(!wtNative()) return;
+  clearTimeout(LA.timer);
+  LA.timer = setTimeout(laPush, 400);
+}
+function laStarted(id) {
+  if(LA.started[id]) return LA.started[id];
+  let all = load(LA_KEY) || {};
+  if(!all[id]) {
+    let t = Date.now();
+    try { if(id.startsWith('h:')) { const sess = hyState.sessions[id.slice(2)]; if(sess && sess.startedAt) t = sess.startedAt; } } catch(e) {}
+    all = { [id]: t };                     // only the current workout is kept
+    save(LA_KEY, all);
+  }
+  return (LA.started[id] = all[id]);
+}
+function laState() {
+  const snap = wtSnapshot(), a = snap.active;   // (also picks up a LANTIK session already in progress)
+  if(!WT.activeId) return null;
+  if(!a || !Array.isArray(a.items) || !a.items.length) return null;
+  const items = a.items, cur = Math.max(0, Math.min(a.cur || 0, items.length - 1)), it = items[cur];
+  const finishedItem = x => ['done', 'skipped', 'omitted'].includes(x.status);
+  const done = items.filter(finishedItem).length;
+  let next = '';
+  for(let k = 1; k < items.length; k++) { const x = items[(cur + k) % items.length]; if(!finishedItem(x)) { next = x.name; break; } }
+  let detail = '';
+  if(a.finished) detail = `${done}/${items.length} exercises done`;
+  else if(it.check) detail = it.target || '';
+  else {
+    const logged = (it.sets || []).filter(x => x.done).length, total = Math.max(1, it.total || 1);
+    detail = [logged >= total ? `${logged}/${total} sets done` : `Set ${logged + 1} of ${total}`, it.target, it.tw ? `${it.tw} lb` : ''].filter(Boolean).join(' · ');
+  }
+  const r = snap.rest;
+  return {
+    id: a.id, title: String(a.title || 'Workout').slice(0, 60), started: laStarted(a.id),
+    exercise: String(it.name || '').slice(0, 80), detail: detail.slice(0, 100), next: String(next).slice(0, 80),
+    done, total: items.length,
+    restEnd: r && !r.paused ? (r.endsAt || 0) : 0, restLeft: r ? Math.max(0, Math.round(r.paused ? r.remaining : (r.endsAt - Date.now()) / 1000)) : 0,
+    restTotal: r ? (r.duration || 60) : 0, restPaused: !!(r && r.paused),
+    finished: !!a.finished, accent: snap.accent || '#32FCFD'
+  };
+}
+function laPush() {
+  let st;
+  try { st = laState(); } catch(e) { console.warn('Live Activity skipped:', e); return; }
+  if(!st) {
+    // A workout shown during this visit is no longer open (e.g. another program): take it off the Lock Screen.
+    if(LA.id) { LA.id = null; LA.last = ''; laCall('end', {}); }
+    return;
+  }
+  const key = JSON.stringify(Object.assign({}, st, { restLeft: st.restPaused ? st.restLeft : 0 }));
+  if(key === LA.last) return;
+  LA.last = key;
+  if(st.finished) {
+    if(LA.id !== st.id) return;            // only end one this visit showed
+    LA.id = null;
+    laCall('end', { final: JSON.stringify(st) });
+    return;
+  }
+  LA.id = st.id;
+  laCall('update', { state: JSON.stringify(st) });
+}
+function laCall(method, options) {
+  try { return window.Capacitor.nativePromise('LiveActivity', method, options || {}).catch(() => {}); } catch(e) { return Promise.resolve(); }
 }
 
 // ── Starting the workout on the watch ──
