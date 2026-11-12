@@ -1495,7 +1495,7 @@ body:not([data-page="dashboard"]) .settings-btn{display:none;}
 .sleep-star.lit{opacity:1;}
 .sleep-remind-row{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg4);border-radius:var(--radius);border:0.5px solid var(--border);}
 .sleep-tip{margin-top:14px;padding:12px 14px;background:var(--pink-dim);border:0.5px solid var(--pink-border);border-radius:var(--radius);font-size:12px;color:var(--text2);line-height:1.5;}
-.sleep-tip::before{content:'💡 ';font-style:normal;}
+.sleep-tip::before{content:none;}
 .sleep-tip:empty{display:none;}
 
 /* ════════════════════════════════
@@ -2475,6 +2475,45 @@ button,input,select,textarea{font-family:inherit;}
 #page-workout .exercise-card.active-ex,.exercise-card.active-ex{border-color:rgba(255,255,255,0.22);box-shadow:none;}
 .ex-target-banner{background:rgba(255,255,255,0.05);border-color:var(--border);border-radius:16px;}
 .wo-change-prog-btn{border-radius:999px;}
+/* Gym Days: this week as one bar per day (done = your colour, today = white) */
+.gyc-week{gap:6px;margin-top:14px;}
+.gyc-wd{flex-direction:column-reverse;gap:7px;}
+.gyc-wd i{width:100%;height:6px;aspect-ratio:auto;border-radius:3px;background:rgba(255,255,255,0.1);border:none;box-shadow:none;}
+.gyc-wd i svg{display:none;}
+.gyc-wd.done i,.gyc-wd.done.is-today i{background:var(--pink);border:none;box-shadow:0 0 10px var(--pink-dim);}
+.gyc-wd.today i{background:#FFFFFF;border:none;box-shadow:none;}
+.gyc-wd.future i{opacity:1;background:rgba(255,255,255,0.06);}
+.gyc-wd span{font-size:12px;}
+.gyc-wd.is-today span{color:var(--text);font-weight:800;}
+.gyc-num{font-size:40px;font-weight:800;}
+.gyc-stat{background:rgba(255,255,255,0.05);border-radius:14px;padding:9px 4px;}
+.gyc-stat-val{font-size:17px;font-weight:800;}
+/* Set rows: big, bold numbers you can read mid-set; pill buttons */
+#page-workout .set-row,.set-row{background:rgba(255,255,255,0.04);border-radius:16px;padding:11px 12px;}
+.set-num{font-size:15px;font-weight:800;width:20px;color:var(--text2);}
+.set-stat-val{font-size:21px;font-weight:800;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;}
+.set-stat-lbl{font-size:10px;font-weight:700;letter-spacing:.06em;}
+.set-divider{height:32px;}
+.rest-btn{padding:9px 15px;border-radius:999px;font-size:12.5px;font-weight:700;box-shadow:none;}
+.rest-btn.resting{box-shadow:none;}
+.rest-btn.done{border-radius:999px;}
+.add-set-btn{border-radius:999px;padding:10px;}
+/* Line icons that replaced emoji */
+.wn-ic,.ah-wo-ic{color:var(--pink);font-size:0;}
+.ah-home-item i{display:flex;justify-content:center;color:var(--pink);font-style:normal;}
+.ob-gender-icon,.ob-focus-icon{color:var(--pink);display:flex;justify-content:center;}
+.ob-focus-icon{justify-content:flex-start;}
+.mx-act-ic{color:#FF9F0A;}
+.mx-empty-ic,.cm-empty-ic,.mg-empty>div:first-child{color:var(--text3);display:flex;justify-content:center;}
+.wo-preview-rest-icon{color:var(--pink);display:flex;justify-content:center;}
+.pr-trophy,.dpr-icon,.cm-pr-trophy{color:#FFC72C;display:flex;align-items:center;}
+.cm-pr-trophy{filter:none;}
+.cmp-tile span{color:var(--pink);display:flex;}
+.cm-qi{display:inline-flex;}
+.summary-pr-badge svg,.ex-pr-badge svg{vertical-align:-2px;}
+.sq-btn{font-size:15px;font-weight:700;color:var(--text2);}
+.profile-pic-display{color:var(--text3);}
+.cm-act-badge.comment{display:inline-flex;align-items:center;justify-content:center;}
 /* Splash and other italic text: upright */
 .splash-name{font-style:normal;font-weight:800;letter-spacing:.14em;font-size:24px;}
 .cal-note,.food-log-empty,.wday-tab.rest,.food-search-empty{font-style:normal;}
@@ -2513,9 +2552,9 @@ button,input,select,textarea{font-family:inherit;}
       <div class="ob-sub">It only takes a minute. We'll personalise your programs, calorie targets, and dashboard based on your answers.</div>
       <div style="background:var(--bg4);border-radius:var(--radius-lg);padding:16px 18px;margin-bottom:8px;">
         <div style="display:flex;flex-direction:column;gap:10px;">
-          <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:20px;">🏋️</span><span style="font-size:13px;color:var(--text2);">Personalised workout programs</span></div>
-          <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:20px;">🥗</span><span style="font-size:13px;color:var(--text2);">Smart calorie & macro targets</span></div>
-          <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:20px;">📈</span><span style="font-size:13px;color:var(--text2);">Progress tracking tailored to your goal</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="color:var(--pink);display:flex;"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/></svg></span><span style="font-size:13px;color:var(--text2);">Personalised workout programs</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="color:var(--pink);display:flex;"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v7a3 3 0 0 0 6 0V3M7 3v18M17 21V3c-2 1-3 4-3 7s1 4 3 4"/></svg></span><span style="font-size:13px;color:var(--text2);">Smart calorie & macro targets</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><span style="color:var(--pink);display:flex;"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><span style="font-size:13px;color:var(--text2);">Progress tracking tailored to your goal</span></div>
         </div>
       </div>
       <div class="ob-nav">
@@ -2547,12 +2586,12 @@ button,input,select,textarea{font-family:inherit;}
       <div class="ob-sub">This helps us show the right workout programs for your goals. You can change this any time in Settings.</div>
       <div class="ob-gender-row">
         <div class="ob-gender-card" id="ob-gender-female" onclick="obSelectGender('female')">
-          <div class="ob-gender-icon">🌸</div>
+          <div class="ob-gender-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15a5 5 0 1 0 0-10 5 5 0 0 0 0 10M12 15v7M9 19h6"/></svg></div>
           <div class="ob-gender-name">Female</div>
           <div class="ob-gender-desc">Glute, tone & sculpt programs</div>
         </div>
         <div class="ob-gender-card" id="ob-gender-male" onclick="obSelectGender('male')">
-          <div class="ob-gender-icon">⚡</div>
+          <div class="ob-gender-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 20a6 6 0 1 0 0-12 6 6 0 0 0 0 12M14.5 9.5 21 3M15 3h6v6"/></svg></div>
           <div class="ob-gender-name">Male</div>
           <div class="ob-gender-desc">Strength & muscle programs</div>
         </div>
@@ -2571,7 +2610,7 @@ button,input,select,textarea{font-family:inherit;}
       <div class="ob-sub">This sets your calorie targets and workout focus. You can always change it in the Goals tab.</div>
       <div class="ob-focus-list">
         <div class="ob-focus-card" data-focus="fat_loss" onclick="obSelectFocus('fat_loss')">
-          <div class="ob-focus-icon">🔥</div>
+          <div class="ob-focus-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22a7 7 0 0 0 7-7c0-4-3-6-4-9-1 2-2 3-4 4 0-2-1-4-2-6-2 3-4 6-4 11a7 7 0 0 0 7 7z"/></svg></div>
           <div class="ob-focus-info">
             <div class="ob-focus-name">Fat Loss</div>
             <div class="ob-focus-desc">Burn fat, stay in a calorie deficit, keep muscle</div>
@@ -2579,7 +2618,7 @@ button,input,select,textarea{font-family:inherit;}
           <div class="ob-focus-check" id="ob-check-fat_loss"></div>
         </div>
         <div class="ob-focus-card" data-focus="muscle_gain" onclick="obSelectFocus('muscle_gain')">
-          <div class="ob-focus-icon">💪</div>
+          <div class="ob-focus-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/></svg></div>
           <div class="ob-focus-info">
             <div class="ob-focus-name">Muscle Gain</div>
             <div class="ob-focus-desc">Build lean muscle with a moderate calorie surplus</div>
@@ -2587,7 +2626,7 @@ button,input,select,textarea{font-family:inherit;}
           <div class="ob-focus-check" id="ob-check-muscle_gain"></div>
         </div>
         <div class="ob-focus-card" data-focus="recomp" onclick="obSelectFocus('recomp')">
-          <div class="ob-focus-icon">⚡</div>
+          <div class="ob-focus-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></div>
           <div class="ob-focus-info">
             <div class="ob-focus-name">Body Recomp</div>
             <div class="ob-focus-desc">Lose fat and gain muscle simultaneously at maintenance</div>
@@ -2603,7 +2642,7 @@ button,input,select,textarea{font-family:inherit;}
 
     <!-- Step 4: All done -->
     <div class="ob-step" id="ob-step-4">
-      <div class="ob-finish-icon">🎉</div>
+      <div class="ob-finish-icon"><img src="Icons/trident-mark.png" alt="" style="width:72px;height:72px;object-fit:contain;"></div>
       <div class="ob-finish-title">You're all set!</div>
       <div class="ob-finish-sub">Here's your profile summary. Everything is saved and you can update it anytime in Settings or Goals.</div>
       <div class="ob-summary" id="ob-summary"></div>
@@ -2626,7 +2665,7 @@ button,input,select,textarea{font-family:inherit;}
         <div class="home-hello-name" id="dash-name"></div>
       </div>
       <button class="home-av-btn" onclick="homeAvatarTap()" aria-label="Open your Community profile">
-        <span class="profile-pic-display home-av">👤</span>
+        <span class="profile-pic-display home-av"><svg viewBox="0 0 24 24" width="46%" height="46%" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-1a6 6 0 0 0-6-6h-4a6 6 0 0 0-6 6v1M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/></svg></span>
       </button>
     </div>
     <div class="page-sub" id="dash-date"></div>
@@ -2732,11 +2771,11 @@ button,input,select,textarea{font-family:inherit;}
       <div class="field" style="margin-bottom:10px;">
         <label>Sleep Quality</label>
         <div class="sleep-quality-row" id="sleepQualityPicker">
-          <button class="sq-btn" data-q="1" onclick="selectSleepQuality(1)">😴</button>
-          <button class="sq-btn" data-q="2" onclick="selectSleepQuality(2)">😐</button>
-          <button class="sq-btn" data-q="3" onclick="selectSleepQuality(3)">🙂</button>
-          <button class="sq-btn" data-q="4" onclick="selectSleepQuality(4)">😊</button>
-          <button class="sq-btn" data-q="5" onclick="selectSleepQuality(5)">🌟</button>
+          <button class="sq-btn" data-q="1" onclick="selectSleepQuality(1)" aria-label="Poor">1</button>
+          <button class="sq-btn" data-q="2" onclick="selectSleepQuality(2)" aria-label="Fair">2</button>
+          <button class="sq-btn" data-q="3" onclick="selectSleepQuality(3)" aria-label="Okay">3</button>
+          <button class="sq-btn" data-q="4" onclick="selectSleepQuality(4)" aria-label="Good">4</button>
+          <button class="sq-btn" data-q="5" onclick="selectSleepQuality(5)" aria-label="Great">5</button>
         </div>
       </div>
       <button class="tc-save-btn" style="width:100%;margin-bottom:12px;" onclick="saveSleep()">Save Sleep Entry</button>
@@ -2812,7 +2851,7 @@ button,input,select,textarea{font-family:inherit;}
     <!-- Activity -->
     <div class="activity-panel">
       <div class="activity-header">
-        <div class="activity-title"><span class="mx-act-ic" aria-hidden="true">🔥</span>Activity</div>
+        <div class="activity-title"><span class="mx-act-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22a7 7 0 0 0 7-7c0-4-3-6-4-9-1 2-2 3-4 4 0-2-1-4-2-6-2 3-4 6-4 11a7 7 0 0 0 7 7z"/></svg></span>Activity</div>
         <div class="activity-autosave" id="actSaveStatus"><span class="autosave-dot"></span><span id="actSaveText">updates automatically</span></div>
       </div>
       <div class="mx-act-fields">
@@ -3470,10 +3509,10 @@ button,input,select,textarea{font-family:inherit;}
       <div id="cmMention" class="cm-mention-box" style="display:none;"></div>
       <div class="cm-count cm-open-only" id="cmCount">0 / 1000</div>
       <div class="cm-composer-chips">
-        <button class="cm-qchip" id="cmChipPhoto" onclick="cmQuick('photo')"><span class="cm-qi">📷</span>Photo</button>
-        <button class="cm-qchip" id="cmChipWorkout" onclick="cmQuick('workout')"><span class="cm-qi">🏋️</span>Workout</button>
-        <button class="cm-qchip" id="cmChipPR" onclick="cmQuick('pr')"><span class="cm-qi">🏆</span>PR</button>
-        <button class="cm-qchip cm-open-only" id="cmChipTag" onpointerdown="event.preventDefault()" onclick="cmTagChip()"><span class="cm-qi">👥</span>Tag</button>
+        <button class="cm-qchip" id="cmChipPhoto" onclick="cmQuick('photo')"><span class="cm-qi"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8a2 2 0 0 1 2-2h2l2-2h6l2 2h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/></svg></span>Photo</button>
+        <button class="cm-qchip" id="cmChipWorkout" onclick="cmQuick('workout')"><span class="cm-qi"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/></svg></span>Workout</button>
+        <button class="cm-qchip" id="cmChipPR" onclick="cmQuick('pr')"><span class="cm-qi"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3"/></svg></span>PR</button>
+        <button class="cm-qchip cm-open-only" id="cmChipTag" onpointerdown="event.preventDefault()" onclick="cmTagChip()"><span class="cm-qi"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 19v-1a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v1M9 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6M22 19v-1a4 4 0 0 0-3-3.8M16 4.2a3 3 0 0 1 0 5.6"/></svg></span>Tag</button>
       </div>
       <input type="file" id="cmPhotoInput" accept="image/*" style="display:none;" onchange="cmPhotoChosen(this)">
       <div id="cmPicker" class="cm-open-only"></div>
@@ -3525,7 +3564,7 @@ button,input,select,textarea{font-family:inherit;}
     </div>
     <div class="settings-row" style="justify-content:space-between;">
       <div style="display:flex;align-items:center;gap:12px;">
-        <div class="profile-pic-display" onclick="openProfilePic()" style="width:52px;height:52px;border-radius:50%;background:var(--bg4);border:0.5px solid var(--border2);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;flex-shrink:0;">👤</div>
+        <div class="profile-pic-display" onclick="openProfilePic()" style="width:52px;height:52px;border-radius:50%;background:var(--bg4);border:0.5px solid var(--border2);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;flex-shrink:0;"><svg viewBox="0 0 24 24" width="46%" height="46%" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-1a6 6 0 0 0-6-6h-4a6 6 0 0 0-6 6v1M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/></svg></div>
         <div>
           <div class="settings-row-label">Profile Picture</div>
           <div class="settings-row-sub">Tap to change</div>
@@ -3716,7 +3755,7 @@ button,input,select,textarea{font-family:inherit;}
     box-shadow:0 0 60px var(--pink-glow), 0 20px 60px rgba(0,0,0,0.8);
     pointer-events:all;
   ">
-    <div id="prTrophyEmoji" style="font-size:72px;line-height:1;margin-bottom:4px;display:block;">🏆</div>
+    <div id="prTrophyEmoji" style="line-height:1;margin-bottom:8px;display:flex;justify-content:center;color:#FFC72C;"><svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3"/></svg></div>
     <div style="font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--pink);margin-bottom:8px;">Personal Record</div>
     <div id="prExName" style="font-size:22px;font-weight:700;letter-spacing:-0.02em;margin-bottom:6px;"></div>
     <div id="prWeightDisplay" style="font-size:42px;font-weight:700;letter-spacing:-0.04em;color:var(--pink);line-height:1;"></div>
@@ -3735,6 +3774,20 @@ button,input,select,textarea{font-family:inherit;}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
+// ── Line icons (Design E: used instead of emoji) ──
+const TFI_P = {"dumbbell": "M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12", "food": "M4 3v7a3 3 0 0 0 6 0V3M7 3v18M17 21V3c-2 1-3 4-3 7s1 4 3 4", "chart": "M4 20V10M10 20V4M16 20v-7M22 20H2", "user": "M20 21v-1a6 6 0 0 0-6-6h-4a6 6 0 0 0-6 6v1M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8", "users": "M16 19v-1a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v1M9 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6M22 19v-1a4 4 0 0 0-3-3.8M16 4.2a3 3 0 0 1 0 5.6", "flame": "M12 22a7 7 0 0 0 7-7c0-4-3-6-4-9-1 2-2 3-4 4 0-2-1-4-2-6-2 3-4 6-4 11a7 7 0 0 0 7 7z", "bolt": "M13 2 4 14h7l-1 8 9-12h-7z", "heart": "M20.8 5.6a5.5 5.5 0 0 0-7.8 0L12 6.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 22l8.8-8.6a5.5 5.5 0 0 0 0-7.8z", "trophy": "M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3", "camera": "M3 8a2 2 0 0 1 2-2h2l2-2h6l2 2h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8", "chat": "M21 12a8 8 0 0 1-11.5 7.2L4 21l1.8-5.5A8 8 0 1 1 21 12z", "bell": "M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0", "signal": "M2 9a15 15 0 0 1 20 0M5 13a10 10 0 0 1 14 0M8.5 16.5a5 5 0 0 1 7 0M12 20h.01M3 3l18 18", "moon": "M20 14A8 8 0 1 1 10 4a6 6 0 0 0 10 10z", "shield": "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z", "key": "M15 7a4 4 0 1 1-3.9 4.9L3 20v-3l2-2h2v-2l2.1-2.1A4 4 0 0 1 15 7zM16 8h.01", "mail": "M3 6h18v12H3zM3 7l9 6 9-6", "search": "M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14M20 20l-3.5-3.5", "box": "M21 8 12 3 3 8v8l9 5 9-5zM3 8l9 5 9-5M12 13v8", "phone": "M7 2h10v20H7zM11 18h2", "sliders": "M4 7h10M18 7h2M4 17h4M12 17h8M16 5v4M10 15v4", "calendar": "M4 5h16v16H4zM4 10h16M9 3v4M15 3v4", "image": "M3 4h18v16H3zM3 16l5-5 4 4 3-3 6 6M15 9h.01", "pen": "M4 20h4L19 9l-4-4L4 16zM14 6l4 4", "eye": "M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6", "target": "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8M12 12h.01", "ball": "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18M3.5 9h17M3.5 15h17M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18", "sparkle": "M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 17l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z", "gear": "M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z", "upload": "M12 15V3M7 8l5-5 5 5M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4", "check": "M20 6 9 17l-5-5", "run": "M13 4a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3M7 21l3-6 3 2v5M6 12l3-4 5 1 3 4M10 15l-1-5", "bike": "M5.5 20a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7M18.5 20a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7M15 6h2l1.5 10.5M12 16.5 9 9h6M5.5 16.5 9 9", "swim": "M2 18c2 0 2-1.5 4-1.5S8 18 10 18s2-1.5 4-1.5 2 1.5 4 1.5 2-1.5 4-1.5M8 13l3-4 4 2 3-3M17 6a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3", "yoga": "M12 6a2 2 0 1 0 0-4 2 2 0 0 0 0 4M4 20h16M12 8v6M7 11l5-1 5 1M9 20l3-6 3 6", "wave": "M2 12c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2M2 18c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2", "drop": "M12 2.7 6.3 9.3a7 7 0 1 0 11.4 0z", "mountain": "M3 20 9.5 8l4 7 2.5-4L21 20z", "wind": "M3 8h11a3 3 0 1 0-3-3M3 12h16a3 3 0 1 1-3 3M3 16h8", "alert": "M12 3 2 21h20zM12 10v5M12 18h.01", "dot": "M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4", "up": "M12 19V5M5 12l7-7 7 7", "clock": "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18M12 7v5l3 2", "female": "M12 15a5 5 0 1 0 0-10 5 5 0 0 0 0 10M12 15v7M9 19h6", "male": "M10 20a6 6 0 1 0 0-12 6 6 0 0 0 0 12M14.5 9.5 21 3M15 3h6v6"};
+const TFI_EMO = {"🏋️": "dumbbell", "🏋": "dumbbell", "💪": "dumbbell", "🥗": "food", "🍽️": "food", "🍽": "food", "🍔": "food", "🌾": "food", "🥑": "food", "📈": "chart", "👤": "user", "🙋": "user", "👋": "user", "👥": "users", "🔥": "flame", "⚡": "bolt", "❤️": "heart", "❤": "heart", "🏆": "trophy", "🥇": "trophy", "📷": "camera", "📸": "camera", "💬": "chat", "🔔": "bell", "📡": "signal", "🌙": "moon", "😴": "moon", "🛌": "moon", "🛡️": "shield", "🛡": "shield", "🔑": "key", "✉️": "mail", "✉": "mail", "🔎": "search", "📦": "box", "📲": "phone", "🎛️": "sliders", "🎛": "sliders", "📅": "calendar", "🖼️": "image", "🖼": "image", "📝": "pen", "✍️": "pen", "✍": "pen", "👀": "eye", "🎯": "target", "🏈": "ball", "⚽": "ball", "🏀": "ball", "🏐": "ball", "⚾": "ball", "🎾": "ball", "🏓": "ball", "⛳": "ball", "✨": "sparkle", "⚙️": "gear", "⚙": "gear", "📤": "upload", "✅": "check", "🏃": "run", "🚶": "run", "🥾": "run", "👟": "run", "🚴": "bike", "🏊": "swim", "🧘": "yoga", "🤸": "yoga", "🩰": "yoga", "💃": "yoga", "🥊": "bolt", "🥋": "bolt", "🚣": "wave", "🪜": "chart", "🧊": "drop", "💧": "drop", "🧗": "mountain", "⛷️": "mountain", "⛷": "mountain", "🏂": "mountain", "🫁": "wind", "⚠️": "alert", "⚠": "alert", "🎉": "check"};
+function tfIc(name, size) {
+  size = size || 20;
+  const d = TFI_P[name] || TFI_P.dot;
+  return `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${d}"/></svg>`;
+}
+// An emoji from saved data (What's New, workout types…) shown as the matching line icon.
+function tfEmo(e, size) {
+  const k = String(e || '').trim();
+  return tfIc(TFI_EMO[k] || TFI_EMO[k.replace(/\uFE0F/g, '')] || 'dot', size);
+}
+
 // ══════════════════════════════════════
 // STORAGE KEYS
 // ══════════════════════════════════════
@@ -5344,13 +5397,13 @@ async function lookupBarcodeOFF(barcode) {
 
 function scanMacroCards(calories, protein, carbs, fat) {
   return [
-    ['🔥', calories, 'kcal'],
-    ['💪', protein+'g', 'protein'],
-    ['🌾', carbs+'g', 'carbs'],
-    ['🥑', fat+'g', 'fat'],
+    [tfIc('flame', 14), calories, 'kcal'],
+    [tfIc('dumbbell', 14), protein+'g', 'protein'],
+    [tfIc('food', 14), carbs+'g', 'carbs'],
+    [tfIc('drop', 14), fat+'g', 'fat'],
   ].map(([icon, val, lbl]) => `
     <div style="background:var(--bg4);border-radius:8px;padding:8px 6px;text-align:center;">
-      <div style="font-size:14px;">${icon}</div>
+      <div style="display:flex;justify-content:center;color:var(--pink);">${icon}</div>
       <div style="font-size:14px;font-weight:700;letter-spacing:-0.02em;margin-top:2px;">${val}</div>
       <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;">${lbl}</div>
     </div>`).join('');
@@ -5593,7 +5646,7 @@ function renderFoodLog() {
   renderMealMacroPills();
 
   if(items.length === 0) {
-    el.innerHTML = `<div class="food-log-empty"><div class="mx-empty-ic">🍽️</div>Nothing logged for ${MEAL_LABELS[curMeal].toLowerCase()} yet</div>`;
+    el.innerHTML = `<div class="food-log-empty"><div class="mx-empty-ic">${tfIc('food', 26)}</div>Nothing logged for ${MEAL_LABELS[curMeal].toLowerCase()} yet</div>`;
     return;
   }
 
@@ -7195,7 +7248,7 @@ function renderWorkoutPreview() {
       <div class="wo-preview-day-name">Rest day</div>
       <div class="wo-preview-day-meta">Recovery is just as important as training</div>
       <div class="wo-preview-rest-card">
-        <div class="wo-preview-rest-icon">🛌</div>
+        <div class="wo-preview-rest-icon">${tfIc('moon', 34)}</div>
         <div class="wo-preview-rest-title">Take it easy today</div>
         <div class="wo-preview-rest-sub">Stretch, hydrate, and let your muscles recover and grow.</div>
       </div>
@@ -7364,18 +7417,18 @@ function renderActiveWorkout(){
 
   // Recovery day — show mobility routine
   if(day.type==='recovery' || day.name==='Recovery'){
-    const icons = {mobility:'🔵',stretch:'🟢',cardio:'🏃'};
+    const icons = {mobility:tfIc('yoga', 18),stretch:tfIc('yoga', 18),cardio:tfIc('run', 18)};
     document.getElementById('workoutContent').innerHTML=`
       <div class="rest-day-card" style="padding:0;">
         <div style="padding:20px 20px 12px;">
-          <div style="font-size:32px;margin-bottom:8px;">🧘</div>
+          <div style="margin-bottom:8px;color:var(--pink);">${tfIc('yoga', 30)}</div>
           <div class="rest-day-title">Active Recovery</div>
           <div class="rest-day-sub" style="margin-bottom:0;">Help your muscles recover and come back stronger.</div>
         </div>
         <div style="padding:0 16px 20px;">
           ${RECOVERY_ROUTINE.exercises.map(ex=>`
             <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg4);border-radius:var(--radius);margin-bottom:8px;border:0.5px solid var(--border);">
-              <div style="font-size:18px;flex-shrink:0;">${icons[ex.type]||'⚪'}</div>
+              <div style="font-size:18px;flex-shrink:0;">${icons[ex.type]||tfIc('dot', 18)}</div>
               <div style="flex:1;">
                 <div style="font-size:14px;font-weight:600;">${ex.name}</div>
                 <div style="font-size:12px;color:var(--text3);">${ex.duration}</div>
@@ -7386,7 +7439,7 @@ function renderActiveWorkout(){
         <div style="padding:0 16px 20px;">
           <div style="background:rgba(50,252,253,0.08);border:0.5px solid rgba(50,252,253,0.2);border-radius:var(--radius);padding:14px;text-align:center;">
             <div style="font-size:13px;font-weight:600;color:var(--pink);margin-bottom:4px;">Recovery Tips</div>
-            <div style="font-size:12px;color:var(--text3);">💧 Drink 8+ glasses of water · 😴 Aim for 8hrs sleep · 🥗 Eat enough protein</div>
+            <div style="font-size:12px;color:var(--text3);">Drink 8+ glasses of water · Aim for 8 hours of sleep · Eat enough protein</div>
           </div>
         </div>
       </div>`;
@@ -7431,7 +7484,7 @@ function renderActiveWorkout(){
       <div class="exercise-card-header">
         <div class="ex-card-icon">${hasLog ? '<span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:rgba(48,209,88,0.2);color:#30D158;font-size:11px;font-weight:700;">✓</span>' : isActive ? '▶' : '○'}</div>
         <div class="ex-card-title">
-          <div class="ex-card-name">${ex.name}${pr?` <span class="summary-pr-badge">🏆 ${pr.weight}lbs</span>`:''}</div>
+          <div class="ex-card-name">${ex.name}${pr?` <span class="summary-pr-badge">${tfIc('trophy', 12)} ${pr.weight}lbs</span>`:''}</div>
           <div class="ex-card-meta">${ex.sets} sets · ${ex.reps} reps</div>
         </div>
         ${statusEl}
@@ -7739,7 +7792,7 @@ function showPhaseAdvancementPrompt() {
   const html = `
     <div style="position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;" id="phasePromptOverlay">
       <div style="background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:28px;max-width:380px;text-align:center;">
-        <div style="font-size:48px;margin-bottom:12px;">🎉</div>
+        <div style="margin-bottom:12px;color:var(--pink);display:flex;justify-content:center;">${tfIc('trophy', 44)}</div>
         <div style="font-size:20px;font-weight:700;margin-bottom:8px;">Phase ${currentPhase} Complete!</div>
         <div style="font-size:14px;color:var(--text3);margin-bottom:20px;">You're ready for the next challenge.</div>
         
@@ -8575,7 +8628,7 @@ function renderExerciseCard(ex, ei) {
   }
 
   const poText=(!bw && suggested)?`+5% → ${suggested} lbs`:'';
-  const prBadge=(!bw && pr)?`<span class="ex-pr-badge">🏆 PR: ${pr.weight} lbs</span>`:'';
+  const prBadge=(!bw && pr)?`<span class="ex-pr-badge">${tfIc('trophy', 12)} PR: ${pr.weight} lbs</span>`:'';
   const hasPhoto=!!photo;
   const exImg = getExerciseImage(ex.name);
   const doneCount=log.filter(s=> bw ? s.reps : (s.weight||s.reps)).length;
@@ -9055,7 +9108,7 @@ function renderMuscleGrowth(animate) {
   try { list = mgAnalyze(); } catch(e) { console.warn('Muscle growth skipped:', e); el.innerHTML = ''; return; }
   const shown = list.filter(g => g.status !== 'none');
   if(!shown.length) {
-    el.innerHTML = `<div class="mg-empty"><div>📈</div>Log weights and reps in a couple of workouts and this chart will show which muscles are growing.</div>`;
+    el.innerHTML = `<div class="mg-empty"><div>${tfIc('chart', 28)}</div>Log weights and reps in a couple of workouts and this chart will show which muscles are growing.</div>`;
     return;
   }
   const growing = list.filter(g => g.status === 'grow');
@@ -9142,7 +9195,7 @@ function renderProgress(){
     prList.innerHTML = prEntries.map(([key, pr]) => {
       const exName = key.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
       return `<div class="pr-row">
-        <div class="pr-trophy">🏆</div>
+        <div class="pr-trophy">${tfIc('trophy', 16)}</div>
         <div class="pr-ex-name">${exName}<span>${pr.date || ''}</span></div>
         <div class="pr-weight">${pr.weight}<span>lbs</span></div>
       </div>`;
@@ -9523,7 +9576,7 @@ function renderDashPRs() {
   const rows = list.slice(0, 4).map(x => {
     const gain = Number(x.pr.prev) > 0 ? Math.round((Number(x.pr.weight) - Number(x.pr.prev)) * 10) / 10 : 0;
     return `<div class="dpr-row">
-      <div class="dpr-icon">🏆</div>
+      <div class="dpr-icon">${tfIc('trophy', 18)}</div>
       <div style="min-width:0;"><div class="dpr-name">${cmEsc(prDisplayName(x.key, x.pr))}</div><div class="dpr-when">${cmEsc(prWhen(Number(x.pr.ts) || 0, x.pr.date))}</div></div>
       <div class="dpr-wt"><div class="dpr-wt-val">${cmEsc(x.pr.weight)}<span>lbs</span></div>${gain > 0 ? `<div class="dpr-gain">+${gain} lbs</div>` : ''}</div>
     </div>`;
@@ -10678,7 +10731,7 @@ function doScheduleReminder(timeStr) {
   clearTimeout(window._sleepReminderTimer);
   window._sleepReminderTimer = setTimeout(() => {
     if(Notification.permission === 'granted') {
-      new Notification('🌙 Bedtime Reminder', { body: 'Time to wind down! Aim for a great night\'s sleep.', icon: '' });
+      new Notification('Bedtime reminder', { body: 'Time to wind down! Aim for a great night\'s sleep.', icon: '' });
     }
     // Re-schedule for next day
     doScheduleReminder(timeStr);
@@ -11078,7 +11131,7 @@ async function startAICamera() {
     video.srcObject = aiStream;
     badge.textContent = 'Position food in frame';
   } catch(e) {
-    badge.textContent = '⚠ Camera unavailable — use Upload instead';
+    badge.textContent = 'Camera unavailable — use Upload instead';
     document.getElementById('aiSnapBtn').disabled = true;
   }
 }
@@ -11297,7 +11350,7 @@ async function analyseWithLogMeal(dataUrl) {
 
   } catch(e) {
     resetScanner();
-    showToast('⚠ ' + (e.message || 'Could not analyse photo — please try again'), 3500);
+    showToast(e.message || 'Could not analyse photo — please try again', 3500);
     console.error('LogMeal AI error:', e);
   }
 }
@@ -11363,7 +11416,7 @@ async function analyseWithClaude(dataUrl, opts) {
       aiShowPre(true);
       startAICamera();
     }
-    if(msg) showToast('⚠ ' + msg, 3500);
+    if(msg) showToast(msg, 3500);
   }
 
   let res, data;
@@ -13831,7 +13884,7 @@ function cmSetsText(ex) {
 
 // Workout badge by session type (field training, game day, sport, recovery, or a lift)
 function cmWoBadge(payload) {
-  return ({ field: '🏈 Field training', competition: '🏈 Game day', sport: '🥊 Sport', recovery: '🧘 Recovery' })[payload && payload.cat] || 'Workout';
+  return ({ field: 'Field training', competition: 'Game day', sport: 'Sport', recovery: 'Recovery' })[payload && payload.cat] || 'Workout';
 }
 // The three headline numbers a newer workout carries (older posts: null, so the lifting numbers show)
 function cmWoStats(payload) {
@@ -13855,7 +13908,7 @@ function cmOvCardHTML(type, payload, ov, editable) {
   const mark = `<img src="Icons/trident-mark.png" alt="" onerror="this.remove()">`;
   let inner;
   if(type === 'pr') {
-    inner = `<div class="cm-ovc-main"><div class="cm-ovc-top">${mark}<span>🏆 New PR</span></div>
+    inner = `<div class="cm-ovc-main"><div class="cm-ovc-top">${mark}<span>New PR</span></div>
       <div class="cm-ovc-title">${cmEsc(payload.exercise || 'Lift')}</div></div>
       <div class="cm-ovc-side"><div class="cm-ovc-pr">${cmNum(payload.weight)}<small>lbs</small></div></div>`;
   } else {
@@ -13923,7 +13976,7 @@ function cmAttachHTML(type, payload, who) {
   }
   if(type === 'pr') {
     return `<div class="cm-attach cm-attach-pr">
-      <div class="cm-pr-trophy">🏆</div>
+      <div class="cm-pr-trophy">${tfIc('trophy', 40)}</div>
       <div style="min-width:0;">
         <div class="cm-attach-badge">New personal record</div>
         <div class="cm-attach-title">${cmEsc(payload.exercise || 'Lift')}</div>
@@ -14201,8 +14254,8 @@ function cmGridHTML(posts) {
     if(!id) return '';
     let inner;
     if(p.has_photo) inner = `<img src="${WORKER_URL}/community/photo/${id}" alt="" loading="lazy" decoding="async" onerror="this.remove()">`;
-    else if(p.type === 'pr' && p.payload) inner = `<div class="cmp-tile pr"><span>🏆</span><b>${cmNum(p.payload.weight)}<small>lbs</small></b><em>${cmEsc(p.payload.exercise || 'PR')}</em></div>`;
-    else if(p.type === 'workout' && p.payload) inner = `<div class="cmp-tile wo"><span>🏋️</span><em>${cmEsc(p.payload.day || 'Workout')}</em></div>`;
+    else if(p.type === 'pr' && p.payload) inner = `<div class="cmp-tile pr"><span>${tfIc('trophy', 24)}</span><b>${cmNum(p.payload.weight)}<small>lbs</small></b><em>${cmEsc(p.payload.exercise || 'PR')}</em></div>`;
+    else if(p.type === 'workout' && p.payload) inner = `<div class="cmp-tile wo"><span>${tfIc('dumbbell', 24)}</span><em>${cmEsc(p.payload.day || 'Workout')}</em></div>`;
     else inner = `<div class="cmp-tile txt"><p>${cmEsc(String(p.body || '').slice(0, 90))}</p></div>`;
     return `<button class="cmp-cell" onclick="cmGridOpen('${id}')" aria-label="Open post">${inner}${p.like_count ? `<span class="cmp-cell-likes">${CM_HEART}${cmNum(p.like_count)}</span>` : ''}</button>`;
   }).join('')}</div>`;
@@ -14490,11 +14543,11 @@ function cmDraw() {
     const skel = `<div class="cm-skel"><div style="display:flex;gap:10px;align-items:center;margin-bottom:14px;"><i style="width:40px;height:40px;border-radius:50%;"></i><div style="flex:1;"><i style="width:40%;height:12px;margin-bottom:6px;"></i><i style="width:25%;height:10px;"></i></div></div><i style="width:90%;height:12px;margin-bottom:8px;"></i><i style="width:70%;height:12px;margin-bottom:14px;"></i><i style="width:100%;height:120px;border-radius:14px;"></i></div>`;
     html += skel + skel;
   } else if(cmState.status === 'error') {
-    html += `<div class="cm-empty"><div class="cm-empty-ic">📡</div><b>Can't reach the community</b>Check your connection and try again.<br><br><button class="cm-chip" onclick="cmLoadFeed(true)">Try again</button></div>`;
+    html += `<div class="cm-empty"><div class="cm-empty-ic">${tfIc('signal', 34)}</div><b>Can't reach the community</b>Check your connection and try again.<br><br><button class="cm-chip" onclick="cmLoadFeed(true)">Try again</button></div>`;
   } else if(!cmState.posts.length) {
     html += following
-      ? `<div class="cm-empty"><div class="cm-empty-ic">👥</div><b>Follow people to fill this feed</b>Tap someone's name or picture on a post to see their profile and follow them.</div>`
-      : `<div class="cm-empty"><div class="cm-empty-ic">💬</div><b>No posts yet</b>Be the first to share something.</div>`;
+      ? `<div class="cm-empty"><div class="cm-empty-ic">${tfIc('users', 34)}</div><b>Follow people to fill this feed</b>Tap someone's name or picture on a post to see their profile and follow them.</div>`
+      : `<div class="cm-empty"><div class="cm-empty-ic">${tfIc('chat', 34)}</div><b>No posts yet</b>Be the first to share something.</div>`;
   } else {
     html += cmState.posts.map(cmPostHTML).join('');
     if(cmState.next) html += `<button class="ghost-btn" onclick="cmLoadFeed(false)">Load more</button>`;
@@ -14669,7 +14722,7 @@ function cmEditProfile() {
   const pr = cmProf.data || {};
   cmSheet(`<div class="cm-sheet-title">Edit profile</div>
     <label class="cmp-edit-label" for="cmBioInput">Bio</label>
-    <textarea class="cm-textarea" id="cmBioInput" maxlength="150" rows="4" placeholder="Tell people about you, e.g. Hybrid athlete · Training for my first marathon 🏃" oninput="cmBioCount()"></textarea>
+    <textarea class="cm-textarea" id="cmBioInput" maxlength="150" rows="4" placeholder="Tell people about you, e.g. Hybrid athlete · Training for my first marathon" oninput="cmBioCount()"></textarea>
     <div class="cm-count" id="cmBioCount">0 / 150</div>
     <button class="pink-btn" id="cmBioSave" style="margin-top:12px;" onclick="cmSaveBio()">Save</button>
     <button class="cmp-edit-link" onclick="cmSheetClose();openSettings()">Change your photo, name or username in Settings ›</button>
@@ -15021,7 +15074,7 @@ function cmActivityText(it) {
 }
 function cmActivityIcon(kind) {
   return kind === 'like_post' || kind === 'like_comment' ? '<span class="cm-act-badge like">♥</span>'
-    : kind === 'follow' ? '<span class="cm-act-badge follow">＋</span>' : '<span class="cm-act-badge comment">💬</span>';
+    : kind === 'follow' ? '<span class="cm-act-badge follow">＋</span>' : '<span class="cm-act-badge comment">' + tfIc('chat', 10) + '</span>';
 }
 async function cmOpenActivity() {
   cmSheet(`<div class="cm-sheet-title">Activity</div><div class="cm-empty" style="padding:22px 0;">Loading…</div>`, true);
@@ -15041,7 +15094,7 @@ async function cmOpenActivity() {
     </button>`;
   }).join('');
   cmSheet(`<div class="cm-sheet-title">Activity</div>
-    ${items.length ? `<div class="cm-act-list">${rows}</div>` : `<div class="cm-empty" style="padding:22px 0;"><div class="cm-empty-ic">🔔</div><b>Nothing yet</b>When people like or comment on your posts and comments, or follow you, it shows up here.</div>`}
+    ${items.length ? `<div class="cm-act-list">${rows}</div>` : `<div class="cm-empty" style="padding:22px 0;"><div class="cm-empty-ic">${tfIc('bell', 34)}</div><b>Nothing yet</b>When people like or comment on your posts and comments, or follow you, it shows up here.</div>`}
     <button class="ghost-btn" style="margin-top:12px;" onclick="cmSheetClose()">Close</button>`);
   // Opening the list counts as seeing it
   if(r.data.unread) { const s2 = await cmApi('/community/activity/seen', 'POST', {}); if(s2.ok) cmSetActUnread(0); }
@@ -15270,7 +15323,7 @@ async function lnBedtimeSyncNow(timeStr) {
     if(!timeStr) { await lnCall('cancel', { notifications: [{ id: LN_BED_ID }] }); return; }
     if(await lnPermission(true) !== 'granted') { lnLastBed = null; return; }
     const [h, m] = timeStr.split(':').map(Number);
-    await lnSchedule({ id: LN_BED_ID, title: '🌙 Bedtime Reminder', body: "Time to wind down! Aim for a great night's sleep.",
+    await lnSchedule({ id: LN_BED_ID, title: 'Bedtime reminder', body: "Time to wind down! Aim for a great night's sleep.",
       schedule: { on: { hour: h, minute: m }, allowWhileIdle: true }, foreground: true });
   } catch(e) { lnLastBed = null; console.warn('Bedtime alert not scheduled:', e); }
 }
@@ -15298,7 +15351,7 @@ async function lnTurnOn() {
 }
 async function lnSendTest() {
   try {
-    await lnSchedule({ id: LN_TEST_ID, title: 'Trident Fitness', body: 'Phone alerts are working ✅', schedule: { at: new Date(Date.now() + 5000), allowWhileIdle: true }, foreground: true });
+    await lnSchedule({ id: LN_TEST_ID, title: 'Trident Fitness', body: 'Phone alerts are working.', schedule: { at: new Date(Date.now() + 5000), allowWhileIdle: true }, foreground: true });
     showToast('Test alert in 5 seconds — try locking your phone');
   } catch(e) { showToast("Couldn't send a test alert"); }
 }
@@ -15776,12 +15829,7 @@ if(wtNative()) {
 // They are kept on this phone only. They go to Community or your profile only when you switch on
 // "Share watch stats" (on the summary, or for one post in the composer). Off by default.
 // Small line icons (used instead of emoji)
-const TF_IC = {
-  flame: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22a7 7 0 0 0 7-7c0-4-3-6-4-9-1 2-2 3-4 4 0-2-1-4-2-6-2 3-4 6-4 11a7 7 0 0 0 7 7z"/></svg>',
-  heart: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.8 5.6a5.5 5.5 0 0 0-7.8 0L12 6.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 22l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/></svg>',
-  up: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>',
-  clock: '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>'
-};
+const TF_IC = { flame: tfIc('flame', 15), heart: tfIc('heart', 15), up: tfIc('up', 15), clock: tfIc('clock', 15) };
 const WT_STATS_KEY = 'trident_watch_stats_v1';   // { 'c:<logKey>' | 'h:<sid>': { cal, avg, max, min, dur, end, hr:[[s,bpm]], share } }
 function wtStatsAll() { const a = load(WT_STATS_KEY); return a && typeof a === 'object' ? a : {}; }
 function wtStatsFor(id) {
@@ -17213,7 +17261,7 @@ function ahWoName(w) {
   if(m) return m[0];
   return String(w.workoutType || 'Workout').replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase());
 }
-function ahWoIcon(w) { return (AH_WO[w.workoutType] || [0, '⚡'])[1]; }
+function ahWoIcon(w) { return tfEmo((AH_WO[w.workoutType] || [0, '⚡'])[1], 20); }
 function ahWoKey(w) { return w.platformId || (w.startDate + '|' + w.workoutType); }
 function ahMiles(m) { return Math.round(ahNum(m) / 1609.344 * 100) / 100; }
 function ahDurS(sec) { const m = Math.round(ahNum(sec) / 60); return m >= 60 ? `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, '0')}m` : `${m} min`; }
@@ -17447,7 +17495,7 @@ function ahOpenConnectSheet() {
       <div><div class="ah-home-name">Apple Health</div><b>${more ? 'Add workouts & heart data' : 'Connect Apple Health'}</b></div></div>
     <p class="ah-sheet-p">${more ? 'Bring in your Apple Watch and Apple Fitness workouts plus heart health from the Apple Health app.'
               : 'See your Apple Health and Apple Fitness data in Trident: your Steps, Sleep and Macros fill in automatically, and your Apple Watch workouts and heart health show on Progress.'}</p>
-    <div class="ah-home-grid">${items.map(([i, t]) => `<div class="ah-home-item"><i>${i}</i><span>${t}</span></div>`).join('')}</div>
+    <div class="ah-home-grid">${items.map(([i, t]) => `<div class="ah-home-item"><i>${tfEmo(i, 18)}</i><span>${t}</span></div>`).join('')}</div>
     <button class="pink-btn" onclick="ahConnect()" ${ahState.connecting ? 'disabled' : ''}>${ahState.connecting ? 'Opening Apple Health…' : more ? 'Allow workouts & heart data' : 'Connect Apple Health'}</button>
     <div class="ah-home-foot"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>Read-only · stays on this iPhone</span><button onclick="ahSheetClose();ahHomeCardHide()">Not now</button></div>`);
 }
@@ -17682,7 +17730,7 @@ function wnOpen(entry) {
         <div class="wn-title" id="wnTitle">${wnEsc(entry.title || 'Fresh updates')}</div>
         <div class="wn-date">${entry.version ? `<span class="wn-ver">Version ${wnEsc(entry.version)}</span>` : ''}${entry.version && entry.date ? ' · ' : ''}${wnEsc(entry.date || '')}</div>
       </div>
-      <div class="wn-list">${(entry.items || []).map(it => `<div class="wn-item"><div class="wn-ic">${wnEsc(it.ic)}</div><div class="wn-txt"><b>${wnEsc(it.t)}</b><span>${wnEsc(it.d)}</span></div></div>`).join('')}</div>
+      <div class="wn-list">${(entry.items || []).map(it => `<div class="wn-item"><div class="wn-ic">${tfEmo(it.ic, 18)}</div><div class="wn-txt"><b>${wnEsc(it.t)}</b><span>${wnEsc(it.d)}</span></div></div>`).join('')}</div>
       <button class="pink-btn wn-btn" onclick="wnClose()">Let's go</button>
     </div>`;
   document.body.appendChild(el);
@@ -17836,7 +17884,7 @@ function openProfilePic() {
   const saved = localStorage.getItem(PROFILE_PIC_KEY);
   const preview = document.getElementById('profilePicPreview');
   if(saved) preview.innerHTML = `<img src="${saved}" style="width:100%;height:100%;object-fit:cover;">`;
-  else preview.innerHTML = '👤';
+  else preview.innerHTML = tfIc('user', 44);
   document.getElementById('profilePicOverlay').style.display = 'flex';
 }
 function closeProfilePic() {
@@ -17911,7 +17959,7 @@ function saveProfilePic() {
 function updateProfilePicDisplay() {
   const src = localStorage.getItem(PROFILE_PIC_KEY);
   document.querySelectorAll('.profile-pic-display').forEach(el => {
-    el.innerHTML = src ? `<img src="${src}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : '👤';
+    el.innerHTML = src ? `<img src="${src}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : tfIc('user', '46%');
   });
 }
 
@@ -18015,7 +18063,7 @@ document.addEventListener('visibilitychange', () => { if(!document.hidden) { try
 <!-- Reset All Confirmation -->
 <div id="resetConfirmOverlay" class="reset-confirm-overlay" style="display:none;" onclick="if(event.target===this)closeResetConfirm()">
   <div class="reset-confirm-card">
-    <div class="reset-confirm-icon">⚠️</div>
+    <div class="reset-confirm-icon" style="color:var(--red);display:flex;justify-content:center;"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2 21h20zM12 10v5M12 18h.01"/></svg></div>
     <div class="reset-confirm-title">Reset All App Data?</div>
     <div class="reset-confirm-body">
       This will permanently delete <strong>all</strong> your data — macros, workouts, progress, goals, food library, and settings.<br><br>
@@ -18061,10 +18109,10 @@ document.addEventListener('visibilitychange', () => { if(!document.hidden) { try
 <!-- ── Progress Photo Overlay ── -->
 <div id="progressPhotoOverlay" class="reset-confirm-overlay" style="display:none;" onclick="if(event.target===this)closeProgressPhoto()">
   <div class="reset-confirm-card" style="text-align:left;max-width:420px;">
-    <div style="font-size:18px;font-weight:700;margin-bottom:16px;">📸 Progress Photo</div>
+    <div style="font-size:18px;font-weight:700;margin-bottom:16px;">Progress Photo</div>
     <div id="ppPhotoPreview" style="width:100%;height:200px;background:var(--bg4);border-radius:var(--radius);margin-bottom:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:13px;">No photo selected</div>
     <input type="file" id="ppFileInput" accept="image/*" style="display:none;" onchange="previewProgressPhoto(this)">
-    <button onclick="document.getElementById('ppFileInput').click()" style="width:100%;padding:12px;border-radius:var(--radius-lg);border:0.5px solid var(--border2);background:transparent;font-family:inherit;font-size:13px;color:var(--text2);cursor:pointer;margin-bottom:10px;">📷 Choose Photo</button>
+    <button onclick="document.getElementById('ppFileInput').click()" style="width:100%;padding:12px;border-radius:var(--radius-lg);border:0.5px solid var(--border2);background:transparent;font-family:inherit;font-size:13px;color:var(--text2);cursor:pointer;margin-bottom:10px;">Choose Photo</button>
     <div class="field" style="margin-bottom:12px;"><label>Caption (optional)</label><div class="iw"><input type="text" id="ppCaption" placeholder="Week 4 check-in…"></div></div>
     <div style="display:flex;gap:10px;">
       <button class="reset-confirm-cancel" onclick="closeProgressPhoto()">Cancel</button>
@@ -18077,7 +18125,7 @@ document.addEventListener('visibilitychange', () => { if(!document.hidden) { try
 <div id="profilePicOverlay" class="reset-confirm-overlay" style="display:none;" onclick="if(event.target===this)closeProfilePic()">
   <div class="reset-confirm-card" style="text-align:center;max-width:360px;">
     <div style="font-size:18px;font-weight:700;margin-bottom:16px;">Profile Picture</div>
-    <div id="profilePicPreview" style="width:100px;height:100px;border-radius:50%;background:var(--bg4);margin:0 auto 16px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:36px;">👤</div>
+    <div id="profilePicPreview" style="width:100px;height:100px;border-radius:50%;background:var(--bg4);margin:0 auto 16px;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:36px;"><svg viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-1a6 6 0 0 0-6-6h-4a6 6 0 0 0-6 6v1M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/></svg></div>
     <input type="file" id="profilePicInput" accept="image/*" style="display:none;" onchange="previewProfilePic(this)">
     <button onclick="document.getElementById('profilePicInput').click()" style="width:100%;padding:12px;border-radius:var(--radius-lg);border:0.5px solid var(--border2);background:transparent;font-family:inherit;font-size:13px;color:var(--text2);cursor:pointer;margin-bottom:10px;">Choose Photo</button>
     <div style="display:flex;gap:10px;margin-top:6px;">
