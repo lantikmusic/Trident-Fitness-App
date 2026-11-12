@@ -2992,6 +2992,48 @@ body.th-on .bottom-nav,body.th-on .nav-bar{visibility:hidden;}
 .dmc-net b{font-size:16px;font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums;}
 .dmc-net b.surplus{color:var(--red);}.dmc-net b.deficit{color:var(--pink);}
 .dmc-ring svg{overflow:visible;}
+/* ── Readiness ── */
+.rd-card{display:flex;align-items:center;gap:16px;padding:16px;border-radius:26px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.08);margin-bottom:12px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.rd-card:active{transform:scale(.99);}
+.rd-card.rd-empty{display:block;cursor:default;}
+.rd-ring{position:relative;width:92px;height:92px;flex-shrink:0;}
+.rd-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;letter-spacing:-0.03em;}
+.rd-info{flex:1;min-width:0;}
+.rd-eyebrow{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--pink);margin-bottom:2px;}
+.rd-label{font-size:22px;font-weight:800;letter-spacing:-0.02em;}
+.rd-tip{font-size:12.5px;color:#9BA0A8;line-height:1.35;margin-top:2px;}
+.rd-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px;}
+.rd-chip{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 9px;border-radius:12px;background:rgba(255,255,255,0.07);font-size:11px;font-weight:600;color:#9BA0A8;}
+.rd-chip i{width:6px;height:6px;border-radius:50%;}
+.rd-chip b{color:#fff;font-weight:800;}
+.rd-msg{font-size:13.5px;color:#9BA0A8;line-height:1.45;margin-top:4px;}
+.rd-allow{margin-top:12px;height:40px;padding:0 18px;border-radius:20px;border:none;background:var(--pink);color:#000;font:800 14px var(--tf-font);}
+.rd-hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:8px 10px 18px;}
+.rd-hero-ring{position:relative;width:190px;height:190px;}
+.rd-hero-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:60px;font-weight:800;letter-spacing:-0.04em;}
+.rd-hero-label{font-size:26px;font-weight:800;margin-top:12px;}
+.rd-hero-tip{font-size:14.5px;color:#9BA0A8;line-height:1.45;margin-top:4px;max-width:300px;}
+.rd-sec{font-size:15px;font-weight:600;color:#9BA0A8;margin:18px 0 8px 6px;}
+.rd-list{border-radius:24px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.08);overflow:hidden;}
+.rd-row{display:flex;gap:12px;padding:14px 16px;border-top:0.5px solid rgba(255,255,255,0.07);}
+.rd-row:first-child{border-top:none;}
+.rd-row-ic{width:32px;height:32px;border-radius:10px;background:rgba(255,255,255,0.07);color:var(--pink);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.rd-row-main{flex:1;min-width:0;}
+.rd-row-top{display:flex;justify-content:space-between;gap:8px;font-size:15px;font-weight:600;}
+.rd-row-top b{font-weight:800;white-space:nowrap;}
+.rd-row-bar{height:5px;border-radius:3px;background:rgba(255,255,255,0.08);margin:8px 0 6px;overflow:hidden;}
+.rd-row-bar i{display:block;height:100%;border-radius:3px;}
+.rd-row-sub{display:flex;justify-content:space-between;font-size:12px;color:#7D828A;}
+.rd-row-sub em{font-style:normal;font-weight:700;}
+.rd-miss{font-size:12px;color:#7D828A;margin:8px 6px 0;line-height:1.4;}
+.rd-week{display:flex;gap:6px;padding:14px 12px 10px;border-radius:24px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.08);}
+.rd-bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.rd-bar-col{width:100%;max-width:26px;height:90px;display:flex;align-items:flex-end;}
+.rd-bar-col i{display:block;width:100%;border-radius:7px;}
+.rd-bar b{font-size:12px;font-weight:800;}
+.rd-bar span{font-size:11px;color:#7D828A;font-weight:600;}
+.rd-how{margin:18px 4px 0;font-size:12.5px;color:#7D828A;line-height:1.5;}
+.rd-how b{display:block;color:#C9CDD3;font-size:13px;margin-bottom:3px;}
 /* Line icons that replaced emoji */
 .wn-ic,.ah-wo-ic{color:var(--pink);font-size:0;}
 .ah-home-item i{display:flex;justify-content:center;color:var(--pink);font-style:normal;}
@@ -3187,6 +3229,8 @@ body.th-on .bottom-nav,body.th-on .nav-bar{visibility:hidden;}
     <div id="evHomeCard" style="display:none;"></div>
     <div id="ahHomeCard" style="display:none;"></div>
     <!-- Today's workout preview -->
+    <!-- Readiness (Apple Health: Apple Watch, Oura or any device that saves to Health) -->
+    <div id="rdHomeCard"></div>
     <div id="dashWorkout"></div>
     <!-- Today's macros (+ goal progress when a goal is set) -->
     <div id="dashGoalProgress"></div>
@@ -4266,6 +4310,11 @@ body.th-on .bottom-nav,body.th-on .nav-bar{visibility:hidden;}
       <div class="sleep-tip" id="sleepTip"></div>
     </div>
   </div>
+</div>
+<!-- ══ READINESS PAGE (opened from the Home card) ══ -->
+<div class="th-page" id="th-ready" aria-hidden="true">
+  <div class="th-bar"><button class="e-circ" onclick="thClose()" aria-label="Back"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><div class="th-title">Readiness</div><span style="width:44px"></span></div>
+  <div class="th-body" id="rdPage"></div>
 </div>
 <!-- Bottom Nav -->
 <nav class="bottom-nav" id="bottomNav">
@@ -10677,6 +10726,7 @@ function renderDashboard(){
   }
 
   try { thWidgets(); } catch(e) {}
+  try { rdRenderHome(); } catch(e) {}
   // Gym days this year
   renderGymYear();
   // Recent PRs
@@ -18131,7 +18181,8 @@ function cmShareLastWorkout() {
 // server (no save()/cloudPost of Health values; the manual steps/sleep/burned entries are left untouched).
 // ══════════════════════════════════════
 const AH_FIT_TYPES = ['workouts', 'heartRate', 'restingHeartRate', 'heartRateVariability', 'vo2Max'];
-const AH_READ = ['steps', 'calories', 'basalCalories', 'sleep'].concat(AH_FIT_TYPES);   // 'calories' = active energy
+const AH_READY_TYPES = ['respiratoryRate', 'oxygenSaturation', 'appleSleepingWristTemperature'];   // extra inputs for the readiness score
+const AH_READ = ['steps', 'calories', 'basalCalories', 'sleep'].concat(AH_FIT_TYPES, AH_READY_TYPES);   // 'calories' = active energy
 const AH_ASKED_KEY = 'trident_health_asked_v1';                    // only remembers that Connect was tapped (no health data)
 const AH_QUICK_MS = 60 * 1000;                                     // re-read today's numbers this often while open
 const AH_FULL_MS = 15 * 60 * 1000;                                 // re-read the whole week this often
@@ -18191,6 +18242,7 @@ async function ahInit() {
   // already allowed Trident for an earlier account: a new account sees the Connect card first.
   if(!asked) { ahState.status = 'connect'; ahRender(); return; }
   ahState.needsMore = !!seen && AH_FIT_TYPES.some(t => !seen.includes(t));   // connected before workouts/heart were added
+  ahState.needsReady = !!seen && AH_READY_TYPES.some(t => !seen.includes(t));   // connected before the readiness inputs were added
   ahLoad(false, true);
 }
 
@@ -18203,6 +18255,8 @@ async function ahConnect() {
   if(!r.ok) { ahRender(); showToast("Couldn't open Apple Health permissions. Please try again."); return; }
   ahSetAsked();
   ahState.needsMore = false;
+  ahState.needsReady = false;
+  try { RD.loadedAt = 0; } catch(e) {}
   if(ahSheetIsOpen('connect')) ahSheetClose();
   await ahLoad(true, true);
   ahLoadFitness(true);
@@ -18932,6 +18986,177 @@ function ahOpenConnectSheet() {
     <div class="ah-home-grid">${items.map(([i, t]) => `<div class="ah-home-item"><i>${tfEmo(i, 18)}</i><span>${t}</span></div>`).join('')}</div>
     <button class="pink-btn" onclick="ahConnect()" ${ahState.connecting ? 'disabled' : ''}>${ahState.connecting ? 'Opening Apple Health…' : more ? 'Allow workouts & heart data' : 'Connect Apple Health'}</button>
     <div class="ah-home-foot"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>Read-only · stays on this iPhone</span><button onclick="ahSheetClose();ahHomeCardHide()">Not now</button></div>`);
+}
+
+// ══════════════════════════════════════
+// READINESS — a 0–100 score for today from last night's Apple Health data (Apple Watch, Oura or any device
+// that saves to Health), each input compared with the person's own 30-day baseline. In memory only, like
+// everything else from Apple Health: never saved and never sent anywhere.
+// ══════════════════════════════════════
+const RD = { loading: false, loadedAt: 0, hrv: {}, rhr: {}, resp: {}, spo2: {}, temp: {} };
+const RD_DAYS = 40;
+// Measurements taken overnight belong to the morning they end (8 pm – 8 pm, keyed by the later date)
+function rdNightKey(t) { return ahKey(new Date(new Date(t).getTime() + 4 * 3600000)); }
+async function ahLoadReadiness(force) {
+  if(!ahLive() || ahState.needsMore || RD.loading) return;
+  if(!force && RD.loadedAt && Date.now() - RD.loadedAt < AH_FULL_MS) return;
+  RD.loading = true;
+  const now = new Date(), iso = d => d.toISOString();
+  const from = ahDayStart(now); from.setDate(from.getDate() - RD_DAYS);
+  const extra = !ahState.needsReady;
+  const [hrvR, rhrR, respR, spoR, tmpR] = await Promise.all([
+    ahSafe(ahCall('readSamples', { dataType: 'heartRateVariability', startDate: iso(from), endDate: iso(now), limit: 8000, ascending: true })),
+    ahSafe(ahCall('queryAggregated', { dataType: 'restingHeartRate', startDate: iso(from), endDate: iso(now), bucket: 'day', aggregation: 'average' })),
+    extra ? ahSafe(ahCall('readSamples', { dataType: 'respiratoryRate', startDate: iso(from), endDate: iso(now), limit: 8000, ascending: true })) : null,
+    extra ? ahSafe(ahCall('readSamples', { dataType: 'oxygenSaturation', startDate: iso(from), endDate: iso(now), limit: 12000, ascending: true })) : null,
+    extra ? ahSafe(ahCall('readSamples', { dataType: 'appleSleepingWristTemperature', startDate: iso(from), endDate: iso(now), limit: 400, ascending: true })) : null
+  ]);
+  const byNight = (r, keyOf, fix) => {
+    const by = {};
+    ((r && r.ok && r.v && r.v.samples) || []).forEach(x => {
+      const v = fix ? fix(ahNum(x.value)) : ahNum(x.value);
+      if(v > 0 || (fix && v !== 0)) (by[keyOf(x)] = by[keyOf(x)] || []).push(v);
+    });
+    const out = {};
+    Object.keys(by).forEach(k => { out[k] = by[k].reduce((a, b) => a + b, 0) / by[k].length; });
+    return out;
+  };
+  RD.hrv = byNight(hrvR, x => rdNightKey(x.startDate));
+  RD.rhr = byNight(rhrR, x => ahKey(x.startDate));
+  RD.resp = byNight(respR, x => rdNightKey(x.startDate));
+  RD.spo2 = byNight(spoR, x => rdNightKey(x.startDate), v => v > 0 && v <= 1.5 ? v * 100 : v);   // Health gives 0–1
+  RD.temp = byNight(tmpR, x => ahKey(x.endDate), v => v);   // °C while asleep (absolute; compared with the person's usual)
+  RD.loading = false;
+  RD.loadedAt = Date.now();
+  try { if(currentPage === 'dashboard') rdRenderHome(); } catch(e) {}
+  try { if(document.getElementById('th-ready').classList.contains('open')) rdRenderPage(); } catch(e) {}
+}
+function rdLerp(x, pts) {
+  if(x <= pts[0][0]) return pts[0][1];
+  for(let i = 1; i < pts.length; i++) if(x <= pts[i][0]) {
+    const [x0, y0] = pts[i - 1], [x1, y1] = pts[i];
+    return y0 + (y1 - y0) * (x - x0) / (x1 - x0);
+  }
+  return pts[pts.length - 1][1];
+}
+// The person's usual value: the average of up to 30 days before `key` (needs 4+ days)
+function rdBase(map, key) {
+  const end = new Date(key + 'T12:00:00'), vals = [];
+  for(let i = 1; i <= 30; i++) { const d = new Date(end); d.setDate(d.getDate() - i); const v = map[ahKey(d)]; if(v) vals.push(v); }
+  return vals.length >= 4 ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
+}
+// Score for one morning, with each contributor. null when there isn't enough to go on.
+function rdScore(key) {
+  const c = [];
+  const hrv = RD.hrv[key], hrvB = rdBase(RD.hrv, key);
+  if(hrv && hrvB) c.push({ k: 'hrv', w: 30, v: hrv, b: hrvB, s: rdLerp(hrv / hrvB, [[0.7, 20], [0.85, 55], [1, 82], [1.1, 95], [1.2, 100]]) });
+  const rhr = RD.rhr[key], rhrB = rdBase(RD.rhr, key);
+  if(rhr && rhrB) c.push({ k: 'rhr', w: 25, v: rhr, b: rhrB, s: rdLerp(rhr - rhrB, [[-4, 100], [0, 82], [3, 62], [6, 38], [10, 15]]) });
+  const n = ahState.nights[key];
+  const mins = n ? (n.asleep > 0 ? n.asleep : n.inBed) : 0;
+  if(mins > 60) c.push({ k: 'sleep', w: 25, v: mins, b: 480, s: rdLerp(mins / 60, [[4, 20], [5, 45], [6, 68], [7, 88], [7.5, 96], [8, 100]]) });
+  const tp = RD.temp[key], tpB = rdBase(RD.temp, key);
+  if(tp && tpB) c.push({ k: 'temp', w: 10, v: tp - tpB, b: tpB, s: rdLerp(Math.abs(tp - tpB), [[0.2, 100], [0.5, 75], [1, 35], [1.5, 10]]) });
+  const rr = RD.resp[key], rrB = rdBase(RD.resp, key);
+  if(rr && rrB) c.push({ k: 'resp', w: 5, v: rr, b: rrB, s: rdLerp(Math.abs(rr - rrB), [[0.5, 100], [1.5, 65], [3, 20]]) });
+  const o2 = RD.spo2[key];
+  if(o2) c.push({ k: 'spo2', w: 5, v: o2, b: null, s: rdLerp(o2, [[90, 20], [92, 45], [94, 75], [96, 100]]) });
+  const core = c.filter(x => x.k === 'hrv' || x.k === 'rhr' || x.k === 'sleep').length;
+  if(core < 2) return { score: null, c };
+  const w = c.reduce((a, x) => a + x.w, 0);
+  return { score: Math.round(c.reduce((a, x) => a + x.s * x.w, 0) / w), c };
+}
+function rdLevel(score) {
+  if(score >= 85) return { label: 'Optimal', color: 'var(--pink)', tip: 'You are well recovered. A great day to push hard or go for a PR.' };
+  if(score >= 70) return { label: 'Good', color: 'var(--pink)', tip: 'Recovered and ready. Train as planned.' };
+  if(score >= 55) return { label: 'Fair', color: '#FF9F0A', tip: 'Some signs of strain. Keep the intensity moderate today.' };
+  return { label: 'Low', color: '#FF453A', tip: 'Your body is asking for recovery. Go light, do mobility or rest.' };
+}
+const RD_META = {
+  hrv:   { name: 'Heart rate variability', short: 'HRV', ic: 'M3 12h4l2-6 4 12 2-6h6' },
+  rhr:   { name: 'Resting heart rate', short: 'RHR', ic: 'M20.8 5.6a5.5 5.5 0 0 0-7.8 0L12 6.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 22l8.8-8.6a5.5 5.5 0 0 0 0-7.8z' },
+  sleep: { name: 'Sleep', short: 'Sleep', ic: 'M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z' },
+  temp:  { name: 'Wrist temperature', short: 'Temp', ic: 'M14 14.8V4a2 2 0 0 0-4 0v10.8a4 4 0 1 0 4 0z' },
+  resp:  { name: 'Respiratory rate', short: 'Resp', ic: 'M3 8h11a3 3 0 1 0-3-3M3 12h15a3 3 0 1 1-3 3M3 16h7' },
+  spo2:  { name: 'Blood oxygen', short: 'SpO₂', ic: 'M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z' }
+};
+function rdFmt(x) {
+  const f = appSettings.unit !== 'kg';   // °F for people who use pounds
+  switch(x.k) {
+    case 'hrv': return { val: Math.round(x.v) + ' ms', usual: 'Usual ' + Math.round(x.b) + ' ms' };
+    case 'rhr': return { val: Math.round(x.v) + ' bpm', usual: 'Usual ' + Math.round(x.b) + ' bpm' };
+    case 'sleep': return { val: ahDur(x.v), usual: 'Goal 8h' };
+    case 'temp': { const d = f ? x.v * 1.8 : x.v; return { val: (d >= 0 ? '+' : '−') + Math.abs(d).toFixed(1) + (f ? '°F' : '°C'), usual: 'vs your usual' }; }
+    case 'resp': return { val: x.v.toFixed(1) + ' /min', usual: 'Usual ' + x.b.toFixed(1) };
+    case 'spo2': return { val: Math.round(x.v) + '%', usual: 'Overnight average' };
+  }
+  return { val: '', usual: '' };
+}
+function rdStatus(s) {
+  return s >= 80 ? ['Optimal', '#30D158'] : s >= 60 ? ['Good', 'var(--pink)'] : s >= 40 ? ['Fair', '#FF9F0A'] : ['Pay attention', '#FF453A'];
+}
+function rdRingSVG(score, size, sw, color) {
+  const r = (size - sw) / 2 - 6, C = 2 * Math.PI * r, c = size / 2, pct = Math.max(0, Math.min(1, (score || 0) / 100));
+  return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" style="overflow:visible"><defs><filter id="rdGlow${size}" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur in="SourceGraphic" stdDeviation="${size > 120 ? 6 : 4}" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+    <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="${sw}"/>
+    <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${C.toFixed(2)}" stroke-dashoffset="${(C * (1 - pct)).toFixed(2)}" transform="rotate(-90 ${c} ${c})"${pct > 0 ? ` filter="url(#rdGlow${size})"` : ' opacity="0"'}/></svg>`;
+}
+function rdBaselineNights() { return Object.keys(RD.hrv).length; }
+function rdRenderHome() {
+  const el = document.getElementById('rdHomeCard'); if(!el) return;
+  if(!ahLive()) { el.innerHTML = ''; return; }
+  if(!RD.loadedAt && !RD.loading && !ahState.needsMore) ahLoadReadiness();
+  else if(RD.loadedAt && Date.now() - RD.loadedAt > AH_FULL_MS) ahLoadReadiness();
+  const head = `<div class="rd-eyebrow">Readiness</div>`;
+  if(ahState.needsMore || ahState.needsReady) {
+    el.innerHTML = `<div class="rd-card rd-empty">${head}<div class="rd-msg">Allow heart, sleep and recovery data from Apple Health to get a daily readiness score from your Apple Watch or Oura Ring.</div>
+      <button class="rd-allow" onclick="ahConnect()" ${ahState.connecting ? 'disabled' : ''}>${ahState.connecting ? 'Opening Apple Health…' : 'Allow in Apple Health'}</button></div>`;
+    return;
+  }
+  const key = ahKey(new Date()), r = rdScore(key);
+  if(!RD.loadedAt) { el.innerHTML = `<div class="rd-card rd-empty">${head}<div class="rd-msg">Reading Apple Health…</div></div>`; return; }
+  if(r.score === null) {
+    const n = Math.min(4, rdBaselineNights());
+    el.innerHTML = `<div class="rd-card rd-empty" onclick="thOpen('ready');rdRenderPage()">${head}<div class="rd-msg">${n < 4
+      ? `Wear your Apple Watch or Oura Ring to sleep. Your score needs a few nights to learn your usual (${n} of 4).`
+      : 'No sleep or heart data for last night yet. Wear your watch or ring to bed and check back in the morning.'}</div></div>`;
+    return;
+  }
+  const lv = rdLevel(r.score);
+  const chips = ['hrv', 'rhr', 'sleep'].map(k => r.c.find(x => x.k === k)).filter(Boolean)
+    .map(x => `<span class="rd-chip"><i style="background:${rdStatus(x.s)[1]}"></i>${RD_META[x.k].short} <b>${rdFmt(x).val}</b></span>`).join('');
+  el.innerHTML = `<div class="rd-card" role="button" tabindex="0" onclick="thOpen('ready');rdRenderPage()">
+    <div class="rd-ring">${rdRingSVG(r.score, 92, 9, lv.color)}<div class="rd-num">${r.score}</div></div>
+    <div class="rd-info">${head}<div class="rd-label" style="color:${lv.color}">${lv.label}</div><div class="rd-tip">${lv.tip}</div><div class="rd-chips">${chips}</div></div>
+  </div>`;
+}
+function rdRenderPage() {
+  const el = document.getElementById('rdPage'); if(!el) return;
+  const key = ahKey(new Date()), r = rdScore(key);
+  const days = [];
+  for(let i = 6; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate() - i); const k = ahKey(d); days.push({ k, d, s: rdScore(k).score }); }
+  const bars = days.map(x => `<div class="rd-bar"><div class="rd-bar-col"><i style="height:${x.s ? Math.max(6, x.s) : 4}%;background:${x.s ? rdLevel(x.s).color : 'rgba(255,255,255,0.12)'}"></i></div><b>${x.s || '—'}</b><span>${x.d.toLocaleDateString('en-US', { weekday: 'short' }).slice(0, 2)}</span></div>`).join('');
+  const how = `<div class="rd-how"><b>How it works</b>Your score compares last night with your own usual over the past 30 days: heart rate variability, resting heart rate and sleep count most, then wrist temperature, respiratory rate and blood oxygen. It uses whatever your Apple Watch, Oura Ring or other device saves to Apple Health. Read-only, stays on this iPhone. Not medical advice.</div>`;
+  if(r.score === null) {
+    el.innerHTML = `<div class="rd-hero"><div class="rd-hero-ring">${rdRingSVG(0, 190, 14, 'var(--pink)')}<div class="rd-hero-num">—</div></div>
+      <div class="rd-hero-label">Not enough data yet</div><div class="rd-hero-tip">Wear your Apple Watch or Oura Ring to sleep for a few nights. Your score appears once Trident knows your usual HRV, resting heart rate and sleep.</div></div>${how}`;
+    return;
+  }
+  const lv = rdLevel(r.score);
+  const order = ['hrv', 'rhr', 'sleep', 'temp', 'resp', 'spo2'];
+  const rows = order.map(k => r.c.find(x => x.k === k)).filter(Boolean).map(x => {
+    const f = rdFmt(x), [st, col] = rdStatus(x.s);
+    return `<div class="rd-row"><span class="rd-row-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="${RD_META[x.k].ic}"/></svg></span>
+      <div class="rd-row-main"><div class="rd-row-top"><span>${RD_META[x.k].name}</span><b>${f.val}</b></div>
+        <div class="rd-row-bar"><i style="width:${Math.round(x.s)}%;background:${col}"></i></div>
+        <div class="rd-row-sub"><span>${f.usual}</span><em style="color:${col}">${st}</em></div></div></div>`;
+  }).join('');
+  const missing = order.filter(k => !r.c.find(x => x.k === k)).map(k => RD_META[k].name.toLowerCase());
+  el.innerHTML = `<div class="rd-hero"><div class="rd-hero-ring">${rdRingSVG(r.score, 190, 14, lv.color)}<div class="rd-hero-num">${r.score}</div></div>
+      <div class="rd-hero-label" style="color:${lv.color}">${lv.label}</div><div class="rd-hero-tip">${lv.tip}</div></div>
+    <div class="rd-sec">Contributors</div><div class="rd-list">${rows}</div>
+    ${missing.length ? `<div class="rd-miss">No ${missing.join(', ')} for last night, so ${missing.length > 1 ? 'they were' : 'it was'} left out.</div>` : ''}
+    <div class="rd-sec">Last 7 days</div><div class="rd-week">${bars}</div>${how}`;
 }
 
 // Redraws everything that shows Apple Health numbers.
