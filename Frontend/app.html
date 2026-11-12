@@ -2726,6 +2726,92 @@ body.ef-on:not(.ef-edit) #restOverlay{display:none !important;}
 .cm-attach-wo{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);border-radius:22px;}
 .cm-photo{border-radius:24px;}
 .cm-ovc{background:rgba(13,14,16,0.55) !important;-webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%);border:0.5px solid rgba(255,255,255,0.16) !important;}
+/* ── Design E: Community, laid out like the mockup ── */
+.cm-head-actions{gap:6px;align-items:center;}
+.cm-head-actions .cm-inbox-btn{width:40px;height:40px;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.1);box-shadow:none;}
+.cm-head-actions .cm-inbox-btn svg{width:18px;height:18px;}
+.cm-head-actions .nav-dot{background:var(--pink);color:#061011;}
+.e-me .cm-ring{padding:1.5px;background:var(--pink);border-radius:50%;}
+.e-me .cm-avatar{width:36px;height:36px;border:2px solid #0D0E10;}
+.cm-top .cm-scope{height:46px;}
+.cm-stories{display:none;}
+.cm-composer:not(.open) .cm-me-av,.cm-composer:not(.open) .cm-composer-chips{display:none;}
+.cm-composer:not(.open){padding:10px 10px 10px 16px;}
+.cm-composer-ph{flex:1;font-size:14px;color:#6B6F76;}
+.cm-comp-photo{width:36px;height:36px;border-radius:18px;border:none;background:rgba(255,255,255,0.08);color:#fff;}
+.cm-comp-photo svg{width:16px;height:16px;}
+.cm-comp-post{flex-shrink:0;height:36px;padding:0 14px;border-radius:18px;border:none;background:var(--pink);color:#061011;font:800 13px var(--tf-font);}
+.cm-composer.open .cm-comp-post{display:none;}
+.cm-post{margin:0 0 6px;padding:14px 0 16px;border-bottom:0.5px solid rgba(255,255,255,0.07);}
+.cm-post .cm-pad{padding-left:0;padding-right:0;}
+.cm-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.cm-head .cm-who{flex:1;min-width:0;}
+.cm-head .cm-ring{padding:0;background:none;}
+.cm-head .cm-avatar{width:40px;height:40px;}
+.cm-uname{font-size:15px;font-weight:700;}
+.cm-when{color:#9BA0A8;font-weight:500;}
+.e-pr-chip{flex-shrink:0;height:26px;padding:0 10px;border-radius:13px;background:rgba(255,199,44,0.12);color:#FFC72C;display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:800;}
+.cm-body{font-size:15px;line-height:1.45;color:#E6E8EB;margin-bottom:10px;}
+.cm-body.big{font-size:17px;}
+.cm-post .cm-media{border-radius:26px;margin:0 0 10px;border:0.5px solid rgba(255,255,255,0.08);}
+.cm-post.has-media .cm-pad:first-of-type{padding-top:0;}
+.cm-actions{margin:0 -6px;}
+.cm-act.liked{color:var(--pink);}
+.cm-act.liked svg{fill:var(--pink);stroke:var(--pink);}
+/* ── Design E: Macros, laid out like the mockup ── */
+.e-mx-head{display:grid;grid-template-columns:1fr auto;align-items:end;column-gap:10px;}
+.e-mx-head .eyebrow{grid-column:1;}
+.e-mx-head .page-title{grid-column:1;}
+.e-mx-act{grid-column:2;grid-row:1 / span 2;display:flex;gap:8px;align-items:center;}
+.e-circ{width:40px;height:40px;border-radius:20px;border:0.5px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.06);color:#fff;display:flex;align-items:center;justify-content:center;padding:0;}
+.e-circ:disabled{opacity:.3;}
+.e-circ svg{width:16px;height:16px;}
+.e-pill{height:40px;padding:0 14px;border-radius:20px;border:0.5px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.06);color:#fff;font:700 13px var(--tf-font);display:flex;align-items:center;gap:6px;}
+#mxWk{display:none;}
+#page-macros .day-nav-wrap{padding-top:16px;}
+.mx-sum-head{display:none;}
+.mx-sum{padding:18px;}
+.mx-sum-body{margin-bottom:16px;}
+#page-macros .meal-tab .meal-cals{display:none;}
+#page-macros .meal-panel{padding:0;overflow:hidden;}
+#page-macros .meal-panel-header{padding:12px 16px 4px;margin:0;}
+#page-macros .meal-panel-title{font-size:13px;font-weight:700;color:#9BA0A8;}
+#page-macros .meal-macro-row{display:none;}
+#page-macros .food-log{padding:0;}
+#page-macros .food-item{background:none;border:none;border-radius:0;margin:0;padding:12px 16px;border-bottom:0.5px solid rgba(255,255,255,0.07);}
+#page-macros .food-item-name{font-size:15px;font-weight:700;}
+#page-macros .food-item-macros{font-size:12px;color:#9BA0A8;}
+#page-macros .food-item-cal{font-size:15px;font-weight:800;color:#fff;}
+#page-macros .food-log-empty{padding:16px;}
+.e-mx-btns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:12px;margin:0;}
+.e-mx-b{height:44px;border-radius:22px;border:0.5px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.07);color:#fff;font:700 13px var(--tf-font);display:flex;align-items:center;justify-content:center;gap:6px;}
+.e-mx-b.main{background:var(--pink);border:none;color:#061011;font-weight:800;}
+.e-mx-more{display:block;width:100%;border:none;background:none;color:#6B6F76;font:600 12px var(--tf-font);padding:0 0 12px;}
+/* ── Design E: Progress, laid out like the mockup ── */
+#prPanel{background:none;border:none;padding:0;}
+#prPanel #prProgressList{border-radius:24px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.08);overflow:hidden;}
+.e-pr{display:flex;align-items:center;gap:12px;padding:12px 16px;border-top:0.5px solid rgba(255,255,255,0.07);}
+.e-pr:first-child{border-top:none;}
+.e-pr-ic{width:36px;height:36px;border-radius:12px;background:rgba(255,199,44,0.12);color:#FFC72C;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.e-pr-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}
+.e-pr-txt b{font-size:15px;font-weight:700;}
+.e-pr-txt span{font-size:12px;color:#9BA0A8;}
+.e-pr-w{display:flex;flex-direction:column;align-items:flex-end;gap:1px;}
+.e-pr-w b{font-size:17px;font-weight:800;}
+.e-pr-w span{font-size:12px;font-weight:700;color:var(--pink);}
+#muscleGrowthPanel{border-radius:24px;}
+/* Community workout card: compact like the mockup */
+.cm-attach-wo{padding:14px;}
+.cm-attach-stats div{border-radius:12px;background:rgba(255,255,255,0.08);padding:8px 10px;text-align:left;}
+.cm-attach-stats b{font-size:16px;font-weight:800;}
+.cm-attach-stats span{text-transform:none;letter-spacing:0;font-size:11px;}
+.cm-prs{gap:6px;}
+.cm-prs-row{padding:8px 10px;border-radius:14px;background:rgba(255,199,44,0.08);border:none;}
+.cm-prs-row .cm-medal,.cm-prs-row.top .cm-medal{width:22px;height:26px;}
+.cm-prs-row.top{padding:8px 10px;}
+.cm-prs-row b{font-size:13px;}
+.cm-prs-row span{font-size:12px;}
+.cm-prs-row.top{background:rgba(255,199,44,0.12);}
 /* Line icons that replaced emoji */
 .wn-ic,.ah-wo-ic{color:var(--pink);font-size:0;}
 .ah-home-item i{display:flex;justify-content:center;color:var(--pink);font-style:normal;}
@@ -3038,9 +3124,10 @@ body.ef-on:not(.ef-edit) #restOverlay{display:none !important;}
 
 <!-- ══════════ MACROS ══════════ -->
 <div class="page" id="page-macros">
-  <div class="page-header compact">
-    <div class="eyebrow">Nutrition</div>
+  <div class="page-header compact e-mx-head">
+    <div class="eyebrow" id="eMxRange">Nutrition</div>
     <div class="page-title">Macros</div>
+    <div class="e-mx-act" id="eMxAct"></div>
   </div>
   <div class="day-nav-wrap">
     <div class="mx-wk" id="mxWk"></div>
@@ -3071,13 +3158,12 @@ body.ef-on:not(.ef-edit) #restOverlay{display:none !important;}
         <div class="meal-macro-pill mx-f"><i></i><b><span id="meal-f-display">0</span>g</b><span class="mmp-lbl">Fat</span></div>
       </div>
       <div class="food-log" id="foodLog"></div>
-      <div class="mx-actions">
-        <button class="add-food-btn" onclick="openAddFood()">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Add Food
-        </button>
-        <button class="saved-meals-btn" onclick="openSavedMeals()">Saved meals</button>
+      <div class="mx-actions e-mx-btns">
+        <button class="e-mx-b main" onclick="openAddFood();openAddFoodSearch()"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Search</button>
+        <button class="e-mx-b" onclick="openAddFoodScanner()"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7V5a1 1 0 0 1 1-1h2M17 4h2a1 1 0 0 1 1 1v2M20 17v2a1 1 0 0 1-1 1h-2M7 20H5a1 1 0 0 1-1-1v-2M8 8v8M12 8v8M16 8v8"/></svg>Scan</button>
+        <button class="e-mx-b" onclick="openAddFood();openAIScanner()"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8a2 2 0 0 1 2-2h2l2-2h6l2 2h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/></svg>Photo</button>
       </div>
+      <button class="e-mx-more" onclick="openAddFood()">Food library &amp; custom food</button>
     </div>
     <!-- Activity -->
     <div class="activity-panel">
@@ -3731,8 +3817,9 @@ body.ef-on:not(.ef-edit) #restOverlay{display:none !important;}
     <div class="cm-composer" id="cmComposer" style="display:none;">
       <div class="cm-composer-row" onclick="cmOpenCompose()">
         <button class="cm-me-av" id="cmComposerAv" onclick="event.stopPropagation();cmOpenMyProfile()" aria-label="My profile"></button>
-        <div class="cm-composer-ph">What did you crush today?</div>
+        <div class="cm-composer-ph">Share a win, a workout or a PR…</div>
         <button class="cm-comp-photo" onclick="event.stopPropagation();cmQuick('photo')" aria-label="Add a photo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="15" rx="3"/><circle cx="12" cy="12.5" r="3.5"/><path d="M8 5l1.5-2h5L16 5"/></svg></button>
+        <button class="cm-comp-post" onclick="event.stopPropagation();cmOpenCompose()">Post</button>
         <textarea class="cm-composer-text" id="cmText" rows="1" maxlength="1000" placeholder="Share a win, a workout, or a question… Type @ to tag a friend" oninput="cmUpdateCount();cmGrowText();cmMentionInput()" onclick="event.stopPropagation();cmMentionInput()" onblur="setTimeout(cmMentionHide,200)"></textarea>
       </div>
       <div id="cmMention" class="cm-mention-box" style="display:none;"></div>
@@ -4607,6 +4694,13 @@ function mxRenderWeekBar() {
     <button class="mx-wk-arrow" onclick="mxGoWeek(mxWeekOff+1)" aria-label="Next week"${off >= 0 ? ' disabled' : ''}>${chev('9 18 15 12 9 6')}</button>`;
   const t = document.getElementById('mxWeekTitle');
   if(t) t.textContent = off === 0 ? 'This Week' : off === -1 ? 'Last Week' : 'Week of ' + mxMonday(off).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  // Design E header: the week's dates over the title; week arrows and Saved on the right
+  const rg = document.getElementById('eMxRange');
+  if(rg) rg.textContent = (off === 0 ? '' : mxWeekName(off) + ' · ') + mxWeekRange(off) + (mxLoading ? ' · loading…' : '');
+  const act = document.getElementById('eMxAct');
+  if(act) act.innerHTML = `<button class="e-circ" onclick="mxGoWeek(mxWeekOff-1)" aria-label="Previous week"${off <= -MX_MAX_BACK ? ' disabled' : ''}>${chev('15 18 9 12 15 6')}</button>
+    ${off < 0 ? `<button class="e-circ" onclick="mxGoWeek(mxWeekOff+1)" aria-label="Next week">${chev('9 18 15 12 9 6')}</button><button class="e-pill" onclick="mxToday()">Today</button>` : ''}
+    <button class="e-pill" onclick="openSavedMeals()" aria-label="Saved meals"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg>Saved</button>`;
 }
 // Reads an earlier week's food from the account. Each day is asked for separately, plus one day either
 // side (older versions saved some food under the UTC date). Null if any part can't be read.
@@ -9756,10 +9850,11 @@ function renderProgress(){
   } else {
     prList.innerHTML = prEntries.map(([key, pr]) => {
       const exName = key.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
-      return `<div class="pr-row">
-        <div class="pr-trophy">${tfIc('trophy', 16)}</div>
-        <div class="pr-ex-name">${exName}<span>${pr.date || ''}</span></div>
-        <div class="pr-weight">${pr.weight}<span>lbs</span></div>
+      const up = pr.prev ? Math.round((pr.weight - pr.prev) * 10) / 10 : 0;
+      return `<div class="pr-row e-pr">
+        <div class="e-pr-ic">${tfIc('trophy', 18)}</div>
+        <div class="e-pr-txt"><b>${pr.name || exName}</b><span>${pr.date || ''}</span></div>
+        <div class="e-pr-w"><b>${pr.weight} lb</b>${up > 0 ? `<span>+${up} lb</span>` : ''}</div>
       </div>`;
     }).join('');
   }
@@ -9769,7 +9864,15 @@ function renderProgress(){
   const ctx=document.getElementById('weightChart').getContext('2d');
   if(weightChart)weightChart.destroy();
   if(chartData.length>0){
-    weightChart=new Chart(ctx,{type:'line',data:{labels:chartData.map(e=>e.date),datasets:[{data:chartData.map(e=>e.weight),borderColor:getAccentColor(),borderWidth:2,pointBackgroundColor:getAccentColor(),pointRadius:4,tension:0.4,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#111',borderColor:'rgba(255,255,255,0.1)',borderWidth:0.5,bodyColor:'#fff',padding:10,cornerRadius:10}},scales:{x:{ticks:{color:'rgba(255,255,255,0.28)',font:{size:10}},grid:{color:'rgba(255,255,255,0.05)'},border:{display:false}},y:{ticks:{color:'rgba(255,255,255,0.28)',font:{size:10}},grid:{color:'rgba(255,255,255,0.05)'},border:{display:false}}},animation:{duration:400}}});
+    // Design E: one glowing line with a soft fill, last point marked, no grid
+    const acc = getAccentColor();
+    const fillGrad = (() => { const g = ctx.createLinearGradient(0, 0, 0, 150); g.addColorStop(0, acc + '2A'); g.addColorStop(0.7, acc + '08'); g.addColorStop(1, acc + '00'); return g; })();
+    const n = chartData.length;
+    weightChart=new Chart(ctx,{type:'line',data:{labels:chartData.map(e=>String(e.date).replace(/,\s*\d{4}$/,'')),datasets:[{data:chartData.map(e=>e.weight),borderColor:acc,borderWidth:3,backgroundColor:fillGrad,fill:true,tension:0.35,
+      pointRadius:chartData.map((_,i)=>i===n-1?5:0),pointBackgroundColor:'#FFFFFF',pointBorderWidth:0,pointHoverRadius:5}]},
+      options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:8,right:6}},plugins:{legend:{display:false},tooltip:{backgroundColor:'#111',borderColor:'rgba(255,255,255,0.1)',borderWidth:0.5,bodyColor:'#fff',padding:10,cornerRadius:10}},
+      scales:{x:{ticks:{color:'#6B6F76',font:{size:11,weight:'600',family:'Plus Jakarta Sans'},maxRotation:0,autoSkip:true,maxTicksLimit:6},grid:{display:false},border:{display:false}},y:{display:false}},animation:{duration:400}},
+      plugins:[{id:'glow',beforeDatasetDraw(c){c.ctx.save();c.ctx.shadowColor=acc;c.ctx.shadowBlur=10;},afterDatasetDraw(c){c.ctx.restore();}}]});
   } else {
     ctx.fillStyle='rgba(255,255,255,0.2)';ctx.font='13px -apple-system';ctx.textAlign='center';ctx.fillText('No weight entries yet',ctx.canvas.width/2,80);
   }
@@ -14865,7 +14968,7 @@ function cmPostHTML(p) {
   const long = bodyText.length > 160 || (bodyText.match(/\n/g) || []).length > 2;
   const big = !photo && !attach && bodyText.length > 0 && bodyText.length <= 140;
   const body = bodyText
-    ? `<div class="cm-body${photo ? ' cm-caption' : ''}${big ? ' big' : ''}${long ? ' clamp' : ''}">${photo ? `<button class="cm-cap-name" onclick="cmOpenProfile('${uid}')">${handle || name}</button> ` : ''}${cmBodyHTML(p)}${long ? `<button class="cm-more" onclick="cmMore(this)">more</button>` : ''}</div>`
+    ? `<div class="cm-body${big ? ' big' : ''}${long ? ' clamp' : ''}">${cmBodyHTML(p)}${long ? `<button class="cm-more" onclick="cmMore(this)">more</button>` : ''}</div>`
     : '';
   const nC = cmNum(p.comment_count);
   const viewC = (!cmState.open[id] && nC) ? `<button class="cm-viewc" onclick="cmToggleComments('${id}')">${nC === 1 ? 'View 1 comment' : `View all ${nC} comments`}</button>` : '';
@@ -14877,15 +14980,16 @@ function cmPostHTML(p) {
       ${p.tagged_me ? `<button class="cm-untag" onclick="cmRemoveMyTag('${id}')">Remove tag</button>` : ''}
     </div>`;
   return `<article class="cm-post cm-attach-host${photo ? ' has-media' : ''}" id="cm-post-${id}">
-${photo ? '' : `    <div class="cm-pad cm-head">
+${`    <div class="cm-pad cm-head">
       <button class="cm-who" onclick="cmOpenProfile('${uid}')" aria-label="Open ${name}'s profile">
         <div class="cm-ring">${cmAvatarHTML(p)}</div>
         <div style="min-width:0;"><div class="cm-name cm-uname">${handle || name}<span class="cm-when"> · ${cmEsc(cmTimeAgo(p.created_at))}</span></div><div class="cm-time">${handle ? name : ''}${handle && kind ? ' · ' : ''}${kind ? `<span class="cm-kind">${kind}</span>` : ''}</div></div>
       </button>
+      ${(() => { const n = cmCleanPRs(p.payload && p.payload.prs).length + (p.type === 'pr' ? 1 : 0); return n ? `<span class="e-pr-chip">${tfIc('trophy', 13)}${n === 1 ? '1 PR' : n + ' PRs'}</span>` : ''; })()}
       ${p.mine ? `<button class="cm-del" onclick="cmDeletePost('${id}')" aria-label="Delete post">${CM_TRASH}</button>` : (p.following ? '' : `<button class="cm-follow" onclick="cmToggleFollow('${uid}')">Follow</button>`)}
     </div>`}
     ${photo
-      ? `${cmMediaHTML(id, name, cmMediaHeadHTML(p, id, uid, name, handle) + (ov ? cmOvCardHTML(p.type, p.payload, ov) : ''))}<div class="cm-pad">${actions}${body}${attach}${viewC}</div>`
+      ? `${body ? `<div class="cm-pad">${body}</div>` : ''}${cmMediaHTML(id, name, ov ? cmOvCardHTML(p.type, p.payload, ov) : '')}<div class="cm-pad">${actions}${attach}${viewC}</div>`
       : `<div class="cm-pad">${body}${attach}${actions}${viewC}</div>`}
     ${cmState.open[id] ? `<div class="cm-pad">${cmCommentsHTML(id)}</div>` : ''}
   </article>`;
@@ -15193,10 +15297,8 @@ function cmDraw() {
   const following = cmState.scope === 'following';
   cmDrawHeadActions();
   let top = `<div class="cm-top">
-      <div class="cm-scope${following ? ' following' : ''}"><span class="cm-scope-pill"></span><button class="cm-scope-btn${following ? '' : ' active'}" onclick="cmSetScope('all')">Main Feed</button><button class="cm-scope-btn${following ? ' active' : ''}" onclick="cmSetScope('following')">Following</button></div>
-      <button class="cm-me-btn" onclick="cmOpenMyProfile()" aria-label="My profile"><span class="cm-ring">${cmMyAvatarHTML()}</span></button>
+      <div class="cm-scope${following ? ' following' : ''}"><span class="cm-scope-pill"></span><button class="cm-scope-btn${following ? '' : ' active'}" onclick="cmSetScope('all')">For you</button><button class="cm-scope-btn${following ? ' active' : ''}" onclick="cmSetScope('following')">Following</button></div>
     </div>
-    ${cmStoriesHTML()}
     ${unGet() || !window._unKnown ? '' : `<div class="cm-un-card">
       <div class="cm-un-ic">@</div>
       <div style="flex:1;min-width:0;"><b>Choose a username</b><span>So friends can find and follow you</span></div>
@@ -15689,7 +15791,8 @@ function cmDrawHeadActions() {
   el.innerHTML = `
     <button class="cm-inbox-btn" onclick="cmOpenSearch()" aria-label="Find friends">${cmSearchIcon()}</button>
     <button class="cm-inbox-btn" onclick="cmOpenActivity()" aria-label="Activity">${cmBellIcon()}${dot('cmActDot', act)}</button>
-    <button class="cm-inbox-btn" onclick="cmOpenInbox()" aria-label="Messages">${CM_MAIL}${dot('cmInboxDot', dm)}</button>`;
+    <button class="cm-inbox-btn" onclick="cmOpenInbox()" aria-label="Messages">${CM_MAIL}${dot('cmInboxDot', dm)}</button>
+    <button class="cm-me-btn e-me" onclick="cmOpenMyProfile()" aria-label="My profile"><span class="cm-ring">${cmMyAvatarHTML()}</span></button>`;
 }
 
 // ── Comment likes ──
