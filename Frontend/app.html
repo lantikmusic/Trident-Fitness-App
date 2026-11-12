@@ -10243,6 +10243,7 @@ function applyAccentColor(hex, rgb) {
   root.style.setProperty('--pink-dim', `rgba(${rgb},0.12)`);
   root.style.setProperty('--pink-glow', `rgba(${rgb},0.25)`);
   root.style.setProperty('--pink-border', `rgba(${rgb},0.2)`);
+  try { wtSoon(); } catch(e) {} // the Apple Watch app uses the same colour
 
   // Re-apply to all SVG ring stroke attributes that were set as inline style or attr
   document.querySelectorAll('.ring-fg, .rtc-fill, #ringFg').forEach(el => {
@@ -15179,7 +15180,9 @@ function wtSnapshot() {
     if(w && !w.finished) today.push(w);
   }
   if(WT.activeId) active = WT.activeId.startsWith('h:') ? wtHyWorkout(WT.activeId.slice(2)) : wtClassicWorkout(WT.activeId.slice(2));
-  return { v: 1, today, active, rest: wtRestState() };
+  let accent = '#32FCFD';
+  try { accent = getAccentColor(); } catch(e) {}
+  return { v: 1, today, active, rest: wtRestState(), accent };
 }
 function wtRestState() {
   const overlay = document.getElementById('restOverlay');
