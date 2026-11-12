@@ -2573,6 +2573,20 @@ button,input,select,textarea{font-family:inherit;}
 .e-hero .dwc-start{margin-top:2px;}
 .e-hero-rows{margin-top:0;}
 .e-hero button[onclick*="openCustomWorkout"]{border-radius:999px !important;color:rgba(255,255,255,0.6) !important;background:rgba(255,255,255,0.05) !important;margin-top:0 !important;}
+/* ── Design E: LANTIK session ── */
+.hy-ehero{position:relative;min-height:330px;border-radius:30px;overflow:hidden;margin:0 0 14px;background:radial-gradient(120% 80% at 100% 0%,rgba(255,255,255,0.07),transparent 60%),#16171A;border:0.5px solid rgba(255,255,255,0.1);display:flex;flex-direction:column;justify-content:flex-end;}
+.hy-ehero.no-img::before{content:'';position:absolute;right:-30px;top:-10px;width:230px;height:230px;background:url('Icons/trident-mark.png') center/contain no-repeat;opacity:.06;}
+.hy-ehero .e-hero-body{padding-top:80px;}
+.hy-ehero .hy-overall{margin-top:2px;}
+.hy-eback{cursor:pointer;color:#fff !important;font-family:inherit;}
+.hy-ex.open{padding-bottom:4px;}
+.hy-e{margin:2px -2px 10px;}
+.hy-e-hero{height:220px;border-radius:20px;}
+.hy-e-hero.no-img{height:auto;min-height:96px;background:rgba(255,255,255,0.04);}
+.hy-e-hero.no-img .exe-shade{display:none;}
+.hy-e-hero.no-img .exe-title{position:relative;left:auto;right:auto;bottom:auto;padding:14px;}
+.hy-e .exe-panel{margin:10px 0 0;}
+.hy-ex.open .hy-ex-tools{display:flex;}
 /* Line icons that replaced emoji */
 .wn-ic,.ah-wo-ic{color:var(--pink);font-size:0;}
 .ah-home-item i{display:flex;justify-content:center;color:var(--pink);font-style:normal;}
@@ -13047,6 +13061,7 @@ function hyExerciseHTML(c, section, ex) {
       }
     }
     body = `<div class="hy-ex-body">
+      ${hyEBlock(c, section, ex, key, info, st, f, name, rxLine, last)}
       ${ex.cue && !locked ? `<div class="hy-cue">${hyEsc(ex.cue)}</div>` : ''}
       ${locked ? `<div class="hy-cue">Locked while return to impact is restricted. It opens again only when you change your training status after being cleared.</div>` : (info.rx.omitted ? `<div class="hy-cue">${hyEsc(info.rx.omitted)}.</div>` : '')}
       ${info.rx.alt ? `<div class="hy-cue">Standing in for ${hyEsc(ex.name)} while return to impact is restricted.</div>` : ''}
@@ -13078,6 +13093,72 @@ function hyExerciseHTML(c, section, ex) {
       ${right}<span class="hy-chev">›</span>
     </div>${body}
   </div>`;
+}
+// ── Design E for LANTIK: photo, SET badge and big −/+ pickers on the open exercise ──
+function hyEBlock(c, section, ex, key, info, st, f, name, rxLine, last) {
+  if(info.status === 'omitted' || ex.kind === 'check' || (!f.f1 && !f.f2)) return '';
+  let img = '';
+  try { img = getExPhoto(ex.name) || getExerciseImage(ex.name) || ''; } catch(e) {}
+  const sets = (st && st.sets) || [];
+  const total = Math.max(info.rx.sets || 0, sets.length);
+  const doneN = sets.filter(x => x && x.done).length;
+  let next = -1;
+  for(let i = 0; i < total; i++) { if(!(sets[i] && sets[i].done)) { next = i; break; } }
+  const prev = next > 0 ? sets[next - 1] : null;
+  const fromLast = last && last.sets && (last.sets[next] || last.sets[last.sets.length - 1]);
+  const v1 = f.f1 ? ((prev && prev.done && prev.w) || (f.f1 === HY_F.lbs && fromLast && fromLast.w) || '') : '';
+  const repN = parseInt(String(ex.reps || '').match(/\d+/)?.[0] || '', 10);
+  const v2 = f.f2 ? ((prev && prev.done && prev.r) || (f.f2 === HY_F.reps && repN) || '') : '';
+  const step = fl => { const n = parseFloat(fl.step); return n > 0 ? (fl === HY_F.lbs || fl === HY_F.add ? 5 : n) : 1; };
+  const kk = key.replace('.', '-');
+  const field = (which, fl, v, act) => `<div class="exe-field${act ? ' act' : ''}"><span>${hyEsc(fl.label.toUpperCase().replace(' (LBS)', ' · LB').replace(' (FT)', ' · FT').replace(' (IN)', ' · IN').replace(' (SEC)', ' · SEC'))}</span><div class="exe-row">
+      <button aria-label="Less" onclick="event.stopPropagation();hyEAdj('${kk}','${which}',-${step(fl)})">−</button>
+      <input id="hye-${which}-${kk}" inputmode="decimal" value="${hyEsc(v)}" placeholder="0" aria-label="${hyEsc(fl.label)}" onclick="event.stopPropagation()" onfocus="this.select()">
+      <button aria-label="More" onclick="event.stopPropagation();hyEAdj('${kk}','${which}',${step(fl)})">+</button></div></div>`;
+  const panel = c.future ? '' : (next < 0
+    ? `<div class="exe-alldone">${tfIc('check', 18)}All ${total} ${ex.kind === 'sprint' ? 'reps' : 'sets'} done</div>`
+    : `<div class="exe-pick${f.f1 && f.f2 ? '' : ' one'}">${f.f1 ? field('w', f.f1, v1, true) : ''}${f.f2 ? field('r', f.f2, v2, !f.f1) : ''}</div>
+       <button class="pink-btn exe-log" onclick="event.stopPropagation();hyELog('${key}',${next})">Log ${ex.kind === 'sprint' ? 'rep' : 'set'} ${next + 1}</button>`);
+  return `<div class="hy-e">
+    <div class="exe-hero hy-e-hero${img ? '' : ' no-img'}">
+      ${img ? `<img class="e-hero-img" src="${img}" alt="" onerror="this.remove()">` : ''}
+      <div class="exe-shade"></div>
+      <div class="exe-title">
+        <div style="min-width:0;"><div class="exe-name">${name}</div>${rxLine ? `<div class="exe-meta">${hyEsc(rxLine)}</div>` : ''}</div>
+        <span class="exe-badge">${ex.kind === 'sprint' ? 'REP' : 'SET'} ${Math.min(doneN, total)}/${total}</span>
+      </div>
+    </div>
+    ${panel ? `<div class="exe-panel">${panel}</div>` : ''}
+  </div>`;
+}
+function hyEAdj(kk, which, delta) {
+  const el = document.getElementById(`hye-${which}-${kk}`);
+  if(!el) return;
+  el.value = Math.round(Math.max(0, (parseFloat(el.value) || 0) + delta) * 10) / 10;
+  try { if(window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform()) Capacitor.nativePromise('Haptic', 'impact', {}).catch(() => {}); } catch(e) {}
+}
+// Log set from the pickers: saved like the rest timer's Save Set, then the rest timer starts (when the exercise has rest).
+function hyELog(key, s) {
+  const c = hyGuard(); if(!c || hyLeftOut(c, key)) return;
+  const found = hyFind(c.workout, key); if(!found) return;
+  const f = hyFields(found.ex), kk = key.replace('.', '-');
+  const w = f.f1 ? String(document.getElementById(`hye-w-${kk}`)?.value || '').trim().slice(0, 10) : '';
+  const r = f.f2 ? String(document.getElementById(`hye-r-${kk}`)?.value || '').trim().slice(0, 10) : '';
+  if(f.required && !w && !r) { showToast('Enter your numbers first'); return; }
+  const sess = hyEnsureSession(), st = hyExState(sess, key);
+  while(st.sets.length <= s) st.sets.push({ w: '', r: '', done: false });
+  st.sets[s] = { w, r, done: true };
+  st.skipped = false;
+  const logged = st.sets.filter(x => x && x.done).length;
+  const target = hyRx(c.workout, found.section, found.ex, sess).sets;
+  if(found.section.checkable && logged >= target) st.done = true;
+  hyView.exOpen = key;
+  hySave();
+  hyRender();
+  const pr = logged >= target ? hyCheckPR(c.workout, key, sess) : null;
+  if(pr) { showPRPopup([pr], 0, () => {}); return; }
+  if(found.ex.rest) hyLogSet(key, s);       // rest timer, with this set ready to edit
+  else showToast('Set logged!');
 }
 function hySectionHTML(c, section) {
   const p = hySectionProgress(c.workout, section, c.sess);
@@ -13184,13 +13265,21 @@ function hySessionHTML() {
   const parts = (w.sections || []).filter(sec => !sec.optional).map(sec => { const pr = hySectionProgress(w, sec, sess); return `${sec.title.charAt(0) + sec.title.slice(1).toLowerCase()} ${pr.done}/${pr.total}`; });
   if(w.games) parts.push(`Games ${hyGamesProgress(w, sess).done}/${w.games}`);
   return `
-    <button class="hy-back" onclick="hyBack()">‹ ${HY_DAYS[c.dayIdx]}</button>
-    <div class="hy-head">
-      <div class="hy-tag">${hyEsc([HY_DAYS[c.dayIdx], hyDateLabel(date).replace(/^\w+, /, ''), c.slot.time].filter(Boolean).join(' · '))} · ${hyEsc(w.tag)}</div>
-      <div class="hy-title">${hyEsc(w.name)}</div>
-      <div class="hy-goal">${hyEsc(w.goal)}</div>
-      ${needsSetup ? '' : `<div class="hy-overall"><div class="hy-bar"><div style="width:${overall.pct}%"></div></div><div class="hy-overall-row"><span>${done ? '✓ Session completed' : `Session ${overall.pct}%`}</span><span>${hyEsc(parts.join(' · '))}</span></div></div>`}
-    </div>
+    ${(() => {
+      let img = '';
+      try { const first = (w.sections || []).map(sec => sec.items).flat().find(e => getExerciseImage(e.name)); if(first) img = getExPhoto(first.name) || getExerciseImage(first.name) || ''; } catch(e) {}
+      return `<div class="hy-ehero${img ? '' : ' no-img'}">
+        ${img ? `<img class="e-hero-img" src="${img}" alt="" onerror="this.remove()">` : ''}
+        <div class="e-hero-shade"></div>
+        <div class="e-hero-chips"><button class="e-chip hy-eback" onclick="hyBack()">‹ ${HY_DAYS[c.dayIdx]}</button><span class="e-chip">${hyEsc([hyDateLabel(date).replace(/^\w+, /, ''), c.slot.time].filter(Boolean).join(' · '))}</span></div>
+        <div class="e-hero-body">
+          <div class="e-hero-eyebrow">${hyEsc(w.tag || 'LANTIK Hybrid')}</div>
+          <div class="e-hero-title">${hyEsc(w.name)}</div>
+          ${w.goal ? `<div class="e-hero-sub">${hyEsc(w.goal)}</div>` : ''}
+          ${needsSetup ? '' : `<div class="hy-overall"><div class="hy-bar"><div style="width:${overall.pct}%"></div></div><div class="hy-overall-row"><span>${done ? '✓ Session completed' : `Session ${overall.pct}%`}</span><span>${hyEsc(parts.join(' · '))}</span></div></div>`}
+        </div>
+      </div>`;
+    })()}
     ${banners.join('')}
     ${training && !needsSetup ? hyCheckHTML(c) : ''}
     ${middle}
