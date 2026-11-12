@@ -2991,6 +2991,7 @@ body.th-on .bottom-nav,body.th-on .nav-bar{visibility:hidden;}
 .dmc-net-sub{flex:1;min-width:0;font-size:11px;color:#7D828A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .dmc-net b{font-size:16px;font-weight:800;white-space:nowrap;font-variant-numeric:tabular-nums;}
 .dmc-net b.surplus{color:var(--red);}.dmc-net b.deficit{color:var(--pink);}
+.dmc-ring svg{overflow:visible;}
 /* Line icons that replaced emoji */
 .wn-ic,.ah-wo-ic{color:var(--pink);font-size:0;}
 .ah-home-item i{display:flex;justify-content:center;color:var(--pink);font-style:normal;}
@@ -10430,10 +10431,10 @@ function renderGoals() {
 function dashMacroCardHTML() {
   const g = load(GOALS_KEY) || {};
   const t = dayTotals(macroData[getTodayIdx()] || emptyDay());
-  const ring = (r, sw, val, goal, color) => {
+  const ring = (r, sw, val, goal, color, glow) => {
     const C = 2 * Math.PI * r, pct = goal > 0 ? Math.min(val / goal, 1) : 0;
-    return `<circle cx="${r + sw / 2}" cy="${r + sw / 2}" r="${r}" fill="none" stroke="var(--bg5)" stroke-width="${sw}"/>
-      <circle cx="${r + sw / 2}" cy="${r + sw / 2}" r="${r}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round"
+    return `${glow ? '<defs><filter id="dmcRingGlow" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB"><feGaussianBlur in="SourceGraphic" stdDeviation="4.5" result="b"/><feComponentTransfer in="b" result="g"><feFuncA type="linear" slope="1.5"/></feComponentTransfer><feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>' : ''}<circle cx="${r + sw / 2}" cy="${r + sw / 2}" r="${r}" fill="none" stroke="${glow ? 'rgba(255,255,255,0.08)' : 'var(--bg5)'}" stroke-width="${sw}"/>
+      <circle cx="${r + sw / 2}" cy="${r + sw / 2}" r="${r}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round"${glow ? ' filter="url(#dmcRingGlow)"' : ''}
         stroke-dasharray="${C.toFixed(2)}" stroke-dashoffset="${(C * (1 - pct)).toFixed(2)}"${pct === 0 ? ' opacity="0"' : ''}/>`;
   };
   const calGoal = g.cal || 2000;
@@ -10454,7 +10455,7 @@ function dashMacroCardHTML() {
   return `<div class="dmc" onclick="navTo('macros')">
     <div class="dmc-eyebrow">Today's Macros<span>${calOver ? `${Math.abs(left).toLocaleString()} kcal over` : `${left.toLocaleString()} kcal left`}</span></div>
     <div class="dmc-body">
-      <div class="dmc-ring"><svg viewBox="0 0 112 112">${ring(49, 10, t.cal, calGoal, calOver ? 'var(--red)' : 'var(--pink)')}</svg>
+      <div class="dmc-ring"><svg viewBox="0 0 112 112">${ring(49, 10, t.cal, calGoal, calOver ? 'var(--red)' : 'var(--pink)', true)}</svg>
         <div class="dmc-center"><div class="dmc-cal">${Math.round(t.cal).toLocaleString()}</div><div class="dmc-cal-lbl">of ${calGoal.toLocaleString()} kcal</div></div>
       </div>
       <div class="dmc-rows">${rows}</div>
