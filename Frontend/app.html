@@ -2812,6 +2812,92 @@ body.ef-on:not(.ef-edit) #restOverlay{display:none !important;}
 .cm-prs-row b{font-size:13px;}
 .cm-prs-row span{font-size:12px;}
 .cm-prs-row.top{background:rgba(255,199,44,0.12);}
+/* ── Design E: Settings as a full page with grouped lists ── */
+.settings-overlay.open{background:rgba(0,0,0,0.6);}
+.settings-sheet.e-set,.settings-sheet{top:0;bottom:0;border-radius:0;border:none;background:#0D0E10;max-height:none;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:calc(env(safe-area-inset-top) + 8px) 0 calc(40px + env(safe-area-inset-bottom));}
+.settings-handle{display:none;}
+.e-set-top{display:flex;justify-content:flex-end;padding:0 16px;}
+.e-set-hero{display:flex;flex-direction:column;align-items:center;gap:8px;padding:6px 20px 26px;}
+.e-set-av{width:104px;height:104px;border-radius:50%;border:none;padding:0;background:#24272C;color:#9BA0A8;overflow:hidden;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px #0D0E10,0 0 0 4.5px var(--pink);cursor:pointer;}
+.e-set-av img{width:100%;height:100%;object-fit:cover;}
+.e-set-name{font-size:28px;font-weight:800;letter-spacing:-0.02em;}
+.e-set-edit{border:none;background:none;color:var(--pink);font:700 13px var(--tf-font);padding:2px 8px;}
+.settings-section{padding:0 16px;margin-bottom:22px;}
+.settings-section-label{font-size:15px;font-weight:600;letter-spacing:0;text-transform:none;color:#9BA0A8;margin:0 0 8px 16px;}
+.e-card{border-radius:22px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.07);overflow:hidden;}
+.e-card>.settings-row{background:none;border-radius:0;margin:0;padding:14px 16px;gap:12px;border-top:0.5px solid rgba(255,255,255,0.07);min-height:56px;box-sizing:border-box;}
+.e-card>.settings-row:first-child{border-top:none;}
+.e-card>.settings-row>div:nth-child(2){flex:1;min-width:0;}
+.e-row-ic{width:24px;display:flex;justify-content:center;color:#9BA0A8;flex-shrink:0;}
+.settings-row-label{font-size:16px;font-weight:500;}
+.settings-row-sub{font-size:12px;color:#7D828A;}
+.settings-input,.settings-select{background:transparent;border:none;text-align:right;color:#9BA0A8;font-size:16px;padding:4px 0;width:140px;}
+.settings-input:focus{color:#fff;}
+.settings-select{appearance:none;-webkit-appearance:none;width:auto;}
+.e-card .un-row{display:block;}
+.e-card .un-row .e-row-ic{float:left;margin:2px 12px 0 0;}
+.un-field{background:rgba(255,255,255,0.06);border:none;border-radius:10px;}
+.e-card .ghost-btn{margin:0 !important;border:none;border-top:0.5px solid rgba(255,255,255,0.07);border-radius:0;background:none;color:var(--pink);text-align:left;padding:14px 16px 14px 52px;}
+.e-card .color-swatches{margin-left:36px;}
+.e-card .prog-pick-row{padding:8px;}
+.e-card .ah-set-help{padding:10px 16px 14px;border-top:0.5px solid rgba(255,255,255,0.07);font-size:12px;color:#7D828A;}
+.e-row-btn{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:14px 16px;border:none;border-top:0.5px solid rgba(255,255,255,0.07);background:none;color:#fff;font:500 16px var(--tf-font);text-align:left;}
+.e-card>.e-row-btn:first-child,.e-card>.settings-row[style*="display:none"]+.e-row-btn{border-top:none;}
+.e-row-btn.danger,.e-row-btn.danger .e-row-ic{color:#FF453A;}
+#genderFemale,#genderMale{border-radius:16px !important;}
+/* ── Design E: onboarding as full-screen steps ── */
+#onboardingOverlay{align-items:stretch;background:#0D0E10;backdrop-filter:none;-webkit-backdrop-filter:none;}
+#onboardingSheet{background:#0D0E10;border:none;border-radius:0;max-width:none;width:100%;height:100%;max-height:none;transform:none;padding:0;display:flex;flex-direction:column;}
+#onboardingOverlay.open #onboardingSheet{transform:none;}
+.ob-step{display:none;flex:1;flex-direction:column;padding:calc(env(safe-area-inset-top) + 8px) 20px calc(20px + env(safe-area-inset-bottom));min-height:100%;box-sizing:border-box;animation:obIn .3s ease;}
+.ob-step.active{display:flex;}
+@keyframes obIn{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+.ob-top{display:grid;grid-template-columns:44px 1fr auto;align-items:center;gap:8px;margin-bottom:26px;}
+.ob-circ{width:44px;height:44px;border-radius:50%;border:0.5px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.07);color:#fff;display:flex;align-items:center;justify-content:center;padding:0;}
+.ob-top-t{text-align:center;font-size:16px;font-weight:700;}
+.ob-skip{height:36px;padding:0 16px;border-radius:18px;border:0.5px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.07);color:#fff;font:600 14px var(--tf-font);}
+.ob-title{font-size:32px;font-weight:800;letter-spacing:-0.03em;line-height:1.1;margin:0 0 10px;}
+.ob-sub{font-size:16px;color:#9BA0A8;line-height:1.45;margin:0 0 26px;}
+.ob-hero{display:flex;flex-direction:column;align-items:center;gap:10px;padding:56px 0 34px;}
+.ob-hero-logo{width:84px;height:84px;object-fit:contain;filter:drop-shadow(0 0 18px var(--pink-glow));}
+.ob-hero-wm{font-size:18px;}
+.ob-list{display:flex;flex-direction:column;gap:10px;}
+.ob-pick,.ob-feat{display:flex;align-items:center;gap:14px;width:100%;padding:12px 16px 12px 12px;border-radius:22px;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.05);color:#fff;text-align:left;font-family:var(--tf-font);transition:border-color .15s,background .15s;}
+.ob-pick.selected{border-color:var(--pink);background:rgba(255,255,255,0.08);}
+.ob-pick-th{width:56px;height:56px;border-radius:16px;background:#1B1D21;color:var(--pink);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ob-pick-txt{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0;}
+.ob-pick-n{font-size:17px;font-weight:700;}
+.ob-pick-d{font-size:13px;color:#9BA0A8;line-height:1.35;}
+.ob-box{width:26px;height:26px;border-radius:8px;border:1.5px solid rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;color:transparent;flex-shrink:0;transition:all .15s;}
+.ob-pick.selected .ob-box{background:var(--pink);border-color:var(--pink);color:#000;}
+.ob-foot{margin-top:auto;padding-top:24px;display:flex;justify-content:center;}
+.ob-foot .ob-next{width:100%;height:58px;padding:0;border-radius:29px;font-size:17px;font-weight:700;}
+.ob-next:disabled{opacity:1;background:rgba(255,255,255,0.12);color:#6B6F76;}
+.ob-name-in{width:100%;box-sizing:border-box;height:64px;border-radius:22px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.05);color:#fff;font:700 22px var(--tf-font);padding:0 20px;outline:none;}
+.ob-name-in:focus{border-color:var(--pink);}
+.ob-seg{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;border-radius:24px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.08);}
+.ob-seg button{height:42px;border-radius:20px;border:none;background:transparent;color:#9BA0A8;font:700 14px var(--tf-font);}
+.ob-seg button.on{background:rgba(255,255,255,0.14);color:#fff;}
+.ob-big{text-align:center;font-size:64px;font-weight:800;letter-spacing:-0.03em;margin:44px 0 22px;font-variant-numeric:tabular-nums;}
+.ob-big small{font-size:26px;font-weight:700;color:#9BA0A8;}
+.ob-ruler-wrap{position:relative;margin:0 -20px;}
+.ob-ruler{overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;-webkit-mask-image:linear-gradient(90deg,transparent,#000 22%,#000 78%,transparent);mask-image:linear-gradient(90deg,transparent,#000 22%,#000 78%,transparent);}
+.ob-ruler::-webkit-scrollbar{display:none;}
+.ob-ticks{display:flex;align-items:flex-start;height:86px;width:max-content;}
+.ob-ticks i{position:relative;width:12px;flex-shrink:0;height:100%;}
+.ob-ticks i::before{content:'';position:absolute;left:5px;top:0;width:2px;height:18px;border-radius:1px;background:rgba(255,255,255,0.22);}
+.ob-ticks i.md::before{height:28px;background:rgba(255,255,255,0.38);}
+.ob-ticks i.mj::before{height:40px;background:rgba(255,255,255,0.7);}
+.ob-ticks b{position:absolute;top:52px;left:6px;transform:translateX(-50%);font-size:14px;font-weight:700;color:#9BA0A8;white-space:nowrap;}
+.ob-ruler-pin{position:absolute;left:50%;top:-8px;width:4px;height:56px;margin-left:-2px;border-radius:2px;background:var(--pink);box-shadow:0 0 12px var(--pink);pointer-events:none;}
+.ob-summary{gap:0;border-radius:22px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.08);overflow:hidden;}
+.ob-sum-row{display:flex;justify-content:space-between;align-items:center;padding:15px 18px;border-top:0.5px solid rgba(255,255,255,0.07);font-size:15px;color:#9BA0A8;}
+.ob-sum-row:first-child{border-top:none;}
+.ob-sum-row b{color:#fff;font-weight:700;}
+.e-color-row{flex-wrap:wrap;}
+.e-color-row .color-swatches{flex-basis:100%;margin:6px 0 2px 36px !important;}
+.e-set-sb{position:fixed;left:0;right:0;top:0;height:env(safe-area-inset-top);background:#0D0E10;z-index:302;display:none;pointer-events:none;}
+body.e-set-on .e-set-sb{display:block;}
 /* Line icons that replaced emoji */
 .wn-ic,.ah-wo-ic{color:var(--pink);font-size:0;}
 .ah-home-item i{display:flex;justify-content:center;color:var(--pink);font-style:normal;}
@@ -2849,118 +2935,96 @@ body.ef-on:not(.ef-edit) #restOverlay{display:none !important;}
 <!-- ══════════ ONBOARDING ══════════ -->
 <div id="onboardingOverlay">
   <div id="onboardingSheet">
-    <div class="ob-handle" role="button" aria-label="Close"></div>
-
-    <!-- Progress dots -->
-    <div class="ob-dots">
-      <div class="ob-dot active" id="ob-dot-0"></div>
-      <div class="ob-dot" id="ob-dot-1"></div>
-      <div class="ob-dot" id="ob-dot-2"></div>
-      <div class="ob-dot" id="ob-dot-3"></div>
-    </div>
 
     <!-- Step 0: Welcome -->
     <div class="ob-step active" id="ob-step-0">
-      <div class="ob-eyebrow">Welcome</div>
-      <div class="ob-title">Let's set up your profile</div>
-      <div class="ob-sub">It only takes a minute. We'll personalise your programs, calorie targets, and dashboard based on your answers.</div>
-      <div style="background:var(--bg4);border-radius:var(--radius-lg);padding:16px 18px;margin-bottom:8px;">
-        <div style="display:flex;flex-direction:column;gap:10px;">
-          <div style="display:flex;align-items:center;gap:12px;"><span style="color:var(--pink);display:flex;"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/></svg></span><span style="font-size:13px;color:var(--text2);">Personalised workout programs</span></div>
-          <div style="display:flex;align-items:center;gap:12px;"><span style="color:var(--pink);display:flex;"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3v7a3 3 0 0 0 6 0V3M7 3v18M17 21V3c-2 1-3 4-3 7s1 4 3 4"/></svg></span><span style="font-size:13px;color:var(--text2);">Smart calorie & macro targets</span></div>
-          <div style="display:flex;align-items:center;gap:12px;"><span style="color:var(--pink);display:flex;"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><span style="font-size:13px;color:var(--text2);">Progress tracking tailored to your goal</span></div>
-        </div>
+      <div class="ob-hero">
+        <img src="Icons/trident-mark.png" alt="" class="ob-hero-logo">
+        <div class="home-wordmark ob-hero-wm" aria-label="Trident Fitness">TRIDENT<span>FITNESS</span></div>
       </div>
-      <div class="ob-nav">
-        <button class="ob-next" onclick="obNext()">Get Started →</button>
+      <div class="ob-title">Let's build your plan</div>
+      <div class="ob-sub">Answer six quick questions. We'll set up your programs, calorie targets and dashboard around you.</div>
+      <div class="ob-list">
+        <div class="ob-feat"><span class="ob-pick-th"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/></svg></span><span class="ob-pick-txt"><span class="ob-pick-n">Programs for your goal</span><span class="ob-pick-d">Strength, sculpt and LANTIK plans</span></span></div>
+        <div class="ob-feat"><span class="ob-pick-th"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9h-9z M14 3.3A9 9 0 0 1 20.7 10H14z"/></svg></span><span class="ob-pick-txt"><span class="ob-pick-n">Calorie and macro targets</span><span class="ob-pick-d">Worked out from your body stats</span></span></div>
+        <div class="ob-feat"><span class="ob-pick-th"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><span class="ob-pick-txt"><span class="ob-pick-n">Progress you can see</span><span class="ob-pick-d">Weight, PRs and muscle growth</span></span></div>
       </div>
+      <div class="ob-foot"><button class="ob-next" onclick="obNext()">Get started</button></div>
     </div>
 
     <!-- Step 1: Name -->
     <div class="ob-step" id="ob-step-1">
-      <div class="ob-eyebrow">Step 1 of 3</div>
+      <div class="ob-top"><button class="ob-circ" onclick="obBack()" aria-label="Back"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><div class="ob-top-t">Profile (1/6)</div><button class="ob-skip" onclick="obSkip()">Skip</button></div>
       <div class="ob-title">What's your name?</div>
-      <div class="ob-sub">We'll use this to personalise your dashboard greeting.</div>
-      <div class="ob-name-wrap">
-        <div class="field">
-          <label>Your name</label>
-          <div class="iw"><input type="text" id="ob-name" placeholder="e.g. Alex" style="font-size:17px;" oninput="obCheckStep1()"></div>
-        </div>
-      </div>
-      <div class="ob-nav">
-        <button class="ob-back" onclick="obBack()">Back</button>
-        <button class="ob-next" id="ob-next-1" disabled onclick="obNext()">Continue →</button>
-      </div>
+      <div class="ob-sub">We'll use it to greet you on your dashboard.</div>
+      <input class="ob-name-in" type="text" id="ob-name" placeholder="Your name" autocomplete="given-name" oninput="obCheckStep1()">
+      <div class="ob-foot"><button class="ob-next" id="ob-next-1" disabled onclick="obNext()">Continue</button></div>
     </div>
 
     <!-- Step 2: Gender -->
     <div class="ob-step" id="ob-step-2">
-      <div class="ob-eyebrow">Step 2 of 3</div>
-      <div class="ob-title">How do you identify?</div>
-      <div class="ob-sub">This helps us show the right workout programs for your goals. You can change this any time in Settings.</div>
-      <div class="ob-gender-row">
-        <div class="ob-gender-card" id="ob-gender-female" onclick="obSelectGender('female')">
-          <div class="ob-gender-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15a5 5 0 1 0 0-10 5 5 0 0 0 0 10M12 15v7M9 19h6"/></svg></div>
-          <div class="ob-gender-name">Female</div>
-          <div class="ob-gender-desc">Glute, tone & sculpt programs</div>
-        </div>
-        <div class="ob-gender-card" id="ob-gender-male" onclick="obSelectGender('male')">
-          <div class="ob-gender-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 20a6 6 0 1 0 0-12 6 6 0 0 0 0 12M14.5 9.5 21 3M15 3h6v6"/></svg></div>
-          <div class="ob-gender-name">Male</div>
-          <div class="ob-gender-desc">Strength & muscle programs</div>
-        </div>
+      <div class="ob-top"><button class="ob-circ" onclick="obBack()" aria-label="Back"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><div class="ob-top-t">Profile (2/6)</div><button class="ob-skip" onclick="obSkip()">Skip</button></div>
+      <div class="ob-title">Which programs fit you?</div>
+      <div class="ob-sub">This picks the workout programs we show first. You can change it any time in Settings.</div>
+      <div class="ob-list">
+        <button class="ob-pick" id="ob-gender-female" data-gender="female" onclick="obSelectGender('female')"><span class="ob-pick-th"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15a5 5 0 1 0 0-10 5 5 0 0 0 0 10M12 15v7M9 19h6"/></svg></span><span class="ob-pick-txt"><span class="ob-pick-n">Female</span><span class="ob-pick-d">Glute, tone and sculpt programs</span></span><span class="ob-box"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
+        <button class="ob-pick" id="ob-gender-male" data-gender="male" onclick="obSelectGender('male')"><span class="ob-pick-th"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 20a6 6 0 1 0 0-12 6 6 0 0 0 0 12M14.5 9.5 21 3M15 3h6v6"/></svg></span><span class="ob-pick-txt"><span class="ob-pick-n">Male</span><span class="ob-pick-d">Strength and muscle programs</span></span><span class="ob-box"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
       </div>
-      <div style="font-size:11px;color:var(--text3);text-align:center;margin-bottom:4px;">Prefer not to say? Just pick whichever programs interest you most.</div>
-      <div class="ob-nav">
-        <button class="ob-back" onclick="obBack()">Back</button>
-        <button class="ob-next" id="ob-next-2" disabled onclick="obNext()">Continue →</button>
-      </div>
+      <div class="ob-foot"><button class="ob-next" id="ob-next-2" disabled onclick="obNext()">Continue</button></div>
     </div>
 
-    <!-- Step 3: Focus -->
+    <!-- Step 3: Goal -->
     <div class="ob-step" id="ob-step-3">
-      <div class="ob-eyebrow">Step 3 of 3</div>
+      <div class="ob-top"><button class="ob-circ" onclick="obBack()" aria-label="Back"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><div class="ob-top-t">Profile (3/6)</div><button class="ob-skip" onclick="obSkip()">Skip</button></div>
       <div class="ob-title">What's your main goal?</div>
-      <div class="ob-sub">This sets your calorie targets and workout focus. You can always change it in the Goals tab.</div>
-      <div class="ob-focus-list">
-        <div class="ob-focus-card" data-focus="fat_loss" onclick="obSelectFocus('fat_loss')">
-          <div class="ob-focus-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22a7 7 0 0 0 7-7c0-4-3-6-4-9-1 2-2 3-4 4 0-2-1-4-2-6-2 3-4 6-4 11a7 7 0 0 0 7 7z"/></svg></div>
-          <div class="ob-focus-info">
-            <div class="ob-focus-name">Fat Loss</div>
-            <div class="ob-focus-desc">Burn fat, stay in a calorie deficit, keep muscle</div>
-          </div>
-          <div class="ob-focus-check" id="ob-check-fat_loss"></div>
-        </div>
-        <div class="ob-focus-card" data-focus="muscle_gain" onclick="obSelectFocus('muscle_gain')">
-          <div class="ob-focus-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/></svg></div>
-          <div class="ob-focus-info">
-            <div class="ob-focus-name">Muscle Gain</div>
-            <div class="ob-focus-desc">Build lean muscle with a moderate calorie surplus</div>
-          </div>
-          <div class="ob-focus-check" id="ob-check-muscle_gain"></div>
-        </div>
-        <div class="ob-focus-card" data-focus="recomp" onclick="obSelectFocus('recomp')">
-          <div class="ob-focus-icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></div>
-          <div class="ob-focus-info">
-            <div class="ob-focus-name">Body Recomp</div>
-            <div class="ob-focus-desc">Lose fat and gain muscle simultaneously at maintenance</div>
-          </div>
-          <div class="ob-focus-check" id="ob-check-recomp"></div>
-        </div>
+      <div class="ob-sub">This sets your calorie targets and workout focus. You can change it in the Goals tab.</div>
+      <div class="ob-list">
+        <button class="ob-pick" id="ob-focus-fat_loss" data-focus="fat_loss" onclick="obSelectFocus('fat_loss')"><span class="ob-pick-th"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22a7 7 0 0 0 7-7c0-4-3-6-4-9-1 2-2 3-4 4 0-2-1-4-2-6-2 3-4 6-4 11a7 7 0 0 0 7 7z"/></svg></span><span class="ob-pick-txt"><span class="ob-pick-n">Fat loss</span><span class="ob-pick-d">Burn fat in a calorie deficit and keep muscle</span></span><span class="ob-box"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
+        <button class="ob-pick" id="ob-focus-muscle_gain" data-focus="muscle_gain" onclick="obSelectFocus('muscle_gain')"><span class="ob-pick-th"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/></svg></span><span class="ob-pick-txt"><span class="ob-pick-n">Muscle gain</span><span class="ob-pick-d">Build lean muscle with a small calorie surplus</span></span><span class="ob-box"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
+        <button class="ob-pick" id="ob-focus-recomp" data-focus="recomp" onclick="obSelectFocus('recomp')"><span class="ob-pick-th"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></span><span class="ob-pick-txt"><span class="ob-pick-n">Body recomp</span><span class="ob-pick-d">Lose fat and gain muscle at maintenance</span></span><span class="ob-box"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></button>
       </div>
-      <div class="ob-nav">
-        <button class="ob-back" onclick="obBack()">Back</button>
-        <button class="ob-next" id="ob-next-3" disabled onclick="obFinish()">Let's go</button>
-      </div>
+      <div class="ob-foot"><button class="ob-next" id="ob-next-3" disabled onclick="obNext()">Continue</button></div>
     </div>
 
-    <!-- Step 4: All done -->
+    <!-- Step 4: Height -->
     <div class="ob-step" id="ob-step-4">
-      <div class="ob-finish-icon"><img src="Icons/trident-mark.png" alt="" style="width:72px;height:72px;object-fit:contain;"></div>
-      <div class="ob-finish-title">You're all set!</div>
-      <div class="ob-finish-sub">Here's your profile summary. Everything is saved and you can update it anytime in Settings or Goals.</div>
-      <div class="ob-summary" id="ob-summary"></div>
-      <button class="ob-next" style="width:100%;" onclick="obClose()">Start Training →</button>
+      <div class="ob-top"><button class="ob-circ" onclick="obBack()" aria-label="Back"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><div class="ob-top-t">Profile (4/6)</div><button class="ob-skip" onclick="obSkip()">Skip</button></div>
+      <div class="ob-title">What's your height?</div>
+      <div class="ob-sub">Used to work out your daily calorie needs.</div>
+      <div class="ob-seg" id="ob-seg-h"><button data-u="cm" onclick="obUnit('h','cm')">Centimeters</button><button data-u="in" onclick="obUnit('h','in')">Feet and inches</button></div>
+      <div class="ob-big" id="ob-val-h">—</div>
+      <div class="ob-ruler-wrap"><div class="ob-ruler" id="ob-ruler-h" onscroll="obRulerScroll('h')"></div><div class="ob-ruler-pin"></div></div>
+      <div class="ob-foot"><button class="ob-next" id="ob-next-4" onclick="obNext()">Continue</button></div>
+    </div>
+
+    <!-- Step 5: Weight -->
+    <div class="ob-step" id="ob-step-5">
+      <div class="ob-top"><button class="ob-circ" onclick="obBack()" aria-label="Back"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><div class="ob-top-t">Profile (5/6)</div><button class="ob-skip" onclick="obSkip()">Skip</button></div>
+      <div class="ob-title">What's your weight?</div>
+      <div class="ob-sub">Your starting point for progress tracking.</div>
+      <div class="ob-seg" id="ob-seg-w"><button data-u="lbs" onclick="obUnit('w','lbs')">Pounds</button><button data-u="kg" onclick="obUnit('w','kg')">Kilograms</button></div>
+      <div class="ob-big" id="ob-val-w">—</div>
+      <div class="ob-ruler-wrap"><div class="ob-ruler" id="ob-ruler-w" onscroll="obRulerScroll('w')"></div><div class="ob-ruler-pin"></div></div>
+      <div class="ob-foot"><button class="ob-next" id="ob-next-5" onclick="obNext()">Continue</button></div>
+    </div>
+
+    <!-- Step 6: Age -->
+    <div class="ob-step" id="ob-step-6">
+      <div class="ob-top"><button class="ob-circ" onclick="obBack()" aria-label="Back"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><div class="ob-top-t">Profile (6/6)</div><button class="ob-skip" onclick="obSkip()">Skip</button></div>
+      <div class="ob-title">How old are you?</div>
+      <div class="ob-sub">Age changes how many calories your body burns at rest.</div>
+      <div class="ob-big" id="ob-val-a">—</div>
+      <div class="ob-ruler-wrap"><div class="ob-ruler" id="ob-ruler-a" onscroll="obRulerScroll('a')"></div><div class="ob-ruler-pin"></div></div>
+      <div class="ob-foot"><button class="ob-next" id="ob-next-6" onclick="obNext()">Continue</button></div>
+    </div>
+
+    <!-- Step 7: Done -->
+    <div class="ob-step" id="ob-step-7">
+      <div class="ob-hero" style="padding-top:40px"><img src="Icons/trident-mark.png" alt="" class="ob-hero-logo"></div>
+      <div class="ob-title" style="text-align:center">You're all set</div>
+      <div class="ob-sub" style="text-align:center">Everything is saved. You can change it any time in Settings or Goals.</div>
+      <div class="ob-list ob-summary" id="ob-summary"></div>
+      <div class="ob-foot"><button class="ob-next" onclick="obClose()">Start training</button></div>
     </div>
 
   </div>
@@ -3862,38 +3926,35 @@ body.ef-on:not(.ef-edit) #restOverlay{display:none !important;}
 
 <!-- Settings Sheet -->
 <div class="settings-overlay" id="settingsOverlay" onclick="closeSettings()"></div>
+<div class="e-set-sb" id="eSetSb" aria-hidden="true"></div>
 <div class="settings-sheet" id="settingsSheet">
   <div class="settings-handle" role="button" aria-label="Close"></div>
-  <div class="settings-header">
-    <div class="settings-title">Settings</div>
-    <button class="settings-close" onclick="closeSettings()">✕</button>
+  <div class="e-set-top"><button class="e-circ" onclick="closeSettings()" aria-label="Close settings"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+  <div class="e-set-hero">
+    <button class="profile-pic-display e-set-av" onclick="openProfilePic()" aria-label="Change profile picture"><svg viewBox="0 0 24 24" width="46%" height="46%" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-1a6 6 0 0 0-6-6h-4a6 6 0 0 0-6 6v1M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/></svg></button>
+    <div class="e-set-name" id="eSetName">Your profile</div>
+    <button class="e-set-edit" onclick="openProfilePic()">Edit picture</button>
   </div>
 
   <!-- Profile -->
   <div class="settings-section">
     <div class="settings-section-label">Profile</div>
+    <div class="e-card">
     <div class="settings-row">
+      <span class="e-row-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 19v-1a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v1M9 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6M22 19v-1a4 4 0 0 0-3-3.8M16 4.2a3 3 0 0 1 0 5.6"/></svg></span>
       <div><div class="settings-row-label">Gender</div><div class="settings-row-sub">Personalizes workout programs</div></div>
       <div class="settings-row-right">
         <button id="genderFemale" onclick="setGender('female')" style="padding:6px 14px;border-radius:99px;border:0.5px solid var(--border2);background:transparent;font-family:inherit;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;margin-right:4px;transition:all .15s;">Female</button>
         <button id="genderMale" onclick="setGender('male')" style="padding:6px 14px;border-radius:99px;border:0.5px solid var(--border2);background:transparent;font-family:inherit;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;transition:all .15s;">Male</button>
       </div>
     </div>
-    <div class="settings-row" style="justify-content:space-between;">
-      <div style="display:flex;align-items:center;gap:12px;">
-        <div class="profile-pic-display" onclick="openProfilePic()" style="width:52px;height:52px;border-radius:50%;background:var(--bg4);border:0.5px solid var(--border2);overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;flex-shrink:0;"><svg viewBox="0 0 24 24" width="46%" height="46%" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-1a6 6 0 0 0-6-6h-4a6 6 0 0 0-6 6v1M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/></svg></div>
-        <div>
-          <div class="settings-row-label">Profile Picture</div>
-          <div class="settings-row-sub">Tap to change</div>
-        </div>
-      </div>
-      <button onclick="openProfilePic()" style="padding:6px 14px;border-radius:99px;border:0.5px solid var(--border2);background:transparent;font-family:inherit;font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;">Edit</button>
-    </div>
     <div class="settings-row">
+      <span class="e-row-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-1a6 6 0 0 0-6-6h-4a6 6 0 0 0-6 6v1M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/></svg></span>
       <div><div class="settings-row-label">Name</div></div>
-      <input class="settings-input" id="set-name" type="text" placeholder="Your name" oninput="saveSettings()">
+      <input class="settings-input" id="set-name" type="text" placeholder="Your name" oninput="saveSettings();eSetNameSync()">
     </div>
     <div class="settings-row un-row">
+      <span class="e-row-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM16 12v1.5a2.5 2.5 0 0 0 5 0V12a9 9 0 1 0-3.5 7.1"/></svg></span>
       <div class="un-row-top">
         <div><div class="settings-row-label">Username</div><div class="settings-row-sub">Friends search this in Community</div></div>
         <div class="un-field"><span>@</span><input id="set-username" type="text" maxlength="20" placeholder="username" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" oninput="unSetInput()" onkeydown="if(event.key==='Enter')unSetSave()"></div>
@@ -3901,10 +3962,12 @@ body.ef-on:not(.ef-edit) #restOverlay{display:none !important;}
       <div class="un-row-foot"><span class="un-status" id="set-username-status" aria-live="polite"></span><button class="un-save" id="set-username-save" disabled onclick="unSetSave()">Save</button></div>
     </div>
     <div class="settings-row">
+      <span class="e-row-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v16H4zM4 10h16M9 3v4M15 3v4"/></svg></span>
       <div><div class="settings-row-label">Age</div></div>
       <input class="settings-input" id="set-age" type="number" placeholder="—" min="13" max="99" style="width:80px;" oninput="saveSettings()">
     </div>
     <div class="settings-row">
+      <span class="e-row-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 20h14l-2-12H7zM9 8a3 3 0 0 1 6 0"/></svg></span>
       <div><div class="settings-row-label">Weight Unit</div></div>
       <select class="settings-select" id="set-unit" onchange="saveSettings()">
         <option value="lbs">lbs</option>
@@ -3912,45 +3975,59 @@ body.ef-on:not(.ef-edit) #restOverlay{display:none !important;}
       </select>
     </div>
     <div class="settings-row">
+      <span class="e-row-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17 17 3l4 4L7 21zM7 13l2 2M10 10l2 2M13 7l2 2"/></svg></span>
       <div><div class="settings-row-label">Height</div></div>
       <input class="settings-input" id="set-height" type="text" placeholder='e.g. 5\'6"' oninput="saveSettings()">
+    </div>
     </div>
   </div>
 
   <!-- Theme Color -->
   <div class="settings-section">
     <div class="settings-section-label">Notifications</div>
+    <div class="e-card">
     <div class="settings-row">
+      <span class="e-row-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg></span>
       <div style="min-width:0;padding-right:10px;"><div class="settings-row-label">Push notifications</div><div class="settings-row-sub" id="pushStatus">Messages, new followers and comments on your posts</div></div>
       <div class="settings-row-right"><button class="push-btn" id="pushBtn" style="display:none;" onclick="pushToggle()">Turn on</button></div>
     </div>
     <button class="ghost-btn" id="pushTestBtn" style="display:none;margin-top:4px;" onclick="pushSendTest()">Send a test notification</button>
+    </div>
   </div>
 
   <div class="settings-section">
     <div class="settings-section-label">Community</div>
+    <div class="e-card">
     <div class="settings-row">
+      <span class="e-row-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 19v-1a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v1M9 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6M22 19v-1a4 4 0 0 0-3-3.8M16 4.2a3 3 0 0 1 0 5.6"/></svg></span>
       <div style="min-width:0;padding-right:10px;"><div class="settings-row-label">Add every workout to my profile</div><div class="settings-row-sub" id="cmWoSub">Off: after each workout, you choose whether to add it</div></div>
       <label class="toggle-wrap" style="flex-shrink:0;"><input type="checkbox" id="cmWoToggle" onchange="cmWoSetAuto(this.checked)"><span class="toggle-slider"></span></label>
+    </div>
     </div>
   </div>
 
   <div class="settings-section" id="ahSettings" style="display:none;">
     <div class="settings-section-label">Apple Health</div>
+    <div class="e-card">
     <div class="settings-row">
+      <span class="e-row-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 5.6a5.5 5.5 0 0 0-7.8 0L12 6.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 22l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/></svg></span>
       <div style="min-width:0;padding-right:10px;"><div class="settings-row-label">Apple Health</div><div class="settings-row-sub" id="ahSetStatus">Steps, calories and sleep · read-only</div></div>
       <div class="settings-row-right"><button class="push-btn" id="ahSetBtn" onclick="ahSettingsButton()">Connect</button></div>
     </div>
     <div class="settings-row">
+      <span class="e-row-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/></svg></span>
       <div style="min-width:0;padding-right:10px;"><div class="settings-row-label">Count Apple Watch workouts</div><div class="settings-row-sub">Strength, HIIT and cross-training workouts count as gym days</div></div>
       <label class="toggle-wrap" style="flex-shrink:0;"><input type="checkbox" id="ahGymToggle" onchange="ahSetGymCount(this.checked)"><span class="toggle-slider"></span></label>
     </div>
     <div class="ah-set-help">Read-only: Trident never changes your Health data, and it stays on this iPhone (it isn't sent to Trident's servers). To change what Trident can read, open the <b>Health</b> app → tap your picture → <b>Apps</b> → <b>Trident Fitness</b>.</div>
+    </div>
   </div>
 
   <div class="settings-section">
-    <div class="settings-section-label">Accent Color</div>
-    <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:12px;">
+    <div class="settings-section-label">Appearance</div>
+    <div class="e-card">
+    <div class="settings-row e-color-row">
+      <span class="e-row-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 1 1 9-9c0 2-1.5 3-3 3h-2a2 2 0 0 0-1 3.7A1.5 1.5 0 0 1 12 21zM7.5 11h.01M12 7.5h.01M16.5 11h.01"/></svg></span>
       <div class="settings-row-label">Choose your color</div>
       <div class="color-swatches" id="colorSwatches">
         <div class="color-swatch" style="background:#BF5AF2;" data-color="#BF5AF2" data-rgb="191,90,242" onclick="setAccentColor('#BF5AF2','191,90,242')"></div>
@@ -3962,18 +4039,23 @@ body.ef-on:not(.ef-edit) #restOverlay{display:none !important;}
         <div class="color-swatch" style="background:#FF453A;" data-color="#FF453A" data-rgb="255,69,58" onclick="setAccentColor('#FF453A','255,69,58')"></div>
       </div>
     </div>
+    </div>
   </div>
 
   <!-- Workout Program -->
   <div class="settings-section">
-    <div class="settings-section-label">Workout Program</div>
+    <div class="settings-section-label">Training</div>
+    <div class="e-card">
     <div class="prog-pick-row" id="settingsProgPicker"></div>
+    </div>
   </div>
 
   <!-- Reminders -->
   <div class="settings-section">
     <div class="settings-section-label">Reminders</div>
+    <div class="e-card">
     <div class="settings-row">
+      <span class="e-row-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a8 8 0 1 0 0-16 8 8 0 0 0 0 16M12 9v4l2 2M5 3 2 6M19 3l3 3"/></svg></span>
       <div>
         <div class="settings-row-label">Morning Log Reminder</div>
         <div class="settings-row-sub">Remind me to log breakfast</div>
@@ -3981,6 +4063,7 @@ body.ef-on:not(.ef-edit) #restOverlay{display:none !important;}
       <label class="toggle-wrap"><input type="checkbox" id="rem-morning" onchange="saveSettings()"><span class="toggle-slider"></span></label>
     </div>
     <div class="settings-row">
+      <span class="e-row-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a8 8 0 1 0 0-16 8 8 0 0 0 0 16M12 9v4l2 2M5 3 2 6M19 3l3 3"/></svg></span>
       <div>
         <div class="settings-row-label">Lunch Reminder</div>
         <div class="settings-row-sub">Remind me to log lunch</div>
@@ -3988,6 +4071,7 @@ body.ef-on:not(.ef-edit) #restOverlay{display:none !important;}
       <label class="toggle-wrap"><input type="checkbox" id="rem-lunch" onchange="saveSettings()"><span class="toggle-slider"></span></label>
     </div>
     <div class="settings-row">
+      <span class="e-row-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a8 8 0 1 0 0-16 8 8 0 0 0 0 16M12 9v4l2 2M5 3 2 6M19 3l3 3"/></svg></span>
       <div>
         <div class="settings-row-label">Evening Check-in</div>
         <div class="settings-row-sub">Daily summary reminder</div>
@@ -3995,13 +4079,15 @@ body.ef-on:not(.ef-edit) #restOverlay{display:none !important;}
       <label class="toggle-wrap"><input type="checkbox" id="rem-evening" onchange="saveSettings()"><span class="toggle-slider"></span></label>
     </div>
     <div class="settings-row" style="margin-top:4px;">
-      <div class="settings-row-label" style="font-size:12px;color:var(--text3);">→ To set reminder times, add them in your phone's calendar app</div>
+      <div class="settings-row-label" style="font-size:12px;color:var(--text3);">To set reminder times, add them in your phone's calendar app</div>
+    </div>
     </div>
   </div>
 
   <!-- Reset -->
   <div class="settings-section">
-    <div class="settings-section-label">Data</div>
+    <div class="settings-section-label">Account</div>
+    <div class="e-card">
     <div class="settings-row" style="display:none;">
       <div>
         <div class="settings-row-label">USDA Food Database Key</div>
@@ -4013,13 +4099,14 @@ body.ef-on:not(.ef-edit) #restOverlay{display:none !important;}
       </div>
       <div id="usdaKeyStatus" style="font-size:11px;color:var(--text3);"></div>
     </div>
-    <button class="danger-btn" onclick="confirmResetWorkout()">↺ Reset Workout Logs</button>
-    <button class="danger-btn" onclick="confirmResetAll()" style="border-color:rgba(255,69,58,0.5);background:rgba(255,69,58,0.12);">! Reset All App Data</button>
-    <button class="ghost-btn" onclick="handleLogout()" style="margin-top:4px;">Sign Out</button>
+    <button class="e-row-btn danger" onclick="confirmResetWorkout()"><span class="e-row-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/></svg></span>Reset workout logs</button>
+    <button class="e-row-btn danger" onclick="confirmResetAll()"><span class="e-row-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 21h20zM12 10v5M12 18h.01"/></svg></span>Reset all app data</button>
+    <button class="e-row-btn" onclick="handleLogout()"><span class="e-row-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg></span>Sign out</button>
+    </div>
   </div>
 
   <!-- Version -->
-  <div style="text-align:center;padding:0 20px;color:var(--text3);font-size:11px;">Trident Fitness<span id="appVersionLabel"></span> · Built with ♥</div>
+  <div style="text-align:center;padding:0 20px;color:var(--text3);font-size:11px;">Trident Fitness<span id="appVersionLabel"></span></div>
 </div>
 
 <!-- Bottom Nav -->
@@ -11012,8 +11099,14 @@ function saveUSDAKey() {
   }
 }
 
+function eSetNameSync() {
+  const el = document.getElementById('eSetName'), v = (document.getElementById('set-name') || {}).value || '';
+  if(el) el.textContent = v.trim() || 'Your profile';
+}
 function openSettings() {
+  document.body.classList.add('e-set-on');
   loadSettingsInputs();
+  try { eSetNameSync(); } catch(e) {}
   try { unSettingsFill(); } catch(e) {}
   pushRefreshUI();
   try { ahRenderSettings(); } catch(e) {}
@@ -11026,6 +11119,7 @@ function openSettings() {
 }
 
 function closeSettings() {
+  document.body.classList.remove('e-set-on');
   const overlay = document.getElementById('settingsOverlay');
   const sheet = document.getElementById('settingsSheet');
   overlay.classList.remove('open'); sheet.classList.remove('open');
@@ -11596,9 +11690,14 @@ function sheetGrabAt(e, x, y) {
 // ONBOARDING
 // ══════════════════════════════════════
 const ONBOARDING_KEY = 'trident_onboarded_v1';
+const OB_LAST = 6;   // last question step (steps 1–6 are the questions, 7 is the summary)
 let obStep = 0;
 let obGender = '';
 let obFocus = '';
+// Body stats are kept in inches, pounds and years; the unit toggles only change what's shown
+const obStats = { h: 69, w: 170, a: 28 };
+const obUnits = { h: 'in', w: 'lbs' };
+const obSet = { h: false, w: false, a: false };
 
 function obShouldShow() {
   return !localStorage.getItem(ONBOARDING_KEY);
@@ -11608,6 +11707,8 @@ function obOpen() {
   obStep = 0;
   obGender = '';
   obFocus = '';
+  obStats.h = 69; obStats.w = 170; obStats.a = 28;
+  obUnits.h = 'in'; obUnits.w = (appSettings.unit === 'kg') ? 'kg' : 'lbs';
   obRenderStep();
   const overlay = document.getElementById('onboardingOverlay');
   overlay.style.display = 'flex';
@@ -11621,27 +11722,35 @@ function obClose() {
 }
 
 function obRenderStep() {
-  // Update steps visibility
   document.querySelectorAll('.ob-step').forEach((el, i) => {
     el.classList.toggle('active', i === obStep);
   });
-  // Update dots (steps 0-3 map to dots 0-3, step 4 keeps dot 3 active)
-  const dotStep = Math.min(obStep, 3);
-  document.querySelectorAll('.ob-dot').forEach((dot, i) => {
-    dot.classList.toggle('active', i <= dotStep);
-  });
+  const sheet = document.getElementById('onboardingSheet');
+  if(sheet) sheet.scrollTop = 0;
+  const k = { 4: 'h', 5: 'w', 6: 'a' }[obStep];
+  if(k) requestAnimationFrame(() => obBuildRuler(k));
 }
 
 function obNext() {
+  const k = { 4: 'h', 5: 'w', 6: 'a' }[obStep];
+  if(k) obSet[k] = true;
+  if(obStep >= OB_LAST) { obFinish(); return; }
   obStep++;
   obRenderStep();
-  // Auto-focus name input on step 1
-  if(obStep === 1) {
-    setTimeout(() => document.getElementById('ob-name')?.focus(), 300);
-  }
+  if(obStep === 1) setTimeout(() => document.getElementById('ob-name')?.focus(), 350);
+}
+
+// Skip leaves that answer blank and moves on
+function obSkip() {
+  const k = { 4: 'h', 5: 'w', 6: 'a' }[obStep];
+  if(k) obSet[k] = false;
+  if(obStep >= OB_LAST) { obFinish(); return; }
+  obStep++;
+  obRenderStep();
 }
 
 function obBack() {
+  if(obStep <= 0) return;
   obStep--;
   obRenderStep();
 }
@@ -11654,30 +11763,88 @@ function obCheckStep1() {
 
 function obSelectGender(gender) {
   obGender = gender;
-  document.getElementById('ob-gender-female').classList.toggle('selected', gender === 'female');
-  document.getElementById('ob-gender-male').classList.toggle('selected', gender === 'male');
+  document.querySelectorAll('[data-gender]').forEach(c => c.classList.toggle('selected', c.dataset.gender === gender));
   const btn = document.getElementById('ob-next-2');
   if(btn) btn.disabled = false;
+  if(!obSet.w) obStats.w = gender === 'male' ? 180 : 145;
 }
 
 function obSelectFocus(focus) {
   obFocus = focus;
-  document.querySelectorAll('.ob-focus-card').forEach(c => {
-    c.classList.toggle('selected', c.dataset.focus === focus);
-  });
-  document.querySelectorAll('[id^="ob-check-"]').forEach(c => c.textContent = '');
-  const check = document.getElementById('ob-check-' + focus);
-  if(check) check.textContent = '✓';
+  document.querySelectorAll('[data-focus]').forEach(c => c.classList.toggle('selected', c.dataset.focus === focus));
   const btn = document.getElementById('ob-next-3');
   if(btn) btn.disabled = false;
 }
 
+// ── Ruler pickers ──
+const OB_TICK = 12; // px between ticks
+function obRulerSpec(k) {
+  if(k === 'h') return obUnits.h === 'cm'
+    ? { min: 120, max: 230, major: 10, label: v => v }
+    : { min: 48, max: 90, major: 12, half: 6, label: v => Math.floor(v / 12) + "'" };
+  if(k === 'w') return obUnits.w === 'kg'
+    ? { min: 30, max: 200, major: 10, half: 5, label: v => v }
+    : { min: 70, max: 400, major: 10, half: 5, label: v => v };
+  return { min: 13, max: 90, major: 10, half: 5, label: v => v };
+}
+function obShownValue(k) {
+  if(k === 'h') return obUnits.h === 'cm' ? Math.round(obStats.h * 2.54) : Math.round(obStats.h);
+  if(k === 'w') return obUnits.w === 'kg' ? Math.round(obStats.w * 0.453592) : Math.round(obStats.w);
+  return Math.round(obStats.a);
+}
+function obPaintValue(k) {
+  const el = document.getElementById('ob-val-' + k); if(!el) return;
+  const v = obShownValue(k);
+  if(k === 'h') el.innerHTML = obUnits.h === 'cm' ? `${v}<small> cm</small>` : `${Math.floor(v / 12)}<small>'</small> ${v % 12}<small>"</small>`;
+  else if(k === 'w') el.innerHTML = `${v}<small> ${obUnits.w === 'kg' ? 'kg' : 'lb'}</small>`;
+  else el.innerHTML = `${v}<small> years</small>`;
+  const seg = document.getElementById('ob-seg-' + k);
+  if(seg) seg.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.u === obUnits[k]));
+}
+function obBuildRuler(k) {
+  const r = document.getElementById('ob-ruler-' + k); if(!r) return;
+  const sp = obRulerSpec(k);
+  let ticks = '';
+  for(let v = sp.min; v <= sp.max; v++) {
+    const cls = (v % sp.major === 0) ? 'mj' : (sp.half && v % sp.half === 0) ? 'md' : '';
+    ticks += `<i class="${cls}">${cls === 'mj' ? `<b>${sp.label(v)}</b>` : ''}</i>`;
+  }
+  r.innerHTML = `<div class="ob-ticks" style="padding:0 calc(50% - ${OB_TICK / 2}px)">${ticks}</div>`;
+  r._busy = true;
+  const v = Math.min(sp.max, Math.max(sp.min, obShownValue(k)));
+  r.scrollLeft = (v - sp.min) * OB_TICK;
+  obPaintValue(k);
+  setTimeout(() => { r._busy = false; }, 60);
+}
+function obRulerScroll(k) {
+  const r = document.getElementById('ob-ruler-' + k); if(!r || r._busy) return;
+  const sp = obRulerSpec(k);
+  const v = Math.min(sp.max, Math.max(sp.min, sp.min + Math.round(r.scrollLeft / OB_TICK)));
+  if(v === obShownValue(k)) return;
+  if(k === 'h') obStats.h = obUnits.h === 'cm' ? v / 2.54 : v;
+  else if(k === 'w') obStats.w = obUnits.w === 'kg' ? v / 0.453592 : v;
+  else obStats.a = v;
+  obPaintValue(k);
+  try { if(window.Capacitor?.Plugins?.Haptics) Capacitor.Plugins.Haptics.selectionStart?.(), Capacitor.Plugins.Haptics.selectionChanged?.(); } catch(e) {}
+}
+function obUnit(k, u) {
+  if(obUnits[k] === u) return;
+  obUnits[k] = u;
+  obBuildRuler(k);
+}
+
 function obFinish() {
   const name = document.getElementById('ob-name')?.value.trim() || '';
+  const inches = Math.round(obStats.h);
+  const lbs = Math.round(obStats.w);
+  const age = Math.round(obStats.a);
 
   // ── Save to appSettings (same format as Settings tab) ──
   appSettings.name   = name;
   appSettings.gender = obGender || 'female';
+  appSettings.unit   = obUnits.w === 'kg' ? 'kg' : 'lbs';
+  if(obSet.h) { appSettings.height = `${Math.floor(inches / 12)}'${inches % 12}"`; appSettings.heightFt = Math.floor(inches / 12); appSettings.heightIn = inches % 12; }
+  if(obSet.a) appSettings.age = String(age);
   save(SETTINGS_KEY, appSettings);
 
   // ── Apply gender (updates button state + refreshes programs) ──
@@ -11688,30 +11855,37 @@ function obFinish() {
   const g = load(GOALS_KEY) || {};
   g.name  = name;
   g.focus = obFocus;
+  if(obSet.a) g.age = age;
+  if(obSet.w) { g.currentWeight = lbs; if(!g.startWeight) g.startWeight = lbs; }
   save(GOALS_KEY, g);
   goalsData = g;
+  if(obSet.h) {
+    const ft = document.getElementById('goalHeightFt'), inn = document.getElementById('goalHeightIn');
+    if(ft) ft.value = Math.floor(inches / 12);
+    if(inn) inn.value = inches % 12;
+  }
+  try { saveSettings && cloudPost('/user/settings', { name, gender: appSettings.gender, age: obSet.a ? age : null, activity_level: g.activity || 1.55, weight: obSet.w ? lbs : null, goal_weight: g.goalWeight || null }); } catch(e) {}
 
   // ── Mark onboarding complete ──
   localStorage.setItem(ONBOARDING_KEY, '1');
 
   // ── Show summary step ──
-  const focusLabels = {
-    fat_loss:    'Fat Loss',
-    muscle_gain: 'Muscle Gain',
-    recomp:      'Body Recomp',
-  };
-  const genderLabel = obGender === 'male' ? 'Male' : 'Female';
-  document.getElementById('ob-summary').innerHTML = `
-    <div class="ob-summary-row"><span class="ob-summary-lbl">Name</span><span class="ob-summary-val">${name || '—'}</span></div>
-    <div class="ob-summary-row"><span class="ob-summary-lbl">Gender</span><span class="ob-summary-val">${genderLabel}</span></div>
-    <div class="ob-summary-row"><span class="ob-summary-lbl">Goal</span><span class="ob-summary-val">${focusLabels[obFocus] || '—'}</span></div>
-    <div class="ob-summary-row"><span class="ob-summary-lbl">Programs unlocked</span><span class="ob-summary-val" style="color:var(--pink);">✓ Ready</span></div>
-  `;
+  const focusLabels = { fat_loss: 'Fat loss', muscle_gain: 'Muscle gain', recomp: 'Body recomp' };
+  const wShown = obUnits.w === 'kg' ? Math.round(lbs * 0.453592) + ' kg' : lbs + ' lb';
+  const rows = [
+    ['Name', name || '—'],
+    ['Programs', obGender === 'male' ? 'Male' : 'Female'],
+    ['Goal', focusLabels[obFocus] || '—'],
+    ['Height', obSet.h ? `${Math.floor(inches / 12)}' ${inches % 12}"` : '—'],
+    ['Weight', obSet.w ? wShown : '—'],
+    ['Age', obSet.a ? age : '—'],
+  ];
+  document.getElementById('ob-summary').innerHTML = rows.map(([l, v]) =>
+    `<div class="ob-sum-row"><span>${l}</span><b>${String(v).replace(/</g, '&lt;')}</b></div>`).join('');
 
-  obStep = 4;
+  obStep = 7;
   obRenderStep();
 
-  // Re-render dashboard and goals so they reflect new data immediately
   renderDashboard();
   renderGoals();
   renderWorkout();
