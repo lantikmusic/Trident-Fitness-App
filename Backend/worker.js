@@ -344,6 +344,8 @@ export default {
     if (path === '/community/comments/delete' && request.method === 'POST') return community(communityDeleteComment, request, env.DB);
     if (path.startsWith('/community/photo/')  && request.method === 'GET')  return community(communityPhoto, path, env.DB);
     if (path.startsWith('/community/avatar/') && request.method === 'GET')  return community(communityAvatar, path, env.DB);
+    if (path.startsWith('/community/cover/') && request.method === 'GET')   return community(communityCover, path, env.DB);
+    if (path === '/community/cover'           && request.method === 'POST') return community(saveCoverPhoto, request, env.DB);
     if (path === '/community/profile'         && request.method === 'GET')  return community(communityProfile, request, env.DB);
     if (path === '/community/follow'          && request.method === 'POST') return community(communityToggleFollow, request, env.DB, env, ctx);
     if (path === '/community/block'           && request.method === 'POST') return community(communityToggleBlock, request, env.DB);
@@ -1901,8 +1903,10 @@ async function communityProfile(request, DB) {
        EXISTS(SELECT 1 FROM community_follows WHERE follower_id = ?1 AND followee_id = ?2) AS follows_you,
        EXISTS(SELECT 1 FROM dm_blocks WHERE blocker_id = ?2 AND blocked_id = ?1) AS blocked`
   ).bind(userId, me).first();
+  const cover = stats.blocked ? null : await DB.prepare("SELECT updated_at FROM user_blobs WHERE user_id = ? AND blob_key = 'cover'").bind(userId).first();
   return json({
     user_id: user.id, name: user.name, username: await usernameOf(DB, user.id), has_avatar: !!user.has_avatar, is_me: user.id === me,
+    has_cover: !!cover, cover_v: cover ? String(cover.updated_at || '').replace(/\D/g, '') : '',
     bio: stats.blocked ? '' : await bioOf(DB, user.id),
     followers: stats.followers || 0, following: stats.following || 0, posts: stats.posts || 0,
     is_following: !!stats.is_following, follows_you: !!stats.follows_you, blocked: !!stats.blocked
@@ -2245,6 +2249,34 @@ async function saveProfilePic(request, DB) {
     ON CONFLICT(user_id, blob_key) DO UPDATE SET data_json = excluded.data_json, updated_at = excluded.updated_at`)
     .bind(session.user_id, 'profile_pic', JSON.stringify(image)).run();
   return json({ success: true });
+}
+
+// ── Profile cover photo (the wide banner on a Community profile) ──
+const COVER_MAX = 700000; // characters of the data URL (the app sends a 1200×400 JPEG)
+async function saveCoverPhoto(request, DB) {
+  const session = await validateSession(request, DB);
+  if (!session) return error('Unauthorized', 401);
+  let data;
+  try { data = await request.json(); } catch (e) { return error('Invalid request'); }
+  const image = data && data.image;
+  if (image === null) {
+    await DB.prepare("DELETE FROM user_blobs WHERE user_id = ? AND blob_key = 'cover'").bind(session.user_id).run();
+    return json({ success: true, has_cover: false });
+  }
+  if (typeof image !== 'string' || !/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/]+=*$/.test(image)) return error('That photo could not be read');
+  if (image.length > COVER_MAX) return error('That photo is too large', 413);
+  await DB.prepare(`INSERT INTO user_blobs (user_id, blob_key, data_json, updated_at) VALUES (?, 'cover', ?, datetime('now'))
+    ON CONFLICT(user_id, blob_key) DO UPDATE SET data_json = excluded.data_json, updated_at = excluded.updated_at`)
+    .bind(session.user_id, JSON.stringify(image)).run();
+  return json({ success: true, has_cover: true });
+}
+async function communityCover(path, DB) {
+  const userId = path.slice('/community/cover/'.length);
+  if (!COMMUNITY_ID.test(userId)) return new Response('Not found', { status: 404, headers: CORS });
+  const row = await DB.prepare("SELECT data_json FROM user_blobs WHERE user_id = ? AND blob_key = 'cover'").bind(userId).first();
+  let dataUrl = null;
+  try { dataUrl = row ? JSON.parse(row.data_json) : null; } catch (e) {}
+  return communityImageResponse(dataUrl, 'public, max-age=300');
 }
 
 // Images are stored as data URLs; serve them as real image responses so <img> tags can load them.

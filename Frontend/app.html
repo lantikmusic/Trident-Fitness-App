@@ -2682,7 +2682,7 @@ body.ef-on:not(.ef-edit) #restOverlay{display:none !important;}
 .mx-kpi-lbl{font-size:13px;text-transform:none;letter-spacing:0;font-weight:500;color:#9BA0A8;margin:0;}
 .mx-kpi-val{font-size:17px;font-weight:800;}
 .mx-kpi-val span{display:none;}
-.mx-kpi:nth-child(4){display:none;}
+.mx-kpi-lbl{white-space:nowrap;}
 .mx-bars{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;border-top:none;padding-top:0;}
 .mx-bar{border-radius:16px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.08);padding:10px;display:flex;flex-direction:column;gap:7px;min-width:0;}
 .mx-bar-top{flex-direction:column;align-items:flex-start;gap:5px;margin:0;}
@@ -2931,6 +2931,19 @@ body.e-set-on .e-set-sb{display:block;}
 .ob-other-lbl{font-size:15px;font-weight:600;color:#9BA0A8;margin:22px 0 8px 4px;}
 .ob-pick-sm{padding:14px 16px;}
 .ob-pick-sm .ob-pick-n{font-size:15px;}
+/* ── Community profile cover photo ── */
+.cmp-cover{position:relative;margin:-6px -16px 0;height:150px;overflow:hidden;background:radial-gradient(120% 140% at 15% 0%,var(--pink-dim),transparent 60%),linear-gradient(160deg,#1C1E22,#0D0E10);border-bottom:0.5px solid rgba(255,255,255,0.06);}
+.cmp-cover img{width:100%;height:100%;object-fit:cover;display:block;}
+.cmp-cover.has-img::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 55%,rgba(13,14,16,0.55));pointer-events:none;}
+.cmp-cover-btn{position:absolute;right:14px;top:12px;z-index:1;height:32px;padding:0 12px;border-radius:16px;display:flex;align-items:center;gap:6px;border:0.5px solid rgba(255,255,255,0.18);background:rgba(20,22,25,0.55);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);color:#fff;font:700 13px var(--tf-font);}
+.cmp-cover+.cmp-head{padding-top:0;}
+.cmp-cover+.cmp-head .cmp-top{margin-top:-44px;align-items:flex-end;position:relative;z-index:2;}
+.cmp-cover+.cmp-head .cmp-ring{background:#0D0E10;border-radius:50%;}
+.cmp-cover+.cmp-head .cmp-stats{padding-bottom:6px;}
+.cm-cover-frame{position:relative;width:100%;aspect-ratio:3/1;border-radius:16px;overflow:hidden;background:#000;touch-action:none;cursor:grab;}
+.cm-cover-frame img{width:100%;height:100%;object-fit:cover;display:block;user-select:none;-webkit-user-select:none;pointer-events:none;}
+.cm-cover-hint{text-align:center;font-size:13px;color:#9BA0A8;margin-top:10px;}
+.cmp-cover-remove{color:#FF453A !important;}
 /* Line icons that replaced emoji */
 .wn-ic,.ah-wo-ic{color:var(--pink);font-size:0;}
 .ah-home-item i{display:flex;justify-content:center;color:var(--pink);font-style:normal;}
@@ -16048,7 +16061,15 @@ function cmProfilePageHTML() {
       : `<div class="cmp-empty"><div class="cmp-empty-ic">${CMP_DUMBBELL}</div><b>${pr.is_me ? 'No workouts yet' : 'No workouts shared yet'}</b><span>${pr.is_me ? 'Workouts you finish show up here.' : `When ${name} shares a workout or PR, it shows up here.`}</span></div>`)
     + (cmProf.next ? `<button class="ghost-btn" style="margin:4px 0 16px;" onclick="cmProfileMore()">${cmProf.loading ? 'Loading…' : 'Load more posts'}</button>` : '');
 
-  return bar + `<div class="cmp-head">
+  // Cover photo: the wide banner behind the top of the profile
+  const coverSrc = pr.is_me && cmProf.coverLocal ? cmProf.coverLocal
+    : (pr.has_cover ? `${WORKER_URL}/community/cover/${uid}?v=${encodeURIComponent(pr.cover_v || '')}` : '');
+  const cover = `<div class="cmp-cover${coverSrc ? ' has-img' : ''}">
+      ${coverSrc ? `<img src="${coverSrc}" alt="" onerror="this.remove()">` : ''}
+      ${pr.is_me ? `<button class="cmp-cover-btn" onclick="cmCoverPick()" aria-label="${coverSrc ? 'Change' : 'Add'} cover photo"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/></svg>${coverSrc ? 'Edit cover' : 'Add cover'}</button>` : ''}
+    </div>`;
+
+  return bar + cover + `<div class="cmp-head">
       <div class="cmp-top">
         ${pr.is_me
           ? `<button class="cm-ring cmp-ring cmp-ring-me" onclick="openProfilePic()" aria-label="Change your profile picture">${avatar}<span class="cmp-av-plus" aria-hidden="true">+</span></button>`
@@ -16070,6 +16091,103 @@ function cmProfilePageHTML() {
       <button class="${cmProf.view === 'posts' ? 'on' : ''}" onclick="cmProfileView('posts')" aria-label="Photos and posts" aria-selected="${cmProf.view === 'posts'}"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></svg></button>
     </div>
     ${postsHTML}`;
+}
+
+// ══════════════════════════════════════
+// COVER PHOTO — the wide banner on your Community profile (1200×400 JPEG on the server)
+// ══════════════════════════════════════
+const CM_COVER = { src: '', img: null, px: 0.5, py: 0.5 };
+function cmCoverPick() {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'image/*';
+  inp.onchange = () => {
+    const f = inp.files && inp.files[0]; if(!f) return;
+    const rd = new FileReader();
+    rd.onload = e => {
+      const img = new Image();
+      img.onload = () => { Object.assign(CM_COVER, { src: e.target.result, img, px: 0.5, py: 0.5 }); cmCoverSheet(); };
+      img.onerror = () => showToast('That photo could not be read');
+      img.src = e.target.result;
+    };
+    rd.readAsDataURL(f);
+  };
+  // No photo chosen yet but a cover exists: offer to remove it
+  const pr = cmProf.data || {};
+  if(pr.has_cover || cmProf.coverLocal) {
+    cmSheet(`<div class="cm-sheet-title">Cover photo</div>
+      <button class="pink-btn" id="cmCoverChoose">Choose a new photo</button>
+      <button class="ghost-btn cmp-cover-remove" style="margin-top:8px;" onclick="cmCoverRemove()">Remove cover photo</button>
+      <button class="ghost-btn" style="margin-top:8px;" onclick="cmSheetClose()">Cancel</button>`, true);
+    document.getElementById('cmCoverChoose').onclick = () => inp.click();
+  } else inp.click();
+}
+function cmCoverSheet() {
+  cmSheet(`<div class="cm-sheet-title">Position your cover</div>
+    <div class="cm-cover-frame" id="cmCoverFrame"><img id="cmCoverImg" src="${CM_COVER.src}" alt="" draggable="false"></div>
+    <div class="cm-cover-hint">Drag the photo to choose what shows</div>
+    <button class="pink-btn" id="cmCoverSave" style="margin-top:14px;" onclick="cmCoverSave()">Save cover</button>
+    <button class="ghost-btn" style="margin-top:8px;" onclick="cmSheetClose()">Cancel</button>`, true);
+  const frame = document.getElementById('cmCoverFrame');
+  cmCoverPaint();
+  let start = null;
+  const pt = e => (e.touches && e.touches[0]) || e;
+  const down = e => { const p = pt(e); start = { x: p.clientX, y: p.clientY, px: CM_COVER.px, py: CM_COVER.py }; };
+  const move = e => {
+    if(!start) return;
+    e.preventDefault();
+    const p = pt(e), img = CM_COVER.img, fw = frame.clientWidth, fh = frame.clientHeight;
+    const scale = Math.max(fw / img.naturalWidth, fh / img.naturalHeight);
+    const overX = img.naturalWidth * scale - fw, overY = img.naturalHeight * scale - fh;
+    if(overX > 1) CM_COVER.px = Math.min(1, Math.max(0, start.px - (p.clientX - start.x) / overX));
+    if(overY > 1) CM_COVER.py = Math.min(1, Math.max(0, start.py - (p.clientY - start.y) / overY));
+    cmCoverPaint();
+  };
+  const up = () => { start = null; };
+  frame.addEventListener('touchstart', down, { passive: true });
+  frame.addEventListener('touchmove', move, { passive: false });
+  frame.addEventListener('touchend', up);
+  frame.addEventListener('mousedown', down);
+  window.addEventListener('mousemove', move);
+  window.addEventListener('mouseup', up);
+}
+function cmCoverPaint() {
+  const im = document.getElementById('cmCoverImg');
+  if(im) im.style.objectPosition = `${(CM_COVER.px * 100).toFixed(1)}% ${(CM_COVER.py * 100).toFixed(1)}%`;
+}
+// Crops exactly what the frame shows (object-fit: cover with the same position) to a 3:1 JPEG
+function cmCoverCrop() {
+  const img = CM_COVER.img, w = img.naturalWidth, h = img.naturalHeight;
+  let cw, ch;
+  if(w / h > 3) { ch = h; cw = h * 3; } else { cw = w; ch = w / 3; }
+  const sx = (w - cw) * CM_COVER.px, sy = (h - ch) * CM_COVER.py;
+  const outW = Math.round(Math.min(1200, cw)), outH = Math.round(outW / 3);
+  const c = document.createElement('canvas'); c.width = outW; c.height = outH;
+  c.getContext('2d').drawImage(img, sx, sy, cw, ch, 0, 0, outW, outH);
+  let q = 0.82, out = c.toDataURL('image/jpeg', q);
+  while(out.length > 650000 && q > 0.4) { q -= 0.1; out = c.toDataURL('image/jpeg', q); }
+  return out;
+}
+async function cmCoverSave() {
+  const btn = document.getElementById('cmCoverSave');
+  if(!btn || btn.disabled || !CM_COVER.img) return;
+  let data;
+  try { data = cmCoverCrop(); } catch(e) { showToast('That photo could not be read'); return; }
+  btn.disabled = true; btn.textContent = 'Saving…';
+  const r = await cmApi('/community/cover', 'POST', { image: data });
+  btn.disabled = false; btn.textContent = 'Save cover';
+  if(!r.ok) { if(r.status !== 401) showToast((r.data && r.data.error) || 'Could not save your cover — try again'); return; }
+  cmProf.coverLocal = data;
+  if(cmProf.data) { cmProf.data.has_cover = true; cmProf.data.cover_v = String(Date.now()); }
+  cmSheetClose(); cmDraw();
+  showToast('✓ Cover photo saved');
+}
+async function cmCoverRemove() {
+  const r = await cmApi('/community/cover', 'POST', { image: null });
+  if(!r.ok) { if(r.status !== 401) showToast('Could not remove your cover — try again'); return; }
+  cmProf.coverLocal = '';
+  if(cmProf.data) cmProf.data.has_cover = false;
+  cmSheetClose(); cmDraw();
+  showToast('Cover photo removed');
 }
 
 // ══════════════════════════════════════
