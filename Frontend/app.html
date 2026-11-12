@@ -2944,6 +2944,25 @@ body.e-set-on .e-set-sb{display:block;}
 .cm-cover-frame img{width:100%;height:100%;object-fit:cover;display:block;user-select:none;-webkit-user-select:none;pointer-events:none;}
 .cm-cover-hint{text-align:center;font-size:13px;color:#9BA0A8;margin-top:10px;}
 .cmp-cover-remove{color:#FF453A !important;}
+/* ── Home: Steps + Sleep widgets and their full pages ── */
+.th-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:8px 0 14px;}
+.th-w{display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-width:0;padding:14px 14px 16px;border-radius:24px;border:0.5px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.05);color:#fff;text-align:left;font-family:var(--tf-font);-webkit-tap-highlight-color:transparent;transition:transform .12s;}
+.th-w:active{transform:scale(.97);}
+.th-w-top{display:flex;align-items:center;gap:8px;width:100%;margin-bottom:8px;}
+.th-w-ic{width:30px;height:30px;border-radius:10px;background:rgba(255,255,255,0.07);color:var(--pink);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.th-w-lbl{flex:1;font-size:14px;font-weight:700;color:#C9CDD3;}
+.th-w-chev{color:#6B6F76;display:flex;}
+.th-w-val{font-size:26px;font-weight:800;letter-spacing:-0.03em;line-height:1.1;font-variant-numeric:tabular-nums;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.th-w-sub{font-size:12px;font-weight:600;color:#9BA0A8;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.th-w-bar{width:100%;height:6px;border-radius:3px;background:rgba(255,255,255,0.08);margin-top:10px;overflow:hidden;}
+.th-w-bar i{display:block;height:100%;width:0;border-radius:3px;background:var(--pink);box-shadow:0 0 8px var(--pink);transition:width .5s ease;}
+.th-page{position:fixed;inset:0;z-index:290;background:#0D0E10;overflow-y:auto;-webkit-overflow-scrolling:touch;transform:translateX(100%);transition:transform .34s cubic-bezier(.32,0,.15,1);visibility:hidden;}
+.th-page.open{transform:none;visibility:visible;}
+.th-bar{position:sticky;top:0;z-index:2;display:grid;grid-template-columns:44px 1fr 44px;align-items:center;padding:calc(env(safe-area-inset-top) + 8px) 16px 10px;background:linear-gradient(180deg,#0D0E10 70%,rgba(13,14,16,0));}
+.th-title{text-align:center;font-size:17px;font-weight:800;}
+.th-body{padding:6px 16px calc(40px + env(safe-area-inset-bottom));}
+.th-body .tracker-card{background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.08);border-radius:28px;}
+body.th-on .bottom-nav,body.th-on .nav-bar{visibility:hidden;}
 /* Line icons that replaced emoji */
 .wn-ic,.ah-wo-ic{color:var(--pink);font-size:0;}
 .ah-home-item i{display:flex;justify-content:center;color:var(--pink);font-style:normal;}
@@ -3157,111 +3176,20 @@ body.e-set-on .e-set-sb{display:block;}
       <div class="wlabels" id="dashDayLabels"></div>
     </div>
 
-    <!-- ══ STEPS CARD ══ -->
-    <div class="section-head" style="margin-top:8px;"><div class="section-title">Steps</div></div>
-    <div class="tracker-card" id="stepsCard">
-      <div class="ah-src" id="stepsAhSrc" style="display:none;"></div>
-      <div class="ah-daynav" id="stepsAhNav" style="display:none;"></div>
-      <div class="ah-connect-slot" id="stepsAhConnect" style="display:none;"></div>
-      <div class="tc-top">
-        <div class="tc-ring-wrap">
-          <svg viewBox="0 0 80 80" width="80" height="80">
-            <circle cx="40" cy="40" r="33" fill="none" stroke="var(--bg4)" stroke-width="6"/>
-            <circle id="stepsRingFg" cx="40" cy="40" r="33" fill="none" stroke="var(--pink)" stroke-width="6"
-              stroke-dasharray="207.35" stroke-dashoffset="207.35" stroke-linecap="round"
-              transform="rotate(-90 40 40)" style="transition:stroke-dashoffset .5s ease;"/>
-          </svg>
-          <div class="tc-ring-label" id="stepsRingPct">0%</div>
-        </div>
-        <div class="tc-info">
-          <div class="tc-eyebrow" id="stepsEyebrow">Today's Steps</div>
-          <div class="tc-big" id="stepsDisplay">0</div>
-          <div class="tc-sub" id="stepsGoalLabel">Goal: 10,000</div>
-          <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
-            <div class="tc-chip"><span id="stepsDistDisplay">0.0</span> <span class="tc-chip-unit">mi</span></div>
-            <div class="tc-chip"><span id="stepsCalDisplay">0</span> <span class="tc-chip-unit">kcal</span></div>
-          </div>
-        </div>
-      </div>
-      <div class="tc-input-row" id="stepsInputRow">
-        <div class="iw" style="flex:1;"><input type="number" id="stepsInput" placeholder="Enter steps" min="0" oninput="onStepsInput()"></div>
-        <button class="tc-save-btn" onclick="saveSteps()">Log</button>
-      </div>
-      <div class="tc-goal-row">
-        <label style="font-size:11px;color:var(--text3);margin-right:6px;">Daily Goal</label>
-        <div class="iw" style="flex:1;max-width:130px;"><input type="number" id="stepsGoalInput" placeholder="10000" min="1000" step="500" oninput="onStepsGoalInput()"></div>
-        <span style="font-size:11px;color:var(--text3);margin-left:6px;">steps</span>
-      </div>
-      <!-- 7-day bars -->
-      <div class="tc-chart-label">Last 7 Days</div>
-      <div class="tc-bars" id="stepsBars"></div>
-      <div class="tc-bar-labels" id="stepsBarLabels"></div>
-    </div>
-
-    <!-- ══ SLEEP CARD ══ -->
-    <div class="section-head" style="margin-top:8px;"><div class="section-title">Sleep</div></div>
-    <div class="tracker-card" id="sleepCard">
-      <div class="ah-src" id="sleepAhSrc" style="display:none;"></div>
-      <div class="ah-daynav" id="sleepAhNav" style="display:none;"></div>
-      <div class="ah-connect-slot" id="sleepAhConnect" style="display:none;"></div>
-      <div class="tc-top">
-        <div class="tc-ring-wrap">
-          <svg viewBox="0 0 80 80" width="80" height="80">
-            <circle cx="40" cy="40" r="33" fill="none" stroke="var(--bg4)" stroke-width="6"/>
-            <circle id="sleepRingFg" cx="40" cy="40" r="33" fill="none" stroke="var(--pink)" stroke-width="6"
-              stroke-dasharray="207.35" stroke-dashoffset="207.35" stroke-linecap="round"
-              transform="rotate(-90 40 40)" style="transition:stroke-dashoffset .5s ease;"/>
-          </svg>
-          <div class="tc-ring-label" id="sleepRingPct">—</div>
-        </div>
-        <div class="tc-info">
-          <div class="tc-eyebrow" id="sleepEyebrow">Last Night</div>
-          <div class="tc-big" id="sleepHoursDisplay">—</div>
-          <div class="tc-sub" id="sleepQualLabel">Quality: —</div>
-          <div style="margin-top:8px;">
-            <div class="sleep-stars" id="sleepStarsDisplay"></div>
-          </div>
-        </div>
-      </div>
-      <div id="sleepAhStages" style="display:none;"></div>
-      <!-- Inputs (hidden while Apple Health supplies last night's sleep) -->
-      <div id="sleepManual">
-      <div class="two-col" style="margin-bottom:10px;">
-        <div class="field"><label>Bedtime</label><div class="iw"><input type="time" id="sleepBedtime" oninput="calcSleepDuration()"></div></div>
-        <div class="field"><label>Wake time</label><div class="iw"><input type="time" id="sleepWake" oninput="calcSleepDuration()"></div></div>
-      </div>
-      <div class="field" style="margin-bottom:10px;">
-        <label>Sleep Quality</label>
-        <div class="sleep-quality-row" id="sleepQualityPicker">
-          <button class="sq-btn" data-q="1" onclick="selectSleepQuality(1)" aria-label="Poor">1</button>
-          <button class="sq-btn" data-q="2" onclick="selectSleepQuality(2)" aria-label="Fair">2</button>
-          <button class="sq-btn" data-q="3" onclick="selectSleepQuality(3)" aria-label="Okay">3</button>
-          <button class="sq-btn" data-q="4" onclick="selectSleepQuality(4)" aria-label="Good">4</button>
-          <button class="sq-btn" data-q="5" onclick="selectSleepQuality(5)" aria-label="Great">5</button>
-        </div>
-      </div>
-      <button class="tc-save-btn" style="width:100%;margin-bottom:12px;" onclick="saveSleep()">Save Sleep Entry</button>
-      </div>
-      <!-- Bedtime reminder -->
-      <div class="sleep-remind-row">
-        <div>
-          <div style="font-size:13px;font-weight:600;">Bedtime Reminder</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:2px;">Get notified before your target bedtime</div>
-        </div>
-        <label class="toggle-wrap" style="flex-shrink:0;">
-          <input type="checkbox" id="sleepReminderToggle" onchange="toggleSleepReminder()">
-          <span class="toggle-slider"></span>
-        </label>
-      </div>
-      <div id="sleepReminderTime" style="display:none;margin-top:10px;">
-        <div class="field"><label>Remind me at</label><div class="iw"><input type="time" id="sleepReminderInput" oninput="saveSleepReminderTime()"></div></div>
-      </div>
-      <!-- 7-day chart -->
-      <div class="tc-chart-label" style="margin-top:12px;">Last 7 Nights</div>
-      <div class="tc-bars" id="sleepBars"></div>
-      <div class="tc-bar-labels" id="sleepBarLabels"></div>
-      <!-- Tip -->
-      <div class="sleep-tip" id="sleepTip"></div>
+    <!-- ══ STEPS + SLEEP WIDGETS (tap for the full page) ══ -->
+    <div class="th-grid">
+      <button class="th-w" id="thStepsW" onclick="thOpen('steps')" aria-label="Steps, open details">
+        <span class="th-w-top"><span class="th-w-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 21c-1.7 0-3-1.6-3-3.5S5 14 6 12.5 7 9 7 7c0-1.7 1.3-3 3-3s2 1.5 2 3.5c0 2.5-1 4-1 6s1 2.5 1 4S9.5 21 7 21zM17 15c-1.4 0-2.5-1.2-2.5-2.8s.7-2.7 1.5-3.9.8-2.4.8-3.6c0-1.3 1-2.2 2.2-2.2S20.5 3.6 20.5 5c0 2-.8 3.2-.8 4.8s.8 2 .8 3.2-1.6 2-3.5 2z"/></svg></span><span class="th-w-lbl">Steps</span><span class="th-w-chev"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></span>
+        <span class="th-w-val" id="thStepsVal">0</span>
+        <span class="th-w-sub" id="thStepsSub">of 10,000</span>
+        <span class="th-w-bar"><i id="thStepsBar"></i></span>
+      </button>
+      <button class="th-w" id="thSleepW" onclick="thOpen('sleep')" aria-label="Sleep, open details">
+        <span class="th-w-top"><span class="th-w-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></span><span class="th-w-lbl">Sleep</span><span class="th-w-chev"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></span>
+        <span class="th-w-val" id="thSleepVal">—</span>
+        <span class="th-w-sub" id="thSleepSub">Last night</span>
+        <span class="th-w-bar"><i id="thSleepBar"></i></span>
+      </button>
     </div>
 
   </div>
@@ -4190,6 +4118,120 @@ body.e-set-on .e-set-sb{display:block;}
   <div style="text-align:center;padding:0 20px;color:var(--text3);font-size:11px;">Trident Fitness<span id="appVersionLabel"></span></div>
 </div>
 
+<!-- ══ STEPS PAGE (opened from the Home widget) ══ -->
+<div class="th-page" id="th-steps" aria-hidden="true">
+  <div class="th-bar"><button class="e-circ" onclick="thClose()" aria-label="Back"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><div class="th-title">Steps</div><span style="width:44px"></span></div>
+  <div class="th-body">
+    <div class="tracker-card" id="stepsCard">
+      <div class="ah-src" id="stepsAhSrc" style="display:none;"></div>
+      <div class="ah-daynav" id="stepsAhNav" style="display:none;"></div>
+      <div class="ah-connect-slot" id="stepsAhConnect" style="display:none;"></div>
+      <div class="tc-top">
+        <div class="tc-ring-wrap">
+          <svg viewBox="0 0 80 80" width="80" height="80">
+            <circle cx="40" cy="40" r="33" fill="none" stroke="var(--bg4)" stroke-width="6"/>
+            <circle id="stepsRingFg" cx="40" cy="40" r="33" fill="none" stroke="var(--pink)" stroke-width="6"
+              stroke-dasharray="207.35" stroke-dashoffset="207.35" stroke-linecap="round"
+              transform="rotate(-90 40 40)" style="transition:stroke-dashoffset .5s ease;"/>
+          </svg>
+          <div class="tc-ring-label" id="stepsRingPct">0%</div>
+        </div>
+        <div class="tc-info">
+          <div class="tc-eyebrow" id="stepsEyebrow">Today's Steps</div>
+          <div class="tc-big" id="stepsDisplay">0</div>
+          <div class="tc-sub" id="stepsGoalLabel">Goal: 10,000</div>
+          <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+            <div class="tc-chip"><span id="stepsDistDisplay">0.0</span> <span class="tc-chip-unit">mi</span></div>
+            <div class="tc-chip"><span id="stepsCalDisplay">0</span> <span class="tc-chip-unit">kcal</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="tc-input-row" id="stepsInputRow">
+        <div class="iw" style="flex:1;"><input type="number" id="stepsInput" placeholder="Enter steps" min="0" oninput="onStepsInput()"></div>
+        <button class="tc-save-btn" onclick="saveSteps()">Log</button>
+      </div>
+      <div class="tc-goal-row">
+        <label style="font-size:11px;color:var(--text3);margin-right:6px;">Daily Goal</label>
+        <div class="iw" style="flex:1;max-width:130px;"><input type="number" id="stepsGoalInput" placeholder="10000" min="1000" step="500" oninput="onStepsGoalInput()"></div>
+        <span style="font-size:11px;color:var(--text3);margin-left:6px;">steps</span>
+      </div>
+      <!-- 7-day bars -->
+      <div class="tc-chart-label">Last 7 Days</div>
+      <div class="tc-bars" id="stepsBars"></div>
+      <div class="tc-bar-labels" id="stepsBarLabels"></div>
+    </div>
+
+  </div>
+</div>
+<!-- ══ SLEEP PAGE (opened from the Home widget) ══ -->
+<div class="th-page" id="th-sleep" aria-hidden="true">
+  <div class="th-bar"><button class="e-circ" onclick="thClose()" aria-label="Back"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><div class="th-title">Sleep</div><span style="width:44px"></span></div>
+  <div class="th-body">
+    <div class="tracker-card" id="sleepCard">
+      <div class="ah-src" id="sleepAhSrc" style="display:none;"></div>
+      <div class="ah-daynav" id="sleepAhNav" style="display:none;"></div>
+      <div class="ah-connect-slot" id="sleepAhConnect" style="display:none;"></div>
+      <div class="tc-top">
+        <div class="tc-ring-wrap">
+          <svg viewBox="0 0 80 80" width="80" height="80">
+            <circle cx="40" cy="40" r="33" fill="none" stroke="var(--bg4)" stroke-width="6"/>
+            <circle id="sleepRingFg" cx="40" cy="40" r="33" fill="none" stroke="var(--pink)" stroke-width="6"
+              stroke-dasharray="207.35" stroke-dashoffset="207.35" stroke-linecap="round"
+              transform="rotate(-90 40 40)" style="transition:stroke-dashoffset .5s ease;"/>
+          </svg>
+          <div class="tc-ring-label" id="sleepRingPct">—</div>
+        </div>
+        <div class="tc-info">
+          <div class="tc-eyebrow" id="sleepEyebrow">Last Night</div>
+          <div class="tc-big" id="sleepHoursDisplay">—</div>
+          <div class="tc-sub" id="sleepQualLabel">Quality: —</div>
+          <div style="margin-top:8px;">
+            <div class="sleep-stars" id="sleepStarsDisplay"></div>
+          </div>
+        </div>
+      </div>
+      <div id="sleepAhStages" style="display:none;"></div>
+      <!-- Inputs (hidden while Apple Health supplies last night's sleep) -->
+      <div id="sleepManual">
+      <div class="two-col" style="margin-bottom:10px;">
+        <div class="field"><label>Bedtime</label><div class="iw"><input type="time" id="sleepBedtime" oninput="calcSleepDuration()"></div></div>
+        <div class="field"><label>Wake time</label><div class="iw"><input type="time" id="sleepWake" oninput="calcSleepDuration()"></div></div>
+      </div>
+      <div class="field" style="margin-bottom:10px;">
+        <label>Sleep Quality</label>
+        <div class="sleep-quality-row" id="sleepQualityPicker">
+          <button class="sq-btn" data-q="1" onclick="selectSleepQuality(1)" aria-label="Poor">1</button>
+          <button class="sq-btn" data-q="2" onclick="selectSleepQuality(2)" aria-label="Fair">2</button>
+          <button class="sq-btn" data-q="3" onclick="selectSleepQuality(3)" aria-label="Okay">3</button>
+          <button class="sq-btn" data-q="4" onclick="selectSleepQuality(4)" aria-label="Good">4</button>
+          <button class="sq-btn" data-q="5" onclick="selectSleepQuality(5)" aria-label="Great">5</button>
+        </div>
+      </div>
+      <button class="tc-save-btn" style="width:100%;margin-bottom:12px;" onclick="saveSleep()">Save Sleep Entry</button>
+      </div>
+      <!-- Bedtime reminder -->
+      <div class="sleep-remind-row">
+        <div>
+          <div style="font-size:13px;font-weight:600;">Bedtime Reminder</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px;">Get notified before your target bedtime</div>
+        </div>
+        <label class="toggle-wrap" style="flex-shrink:0;">
+          <input type="checkbox" id="sleepReminderToggle" onchange="toggleSleepReminder()">
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div id="sleepReminderTime" style="display:none;margin-top:10px;">
+        <div class="field"><label>Remind me at</label><div class="iw"><input type="time" id="sleepReminderInput" oninput="saveSleepReminderTime()"></div></div>
+      </div>
+      <!-- 7-day chart -->
+      <div class="tc-chart-label" style="margin-top:12px;">Last 7 Nights</div>
+      <div class="tc-bars" id="sleepBars"></div>
+      <div class="tc-bar-labels" id="sleepBarLabels"></div>
+      <!-- Tip -->
+      <div class="sleep-tip" id="sleepTip"></div>
+    </div>
+  </div>
+</div>
 <!-- Bottom Nav -->
 <nav class="bottom-nav" id="bottomNav">
   <span class="nav-pill" aria-hidden="true"></span>
@@ -19211,6 +19253,58 @@ function deleteProgressPhoto(i) {
   save(PROGRESS_PHOTOS_KEY, photos);
   renderProgressPhotos();
 }
+
+// ══════════════════════════════════════
+// HOME STEPS + SLEEP WIDGETS — small cards on Home; tapping one opens the full Steps or Sleep page
+// ══════════════════════════════════════
+// The full cards keep rendering as before; the widgets copy today's numbers from them.
+function thRingPct(id) {
+  const fg = document.getElementById(id);
+  const off = fg ? parseFloat(fg.style.strokeDashoffset) : NaN;
+  return isFinite(off) ? Math.max(0, Math.min(1, 1 - off / 207.35)) : 0;
+}
+function thWidgets() {
+  const t = id => (document.getElementById(id) || {}).textContent || '';
+  const set = (id, v) => { const el = document.getElementById(id); if(el && el.textContent !== v) el.textContent = v; };
+  set('thStepsVal', t('stepsDisplay') || '0');
+  set('thStepsSub', t('stepsGoalLabel').replace(/^Goal:\s*/, 'of '));
+  set('thSleepVal', t('sleepHoursDisplay') || '—');
+  const q = t('sleepQualLabel');
+  set('thSleepSub', /^Quality:\s*(—|Not rated)?$/.test(q) || !q ? 'Last night' : q.replace(/^Quality:\s*/, '').replace(/ · in bed.*$/, ''));
+  const sb = document.getElementById('thStepsBar'), lb = document.getElementById('thSleepBar');
+  if(sb) sb.style.width = (thRingPct('stepsRingFg') * 100).toFixed(1) + '%';
+  if(lb) lb.style.width = (thRingPct('sleepRingFg') * 100).toFixed(1) + '%';
+}
+function thOpen(k) {
+  const pg = document.getElementById('th-' + k); if(!pg) return;
+  pg.scrollTop = 0;
+  pg.setAttribute('aria-hidden', 'false');
+  pg.classList.add('open');
+  document.body.classList.add('th-on');
+}
+function thClose() {
+  document.querySelectorAll('.th-page.open').forEach(pg => { pg.classList.remove('open'); pg.setAttribute('aria-hidden', 'true'); });
+  document.body.classList.remove('th-on');
+  // Back on Home the widgets show today again, even if an earlier day was picked on the page
+  try {
+    if(typeof ahState !== 'undefined' && (ahState.sel.steps || ahState.sel.sleep)) {
+      ahState.sel.steps = 0; ahState.sel.sleep = 0;
+      renderStepsCard(); renderSleepCard();
+      if(typeof ahRenderCards === 'function') ahRenderCards();
+    }
+  } catch(e) {}
+  thWidgets();
+}
+(function thWatch() {
+  let queued = false;
+  const run = () => { queued = false; try { thWidgets(); } catch(e) {} };
+  const mo = new MutationObserver(() => { if(!queued) { queued = true; requestAnimationFrame(run); } });
+  ['stepsCard', 'sleepCard'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) mo.observe(el, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ['style'] });
+  });
+  setTimeout(run, 0);
+})();
 
 // ══════════════════════════════════════
 // PROFILE PICTURE
