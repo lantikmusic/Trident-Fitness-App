@@ -3034,6 +3034,69 @@ body.th-on .bottom-nav,body.th-on .nav-bar{visibility:hidden;}
 .rd-bar span{font-size:11px;color:#7D828A;font-weight:600;}
 .rd-how{margin:18px 4px 0;font-size:12.5px;color:#7D828A;line-height:1.5;}
 .rd-how b{display:block;color:#C9CDD3;font-size:13px;margin-bottom:3px;}
+/* ── Turn on Readiness pop-up ── */
+.rdi-ov{position:fixed;inset:0;z-index:600;display:none;align-items:flex-end;background:rgba(0,0,0,0);transition:background .3s;}
+.rdi-ov.open{background:rgba(0,0,0,0.6);}
+.rdi-sheet{width:100%;box-sizing:border-box;background:#141518;border-radius:32px 32px 0 0;border-top:0.5px solid rgba(255,255,255,0.08);padding:10px 22px calc(22px + env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;text-align:center;transform:translateY(100%);transition:transform .38s cubic-bezier(.32,0,.15,1);max-height:92vh;overflow-y:auto;}
+.rdi-ov.open .rdi-sheet{transform:none;}
+.rdi-ov.walk .rdi-sheet{min-height:78vh;}
+.rdi-handle{width:44px;height:5px;border-radius:3px;background:rgba(255,255,255,0.18);margin-bottom:18px;flex-shrink:0;}
+.rdi-ready{position:relative;width:150px;height:150px;margin:6px 0 16px;}
+.rdi-ready span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;letter-spacing:-0.02em;}
+.rdi-chips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:18px;}
+.rdi-chips span{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 15px;border-radius:19px;background:rgba(255,255,255,0.07);font-size:15px;font-weight:700;}
+.rdi-chips span svg{color:var(--c,#BF5AF2);}
+.rdi-title{font-size:27px;font-weight:800;letter-spacing:-0.025em;line-height:1.15;margin-bottom:8px;}
+.rdi-text{font-size:16px;color:#9BA0A8;line-height:1.45;margin-bottom:18px;max-width:340px;}
+.rdi-btn{width:100%;height:56px;border-radius:28px;border:none;background:var(--pink);color:#000;font:800 17px var(--tf-font);margin-top:6px;flex-shrink:0;}
+.rdi-btn.ghost{background:rgba(255,255,255,0.08);color:#fff;border:0.5px solid rgba(255,255,255,0.1);margin-top:10px;}
+.rdi-btn:disabled{opacity:.6;}
+.rdi-slide{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;animation:obIn .3s ease;}
+.rdi-dots-row{display:flex;gap:7px;margin:14px 0 12px;}
+.rdi-dots-row i{width:8px;height:8px;border-radius:4px;background:rgba(255,255,255,0.25);transition:width .25s;}
+.rdi-dots-row i.on{width:26px;background:#fff;}
+.rdi-art{position:relative;width:280px;height:230px;margin-bottom:14px;}
+.rdi-core{position:absolute;left:65px;top:40px;width:150px;height:150px;}
+.rdi-core i{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#FF453A;filter:drop-shadow(0 0 10px rgba(255,69,58,.6));}
+.rdi-orb{position:absolute;width:62px;height:62px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--c);background:radial-gradient(circle at 35% 30%,rgba(255,255,255,0.28),rgba(255,255,255,0.05) 60%),rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.25);box-shadow:0 0 24px color-mix(in srgb,var(--c) 45%,transparent);animation:rdiFloat 4s ease-in-out infinite;}
+.rdi-orb.o1{left:10px;top:12px;}.rdi-orb.o2{left:0;top:150px;animation-delay:-1.3s;}.rdi-orb.o3{right:2px;top:92px;animation-delay:-2.6s;}
+@keyframes rdiFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.rdi-list{width:100%;text-align:left;display:flex;flex-direction:column;gap:16px;margin:10px 0 6px;}
+.rdi-item{display:flex;gap:14px;align-items:flex-start;}
+.rdi-item-ic{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.rdi-item b{display:block;font-size:17px;font-weight:800;margin-bottom:2px;}
+.rdi-item div>span{display:block;font-size:14.5px;color:#9BA0A8;line-height:1.4;}
+.rdi-item em{display:block;font-style:normal;font-size:13.5px;font-weight:700;color:#FFD60A;margin-top:4px;}
+.rdi-vs{display:flex;align-items:stretch;width:100%;margin:14px 0 18px;}
+.rdi-vs>div:not(.rdi-vs-line){flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.rdi-vs-line{width:1px;background:rgba(255,255,255,0.12);margin:0 8px;}
+.rdi-vs-art{position:relative;width:108px;height:108px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;}
+.rdi-vs-art i{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:34px;font-weight:800;}
+.rdi-vs-db{width:96px;height:96px;border-radius:28px;display:flex;align-items:center;justify-content:center;color:#FF9F0A;background:rgba(255,159,10,0.12);box-shadow:0 0 30px rgba(255,159,10,.25);}
+.rdi-vs b{font-size:17px;font-weight:800;}
+.rdi-vs em{font-style:normal;font-size:16px;font-weight:800;}
+.rdi-vs span{font-size:13.5px;color:#9BA0A8;line-height:1.35;padding:0 6px;}
+.rdi-art-sync{display:flex;align-items:center;justify-content:center;gap:0;}
+.rdi-dev{position:relative;display:flex;align-items:center;justify-content:center;}
+.rdi-dev.watch{width:84px;height:100px;border-radius:26px;background:#0D0E10;border:3px solid #3A3D43;box-shadow:0 0 0 6px #22252A;}
+.rdi-dev.ring{position:absolute;left:30px;top:176px;width:44px;height:44px;border-radius:50%;border:7px solid #4A4D53;box-shadow:inset 0 0 0 2px #2A2D33,0 0 14px rgba(255,255,255,.08);}
+.rdi-dots{width:96px;height:40px;margin:0 2px 30px;}
+.rdi-dots path{animation:rdiDash 1.2s linear infinite;}
+@keyframes rdiDash{to{stroke-dashoffset:-16}}
+.rdi-dev.phone{width:104px;height:196px;border-radius:26px;background:#0D0E10;border:3px solid #3A3D43;}
+.rdi-status{width:100%;box-sizing:border-box;text-align:left;padding:16px 18px;border-radius:22px;background:rgba(255,255,255,0.06);margin-top:2px;}
+.rdi-status-t{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:800;}
+.rdi-status-t i{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#FFD60A;color:#000;}
+.rdi-status.ok .rdi-status-t i{background:#30D158;}
+.rdi-status-s{font-size:14.5px;color:#9BA0A8;line-height:1.4;margin-top:6px;}
+.rdi-srcs{display:flex;flex-wrap:wrap;gap:6px;width:100%;margin-top:10px;}
+.rdi-srcs span{height:30px;padding:0 12px;border-radius:15px;background:rgba(255,255,255,0.08);font-size:13px;font-weight:700;display:flex;align-items:center;}
+.rdi-art-sleep{display:flex;align-items:center;justify-content:center;}
+.rdi-moon{position:relative;z-index:1;width:110px;height:110px;border-radius:30px;display:flex;align-items:center;justify-content:center;color:#BF5AF2;background:#0D0E10;border:3px solid #3A3D43;box-shadow:0 0 40px rgba(191,90,242,.3);margin-top:-30px;}
+.rdi-pillow{position:absolute;left:30px;right:30px;bottom:20px;height:80px;border-radius:40px 40px 34px 34px;background:linear-gradient(180deg,#4F6A9A,#34486E);transform:perspective(300px) rotateX(38deg);box-shadow:0 20px 40px rgba(0,0,0,.5);}
+.rdi-z{position:absolute;z-index:2;color:#BF5AF2;font-weight:800;animation:rdiZ 2.4s ease-in-out infinite;opacity:0;}
+.rdi-z.z1{left:180px;top:40px;font-size:16px;}.rdi-z.z2{left:196px;top:22px;font-size:20px;animation-delay:.6s;}.rdi-z.z3{left:214px;top:0;font-size:26px;animation-delay:1.2s;}
+@keyframes rdiZ{0%{opacity:0;transform:translateY(6px)}40%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
 /* Line icons that replaced emoji */
 .wn-ic,.ah-wo-ic{color:var(--pink);font-size:0;}
 .ah-home-item i{display:flex;justify-content:center;color:var(--pink);font-style:normal;}
@@ -11950,6 +12013,8 @@ function obOpen() {
 }
 
 function obClose() {
+  // Straight after a finished onboarding (iPhone app): offer Readiness
+  try { if(obKey() === 'done' && ahIsNativeIOS()) setTimeout(() => rdIntroOpen(), 650); } catch(e) {}
   const overlay = document.getElementById('onboardingOverlay');
   overlay.classList.remove('open');
   setTimeout(() => { overlay.style.display = 'none'; }, 400);
@@ -19159,6 +19224,144 @@ function rdRenderPage() {
     <div class="rd-sec">Last 7 days</div><div class="rd-week">${bars}</div>${how}`;
 }
 
+// ══════════════════════════════════════
+// TURN ON READINESS — a pop-up after onboarding (and once for existing iPhone users), then a 5-step walkthrough
+// ══════════════════════════════════════
+const RD_INTRO_KEY = 'trident_readiness_intro_v1';   // '1' once the pop-up was answered (Turn on or Not now)
+let rdStep = 0;
+const RD_ICON = {
+  hrv: 'M3 12h4l2-6 4 12 2-6h6', heart: 'M20.8 5.6a5.5 5.5 0 0 0-7.8 0L12 6.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 22l8.8-8.6a5.5 5.5 0 0 0 0-7.8z',
+  moon: 'M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z', dumbbell: 'M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12',
+  temp: 'M14 14.8V4a2 2 0 0 0-4 0v10.8a4 4 0 1 0 4 0z', resp: 'M3 8h11a3 3 0 1 0-3-3M3 12h15a3 3 0 1 1-3 3M3 16h7',
+  drop: 'M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z', check: 'M5 12.5l4.5 4.5L19 7.5', alert: 'M12 8v5M12 16.5v.5'
+};
+const rdIc = (n, sz = 18, w = 2) => `<svg viewBox="0 0 24 24" width="${sz}" height="${sz}" fill="none" stroke="currentColor" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${RD_ICON[n]}"/></svg>`;
+function rdIntroMaybe() {
+  if(!ahIsNativeIOS()) return;
+  try { if(localStorage.getItem(RD_INTRO_KEY) === '1') return; } catch(e) { return; }
+  if(localStorage.getItem(OB_PENDING_KEY)) return;   // the onboarding offers it when it finishes
+  const busy = document.getElementById('wnOverlay') || document.querySelector('#onboardingOverlay.open') || document.querySelector('.th-page.open');
+  if(busy || currentPage !== 'dashboard') { rdIntroMaybe.tries = (rdIntroMaybe.tries || 0) + 1; if(rdIntroMaybe.tries < 60) setTimeout(rdIntroMaybe, 1500); return; }
+  rdIntroOpen();
+}
+function rdIntroDone() { try { localStorage.setItem(RD_INTRO_KEY, '1'); } catch(e) {} }
+function rdOverlay() {
+  let ov = document.getElementById('rdIntro');
+  if(!ov) {
+    ov = document.createElement('div'); ov.id = 'rdIntro'; ov.className = 'rdi-ov';
+    ov.innerHTML = '<div class="rdi-sheet" id="rdiSheet" role="dialog" aria-modal="true"></div>';
+    document.body.appendChild(ov);
+  }
+  return ov;
+}
+function rdIntroOpen() {
+  const ov = rdOverlay(), sh = document.getElementById('rdiSheet');
+  sh.innerHTML = `<div class="rdi-handle"></div>
+    <div class="rdi-ready">${rdRingSVG(78, 150, 12, 'var(--pink)')}<span>Ready</span></div>
+    <div class="rdi-chips"><span>${rdIc('hrv', 15)}HRV</span><span style="--c:#FF453A">${rdIc('heart', 15)}Resting HR</span><span style="--c:#64D2FF">${rdIc('moon', 15)}Sleep</span></div>
+    <div class="rdi-title">Your daily Readiness score</div>
+    <div class="rdi-text">One score each morning from last night's sleep and heart data. It tells you when to push and when to recover.</div>
+    <button class="rdi-btn" id="rdiOn" onclick="rdIntroTurnOn()">Turn on Readiness</button>
+    <button class="rdi-btn ghost" onclick="rdIntroNotNow()">Not now</button>`;
+  ov.classList.remove('walk');
+  ov.style.display = 'flex';
+  requestAnimationFrame(() => ov.classList.add('open'));
+}
+function rdIntroClose() {
+  const ov = document.getElementById('rdIntro'); if(!ov) return;
+  ov.classList.remove('open');
+  setTimeout(() => { ov.style.display = 'none'; }, 320);
+}
+function rdIntroNotNow() { rdIntroDone(); rdIntroClose(); }
+async function rdIntroTurnOn() {
+  rdIntroDone();
+  const btn = document.getElementById('rdiOn');
+  if(btn) { btn.disabled = true; btn.textContent = 'Opening Apple Health…'; }
+  // Apple's permission screen asks only for what isn't allowed yet (nothing, if it all is)
+  if(ahIsNativeIOS() && (ahState.status === 'connect' || ahState.needsMore || ahState.needsReady || !ahLive())) {
+    try { await ahConnect(); } catch(e) {}
+  }
+  try { await ahLoadReadiness(true); } catch(e) {}
+  rdStep = 0;
+  rdWalkDraw();
+  try { if(currentPage === 'dashboard') renderDashboard(); } catch(e) {}
+}
+// What last night brought in (for the ✓ / not found notes)
+function rdFound() {
+  const k = ahKey(new Date()), n = ahState.nights[k];
+  const src = n ? ((Array.isArray(n.sources) && n.sources.length ? n.sources.map(x => x.name) : [n.source]).filter(Boolean)) : [];
+  return { hrv: !!RD.hrv[k], rhr: !!RD.rhr[k], sleep: !!n, temp: !!RD.temp[k], resp: !!RD.resp[k], spo2: !!RD.spo2[k], sources: [...new Set(src)] };
+}
+function rdWalkDraw() {
+  const ov = rdOverlay(), sh = document.getElementById('rdiSheet');
+  ov.classList.add('walk');
+  const f = rdFound(), last = rdStep === 4;
+  const status = (ok, okT, okS, noT, noS) => `<div class="rdi-status${ok ? ' ok' : ''}"><div class="rdi-status-t"><i>${rdIc(ok ? 'check' : 'alert', 14, 3)}</i>${ok ? okT : noT}</div><div class="rdi-status-s">${ok ? okS : noS}</div></div>`;
+  const slides = [
+    // 1 — the score
+    `<div class="rdi-art rdi-art-orbs">
+       <div class="rdi-core">${rdRingSVG(72, 150, 11, 'var(--pink)')}<i>${rdIc('heart', 34, 2)}</i></div>
+       <span class="rdi-orb o1" style="--c:#FF453A">${rdIc('hrv', 24)}</span>
+       <span class="rdi-orb o2" style="--c:#BF5AF2">${rdIc('moon', 24)}</span>
+       <span class="rdi-orb o3" style="--c:#FF9F0A">${rdIc('dumbbell', 24)}</span>
+     </div>
+     <div class="rdi-title">Your daily Readiness score</div>
+     <div class="rdi-text">Each morning, Readiness compares last night with your own normal. It tells you when to push and when to recover.</div>`,
+    // 2 — what goes into it
+    `<div class="rdi-title" style="margin-top:6px">What goes into it</div>
+     <div class="rdi-list">${[
+        ['hrv', '#BF5AF2', 'Heart rate variability', 'Higher than your normal means you recovered well.', f.hrv],
+        ['heart', '#FF453A', 'Resting heart rate', 'Higher than your normal can mean fatigue or illness.', f.rhr],
+        ['moon', '#64D2FF', 'Sleep', 'How long you slept, against an 8-hour goal.', f.sleep],
+        ['temp', '#FF9F0A', 'Temperature, breathing & oxygen', 'Small extras from your wrist or ring that lower it when they are off your normal.', f.temp || f.resp || f.spo2]
+      ].map(([ic, c, t, d, ok]) => `<div class="rdi-item"><span class="rdi-item-ic" style="color:${c}">${rdIc(ic, 20)}</span><div><b>${t}</b><span>${d}</span>${ok ? '' : `<em>Not found from your watch yet</em>`}</div></div>`).join('')}</div>`,
+    // 3 — readiness vs your program
+    `<div class="rdi-title" style="margin-top:6px">Works with your program</div>
+     <div class="rdi-vs">
+       <div><div class="rdi-vs-art"><span class="rdi-vs-db">${rdIc('dumbbell', 46, 1.8)}</span></div><b>Your program</b><em style="color:#FF9F0A">What to train</em><span>Today's workout and exercises</span></div>
+       <div class="rdi-vs-line"></div>
+       <div><div class="rdi-vs-art">${rdRingSVG(78, 108, 9, '#30D158')}<i>78</i></div><b>Readiness</b><em style="color:#30D158">How hard to go</em><span>Your whole body, from last night</span></div>
+     </div>
+     <div class="rdi-text">Use both. Each one answers a different question.</div>`,
+    // 4 — keep it synced
+    `<div class="rdi-art rdi-art-sync">
+       <span class="rdi-dev watch">${rdRingSVG(70, 64, 6, 'var(--pink)')}</span>
+       <span class="rdi-dev ring"></span>
+       <svg class="rdi-dots" viewBox="0 0 120 40"><path d="M4 30 Q60 -8 116 30" fill="none" stroke="var(--pink)" stroke-width="3" stroke-linecap="round" stroke-dasharray="0.1 8"/></svg>
+       <span class="rdi-dev phone">${rdRingSVG(70, 84, 7, 'var(--pink)')}</span>
+     </div>
+     <div class="rdi-title">Keep your watch synced</div>
+     <div class="rdi-text">Wear your Apple Watch or Oura Ring to sleep. With Oura, open the Oura app each morning so last night's data reaches Apple Health.</div>
+     ${status(f.sleep || f.hrv || f.rhr, "Last night's data arrived", 'Your watch is synced. You are good to go.', "Waiting for last night's data", 'Wear your watch or ring to bed tonight and check back in the morning.')}
+     ${f.sources.length ? `<div class="rdi-srcs">${f.sources.map(x => `<span>${cmEsc(x)}</span>`).join('')}</div>` : ''}`,
+    // 5 — sleep matters most
+    `<div class="rdi-art rdi-art-sleep">
+       <span class="rdi-moon">${rdIc('moon', 64, 1.6)}</span>
+       <span class="rdi-z z1">z</span><span class="rdi-z z2">z</span><span class="rdi-z z3">Z</span>
+       <span class="rdi-pillow"></span>
+     </div>
+     <div class="rdi-title">Sleep matters most</div>
+     <div class="rdi-text">Readiness needs last night's sleep to give you a score. Your watch or ring must track your sleep.</div>
+     ${status(f.sleep, 'Sleep data found', 'We found your recent sleep. Readiness is ready to use.', 'No sleep found yet', 'Turn on sleep tracking on your Apple Watch (Sleep app) or wear your Oura Ring to bed.')}`
+  ];
+  sh.innerHTML = `<div class="rdi-handle"></div><div class="rdi-slide" key="${rdStep}">${slides[rdStep]}</div>
+    <div class="rdi-dots-row">${slides.map((_, i) => `<i class="${i === rdStep ? 'on' : ''}"></i>`).join('')}</div>
+    <button class="rdi-btn" onclick="${last ? 'rdWalkDone()' : 'rdStep++;rdWalkDraw()'}">${last ? 'Done' : 'Next'}</button>`;
+  // Swipe left / right between steps
+  let x0 = null;
+  sh.ontouchstart = e => { x0 = e.touches[0].clientX; };
+  sh.ontouchend = e => {
+    if(x0 === null) return; const dx = e.changedTouches[0].clientX - x0; x0 = null;
+    if(dx < -50 && rdStep < 4) { rdStep++; rdWalkDraw(); } else if(dx > 50 && rdStep > 0) { rdStep--; rdWalkDraw(); }
+  };
+  if(ov.style.display !== 'flex') { ov.style.display = 'flex'; requestAnimationFrame(() => ov.classList.add('open')); }
+}
+function rdWalkDone() {
+  rdIntroClose();
+  try { if(currentPage === 'dashboard') renderDashboard(); } catch(e) {}
+  setTimeout(() => { try { thOpen('ready'); rdRenderPage(); } catch(e) {} }, 360);
+}
+
 // Redraws everything that shows Apple Health numbers.
 function ahRender() {
   try { renderStepsCard(); } catch(e) {}
@@ -19427,6 +19630,8 @@ try {
   try { ahInit(); } catch(e) { console.warn('Apple Health unavailable:', e); }
   // After the splash, show what changed in this update (once)
   setTimeout(() => { window._wnReady = true; wnMaybeShow(); }, 2800);
+  // Existing iPhone users see the Readiness pop-up once (after What's new, if that shows)
+  setTimeout(() => { try { rdIntroMaybe(); } catch(e) {} }, 3600);
 } catch(e) {
   console.error('Init error:', e);
   if(window.__tfDiag) window.__tfDiag('init: ' + (e && e.message) + ' | ' + String(e && e.stack || '').split('\n').slice(0,3).join(' | '));
