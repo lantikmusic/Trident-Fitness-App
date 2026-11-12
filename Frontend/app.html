@@ -2498,6 +2498,81 @@ button,input,select,textarea{font-family:inherit;}
 .rest-btn.resting{box-shadow:none;}
 .rest-btn.done{border-radius:999px;}
 .add-set-btn{border-radius:999px;padding:10px;}
+/* ── Design E: workout screen ── */
+.exe-progress{display:grid;gap:4px;margin:2px 0 14px;}
+.exe-progress span{height:4px;border-radius:2px;background:rgba(255,255,255,0.12);}
+.exe-progress span.on{background:var(--pink);}
+.exe-progress span.cur{background:#fff;}
+.exercise-card.active-ex{padding:0;}
+.exercise-card.active-ex .exercise-card-header{display:none;}
+.exercise-card.active-ex .exercise-card-body{padding:0 0 14px;}
+.exe-hero{position:relative;height:270px;border-radius:22px 22px 0 0;overflow:hidden;background:var(--bg4);}
+.exe-hero .exe-img{position:absolute;inset:0;height:auto;margin:0;border-radius:0;background:#1b1c1f;}
+.exe-hero .exe-img img{object-fit:cover !important;}
+.exe-shade{position:absolute;left:0;right:0;bottom:0;height:62%;background:linear-gradient(to top,rgba(13,14,16,0.97) 18%,rgba(13,14,16,0));pointer-events:none;}
+.exe-chips{position:absolute;top:12px;right:12px;display:flex;gap:6px;}
+.exe-chips .ex-progress-btn,.exe-chips .swap-btn{height:34px;padding:0 12px;border-radius:999px;border:0.5px solid rgba(255,255,255,0.18);background:rgba(13,14,16,0.5);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);color:#fff;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:5px;}
+.exe-title{position:absolute;left:16px;right:16px;bottom:14px;display:flex;align-items:flex-end;justify-content:space-between;gap:10px;}
+.exe-eyebrow{font-size:12px;font-weight:800;letter-spacing:.08em;color:var(--pink);margin-bottom:3px;}
+.exe-name{font-size:28px;font-weight:800;letter-spacing:-0.025em;line-height:1.1;}
+.exe-meta{font-size:13.5px;color:rgba(255,255,255,0.68);margin-top:3px;}
+.exe-badge{flex-shrink:0;height:30px;padding:0 12px;border-radius:15px;background:var(--pink);color:#061011;font-size:13px;font-weight:800;display:inline-flex;align-items:center;font-variant-numeric:tabular-nums;}
+.exe-badges{display:flex;gap:6px;flex-wrap:wrap;padding:10px 14px 0;}
+.exe-panel{margin:12px 12px 10px;padding:14px 12px 12px;border-radius:22px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.1);}
+.exe-pick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+.exe-pick.one{grid-template-columns:minmax(0,1fr);}
+.exe-field{border-radius:18px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:6px;}
+.exe-field.act{border-color:var(--pink);}
+.exe-field>span{font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--text3);}
+.exe-row{display:flex;align-items:center;gap:4px;width:100%;justify-content:center;}
+.exe-row button{width:40px;height:40px;flex-shrink:0;border-radius:20px;border:none;background:rgba(255,255,255,0.09);color:#fff;font:600 20px var(--tf-font);display:flex;align-items:center;justify-content:center;padding:0;}
+.exe-row button:active{transform:scale(.92);background:rgba(255,255,255,0.16);}
+.exe-row input{width:100%;min-width:0;max-width:84px;background:transparent;border:none;outline:none;color:#fff;text-align:center;font:800 30px var(--tf-font);letter-spacing:-0.02em;font-variant-numeric:tabular-nums;padding:0;}
+.exe-log{margin-top:12px;padding:15px;font-size:16px;}
+.exe-alldone{display:flex;align-items:center;justify-content:center;gap:8px;padding:6px 0;font-size:15px;font-weight:700;color:var(--green);}
+.exercise-card.active-ex .ex-sets{padding:0 12px;}
+.exercise-card.active-ex .add-set-btn{margin:8px 12px 0;width:calc(100% - 24px);}
+.exercise-card.active-ex .next-workout-btn{margin:12px 12px 0;width:calc(100% - 24px);}
+/* ── Design E: Home ── */
+.home-bar{margin-bottom:20px;}
+.home-bar .home-av-btn{margin-left:auto;margin-right:52px;padding:2px;}
+.home-bar .home-av{width:40px;height:40px;border-width:2px;font-size:0;}
+.home-hello{display:none;}
+.e-week{display:flex;flex-direction:column;gap:12px;}
+.e-week-top{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;}
+.e-hello{font-size:14px;font-weight:600;color:var(--text3);}
+.e-hello #dash-name{color:var(--text3);}
+.e-week-title{font-size:28px;font-weight:800;letter-spacing:-0.025em;line-height:1.15;}
+.e-week-done{font-size:14px;font-weight:700;color:var(--text2);white-space:nowrap;}
+.e-week-bars{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;}
+.e-day{display:flex;flex-direction:column;align-items:center;gap:7px;}
+.e-day i{width:100%;height:5px;border-radius:3px;background:rgba(255,255,255,0.08);}
+.e-day.done i{background:var(--pink);box-shadow:0 0 10px var(--pink-dim);}
+.e-day.today i{background:#fff;}
+.e-day.past i{background:rgba(255,255,255,0.12);}
+.e-day span{font-size:12px;font-weight:600;color:rgba(255,255,255,0.4);}
+.e-day.is-today span{color:#fff;font-weight:800;}
+.gyc-week{display:none;}
+.e-hero{position:relative;min-height:400px;border-radius:30px;overflow:hidden;margin-bottom:14px;cursor:pointer;
+  background:radial-gradient(120% 80% at 100% 0%,rgba(255,255,255,0.07),transparent 60%),#16171A;border:0.5px solid rgba(255,255,255,0.1);display:flex;flex-direction:column;justify-content:flex-end;}
+.e-hero.no-img::before{content:'';position:absolute;right:-30px;top:-10px;width:230px;height:230px;background:url('Icons/trident-mark.png') center/contain no-repeat;opacity:.06;}
+.e-hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.e-hero-shade{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,9,10,0.97) 38%,rgba(8,9,10,0.35) 70%,rgba(8,9,10,0.1));pointer-events:none;}
+.e-hero-chips{position:absolute;top:16px;left:16px;right:16px;display:flex;justify-content:space-between;gap:8px;}
+.e-chip{height:32px;padding:0 13px;border-radius:16px;background:rgba(13,14,16,0.5);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border:0.5px solid rgba(255,255,255,0.16);display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.e-chip:not(:first-child){color:rgba(255,255,255,0.75);font-weight:600;}
+.e-chip i{width:7px;height:7px;border-radius:50%;background:var(--pink);box-shadow:0 0 8px var(--pink);flex-shrink:0;}
+.e-hero-body{position:relative;padding:96px 18px 18px;display:flex;flex-direction:column;gap:10px;}
+.e-hero-eyebrow{font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--pink);}
+.e-hero-title{font-size:30px;font-weight:800;letter-spacing:-0.025em;line-height:1.1;margin-top:-4px;}
+.e-hero-sub{font-size:14px;color:rgba(255,255,255,0.68);margin-top:-4px;}
+.e-hero-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;}
+.e-hero-stats div{border-radius:14px;background:rgba(255,255,255,0.08);border:0.5px solid rgba(255,255,255,0.1);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);padding:8px 10px;display:flex;flex-direction:column;}
+.e-hero-stats b{font-size:18px;font-weight:800;}
+.e-hero-stats span{font-size:11px;color:rgba(255,255,255,0.6);}
+.e-hero .dwc-start{margin-top:2px;}
+.e-hero-rows{margin-top:0;}
+.e-hero button[onclick*="openCustomWorkout"]{border-radius:999px !important;color:rgba(255,255,255,0.6) !important;background:rgba(255,255,255,0.05) !important;margin-top:0 !important;}
 /* Line icons that replaced emoji */
 .wn-ic,.ah-wo-ic{color:var(--pink);font-size:0;}
 .ah-home-item i{display:flex;justify-content:center;color:var(--pink);font-style:normal;}
@@ -2658,17 +2733,21 @@ button,input,select,textarea{font-family:inherit;}
     <div class="home-bar">
       <img class="home-logo" src="Icons/trident-mark.png" alt="" aria-hidden="true">
       <div class="home-wordmark" aria-label="Trident Fitness">TRIDENT<span>FITNESS</span></div>
-    </div>
-    <div class="home-hello">
-      <div class="home-hello-text">
-        <div class="home-hello-time" id="dash-greeting">Good afternoon</div>
-        <div class="home-hello-name" id="dash-name"></div>
-      </div>
       <button class="home-av-btn" onclick="homeAvatarTap()" aria-label="Open your Community profile">
         <span class="profile-pic-display home-av"><svg viewBox="0 0 24 24" width="46%" height="46%" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-1a6 6 0 0 0-6-6h-4a6 6 0 0 0-6 6v1M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8"/></svg></span>
       </button>
     </div>
-    <div class="page-sub" id="dash-date"></div>
+    <div class="e-week">
+      <div class="e-week-top">
+        <div style="min-width:0;">
+          <div class="e-hello"><span id="dash-greeting">Good afternoon</span> <span id="dash-name"></span></div>
+          <div class="e-week-title">This week</div>
+        </div>
+        <span class="e-week-done" id="eWeekDone"></span>
+      </div>
+      <div class="e-week-bars" id="eWeekBars" aria-label="Gym days this week"></div>
+    </div>
+    <div class="page-sub" id="dash-date" style="display:none;"></div>
   </div>
   <div class="container">
     <div style="height:16px;"></div>
@@ -2676,7 +2755,6 @@ button,input,select,textarea{font-family:inherit;}
     <div id="evHomeCard" style="display:none;"></div>
     <div id="ahHomeCard" style="display:none;"></div>
     <!-- Today's workout preview -->
-    <div class="section-head" style="margin-top:0;"><div class="section-title">Today's Workout</div></div>
     <div id="dashWorkout"></div>
     <!-- Today's macros (+ goal progress when a goal is set) -->
     <div id="dashGoalProgress"></div>
@@ -7133,6 +7211,23 @@ document.addEventListener('visibilitychange', () => {
   } catch(e) { console.warn('Calendar day sync skipped:', e); }
 });
 
+// ── Home: today's workout as a hero card (Design E) ──
+// o: { img, chips:[text…], eyebrow, title, sub, stats:[[value,label]×3], btn, extra }
+function eHeroHTML(o) {
+  const img = o.img ? `<img class="e-hero-img" src="${o.img}" alt="" onerror="this.remove()">` : '';
+  return `<div class="e-hero${o.img ? '' : ' no-img'}" onclick="navTo('workout')">
+    ${img}<div class="e-hero-shade"></div>
+    <div class="e-hero-chips">${(o.chips || []).map((c, i) => `<span class="e-chip">${i === 0 ? '<i></i>' : ''}${c}</span>`).join('')}</div>
+    <div class="e-hero-body">
+      ${o.eyebrow ? `<div class="e-hero-eyebrow">${o.eyebrow}</div>` : ''}
+      <div class="e-hero-title">${o.title}</div>
+      ${o.sub ? `<div class="e-hero-sub">${o.sub}</div>` : ''}
+      ${o.stats ? `<div class="e-hero-stats">${o.stats.map(st => `<div><b>${st[0]}</b><span>${st[1]}</span></div>`).join('')}</div>` : ''}
+      ${o.btn || ''}
+      ${o.extra || ''}
+    </div>
+  </div>`;
+}
 // ── Home card: Start Workout ──
 function dashStartBtnHTML(label) {
   const play = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg>';
@@ -7459,7 +7554,12 @@ function renderActiveWorkout(){
   if(activeExerciseIdx >= exercises.length) activeExerciseIdx = 0;
   const logKey = getLogKey();
 
-  document.getElementById('workoutContent').innerHTML = exercises.map((ex,ei) => {
+  const segs = exercises.map((ex, ei) => {
+    const l = workoutState.logs[logKey]?.[ei] || [];
+    const n = l.length > 0 ? l.length : ex.sets, d = l.filter(x => x.weight || x.reps).length;
+    return `<span class="${d >= n ? 'on' : ei === activeExerciseIdx ? 'cur' : ''}"></span>`;
+  }).join('');
+  document.getElementById('workoutContent').innerHTML = `<div class="exe-progress" style="grid-template-columns:repeat(${exercises.length},minmax(0,1fr))" aria-hidden="true">${segs}</div>` + exercises.map((ex,ei) => {
     const log = workoutState.logs[logKey]?.[ei] || [];
     const hasLog  = log.some(s => s.weight || s.reps);
     const isActive = ei === activeExerciseIdx;
@@ -8608,7 +8708,7 @@ function renderExerciseCard(ex, ei) {
     const wDisplay = sw ? `${sw}` : '—';
     const rDisplay = sr ? `${sr}` : '—';
     const btnClass = isDone ? 'done' : '';
-    const btnLabel = isDone ? '✓ Done' : 'Rest';
+    const btnLabel = isDone ? '✓ Done' : 'Log';
     setsHTML+=`<div class="set-row${isDone?' completed':''}" id="set-row-${ei}-${s}">
       <div class="set-num">${s+1}</div>
       <div class="set-display">
@@ -8647,49 +8747,100 @@ function renderExerciseCard(ex, ei) {
     illustrationContent = `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;">${exSVG(ex.name)}</div>`;
   }
 
+  // Design E: photo header with the name and a SET badge, big −/+ pickers with Log set, then the sets as a checklist.
+  const total = Math.max(Number(ex.sets) || 0, numSets);
+  let next = -1;
+  for(let i = 0; i < numSets; i++) { const st = log[i]; if(!(bw ? st?.reps : (st?.weight || st?.reps))) { next = i; break; } }
+  const prevSet = next > 0 ? log[next - 1] : null;
+  const pw = prevSet?.weight || (suggested || '');
+  const repTarget = parseInt(String(ex.reps).match(/\d+/)?.[0] || '', 10);
+  const rp = prevSet?.reps || (repTarget || '');
+  let exCount = 0;
+  try { exCount = getDayExercises(getProgram(selectedProgram), workoutDayIdx).length; } catch(e) {}
+  const panel = next < 0
+    ? `<div class="exe-alldone">${tfIc('check', 18)}All ${total} sets done</div>`
+    : `<div class="exe-pick${bw ? ' one' : ''}">
+        ${bw ? '' : `<div class="exe-field act"><span>WEIGHT · LB</span><div class="exe-row">
+          <button aria-label="Less weight" onclick="eAdj(${ei},'w',-5)">−</button>
+          <input id="exe-w-${ei}" inputmode="decimal" value="${pw}" placeholder="0" aria-label="Weight in pounds" onfocus="this.select()">
+          <button aria-label="More weight" onclick="eAdj(${ei},'w',5)">+</button></div></div>`}
+        <div class="exe-field${bw ? ' act' : ''}"><span>REPS</span><div class="exe-row">
+          <button aria-label="Fewer reps" onclick="eAdj(${ei},'r',-1)">−</button>
+          <input id="exe-r-${ei}" inputmode="numeric" value="${rp}" placeholder="0" aria-label="Reps" onfocus="this.select()">
+          <button aria-label="More reps" onclick="eAdj(${ei},'r',1)">+</button></div></div>
+      </div>
+      <button class="pink-btn exe-log" onclick="eLog(${ei},${next},'${safeEx}',${suggested||0})">Log set ${next + 1}</button>`;
+
   return`<div class="exercise-card">
-    <div class="ex-header">
-      <div><div class="ex-name">${ex.name}${bw?` <span style="font-size:10px;font-weight:600;color:var(--text3);background:var(--bg4);padding:2px 7px;border-radius:99px;vertical-align:middle;">Bodyweight</span>`:''}</div><div class="ex-meta">${ex.sets} sets · ${ex.reps} reps${doneCount>0?` · <span style="color:var(--green)">${doneCount}/${numSets} done</span>`:''}</div></div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
-        <div style="display:flex;align-items:center;gap:4px;">
-          <button class="ex-progress-btn" onclick="event.stopPropagation();openExProgress('${safeEx}')">
-            <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-            Progress
-          </button>
-          <button class="swap-btn" onclick="openSwap(${ei},'${safeEx}','${ex.sets}','${ex.reps}')">⇄ Swap</button>
+    <div class="exe" id="exe-${ei}">
+    <div class="exe-hero">
+      <div class="ex-illustration exe-img">${illustrationContent}</div>
+      <div class="exe-shade"></div>
+      <div class="exe-chips">
+        <button class="ex-progress-btn" onclick="event.stopPropagation();openExProgress('${safeEx}')">
+          <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Progress
+        </button>
+        <button class="swap-btn" onclick="openSwap(${ei},'${safeEx}','${ex.sets}','${ex.reps}')">⇄ Swap</button>
+      </div>
+      <div class="exe-title">
+        <div style="min-width:0;">
+          ${exCount ? `<div class="exe-eyebrow">EXERCISE ${ei + 1} OF ${exCount}</div>` : ''}
+          <div class="exe-name">${ex.name}</div>
+          <div class="exe-meta">${ex.sets} × ${ex.reps}${bw ? ' · bodyweight' : (suggested ? ` · ${suggested} lb suggested` : '')}</div>
         </div>
-        ${prBadge}
-        ${poText?`<span class="ex-po-badge">↑ ${poText}</span>`:''}
+        <span class="exe-badge">SET ${Math.min(doneCount, total)}/${total}</span>
       </div>
     </div>
-    <div class="ex-illustration">
-      ${illustrationContent}
-      
-      
-      
-      
-    </div>
+    ${(prBadge || poText) ? `<div class="exe-badges">${prBadge}${poText ? `<span class="ex-po-badge">↑ ${poText}</span>` : ''}</div>` : ''}
+    <div class="exe-panel" id="exe-panel-${ei}">${panel}</div>
     <div class="ex-sets" id="sets-${ei}">
-      <div class="ex-target-banner">
-        <div class="ex-target-item">
-          <div class="ex-target-val">${ex.sets}</div>
-          <div class="ex-target-lbl">Sets</div>
-        </div>
-        <div class="ex-target-divider"></div>
-        <div class="ex-target-item">
-          <div class="ex-target-val">${ex.reps}</div>
-          <div class="ex-target-lbl">Reps</div>
-        </div>
-        ${suggested?`<div class="ex-target-divider"></div>
-        <div class="ex-target-item">
-          <div class="ex-target-val" style="font-size:15px;">${suggested} lbs</div>
-          <div class="ex-target-lbl">Suggested</div>
-        </div>`:''}
-      </div>
       ${setsHTML}
     </div>
     <button class="add-set-btn" onclick="addSet(${ei})">＋ Add Set</button>
+    </div>
   </div>`;
+}
+
+// ── Design E pickers ──
+function eAdj(ei, which, delta) {
+  const el = document.getElementById(`exe-${which}-${ei}`);
+  if(!el) return;
+  const v = Math.max(0, (parseFloat(el.value) || 0) + delta);
+  el.value = Math.round(v * 10) / 10;
+  try { if(window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform()) Capacitor.nativePromise('Haptic', 'impact', {}).catch(() => {}); } catch(e) {}
+}
+// Re-draws one exercise (photo header, pickers, sets) in place.
+function eRefresh(ei) {
+  const host = document.getElementById(`exe-${ei}`);
+  if(!host) return;
+  try {
+    const ex = getDayExercises(getProgram(selectedProgram), workoutDayIdx)[ei];
+    const tmp = document.createElement('div');
+    tmp.innerHTML = renderExerciseCard(ex, ei);
+    const fresh = tmp.querySelector(`#exe-${ei}`);
+    if(fresh) host.innerHTML = fresh.innerHTML;
+  } catch(e) { console.warn('Exercise not refreshed:', e); }
+}
+// Log set: save the numbers from the pickers, then start the rest timer for that set.
+function eLog(ei, s, exName, suggested) {
+  const bw = isBodyweight(exName);
+  const w = bw ? '' : String(document.getElementById(`exe-w-${ei}`)?.value || '').trim();
+  const r = String(document.getElementById(`exe-r-${ei}`)?.value || '').trim();
+  if(!r && !w) { showToast('Enter the weight and reps first'); return; }
+  const logKey = getLogKey();
+  if(!workoutState.logs[logKey]) workoutState.logs[logKey] = {};
+  if(!workoutState.logs[logKey][ei]) {
+    const ex = getProgram(selectedProgram).days[workoutDayIdx].exercises[ei];
+    workoutState.logs[logKey][ei] = Array.from({ length: ex.sets }, () => ({ weight: '', reps: '' }));
+  }
+  const arr = workoutState.logs[logKey][ei];
+  while(arr.length <= s) arr.push({ weight: '', reps: '' });
+  arr[s] = { weight: w, reps: r };
+  save(WORKOUT_KEY, workoutState);
+  eRefresh(ei);
+  updateWorkoutButtons();
+  startRest(ei, s, exName, suggested);
 }
 
 function addSet(ei){
@@ -8698,6 +8849,7 @@ function addSet(ei){
   if(!workoutState.logs[logKey][ei])workoutState.logs[logKey][ei]=[];
   workoutState.logs[logKey][ei].push({weight:'',reps:''});
   save(WORKOUT_KEY,workoutState);
+  eRefresh(ei); updateWorkoutButtons(); return;
   // Re-render just the sets section in the expanded card
   const setsEl = document.getElementById(`sets-${ei}`);
   if(setsEl) {
@@ -9623,6 +9775,23 @@ function gymDaysMerge(extra) {
 function gymDaysAll() { return gymDaysMerge(gymDaysFromLantik()); }
 function gymDayAddToday() { gymDaysMerge([localISO(new Date())]); }
 
+// Home "This week": one bar per day (gym day = your colour, today = white).
+function eWeekRender(set, mon, todayISO, thisWeek) {
+  const bars = document.getElementById('eWeekBars'), doneEl = document.getElementById('eWeekDone');
+  if(!bars) return;
+  const L = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+  bars.innerHTML = L.map((l, i) => {
+    const d = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + i), iso = localISO(d);
+    const cls = set.has(iso) ? 'done' : iso === todayISO ? 'today' : iso > todayISO ? 'future' : 'past';
+    return `<div class="e-day ${cls}${iso === todayISO ? ' is-today' : ''}"><i></i><span>${l}</span></div>`;
+  }).join('');
+  let goal = 0;
+  try {
+    const prog = getProgram(workoutState.program);
+    goal = prog ? (prog.hybrid ? 4 : prog.days.filter(d => d.name !== 'Rest' && d.type !== 'recovery' && d.exercises && d.exercises.length).length) : 0;
+  } catch(e) {}
+  if(doneEl) doneEl.textContent = goal ? `${Math.min(thisWeek, 99)} / ${Math.min(goal, 7)} done` : `${thisWeek} done`;
+}
 function renderGymYear() {
   const el = document.getElementById('gymYearCard');
   if(!el) return;
@@ -9653,6 +9822,7 @@ function renderGymYear() {
   const pace = total > 0 ? Math.round(total + total / Math.max(elapsed, 1) * remaining) : 0;
   const paceText = total === 0 ? 'Log a gym workout to start your year'
     : (elapsed < 14 ? 'Great start — keep it going' : `On pace for ${pace} gym days in ${year}`);
+  try { eWeekRender(set, mon, todayISO, thisWeek); } catch(e) {}
   el.innerHTML = `<div class="gyc" onclick="navTo('workout')">
     <div class="gyc-eyebrow">Gym Days · ${year}</div>
     <div class="gyc-top"><div class="gyc-num">${total}</div><div class="gyc-lbl">${total === 1 ? 'day' : 'days'} at the gym<br>this year</div></div>
@@ -9761,14 +9931,21 @@ function renderDashboard(){
     else
     dashWo.innerHTML=(day.name==='Rest'||day.type==='recovery'||!day.exercises||day.exercises.length===0)?
       `<div class="dash-workout-card" style="border-color:var(--border)"><div class="dwc-eyebrow">${prog.name}</div><div class="dwc-title">Rest Day <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M8 16H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-4"/><path d="M12 16v6"/><path d="M8 22h8"/></svg></div><div class="dwc-sub">Recovery time — let those muscles grow!</div><button onclick="openCustomWorkout()" style="margin-top:10px;width:100%;padding:8px;border-radius:var(--radius);border:0.5px solid var(--border2);background:transparent;font-family:inherit;font-size:12px;color:var(--text3);cursor:pointer;">+ Log a custom workout instead</button></div>`:
-      `<div class="dash-workout-card" onclick="navTo('workout')" style="cursor:pointer;">
-        <div class="dwc-eyebrow">${prog.name}</div>
-        <div class="dwc-title">${day.name}</div>
-        <div class="dwc-sub">${day.exercises.length} exercises</div>
-        <div class="dwc-exercises">${day.exercises.slice(0,4).map(e=>`<div class="dwc-ex">${e.name} — ${e.sets}×${e.reps}</div>`).join('')}${day.exercises.length>4?`<div class="dwc-ex" style="color:var(--pink);">+${day.exercises.length-4} more</div>`:''}</div>
-        ${dashStartBtnHTML(dashDayStarted(day, dashDayIdx) ? 'Continue Workout' : 'Start Workout')}
-        <button onclick="event.stopPropagation();openCustomWorkout()" style="margin-top:10px;width:100%;padding:8px;border-radius:var(--radius);border:0.5px solid var(--border2);background:transparent;font-family:inherit;font-size:12px;color:var(--text3);cursor:pointer;">↔ Swap for custom workout</button>
-      </div>`;
+      (() => {
+        const sets = day.exercises.reduce((n, e) => n + (Number(e.sets) || 0), 0);
+        const parts = String(day.name).split(/\s+—\s+/);
+        const dayLbl = parts.length > 1 ? parts[0] : `Day ${dashDayIdx + 1}`;
+        let phase = '';
+        try { phase = `Phase ${getPhase()} · ${getPhaseInfo().name}`; } catch(e) {}
+        let img = '';
+        try { img = getExPhoto(day.exercises[0].name) || getExerciseImage(day.exercises[0].name) || ''; } catch(e) {}
+        return eHeroHTML({ img, chips: [`Today · ${dayLbl}`, phase].filter(Boolean),
+          eyebrow: prog.name, title: parts.length > 1 ? parts.slice(1).join(' — ') : day.name,
+          sub: day.exercises.slice(0, 3).map(e => e.name).join(' · ') + (day.exercises.length > 3 ? ` · +${day.exercises.length - 3}` : ''),
+          stats: [[sets * 3, 'minutes'], [day.exercises.length, 'exercises'], [sets, 'sets']],
+          btn: dashStartBtnHTML(dashDayStarted(day, dashDayIdx) ? 'Continue workout' : 'Start workout'),
+          extra: `<button onclick="event.stopPropagation();openCustomWorkout()" style="margin-top:10px;width:100%;padding:8px;border-radius:var(--radius);border:0.5px solid var(--border2);background:transparent;font-family:inherit;font-size:12px;color:var(--text3);cursor:pointer;">↔ Swap for custom workout</button>` });
+      })();
   } else {
     dashWo.innerHTML=`<div class="dash-workout-card" onclick="navTo('workout')" style="cursor:pointer;border-color:var(--border)"><div class="dwc-eyebrow">Get Started</div><div class="dwc-title">Choose a Program →</div><div class="dwc-sub">Select a workout program to start tracking your training</div><button onclick="event.stopPropagation();openCustomWorkout()" style="margin-top:10px;width:100%;padding:8px;border-radius:var(--radius);border:0.5px solid var(--border2);background:transparent;font-family:inherit;font-size:12px;color:var(--text3);cursor:pointer;">+ Log a custom workout</button></div>`;
   }
@@ -10257,6 +10434,7 @@ function saveRestLog() {
     const newSets = tmp2.querySelector(`#sets-${ei}`);
     if(newSets) setsEl.innerHTML = newSets.innerHTML;
   }
+  eRefresh(ei);
 
   closeRest();
   updateWorkoutButtons();
@@ -13681,13 +13859,19 @@ function hyDashHTML() {
     const state = sess ? (sess.status === 'completed' ? '✓ done' : sess.status === 'skipped' ? 'skipped' : `${hySessionProgress(w, sess).pct}%`) : '';
     return `<div class="dwc-ex">${hyEsc([slot.legacy ? '' : slot.time, w.name].filter(Boolean).join(' — '))}${state ? ` <span style="color:var(--pink);">· ${state}</span>` : ''}</div>`;
   }).join('');
-  return `<div class="dash-workout-card" onclick="navTo('workout')" style="cursor:pointer;">
-    <div class="dwc-eyebrow">${hyEsc(prog.name)}</div>
-    <div class="dwc-title">${HY_DAYS[today]}</div>
-    <div class="dwc-exercises">${rows}</div>
-    ${hyDashStartHTML(today)}
-    <button onclick="event.stopPropagation();openCustomWorkout()" style="margin-top:10px;width:100%;padding:8px;border-radius:var(--radius);border:0.5px solid var(--border2);background:transparent;font-family:inherit;font-size:12px;color:var(--text3);cursor:pointer;">↔ Swap for custom workout</button>
-  </div>`;
+  const next = hyDashNextSlot(today);
+  const w0 = next.w || (() => { const sl = hyDaySlots(today).find(x => hySlotWorkoutId(today, x)); return sl ? hyWorkout(hySlotWorkoutId(today, sl)) : null; })();
+  let items = 0, img = '';
+  try {
+    (w0 && w0.sections || []).forEach(sec => { items += sec.items.length; });
+    const first = w0 && (w0.sections || []).map(sec => sec.items).flat().find(e => getExerciseImage(e.name));
+    if(first) img = getExerciseImage(first.name) || '';
+  } catch(e) {}
+  const week = (() => { try { return hyBlockWeek(); } catch(e) { return 0; } })();
+  return eHeroHTML({ img, chips: [`Today · ${HY_DAYS[today]}`, week ? `Week ${week} of 4` : ''].filter(Boolean),
+    eyebrow: hyEsc(prog.name), title: hyEsc(w0 ? (w0.short || w0.name) : HY_DAYS[today]),
+    sub: '', extra: `<div class="dwc-exercises e-hero-rows">${rows}</div>${hyDashStartHTML(today)}<button onclick="event.stopPropagation();openCustomWorkout()" style="margin-top:10px;width:100%;padding:8px;border-radius:var(--radius);border:0.5px solid var(--border2);background:transparent;font-family:inherit;font-size:12px;color:var(--text3);cursor:pointer;">↔ Swap for custom workout</button>`,
+    stats: w0 ? [[items || '—', 'exercises'], [hyDaySlots(today).length, hyDaySlots(today).length === 1 ? 'session' : 'sessions'], [w0.games ? w0.games : (w0.category === 'strength' ? 'Lift' : '—'), w0.games ? 'games' : 'type']] : null });
 }
 
 // Today's next session that isn't finished or skipped. The gym lift comes first on days that
