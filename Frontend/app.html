@@ -7296,6 +7296,7 @@ const PROGRAMS_MALE = {
   pushPull_m: {
     name:'Full Body Push/Pull Strength',
     short:'Push/Pull',
+    cover:'Icons/pushpull-cover.jpg',
     icon:'bolt',
     desc:'Full body training — push muscles one day, pull the next, hitting every muscle group each session',
     daysPerWeek:'4 days · 12 weeks',
@@ -7954,9 +7955,9 @@ function renderWorkoutPreview() {
 
   document.getElementById('workoutPreviewContent').innerHTML = `
     <!-- Program card -->
-    <div class="wo-preview-program-card">
-      <div class="wo-preview-prog-eyebrow">Active Program</div>
-      <div class="wo-preview-prog-name">${prog.name}</div>
+    <div class="wo-preview-program-card${prog.cover ? ' has-cover' : ''}">
+      ${prog.cover ? `<div class="hy-cover" style="background-image:url('${prog.cover}')"><div class="hy-cover-txt"><div class="wo-preview-prog-eyebrow">Active Program</div><div class="wo-preview-prog-name">${prog.name}</div></div></div>` : `<div class="wo-preview-prog-eyebrow">Active Program</div>
+      <div class="wo-preview-prog-name">${prog.name}</div>`}
       <div class="wo-preview-prog-desc">${prog.desc}</div>
       <div class="wo-preview-prog-stats">
         <div class="wo-preview-prog-stat">
@@ -10867,6 +10868,7 @@ function renderDashboard(){
         try { phase = `Phase ${getPhase()} · ${getPhaseInfo().name}`; } catch(e) {}
         let img = '';
         try { img = getExPhoto(day.exercises[0].name) || getExerciseImage(day.exercises[0].name) || ''; } catch(e) {}
+        if(prog.cover) img = prog.cover;   // the program's own cover photo
         return eHeroHTML({ img, chips: [`Today · ${dayLbl}`, phase].filter(Boolean),
           eyebrow: prog.name, title: parts.length > 1 ? parts.slice(1).join(' — ') : day.name,
           sub: day.exercises.slice(0, 3).map(e => e.name).join(' · ') + (day.exercises.length > 3 ? ` · +${day.exercises.length - 3}` : ''),
