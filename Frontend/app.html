@@ -3097,6 +3097,21 @@ body.th-on .bottom-nav,body.th-on .nav-bar{visibility:hidden;}
 .rdi-z{position:absolute;z-index:2;color:#BF5AF2;font-weight:800;animation:rdiZ 2.4s ease-in-out infinite;opacity:0;}
 .rdi-z.z1{left:180px;top:40px;font-size:16px;}.rdi-z.z2{left:196px;top:22px;font-size:20px;animation-delay:.6s;}.rdi-z.z3{left:214px;top:0;font-size:26px;animation-delay:1.2s;}
 @keyframes rdiZ{0%{opacity:0;transform:translateY(6px)}40%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
+/* Widgets at the top of Home: 2×2 (readiness, steps, sleep, burned) */
+.th-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:10px;margin:2px 0 14px;}
+.th-grid .th-w{padding:13px 14px 15px;border-radius:24px;}
+.th-grid .th-w-ic{width:28px;height:28px;}
+.th-grid .th-w-lbl{font-size:13.5px;}
+.th-grid .th-w-chev{display:flex;}
+.th-grid .th-w-val{font-size:24px;}
+.th-grid .th-w-sub{font-size:11.5px;}
+.th-grid.th-three #thBurnW{grid-column:span 2;}
+.th-rd-row{display:flex;align-items:center;gap:10px;width:100%;margin-top:-2px;}
+.th-rd-ring{position:relative;width:54px;height:54px;flex-shrink:0;}
+.th-rd-ring i{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:17px;font-weight:800;}
+.th-rd-txt{display:flex;flex-direction:column;min-width:0;}
+.th-rd-txt b{font-size:17px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.th-rd-txt span{font-size:11.5px;font-weight:600;color:#9BA0A8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 /* Line icons that replaced emoji */
 .wn-ic,.ah-wo-ic{color:var(--pink);font-size:0;}
 .ah-home-item i{display:flex;justify-content:center;color:var(--pink);font-style:normal;}
@@ -3292,13 +3307,12 @@ body.th-on .bottom-nav,body.th-on .nav-bar{visibility:hidden;}
     <div id="evHomeCard" style="display:none;"></div>
     <div id="ahHomeCard" style="display:none;"></div>
     <!-- Today's workout preview -->
-    <!-- Readiness (Apple Health: Apple Watch, Oura or any device that saves to Health) -->
-    <div id="rdHomeCard"></div>
-    <div id="dashWorkout"></div>
-    <!-- Today's macros (+ goal progress when a goal is set) -->
-    <div id="dashGoalProgress"></div>
-    <!-- ══ STEPS + SLEEP WIDGETS (tap for the full page) ══ -->
-    <div class="th-grid">
+    <!-- ══ WIDGETS: readiness, steps, sleep, burned (tap for the full page) ══ -->
+    <div class="th-grid" id="thGrid">
+      <button class="th-w th-ready" id="thReadyW" onclick="rdWidgetTap()" aria-label="Readiness, open details">
+        <span class="th-w-top"><span class="th-w-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg></span><span class="th-w-lbl">Readiness</span><span class="th-w-chev"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></span>
+        <span class="th-rd-row"><span class="th-rd-ring" id="thReadyRing"></span><span class="th-rd-txt"><b id="thReadyLbl">—</b><span id="thReadySub">Last night</span></span></span>
+      </button>
       <button class="th-w" id="thStepsW" onclick="thOpen('steps')" aria-label="Steps, open details">
         <span class="th-w-top"><span class="th-w-ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 21c-1.7 0-3-1.6-3-3.5S5 14 6 12.5 7 9 7 7c0-1.7 1.3-3 3-3s2 1.5 2 3.5c0 2.5-1 4-1 6s1 2.5 1 4S9.5 21 7 21zM17 15c-1.4 0-2.5-1.2-2.5-2.8s.7-2.7 1.5-3.9.8-2.4.8-3.6c0-1.3 1-2.2 2.2-2.2S20.5 3.6 20.5 5c0 2-.8 3.2-.8 4.8s.8 2 .8 3.2-1.6 2-3.5 2z"/></svg></span><span class="th-w-lbl">Steps</span><span class="th-w-chev"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span></span>
         <span class="th-w-val" id="thStepsVal">0</span>
@@ -3318,6 +3332,10 @@ body.th-on .bottom-nav,body.th-on .nav-bar{visibility:hidden;}
         <span class="th-w-bar"><i id="thBurnBar" style="background:#FF9F0A;box-shadow:0 0 8px #FF9F0A"></i></span>
       </button>
     </div>
+    <div id="rdHomeCard" style="display:none"></div>
+    <div id="dashWorkout"></div>
+    <!-- Today's macros (+ goal progress when a goal is set) -->
+    <div id="dashGoalProgress"></div>
     <!-- Gym days this year -->
     <div id="gymYearCard"></div>
     <!-- Recent PRs -->
@@ -19167,8 +19185,35 @@ function rdRingSVG(score, size, sw, color) {
     <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${C.toFixed(2)}" stroke-dashoffset="${(C * (1 - pct)).toFixed(2)}" transform="rotate(-90 ${c} ${c})"${pct > 0 ? ` filter="url(#rdGlow${size})"` : ' opacity="0"'}/></svg>`;
 }
 function rdBaselineNights() { return Object.keys(RD.hrv).length; }
+// Small Readiness widget at the top of Home (the 2×2 grid with Steps, Sleep and Burned)
+function rdWidgetTap() {
+  if(!ahLive() || ahState.needsMore || ahState.needsReady) { rdIntroOpen(); return; }
+  thOpen('ready'); rdRenderPage();
+}
+function rdRenderWidget() {
+  const w = document.getElementById('thReadyW'), grid = document.getElementById('thGrid');
+  if(!w) return;
+  const on = ahIsNativeIOS();
+  w.style.display = on ? '' : 'none';
+  if(grid) grid.classList.toggle('th-three', !on);
+  if(!on) return;
+  const ring = document.getElementById('thReadyRing'), lbl = document.getElementById('thReadyLbl'), sub = document.getElementById('thReadySub');
+  let score = null, label = '—', tip = 'Last night', color = 'var(--pink)';
+  if(!ahLive() || ahState.needsMore || ahState.needsReady) { label = 'Set up'; tip = 'Tap to turn on'; }
+  else if(!RD.loadedAt) { tip = 'Reading Health…'; }
+  else {
+    const r = rdScore(ahKey(new Date()));
+    if(r.score === null) { label = 'Learning'; tip = Math.min(4, rdBaselineNights()) < 4 ? 'Needs a few nights' : 'No data last night'; }
+    else { score = r.score; const lv = rdLevel(score); label = lv.label; color = lv.color; tip = 'Last night'; }
+  }
+  if(ring) ring.innerHTML = rdRingSVG(score || 0, 54, 6, color) + `<i>${score === null ? '—' : score}</i>`;
+  if(lbl) { lbl.textContent = label; lbl.style.color = score === null ? '#fff' : color; }
+  if(sub) sub.textContent = tip;
+}
 function rdRenderHome() {
+  try { rdRenderWidget(); } catch(e) {}
   const el = document.getElementById('rdHomeCard'); if(!el) return;
+  if(el.style.display === 'none') { if(ahLive() && !ahState.needsMore && (!RD.loadedAt || Date.now() - RD.loadedAt > AH_FULL_MS)) ahLoadReadiness(); return; }
   if(!ahLive()) { el.innerHTML = ''; return; }
   if(!RD.loadedAt && !RD.loading && !ahState.needsMore) ahLoadReadiness();
   else if(RD.loadedAt && Date.now() - RD.loadedAt > AH_FULL_MS) ahLoadReadiness();
