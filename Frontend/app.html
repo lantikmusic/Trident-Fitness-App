@@ -3097,21 +3097,22 @@ body.th-on .bottom-nav,body.th-on .nav-bar{visibility:hidden;}
 .rdi-z{position:absolute;z-index:2;color:#BF5AF2;font-weight:800;animation:rdiZ 2.4s ease-in-out infinite;opacity:0;}
 .rdi-z.z1{left:180px;top:40px;font-size:16px;}.rdi-z.z2{left:196px;top:22px;font-size:20px;animation-delay:.6s;}.rdi-z.z3{left:214px;top:0;font-size:26px;animation-delay:1.2s;}
 @keyframes rdiZ{0%{opacity:0;transform:translateY(6px)}40%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
-/* Widgets at the top of Home: 2×2 (readiness, steps, sleep, burned) */
-.th-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:10px;margin:2px 0 14px;}
-.th-grid .th-w{padding:13px 14px 15px;border-radius:24px;}
-.th-grid .th-w-ic{width:28px;height:28px;}
-.th-grid .th-w-lbl{font-size:13.5px;}
-.th-grid .th-w-chev{display:flex;}
-.th-grid .th-w-val{font-size:24px;}
-.th-grid .th-w-sub{font-size:11.5px;}
-.th-grid.th-three #thBurnW{grid-column:span 2;}
-.th-rd-row{display:flex;align-items:center;gap:10px;width:100%;margin-top:-2px;}
-.th-rd-ring{position:relative;width:54px;height:54px;flex-shrink:0;}
-.th-rd-ring i{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:17px;font-weight:800;}
+/* Widgets at the top of Home: one row of four (readiness, steps, sleep, burned) */
+.th-grid{grid-template-columns:repeat(4,minmax(0,1fr)) !important;gap:7px;margin:2px 0 14px;}
+.th-grid.th-three{grid-template-columns:repeat(3,minmax(0,1fr)) !important;}
+.th-grid .th-w{padding:11px 9px 12px;border-radius:20px;gap:2px;}
+.th-grid .th-w-top{margin-bottom:5px;}
+.th-grid .th-w-ic,.th-grid .th-w-chev{display:none !important;}
+.th-grid .th-w-lbl{font-size:11.5px;font-weight:700;color:#9BA0A8;}
+.th-grid .th-w-val{font-size:17px;letter-spacing:-0.02em;}
+.th-grid .th-w-sub{font-size:10px;}
+.th-grid .th-w-bar{height:5px;margin-top:8px;}
+.th-rd-row{display:flex;flex-direction:column;align-items:flex-start;gap:4px;width:100%;margin-top:-1px;}
+.th-rd-ring{position:relative;width:42px;height:42px;flex-shrink:0;}
+.th-rd-ring i{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:14px;font-weight:800;}
 .th-rd-txt{display:flex;flex-direction:column;min-width:0;}
-.th-rd-txt b{font-size:17px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.th-rd-txt span{font-size:11.5px;font-weight:600;color:#9BA0A8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.th-rd-txt b{font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.th-rd-txt span{display:none;font-size:10px;font-weight:600;color:#9BA0A8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 /* Line icons that replaced emoji */
 .wn-ic,.ah-wo-ic{color:var(--pink);font-size:0;}
 .ah-home-item i{display:flex;justify-content:center;color:var(--pink);font-style:normal;}
@@ -19178,8 +19179,8 @@ function rdFmt(x) {
 function rdStatus(s) {
   return s >= 80 ? ['Optimal', '#30D158'] : s >= 60 ? ['Good', 'var(--pink)'] : s >= 40 ? ['Fair', '#FF9F0A'] : ['Pay attention', '#FF453A'];
 }
-function rdRingSVG(score, size, sw, color) {
-  const r = (size - sw) / 2 - 6, C = 2 * Math.PI * r, c = size / 2, pct = Math.max(0, Math.min(1, (score || 0) / 100));
+function rdRingSVG(score, size, sw, color, pad = 6) {
+  const r = (size - sw) / 2 - pad, C = 2 * Math.PI * r, c = size / 2, pct = Math.max(0, Math.min(1, (score || 0) / 100));
   return `<svg viewBox="0 0 ${size} ${size}" width="${size}" height="${size}" style="overflow:visible"><defs><filter id="rdGlow${size}" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur in="SourceGraphic" stdDeviation="${size > 120 ? 6 : 4}" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
     <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="${sw}"/>
     <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${C.toFixed(2)}" stroke-dashoffset="${(C * (1 - pct)).toFixed(2)}" transform="rotate(-90 ${c} ${c})"${pct > 0 ? ` filter="url(#rdGlow${size})"` : ' opacity="0"'}/></svg>`;
@@ -19206,7 +19207,7 @@ function rdRenderWidget() {
     if(r.score === null) { label = 'Learning'; tip = Math.min(4, rdBaselineNights()) < 4 ? 'Needs a few nights' : 'No data last night'; }
     else { score = r.score; const lv = rdLevel(score); label = lv.label; color = lv.color; tip = 'Last night'; }
   }
-  if(ring) ring.innerHTML = rdRingSVG(score || 0, 54, 6, color) + `<i>${score === null ? '—' : score}</i>`;
+  if(ring) ring.innerHTML = rdRingSVG(score || 0, 42, 5, color, 1) + `<i>${score === null ? '—' : score}</i>`;
   if(lbl) { lbl.textContent = label; lbl.style.color = score === null ? '#fff' : color; }
   if(sub) sub.textContent = tip;
 }
