@@ -3118,6 +3118,23 @@ body.th-on .bottom-nav,body.th-on .nav-bar{visibility:hidden;}
 .th-rd-txt{display:flex;flex-direction:column;min-width:0;}
 .th-rd-txt b{font-size:13px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .th-rd-txt span{display:none;font-size:10px;font-weight:600;color:#9BA0A8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+/* ── LANTIK 12-week program: cover photo and phase bar ── */
+.wo-preview-program-card.has-cover{padding-top:0;overflow:hidden;}
+.hy-cover{position:relative;margin:0 -18px 14px;height:250px;background-size:cover;background-position:center 18%;}
+.hy-cover::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(13,14,16,0) 40%,rgba(13,14,16,0.92));}
+.hy-cover-txt{position:absolute;left:18px;right:18px;bottom:14px;z-index:1;}
+.hy-cover-txt .wo-preview-prog-name{font-size:22px;font-weight:800;line-height:1.15;}
+.hy-phase-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0 4px;}
+.hy-phase-bar span{display:flex;flex-direction:column;gap:5px;}
+.hy-phase-bar i{display:block;height:5px;border-radius:3px;background:var(--pink);box-shadow:0 0 6px var(--pink);}
+.hy-phase-bar span{position:relative;}
+.hy-phase-bar span::before{content:'';position:absolute;left:0;right:0;top:0;height:5px;border-radius:3px;background:rgba(255,255,255,0.1);}
+.hy-phase-bar i{position:relative;z-index:1;}
+.hy-phase-bar b{font-size:10.5px;font-weight:700;color:#7D828A;}
+.hy-phase-bar span.on b{color:#fff;}
+.hy-phase-h{margin:14px 2px 6px;}
+.hy-phase-h b{display:block;font-size:15px;font-weight:800;color:var(--pink);}
+.hy-phase-h span{display:block;font-size:12px;color:#9BA0A8;line-height:1.4;margin-top:2px;}
 /* Line icons that replaced emoji */
 .wn-ic,.ah-wo-ic{color:var(--pink);font-size:0;}
 .ah-home-item i{display:flex;justify-content:center;color:var(--pink);font-style:normal;}
@@ -7259,8 +7276,9 @@ const PROGRAMS = {
     icon:'bolt',
     calendarAligned:true,
     hybrid:true,
-    desc:'Builds an explosive athlete while keeping lean muscle and strength: heavy leg strength Tuesday, upper-body strength Wednesday, explosive leg power Thursday and upper-body muscle Friday, around two football sessions, two Muay Thai sessions, two recovery days and Sunday\'s two games',
-    daysPerWeek:'7-day schedule · Lower A → Upper A → Lower B → Upper B',
+    cover:'Icons/lantik-cover.jpg',
+    desc:'A 12-week, 3-phase plan for flag football and Muay Thai — Foundation, Strength-Power, then Speed & Power Peak. Builds an explosive athlete while keeping lean muscle and strength: heavy leg strength Tuesday, upper-body strength Wednesday, explosive leg power Thursday and upper-body muscle Friday, around two football sessions, two Muay Thai sessions, two recovery days and Sunday\'s two games',
+    daysPerWeek:'12 weeks · 3 phases · Lower A → Upper A → Lower B → Upper B',
     // Sessions, sections and the lifting rotation live in HY_WORKOUTS / HY_WEEK (see "LANTIK HYBRID ATHLETE PROGRAM").
     days:[
       {name:'Monday — Recovery',type:'recovery',exercises:[]},
@@ -7381,8 +7399,9 @@ const PROGRAMS_MALE = {
     icon:'bolt',
     calendarAligned:true,
     hybrid:true,
-    desc:'Builds an explosive athlete while keeping lean muscle and strength: heavy leg strength Tuesday, upper-body strength Wednesday, explosive leg power Thursday and upper-body muscle Friday, around two football sessions, two Muay Thai sessions, two recovery days and Sunday\'s two games',
-    daysPerWeek:'7-day schedule · Lower A → Upper A → Lower B → Upper B',
+    cover:'Icons/lantik-cover.jpg',
+    desc:'A 12-week, 3-phase plan for flag football and Muay Thai — Foundation, Strength-Power, then Speed & Power Peak. Builds an explosive athlete while keeping lean muscle and strength: heavy leg strength Tuesday, upper-body strength Wednesday, explosive leg power Thursday and upper-body muscle Friday, around two football sessions, two Muay Thai sessions, two recovery days and Sunday\'s two games',
+    daysPerWeek:'12 weeks · 3 phases · Lower A → Upper A → Lower B → Upper B',
     // Sessions, sections and the lifting rotation live in HY_WORKOUTS / HY_WEEK (see "LANTIK HYBRID ATHLETE PROGRAM").
     days:[
       {name:'Monday — Recovery',type:'recovery',exercises:[]},
@@ -9996,7 +10015,7 @@ function mgCollect() {
       const p = hyDoneDay(sess, sid).split('-').map(Number);
       const t = new Date(p[0], (p[1] || 1) - 1, p[2] || 1).getTime();
       if(!Number.isFinite(t)) return;
-      const w = hyWorkout(sess.workoutId);
+      const w = hyWorkout(sess.workoutId, sess);
       Object.keys(sess.ex).forEach(key => {
         const dot = key.indexOf('.'), secKey = key.slice(0, dot), exId = key.slice(dot + 1);
         if(secKey === 'primer') return;
@@ -13288,9 +13307,17 @@ const HY_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturd
 const HY_BLOCK = [
   null,
   { name: 'Baseline', tip: 'Establish baseline loads and clean technique.' },
-  { name: 'Small progression', tip: 'Add a little load or a rep where last week left 2+ reps in reserve. Your call — nothing is increased for you.' },
-  { name: 'Top week', tip: 'Highest planned load of the block. No maxing out and no grinding reps.' },
-  { name: 'Deload', tip: 'Lifting sets are cut by about a third and sprint volume is trimmed. Keep the movement sharp.' }
+  { name: 'Build', tip: 'Add a little load or a rep where last week left 2+ reps in reserve. Your call — nothing is increased for you.' },
+  { name: 'Top week', tip: 'Highest planned load of the phase. No maxing out and no grinding reps.' },
+  { name: 'Deload', tip: 'Lifting sets are cut by about a third and sprint and jump volume is trimmed. Keep the movement sharp.' },
+  { name: 'Contrast intro', tip: 'New Strength-Power exercises. Start conservative and learn the heavy-then-jump pairs.' },
+  { name: 'Build', tip: 'Add a little load to the heavy lifts while every jump and throw stays fast.' },
+  { name: 'Top week', tip: 'Heaviest week of the program. Still no grinding reps.' },
+  { name: 'Deload', tip: 'Lifting sets are cut by about a third and sprint and jump volume is trimmed before the peak phase.' },
+  { name: 'Speed intro', tip: 'Lighter bars, faster reps. Learn the depth jumps and flying sprints.' },
+  { name: 'Build', tip: 'Push speed, not load: faster bar, higher jumps, quicker splits.' },
+  { name: 'Peak', tip: 'Your sharpest week — full intent on every rep, full rest between.' },
+  { name: 'Test & taper', tip: 'Low volume, stay fresh. Test your broad jump, countermovement jump and 10-yard time on Tuesday and compare with week 1.' }
 ];
 
 // Input fields a set can record. "lbs/add" go in the first box, everything else in the second.
@@ -13613,9 +13640,289 @@ const HY_WEEK = [
   [{ key: 'game', workout: 'gameDay' }]
 ];
 
+// ── 12 weeks in 3 phases ─────────────────────────────────────────────────────
+// Phase 1 is the program above. Phases 2 and 3 swap in their own exercises for the lifts and field days
+// (same weekly calendar, same Muay Thai, game and recovery days). A session always shows the phase it was
+// done in (its blockWeek), so History never mixes phases.
+const HY_PHASE_INFO = {
+  1: { name: 'Foundation', weeks: 'Weeks 1–4', tip: 'Build the strength base, clean landings and sprint mechanics that the power phases are built on.' },
+  2: { name: 'Strength-Power', weeks: 'Weeks 5–8', tip: 'Heavy lifts paired with jumps and throws, so strength turns into speed: harder cuts, faster first steps and more snap in your strikes.' },
+  3: { name: 'Speed & Power Peak', weeks: 'Weeks 9–12', tip: 'Lighter, faster lifts and your most explosive jumps, sprints and rotational work. You peak for game day and fight night, then test in week 12.' }
+};
+const HY_PHASES = {
+  2: {
+    footballPerf: {
+      name: 'Football Performance — Strength-Power', goal: 'Phase 2: bigger jumps and resisted acceleration while you are fresh. Full recovery between efforts — quality, not conditioning.',
+      sections: [
+        { key: 'primer', title: 'DYNAMIC WARM-UP', checkable: true, items: [
+          hyEx('easy_jog', 'Easy Jog', 'timed', 1, '2 min', { impact: true, alt: 'Easy Walk or Cycling' }),
+          hyEx('leg_swings', 'Leg Swings', 'mobility', 1, '10 per side'),
+          hyEx('walking_lunges', 'Walking Lunges', 'mobility', 1, '8 per side'),
+          hyEx('a_skips', 'A-Skips', 'drill', 2, '10 yd', { impact: true }),
+          hyEx('b_skips', 'B-Skips', 'drill', 2, '10 yd', { impact: true }),
+          hyEx('progressive_runs', 'Progressive Runs', 'drill', 2, '20 yd', { impact: true })
+        ] },
+        { key: 'plyo', title: 'PLYOMETRICS', items: [
+          hyEx('hurdle_hops', 'Hurdle Hops', 'plyo', 3, '4', { rest: 90, restText: '60–120 sec', impact: true, cue: 'Short ground contact, bounce straight into the next hop. Mini hurdles or cones.' }),
+          hyEx('single_leg_broad_jump', 'Single-Leg Broad Jump', 'plyo', 3, '2 per leg', { f1: 'ft', rest: 90, restText: '60–120 sec', impact: true, cue: 'Stick the landing on the same leg. Builds the push-off for cuts and kicks.' }),
+          hyEx('lateral_bounds', 'Lateral Bounds', 'plyo', 3, '3 per side', { rest: 90, restText: '60–120 sec', impact: true, cue: 'Bound further than Phase 1, still with controlled landings.' })
+        ] },
+        { key: 'speed', title: 'ACCELERATION AND FOOTBALL DRILLS', items: [
+          hyEx('resisted_sprint', 'Resisted Sprint (Sled or Band)', 'sprint', 4, '15 yd', { rx: '4 reps', rest: 150, restText: '2–3 min', impact: true, effort: 'Max effort', alt: 'Uphill Sprint', cue: 'Light resistance so your sprint form stays the same — lean, drive the knees.' }),
+          hyEx('accel_10yd', '10-Yard Acceleration', 'sprint', 4, '10 yd', { rx: '4 reps', rest: 120, restText: 'about 2 min', impact: true, effort: 'Max speed' }),
+          hyEx('wr_releases', 'Receiver Releases', 'drill', 1, '4 per side', { impact: true, effort: 'Game speed' }),
+          hyEx('route_breaks', 'Route Breaks and Hard Cuts', 'drill', 1, '6 quality reps', { impact: true, effort: 'Game speed' }),
+          hyEx('catching_on_move', 'Catching While Moving', 'timed', 1, '5–10 min', { impact: true, alt: 'Stationary and Walking Catches', effort: 'Technique' })
+        ] }
+      ]
+    },
+    footballTech: {
+      name: 'Football Technique and Agility — Phase 2', goal: 'Phase 2: sharper change of direction. Short, technical and fresh for Sunday.',
+      sections: [
+        { key: 'primer', title: 'DYNAMIC WARM-UP', checkable: true, items: [hyEx('dynamic_warmup', 'Dynamic Warm-Up', 'check', 1, '', { rx: '8–10 min, easy to moderate' })] },
+        { key: 'main', title: 'MAIN WORKOUT', items: [
+          hyEx('stance_first_step', 'Receiver Stance and First Step', 'drill', 1, '4 reps', { impact: true, effort: 'Explosive' }),
+          hyEx('pro_agility', '5-10-5 Pro Agility', 'sprint', 3, '20 yd', { rx: '3 reps', rest: 90, restText: '90 sec', impact: true, effort: 'Fast', cue: 'Low hips into each turn, plant on the outside foot.' }),
+          hyEx('wr_releases', 'Receiver Releases', 'drill', 1, '3 per side', { impact: true, effort: 'Technique' }),
+          hyEx('easy_route_timing', 'Route Timing and Catching', 'timed', 1, '5–10 min', { impact: true, alt: 'Stationary and Walking Catches', effort: 'Technique' }),
+          hyEx('controlled_route_breaks', 'Deceleration and Route Breaks', 'drill', 1, '4 reps', { impact: true, effort: 'Technique' })
+        ] },
+        { key: 'extra', title: 'OPTIONAL', optional: true, items: [
+          hyEx('reactive_agility', 'Reactive Agility', 'drill', 1, 'a few quality reps', { impact: true, effort: 'Reactive', cue: 'React to a visual or partner cue. Stop while it is still sharp.' })
+        ] }
+      ]
+    },
+    lowerA: {
+      name: 'Lower A — Strength-Power Contrast', goal: 'Phase 2: heavy squats paired with jumps. The heavy set wakes the legs up, the jump turns that strength into explosiveness.',
+      lighterText: 'Squats and contrast jumps drop to 3 rounds, split-squat jumps and Nordic curls are left out, and the accessories lose a set.',
+      notes: [
+        'Contrast pairs: do a squat set, rest 30–60 seconds, then the jumps — then rest fully before the next pair.',
+        'Squats are heavier (about 3 hard reps with 1–2 in reserve). Never grind a rep.',
+        'If landings get sloppy, stop the jumps for the day.'
+      ],
+      sections: [
+        { key: 'primer', title: 'PRIMER', checkable: true, items: [
+          hyEx('ankle_rocks', 'Ankle Rocks', 'mobility', 1, '10 per side'),
+          hyEx('glute_bridges', 'Glute Bridges', 'mobility', 2, '8'),
+          hyEx('bw_squats', 'Bodyweight Squats', 'mobility', 2, '6'),
+          hyEx('pogo_hops', 'Pogo Hops', 'plyo', 2, '10', { impact: true, cue: 'Quick, stiff ankles.' })
+        ] },
+        { key: 'main', title: 'MAIN WORKOUT', items: [
+          hyEx('back_squat', 'Back Squat', 'strength', 4, '3', { rest: 45, restText: '30–60 sec, then the jumps', lighterSets: 3, cue: 'Heavy but fast out of the hole. Go straight into the box jumps.' }),
+          hyEx('contrast_box_jump', 'Contrast Box Jump', 'plyo', 4, '3', { rest: 180, restText: '2–3 min before the next squat set', impact: true, lighterSets: 3, alt: 'Squat Jump (bodyweight)', cue: 'Maximum height, soft landing, step down. Paired with each squat set.' }),
+          hyEx('romanian_deadlift', 'Romanian Deadlift', 'strength', 3, '5', { rest: 150, restText: '2–3 min' }),
+          hyEx('split_squat_jump', 'Split-Squat Jump', 'plyo', 3, '3 per leg', { rest: 90, restText: '90 sec', impact: true, lighterOmit: true, alt: 'Rear-Foot-Elevated Split Squat', cue: 'Switch legs in the air, land balanced. Kick and knee power.' }),
+          hyEx('nordic_hamstring_curl', 'Nordic Hamstring Curl', 'bodyweight', 2, '4–6', { rest: 120, restText: '2 min', lighterOmit: true, alts: ['Hamstring Curl', 'Glute-Ham Raise'] }),
+          hyEx('single_leg_calf_raise', 'Single-Leg Calf Raise', 'strength', 2, '10 per leg', { rest: 60, restText: '60 sec', acc: true }),
+          hyEx('hanging_knee_raise', 'Hanging Knee Raise', 'bodyweight', 3, '10–12', { rest: 60, restText: '60 sec', acc: true })
+        ] },
+        { key: 'cooldown', title: 'OPTIONAL COOLDOWN', checkable: true, optional: true, items: [
+          hyEx('cooldown_walk', 'Easy Walk', 'timed', 1, '5 min'), hyEx('cooldown_mobility', 'Gentle Mobility', 'check', 1, '', { rx: 'as needed' })
+        ] }
+      ]
+    },
+    upperA: {
+      name: 'Upper A — Strength-Power', goal: 'Phase 2: heavy pressing and pulling plus full-body drive and rotational throws — the power behind your punches and stiff-arms.',
+      lighterText: 'Push presses and rotational throws lose a set, the accessories lose a set. Bench and pull-ups stay as written.',
+      notes: ['Heavier bench and pull-ups: about 3–4 hard reps with 1–2 in reserve.', 'Push press: dip and drive with the legs, punch the bar up fast.', 'Rotational throws: turn from the hips like a cross.'],
+      sections: [
+        { key: 'primer', title: 'PRIMER', checkable: true, items: [
+          hyEx('band_pull_aparts', 'Band Pull-Aparts', 'mobility', 2, '12'),
+          hyEx('scap_pushups', 'Scapular Push-Ups', 'mobility', 2, '8'),
+          hyEx('plyo_pushups', 'Plyometric Push-Ups', 'plyo', 3, '3', { cue: 'Explosive off the floor. Leave them out if you are not ready.' }),
+          hyEx('bench_warmup', 'Bench Press Warm-Up Sets', 'strength', 3, 'progressive', { rx: '2–3 progressively heavier sets, as needed' })
+        ] },
+        { key: 'main', title: 'MAIN WORKOUT', items: [
+          hyEx('bench_press', 'Barbell Bench Press', 'strength', 4, '3–4', { rest: 180, restText: '2–4 min' }),
+          hyEx('weighted_pullups', 'Weighted Pull-Ups', 'strength', 4, '4', { rest: 150, restText: '2–3 min', f1: 'add' }),
+          hyEx('push_press', 'Push Press', 'strength', 3, '3', { rest: 150, restText: '2–3 min', lighterSets: 2, alts: ['Landmine Push Press', 'Dumbbell Push Press'], cue: 'Legs start it, arms finish it. Fast lockout.' }),
+          hyEx('mb_rotational_shotput', 'Rotational Medicine-Ball Shot Put', 'plyo', 3, '4 per side', { rest: 60, restText: '60 sec', lighterSets: 2, cue: 'Back foot pivots, hips turn first, then throw through the wall — your cross and hook.' }),
+          hyEx('chest_supported_row', 'Chest-Supported Row', 'strength', 3, '6', { rest: 105, restText: '90–120 sec' }),
+          hyEx('pallof_press', 'Pallof Press', 'strength', 2, '10 per side', { rest: 60, restText: '60 sec', acc: true })
+        ] }
+      ]
+    },
+    lowerB: {
+      name: 'Lower B — Explosive Power II', goal: 'Phase 2: heavier cleans, faster jumps and lateral power for cutting and kicking. Low reps, full rest.',
+      lighterText: 'Hang power cleans drop to 3 sets and the accessories lose a set.',
+      notes: ['Cleans are a little heavier than Phase 1 but every rep must stay fast.', 'Skater bounds: hold each landing for a second before the next.', 'Rest fully — this is power, not conditioning.'],
+      sections: [
+        { key: 'primer', title: 'PRIMER', checkable: true, items: [
+          hyEx('lateral_band_walk', 'Lateral Band Walk', 'mobility', 2, '10 per side'),
+          hyEx('hip_airplanes', 'Hip Airplanes', 'mobility', 2, '5 per side'),
+          hyEx('mb_rotational_toss', 'Rotational Medicine-Ball Scoop Toss', 'plyo', 3, '3 per side', { rest: 60, restText: '60 sec' })
+        ] },
+        { key: 'main', title: 'MAIN WORKOUT', items: [
+          hyEx('hang_power_clean', 'Hang Power Clean', 'strength', 5, '2', { rest: 150, restText: '2–3 min', lighterSets: 3, alts: ['Hang High Pull', 'Kettlebell Swing', 'Dumbbell Snatch'], cue: 'Heavier doubles, still fast elbows and a violent hip snap.' }),
+          hyEx('trap_bar_jump', 'Trap Bar Jump', 'strength', 4, '3', { rest: 120, restText: '2 min', impact: true, alt: 'Fast Trap Bar Deadlift (no jump)', alts: ['Dumbbell Jump Squat', 'Box Jump'] }),
+          hyEx('skater_bounds', 'Skater Bounds', 'plyo', 3, '4 per side', { rest: 90, restText: '90 sec', impact: true, cue: 'Push off sideways as far as you can — the cut that beats a defender.' }),
+          hyEx('explosive_step_up', 'Explosive Step-Up', 'strength', 3, '3 per leg', { rest: 90, restText: '90 sec', alts: ['Rear-Foot-Elevated Split Squat', 'Reverse Lunge'] }),
+          hyEx('landmine_rotation', 'Landmine Rotation', 'strength', 3, '5 per side', { rest: 60, restText: '60 sec', acc: true, alts: ['Cable Woodchop', 'Medicine-Ball Rotational Slam'], cue: 'Faster than Phase 1 — snap the hips around.' }),
+          hyEx('copenhagen_plank', 'Copenhagen Plank', 'bodyweight', 2, '25 sec per side', { f2: 'hold', rest: 60, restText: '60 sec', acc: true })
+        ] },
+        { key: 'cooldown', title: 'OPTIONAL COOLDOWN', checkable: true, optional: true, items: [
+          hyEx('cooldown_walk', 'Easy Walk', 'timed', 1, '5 min'), hyEx('hip_hamstring_mobility', 'Hip and Hamstring Mobility', 'check', 1, '', { rx: 'a few easy minutes' })
+        ] }
+      ]
+    },
+    upperB: {
+      name: 'Upper B — Strength and Clinch', goal: 'Phase 2: keep the muscle while building grip and neck strength for the clinch.',
+      lighterText: 'Accessories, carries and neck work lose a set. The main lifts stay as written.',
+      notes: ['Keep 1–3 reps in reserve on most working sets.', 'Farmer carries: tall posture, crush the handles — clinch grip.'],
+      sections: [
+        { key: 'primer', title: 'PRIMER', checkable: true, items: [
+          hyEx('band_external_rotations', 'Band External Rotations', 'mobility', 2, '10'),
+          hyEx('scap_pushups', 'Scapular Push-Ups', 'mobility', 2, '8'),
+          hyEx('mb_overhead_slam', 'Medicine-Ball Overhead Slam', 'plyo', 3, '5', { cue: 'Reach tall, slam through the floor with your whole body.' })
+        ] },
+        { key: 'main', title: 'MAIN WORKOUT', items: [
+          hyEx('landmine_press', 'Landmine Press', 'strength', 4, '5', { rest: 150, restText: '2–3 min', alts: ['Overhead Press'] }),
+          hyEx('one_arm_db_row', 'One-Arm Dumbbell Row', 'strength', 3, '8 per side', { rest: 90, restText: '90 sec' }),
+          hyEx('db_bench_press', 'Dumbbell Bench Press', 'strength', 3, '8', { rest: 90, restText: '90 sec' }),
+          hyEx('lat_pulldown', 'Lat Pulldown', 'strength', 3, '8', { rest: 90, restText: '90 sec' }),
+          hyEx('farmer_carry', 'Farmer Carry', 'strength', 3, '40 yd', { rest: 75, restText: '60–90 sec', acc: true, cue: 'Heavy dumbbells or kettlebells. Clinch grip and a strong trunk.' }),
+          hyEx('lateral_raise', 'Lateral Raise', 'strength', 2, '12–15', { rest: 60, restText: '60 sec', acc: true }),
+          hyEx('neck_training', 'Neck Flexion and Extension', 'bodyweight', 2, '12–15 each way', { rest: 60, restText: '60 sec', acc: true, alts: ['Plate Neck Curl', 'Band Neck Extension'] })
+        ] }
+      ]
+    }
+  },
+  3: {
+    footballPerf: {
+      name: 'Football Performance — Top Speed', goal: 'Phase 3: top-end speed and reactive cuts. Full recovery between efforts so every rep is your fastest.',
+      sections: [
+        { key: 'primer', title: 'DYNAMIC WARM-UP', checkable: true, items: [
+          hyEx('easy_jog', 'Easy Jog', 'timed', 1, '2 min', { impact: true, alt: 'Easy Walk or Cycling' }),
+          hyEx('leg_swings', 'Leg Swings', 'mobility', 1, '10 per side'),
+          hyEx('a_skips', 'A-Skips', 'drill', 2, '10 yd', { impact: true }),
+          hyEx('b_skips', 'B-Skips', 'drill', 2, '10 yd', { impact: true }),
+          hyEx('progressive_runs', 'Progressive Runs', 'drill', 3, '30 yd', { impact: true })
+        ] },
+        { key: 'plyo', title: 'PLYOMETRICS', items: [
+          hyEx('cmj', 'Countermovement Jump', 'plyo', 3, '3', { f1: 'inch', rest: 90, restText: '60–120 sec', impact: true, cue: 'Log your best — compare it with week 1.' }),
+          hyEx('single_leg_hops', 'Single-Leg Forward Hops', 'plyo', 2, '4 per leg', { rest: 90, restText: '60–120 sec', impact: true, cue: 'Bouncy, quick contacts.' })
+        ] },
+        { key: 'speed', title: 'TOP SPEED AND REACTIVE DRILLS', items: [
+          hyEx('flying_10yd', 'Flying 10-Yard Sprint', 'sprint', 4, '10 yd', { rx: '4 reps (20-yd build-up)', rest: 180, restText: '2–3 min', impact: true, effort: 'Max speed', cue: 'Build up for 20 yards, then sprint the 10 as fast as you can.' }),
+          hyEx('accel_10yd', '10-Yard Acceleration', 'sprint', 3, '10 yd', { rx: '3 reps', rest: 120, restText: 'about 2 min', impact: true, effort: 'Max speed' }),
+          hyEx('reactive_cuts', 'Reactive Cuts', 'drill', 1, '6 reps', { impact: true, effort: 'Reactive', cue: 'Cut on a partner point or call — game reaction speed.' }),
+          hyEx('route_tree_game_speed', 'Route Tree at Game Speed', 'drill', 1, '6–8 routes', { impact: true, effort: 'Game speed' }),
+          hyEx('catching_on_move', 'Catching While Moving', 'timed', 1, '5–10 min', { impact: true, alt: 'Stationary and Walking Catches', effort: 'Technique' })
+        ] }
+      ]
+    },
+    footballTech: {
+      name: 'Football Technique and Reactive Agility', goal: 'Phase 3: react and separate. Short and sharp — stay fresh for Sunday.',
+      sections: [
+        { key: 'primer', title: 'DYNAMIC WARM-UP', checkable: true, items: [hyEx('dynamic_warmup', 'Dynamic Warm-Up', 'check', 1, '', { rx: '8–10 min, easy to moderate' })] },
+        { key: 'main', title: 'MAIN WORKOUT', items: [
+          hyEx('stance_first_step', 'Receiver Stance and First Step', 'drill', 1, '4 reps', { impact: true, effort: 'Explosive' }),
+          hyEx('reactive_agility', 'Reactive Agility', 'drill', 1, '6 quality reps', { impact: true, effort: 'Reactive', cue: 'React to a visual or partner cue.' }),
+          hyEx('wr_releases', 'Receiver Releases', 'drill', 1, '3 per side', { impact: true, effort: 'Game speed' }),
+          hyEx('easy_route_timing', 'Route Timing and Catching', 'timed', 1, '5–10 min', { impact: true, alt: 'Stationary and Walking Catches', effort: 'Technique' }),
+          hyEx('controlled_route_breaks', 'Deceleration and Route Breaks', 'drill', 1, '4 reps', { impact: true, effort: 'Technique' })
+        ] }
+      ]
+    },
+    lowerA: {
+      name: 'Lower A — Speed-Strength', goal: 'Phase 3: lighter squats moved as fast as possible, plus your most demanding jumps. Speed on the bar = speed on the field.',
+      lighterText: 'Speed squats and depth jumps drop to 3 sets, single-leg box jumps and Nordic curls are left out.',
+      notes: ['Speed squats: about 55–65% of your Phase 2 squat. Every rep explosive.', 'Depth jumps: step off a low box (12–18 in), touch the ground and explode up. Quality over quantity.', 'Stop a set the moment speed drops.'],
+      sections: [
+        { key: 'primer', title: 'PRIMER', checkable: true, items: [
+          hyEx('ankle_rocks', 'Ankle Rocks', 'mobility', 1, '10 per side'),
+          hyEx('glute_bridges', 'Glute Bridges', 'mobility', 2, '8'),
+          hyEx('pogo_hops', 'Pogo Hops', 'plyo', 2, '10', { impact: true })
+        ] },
+        { key: 'main', title: 'MAIN WORKOUT', items: [
+          hyEx('speed_squat', 'Speed Back Squat', 'strength', 5, '3', { rest: 120, restText: '2 min', lighterSets: 3, alts: ['Back Squat'], cue: 'Lighter weight, maximum speed up. Think "jump" without leaving the floor.' }),
+          hyEx('depth_jump', 'Depth Jump', 'plyo', 4, '3', { rest: 120, restText: '2 min', impact: true, lighterSets: 3, alt: 'Box Jump', cue: 'Short ground contact — the floor is hot.' }),
+          hyEx('single_leg_box_jump', 'Single-Leg Box Jump', 'plyo', 3, '3 per leg', { rest: 90, restText: '90 sec', impact: true, lighterOmit: true, alt: 'Single-Leg Step-Up', cue: 'Explosive one-leg drive — knee strikes and push-offs.' }),
+          hyEx('single_leg_rdl', 'Single-Leg Romanian Deadlift', 'strength', 3, '6 per leg', { rest: 90, restText: '90 sec' }),
+          hyEx('nordic_hamstring_curl', 'Nordic Hamstring Curl', 'bodyweight', 2, '4', { rest: 120, restText: '2 min', lighterOmit: true, alts: ['Hamstring Curl', 'Glute-Ham Raise'], cue: 'Keeps the hamstrings safe at top speed.' }),
+          hyEx('hanging_knee_raise', 'Hanging Knee Raise', 'bodyweight', 2, '10–12', { rest: 60, restText: '60 sec', acc: true })
+        ] },
+        { key: 'cooldown', title: 'OPTIONAL COOLDOWN', checkable: true, optional: true, items: [
+          hyEx('cooldown_walk', 'Easy Walk', 'timed', 1, '5 min'), hyEx('cooldown_mobility', 'Gentle Mobility', 'check', 1, '', { rx: 'as needed' })
+        ] }
+      ]
+    },
+    upperA: {
+      name: 'Upper A — Speed and Striking Power', goal: 'Phase 3: fast pressing, overhead and rotational throws and band punches — turn your strength into hand speed.',
+      lighterText: 'Speed bench, throws and band punches lose a set.',
+      notes: ['Speed bench: about 50–60% of your bench. Lower under control, press as fast as you can.', 'Band punches: hips and shoulders turn together, snap back to guard.'],
+      sections: [
+        { key: 'primer', title: 'PRIMER', checkable: true, items: [
+          hyEx('band_pull_aparts', 'Band Pull-Aparts', 'mobility', 2, '12'),
+          hyEx('scap_pushups', 'Scapular Push-Ups', 'mobility', 2, '8'),
+          hyEx('mb_chest_pass', 'Medicine-Ball Chest Pass', 'plyo', 3, '4', { cue: 'Maximum intent.' })
+        ] },
+        { key: 'main', title: 'MAIN WORKOUT', items: [
+          hyEx('speed_bench', 'Speed Bench Press', 'strength', 5, '3', { rest: 90, restText: '60–90 sec', lighterSets: 4, alts: ['Barbell Bench Press'], cue: 'Light and fast — every rep as quick as a jab.' }),
+          hyEx('weighted_pullups', 'Weighted Pull-Ups', 'strength', 3, '4', { rest: 150, restText: '2–3 min', f1: 'add' }),
+          hyEx('push_press', 'Push Press', 'strength', 3, '3', { rest: 150, restText: '2–3 min', alts: ['Landmine Push Press', 'Dumbbell Push Press'] }),
+          hyEx('mb_rotational_shotput', 'Rotational Medicine-Ball Shot Put', 'plyo', 4, '3 per side', { rest: 60, restText: '60 sec', lighterSets: 3 }),
+          hyEx('band_resisted_punches', 'Band-Resisted Punches', 'plyo', 3, '10 per side', { rest: 60, restText: '60 sec', lighterSets: 2, cue: 'Band anchored behind you. Jab-cross with full hip turn, snap back to guard.' }),
+          hyEx('chest_supported_row', 'Chest-Supported Row', 'strength', 2, '8', { rest: 90, restText: '90 sec', acc: true })
+        ] }
+      ]
+    },
+    lowerB: {
+      name: 'Lower B — Peak Power', goal: 'Phase 3: your fastest cleans, explosive knee drives and lateral power. Minimum fatigue, maximum speed.',
+      lighterText: 'Cleans drop to 3 sets and the accessories lose a set.',
+      notes: ['Cleans at a weight you can move fastest — not heavier than Phase 2.', 'Knee drives: the hip snap of a Muay Thai knee strike.'],
+      sections: [
+        { key: 'primer', title: 'PRIMER', checkable: true, items: [
+          hyEx('lateral_band_walk', 'Lateral Band Walk', 'mobility', 2, '10 per side'),
+          hyEx('hip_airplanes', 'Hip Airplanes', 'mobility', 2, '5 per side'),
+          hyEx('mb_rotational_toss', 'Rotational Medicine-Ball Scoop Toss', 'plyo', 3, '3 per side', { rest: 60, restText: '60 sec' })
+        ] },
+        { key: 'main', title: 'MAIN WORKOUT', items: [
+          hyEx('hang_power_clean', 'Hang Power Clean', 'strength', 5, '2', { rest: 120, restText: '2 min', lighterSets: 3, alts: ['Hang High Pull', 'Kettlebell Swing', 'Dumbbell Snatch'], cue: 'Lighter than Phase 2 — the fastest doubles you have done.' }),
+          hyEx('trap_bar_jump', 'Trap Bar Jump', 'strength', 3, '3', { rest: 120, restText: '2 min', impact: true, alt: 'Fast Trap Bar Deadlift (no jump)', alts: ['Dumbbell Jump Squat', 'Box Jump'] }),
+          hyEx('explosive_knee_drive', 'Explosive Knee Drive', 'plyo', 3, '6 per side', { rest: 60, restText: '60 sec', alts: ['Cable Knee Drive', 'Band Knee Drive'], cue: 'Band or cable at the ankle, snap the knee up and drive the hips through — a knee strike.' }),
+          hyEx('skater_bounds', 'Skater Bounds', 'plyo', 3, '4 per side', { rest: 90, restText: '90 sec', impact: true }),
+          hyEx('landmine_rotation', 'Landmine Rotation', 'strength', 2, '5 per side', { rest: 60, restText: '60 sec', acc: true, alts: ['Cable Woodchop', 'Medicine-Ball Rotational Slam'] }),
+          hyEx('copenhagen_plank', 'Copenhagen Plank', 'bodyweight', 2, '25 sec per side', { f2: 'hold', rest: 60, restText: '60 sec', acc: true })
+        ] },
+        { key: 'cooldown', title: 'OPTIONAL COOLDOWN', checkable: true, optional: true, items: [
+          hyEx('cooldown_walk', 'Easy Walk', 'timed', 1, '5 min'), hyEx('hip_hamstring_mobility', 'Hip and Hamstring Mobility', 'check', 1, '', { rx: 'a few easy minutes' })
+        ] }
+      ]
+    },
+    upperB: {
+      name: 'Upper B — Maintain and Recover', goal: 'Phase 3: keep the muscle with less volume so speed and power come first.',
+      lighterText: 'Accessories and neck work lose a set. The main lifts stay as written.',
+      notes: ['Fewer sets than Phase 2 on purpose — save energy for speed and fight night.'],
+      sections: [
+        { key: 'primer', title: 'PRIMER', checkable: true, items: [
+          hyEx('band_external_rotations', 'Band External Rotations', 'mobility', 2, '10'),
+          hyEx('plyo_pushups', 'Plyometric Push-Ups', 'plyo', 3, '3', { cue: 'Fast and clean.' })
+        ] },
+        { key: 'main', title: 'MAIN WORKOUT', items: [
+          hyEx('landmine_press', 'Landmine Press', 'strength', 3, '5', { rest: 150, restText: '2–3 min', alts: ['Overhead Press'] }),
+          hyEx('one_arm_db_row', 'One-Arm Dumbbell Row', 'strength', 3, '8 per side', { rest: 90, restText: '90 sec' }),
+          hyEx('db_bench_press', 'Dumbbell Bench Press', 'strength', 2, '8', { rest: 90, restText: '90 sec' }),
+          hyEx('lat_pulldown', 'Lat Pulldown', 'strength', 2, '8', { rest: 90, restText: '90 sec' }),
+          hyEx('farmer_carry', 'Farmer Carry', 'strength', 2, '40 yd', { rest: 75, restText: '60–90 sec', acc: true }),
+          hyEx('neck_training', 'Neck Flexion and Extension', 'bodyweight', 2, '12–15 each way', { rest: 60, restText: '60 sec', acc: true, alts: ['Plate Neck Curl', 'Band Neck Extension'] })
+        ] }
+      ]
+    }
+  }
+};
+function hyPhaseWeek(week) { return week ? ((week - 1) % 4) + 1 : 0; }   // 1–4 inside its phase
+function hyPhase(week) { return week ? Math.min(3, Math.ceil(week / 4)) : 1; }
+function hyIsDeload(week) { return hyPhaseWeek(week) === 4; }   // weeks 4 and 8; week 12 is test & taper
+function hyWeekOfRef(ref) {
+  if(ref && typeof ref === 'object') return ref.blockWeek || 0;
+  if(typeof ref === 'number') return ref;
+  return hyBlockWeek();
+}
+
 // ── Saved state ──────────────────────────────────────────────────────────────
 function hyDefaultState() {
-  return { v: 2, updatedAt: 0, rotationIdx: 0, rotationLog: [], block: { on: false, anchor: null }, readiness: { status: 'normal', since: 0 }, placement: null, sessions: {}, custom: {}, subs: {} };
+  return { v: 3, updatedAt: 0, rotationIdx: 0, rotationLog: [], block: { on: true, anchor: hyISO(hyMonday(new Date())) }, readiness: { status: 'normal', since: 0 }, placement: null, sessions: {}, custom: {}, subs: {} };
 }
 // Accepts anything (missing, partial, from the cloud) and always returns a usable state.
 function hyNormalize(raw) {
@@ -13625,6 +13932,17 @@ function hyNormalize(raw) {
   d.updatedAt = Number(raw.updatedAt) || 0;
   d.rotationLog = Array.isArray(raw.rotationLog) ? raw.rotationLog.filter(isObj).slice(-40) : [];
   if(isObj(raw.block)) d.block = { on: !!raw.block.on, anchor: typeof raw.block.anchor === 'string' ? raw.block.anchor : null };
+  // Saved before the 12-week program: keep the same week number (phase 1), and turn the program on if it was off
+  if((Number(raw.v) || 0) < 3) {
+    const m = hyMonday(new Date());
+    let wk = 1;
+    if(d.block.on && d.block.anchor) {
+      const p = d.block.anchor.split('-').map(Number), a = new Date(p[0], (p[1] || 1) - 1, p[2] || 1);
+      if(!isNaN(a)) { const n = Math.round((m - hyMonday(a)) / 604800000); wk = ((n % 4) + 4) % 4 + 1; }
+    }
+    m.setDate(m.getDate() - (wk - 1) * 7);
+    d.block = { on: true, anchor: hyISO(m) };
+  }
   if(isObj(raw.custom)) Object.keys(raw.custom).forEach(id => {
     const c = raw.custom[id];
     if(!HY_WORKOUTS[id] || !HY_WORKOUTS[id].placeholder || !isObj(c)) return;
@@ -13655,7 +13973,7 @@ function hyNormalize(raw) {
       doneOn: /^\d{4}-\d{2}-\d{2}$/.test(String(s.doneOn || '')) && s.doneOn !== sid.slice(0, 10) ? s.doneOn : '',
       status: ['in_progress', 'completed', 'skipped'].includes(s.status) ? s.status : 'in_progress',
       startedAt: Number(s.startedAt) || 0, finishedAt: Number(s.finishedAt) || 0,
-      blockWeek: [1, 2, 3, 4].includes(s.blockWeek) ? s.blockWeek : 0,
+      blockWeek: Number.isInteger(s.blockWeek) && s.blockWeek >= 1 && s.blockWeek <= 12 ? s.blockWeek : 0,
       lighter: !!s.lighter, recoveryOnly: !!s.recoveryOnly, advanced: !!s.advanced,
       check: ['good', 'tired', 'pain'].includes(s.check) ? s.check : '', noImpact: !!s.noImpact, restricted: !!s.restricted, restDay: !!s.restDay,
       types: (Array.isArray(s.types) ? s.types : []).filter(t => HY_MT_TYPES.includes(t)),
@@ -13744,9 +14062,12 @@ function hyDateLabel(iso) {
 function hySid(dayIdx, slotKey) { return hyISO(hyDayDate(dayIdx)) + '_' + slotKey; }
 
 // Workout definition with the athlete's own set-up merged in for the placeholder workouts.
-function hyWorkout(id) {
-  const w = HY_WORKOUTS[id];
+// ref: a session (uses the week it was done in), a week number, or nothing (this week).
+function hyWorkout(id, ref) {
+  let w = HY_WORKOUTS[id];
   if(!w) return null;
+  const ph = hyPhase(hyWeekOfRef(ref)), o = HY_PHASES[ph] && HY_PHASES[ph][id];
+  if(o) w = Object.assign({}, w, o, { phase: ph });
   if(!w.placeholder) return w;
   const c = hyState.custom[id] || { primer: [], main: [] };
   const sections = [];
@@ -13779,14 +14100,14 @@ function hySetText(ex, st) {
   return a || b || '✓';
 }
 
-// ── Four-week block ──────────────────────────────────────────────────────────
+// ── 12-week program (3 phases of 4 weeks) ───────────────────────────────────
 function hyBlockWeek() {
   if(!hyState.block.on || !hyState.block.anchor) return 0;
   const p = hyState.block.anchor.split('-').map(Number);
   const anchor = new Date(p[0], (p[1] || 1) - 1, p[2] || 1);
   if(isNaN(anchor)) return 0;
   const weeks = Math.round((hyMonday(new Date()) - hyMonday(anchor)) / 604800000);
-  return ((weeks % 4) + 4) % 4 + 1;
+  return ((weeks % 12) + 12) % 12 + 1;
 }
 function hySetBlockWeek(week) {
   if(!week) { hyState.block = { on: false, anchor: null }; }
@@ -13831,7 +14152,7 @@ function hyCtx() {
   const workoutId = sess ? sess.workoutId : hySlotWorkoutId(dayIdx, slot);
   if(!workoutId) return null;
   const later = dayIdx > hyDow(new Date());
-  return { dayIdx, slot, sid, sess, workoutId, workout: hyWorkout(workoutId), later, future: later && !sess && hyView.early !== sid };
+  return { dayIdx, slot, sid, sess, workoutId, workout: hyWorkout(workoutId, sess), later, future: later && !sess && hyView.early !== sid };
 }
 // The day a session was really done: today for a later day's workout done early, otherwise its own day.
 function hyDoneDay(sess, sid) {
@@ -13902,10 +14223,10 @@ function hyRx(workout, section, ex, sess) {
       else if(ex.acc && sets > 1) sets -= 1;
       else if(!hasRules && ex.kind === 'strength' && sets >= 3) sets -= 1;
     }
-    if(week === 4 && (ex.kind === 'strength' || ex.kind === 'bodyweight')) sets = Math.max(1, Math.round(sets * 0.65));
+    if(hyIsDeload(week) && (ex.kind === 'strength' || ex.kind === 'bodyweight')) sets = Math.max(1, Math.round(sets * 0.65));
   }
   // Deload also trims sprint and jump volume, but never the primer or warm-up.
-  if(week === 4 && !section.checkable && (ex.kind === 'sprint' || ex.kind === 'plyo')) sets = Math.max(1, sets - 1);
+  if(hyIsDeload(week) && !section.checkable && (ex.kind === 'sprint' || ex.kind === 'plyo')) sets = Math.max(1, sets - 1);
   if(sess && sess.recoveryOnly && ex.freshOnly) omitted = 'Left out — recovery-only session';
   return { sets, omitted, alt, restricted };
 }
@@ -14012,7 +14333,7 @@ function hyRepTop(reps) {
 function hyProgressHint(c, section, ex, last) {
   if(section.key !== 'main' || ex.kind !== 'strength' || !last) return '';
   const week = c.sess ? c.sess.blockWeek : hyBlockWeek();
-  if(week === 1 || week === 4 || hyState.readiness.status !== 'normal') return '';
+  if(hyPhaseWeek(week) === 1 || hyIsDeload(week) || hyState.readiness.status !== 'normal') return '';
   if(c.sess && (c.sess.lighter || c.sess.check === 'tired' || c.sess.check === 'pain')) return '';
   const before = hyState.sessions[last.sid];
   if(before && (before.lighter || before.check === 'tired' || before.check === 'pain')) return '';
@@ -14078,7 +14399,7 @@ function hyWeekHTML() {
   }).join('');
   // The four lifts of this week, one per gym day, with what happened to each.
   const lifts = HY_GYM_DAYS.map(d => {
-    const sess = hyState.sessions[hySid(d, 'gym')] || null, w = hyWorkout(sess ? sess.workoutId : HY_CAL_LIFT[d]);
+    const sess = hyState.sessions[hySid(d, 'gym')] || null, w = hyWorkout(sess ? sess.workoutId : HY_CAL_LIFT[d], sess);
     const state = sess ? (sess.status === 'completed' ? '✓ Done' : sess.status === 'skipped' ? 'Skipped' : (d < today ? 'Not finished' : 'In progress'))
       : (d < today ? 'Missed' : d === today ? 'Today' : (w.placeholder && !w.configured ? 'Needs set-up' : 'Planned'));
     return `<button class="hy-hist" onclick="hyPickDay(${d})"><span>${HY_DAYS[d].slice(0, 3)} · ${hyEsc(w.short || w.name)}</span><span class="hy-muted">${hyEsc(state)}</span></button>`;
@@ -14086,14 +14407,15 @@ function hyWeekHTML() {
   const history = Object.keys(hyState.sessions).map(id => hyState.sessions[id]).filter(x => x.status !== 'in_progress')
     .sort((a, b) => a.id < b.id ? 1 : -1).slice(0, 8);
   return `
-    <div class="wo-preview-program-card">
-      <div class="wo-preview-prog-eyebrow">Active Program</div>
-      <div class="wo-preview-prog-name">${hyEsc(prog.name)}</div>
+    <div class="wo-preview-program-card${prog.cover ? ' has-cover' : ''}">
+      ${prog.cover ? `<div class="hy-cover" style="background-image:url('${prog.cover}')"><div class="hy-cover-txt"><div class="wo-preview-prog-eyebrow">Active Program</div><div class="wo-preview-prog-name">${hyEsc(prog.name)}</div></div></div>` : `<div class="wo-preview-prog-eyebrow">Active Program</div>
+      <div class="wo-preview-prog-name">${hyEsc(prog.name)}</div>`}
       <div class="wo-preview-prog-desc">${hyEsc(prog.desc)}</div>
       <button class="hy-block" onclick="hyBlockSheet()">
-        <span>${week ? `4-week block · Week ${week} of 4 — ${HY_BLOCK[week].name}` : '4-week block · off'}</span><span class="hy-block-edit">Change</span>
+        <span>${week ? `Phase ${hyPhase(week)} · ${HY_PHASE_INFO[hyPhase(week)].name} · Week ${week} of 12 — ${HY_BLOCK[week].name}` : '12-week program · off'}</span><span class="hy-block-edit">Change</span>
       </button>
-      ${week ? `<div class="hy-block-tip">${hyEsc(HY_BLOCK[week].tip)}</div>` : ''}
+      ${week ? `<div class="hy-phase-bar">${[1, 2, 3].map(p => `<span class="${p < hyPhase(week) ? 'done' : p === hyPhase(week) ? 'on' : ''}"><i style="width:${p < hyPhase(week) ? 100 : p === hyPhase(week) ? hyPhaseWeek(week) * 25 : 0}%"></i><b>${HY_PHASE_INFO[p].name}</b></span>`).join('')}</div>
+      <div class="hy-block-tip">${hyEsc(HY_BLOCK[week].tip)}</div>` : ''}
       <button class="hy-block" onclick="hyStatusSheet()">
         <span>Training status · ${hyEsc(HY_STATUS[status].name)}</span><span class="hy-block-edit">Change</span>
       </button>
@@ -14111,7 +14433,7 @@ function hyWeekHTML() {
     ${history.length ? `<div class="hy-card">
       <div class="hy-card-title">History</div>
       ${history.map(x => {
-        const w = hyWorkout(x.workoutId), t = hyTotals(w, x);
+        const w = hyWorkout(x.workoutId, x), t = hyTotals(w, x);
         const bits = [x.status === 'skipped' ? 'Skipped' : (x.restDay ? 'Rest day' : (t.sets ? `${t.sets} working sets` : 'Completed')), x.rpe ? `RPE ${x.rpe}` : ''].filter(Boolean).join(' · ');
         return `<button class="hy-hist" onclick="hySummary('${x.id}')"><span>${hyEsc(hyDateLabel(hyDoneDay(x, x.id)))} · ${hyEsc(w.short || w.name)}</span><span class="hy-muted">${hyEsc(bits)}</span></button>`;
       }).join('')}
@@ -14401,7 +14723,7 @@ function hySessionHTML() {
   else if(c.later || (sess && sess.doneOn)) banners.push(`<div class="hy-banner">${HY_DAYS[c.dayIdx]}'s workout, ${done ? 'done' : 'doing it'} early${sess && sess.doneOn ? ' on ' + hyEsc(hyDateLabel(sess.doneOn)) : ' today'}.</div>`);
   if(skipped) banners.push(`<div class="hy-banner">Skipped. <button class="hy-link" onclick="hyUndoSkip()">Undo skip</button></div>`);
   if(sess && sess.restDay) banners.push(`<div class="hy-banner">Recorded as a complete rest day.</div>`);
-  if(week && (w.category === 'strength' || w.category === 'field')) banners.push(`<div class="hy-banner"><strong>Week ${week} of 4 — ${HY_BLOCK[week].name}.</strong> ${hyEsc(HY_BLOCK[week].tip)}</div>`);
+  if(week && (w.category === 'strength' || w.category === 'field')) banners.push(`<div class="hy-banner"><strong>Phase ${hyPhase(week)} · ${HY_PHASE_INFO[hyPhase(week)].name} — Week ${week} of 12, ${HY_BLOCK[week].name}.</strong> ${hyEsc(HY_BLOCK[week].tip)}</div>`);
   if(hasImpact && hyImpactBlocked(sess)) banners.push(sess && sess.noImpact && status !== 'restricted'
     ? `<div class="hy-banner warn"><strong>Impact work is left out of this session.</strong> Sprints, jumps and cutting drills are locked for today.</div>`
     : `<div class="hy-banner warn"><strong>Return to impact is restricted.</strong> Sprints, jumps, bounds and cutting drills are locked, and non-impact alternatives are shown where they make sense. Walking without pain is not clearance for impact. Change your training status only once you have been cleared.</div>`);
@@ -14784,10 +15106,11 @@ function hySetStatus(status) {
 }
 function hyBlockSheet() {
   const week = hyBlockWeek();
-  hySheet(`<div class="cm-sheet-title">Four-week training block</div>
-    <div class="hy-muted" style="margin-bottom:12px;">Optional. It adds guidance each week and a lighter fourth week. Loads are never raised for you.</div>
-    ${[1, 2, 3, 4].map(n => `<button class="cm-pick" onclick="hySetBlockWeek(${n})">This is week ${n} — ${HY_BLOCK[n].name}${week === n ? ' ✓' : ''}<small>${hyEsc(HY_BLOCK[n].tip)}</small></button>`).join('')}
-    <button class="cm-pick" onclick="hySetBlockWeek(0)">Turn the block off${week ? '' : ' ✓'}<small>Same prescription every week.</small></button>
+  hySheet(`<div class="cm-sheet-title">12-week program</div>
+    <div class="hy-muted" style="margin-bottom:12px;">Three 4-week phases, each with its own exercises. Weeks 4 and 8 are lighter, week 12 is test and taper. Pick the week you are on. Loads are never raised for you.</div>
+    ${[1, 2, 3].map(p => `<div class="hy-phase-h"><b>Phase ${p} · ${HY_PHASE_INFO[p].name}</b><span>${HY_PHASE_INFO[p].weeks} — ${hyEsc(HY_PHASE_INFO[p].tip)}</span></div>
+      ${[1, 2, 3, 4].map(i => (p - 1) * 4 + i).map(n => `<button class="cm-pick" onclick="hySetBlockWeek(${n})">Week ${n} — ${HY_BLOCK[n].name}${week === n ? ' ✓' : ''}<small>${hyEsc(HY_BLOCK[n].tip)}</small></button>`).join('')}`).join('')}
+    <button class="cm-pick" onclick="hySetBlockWeek(0)">Turn the program off${week ? '' : ' ✓'}<small>Stays on Phase 1 exercises, same every week.</small></button>
     <button class="ghost-btn" style="margin-top:8px;" onclick="hySheetClose()">Close</button>`);
 }
 function hySubSheet(key) {
@@ -14987,7 +15310,7 @@ function hySharePayload(w, sess, sid, always) {
 }
 function hySummary(sid, extra) {
   const sess = hyState.sessions[sid]; if(!sess) return;
-  const w = hyWorkout(sess.workoutId), t = hyTotals(w, sess), x = extra || {};
+  const w = hyWorkout(sess.workoutId, sess), t = hyTotals(w, sess), x = extra || {};
   const stats = [];
   (w.sections || []).forEach(s => { const p = hySectionProgress(w, s, sess); stats.push([`${p.done}/${p.total}`, s.title.charAt(0) + s.title.slice(1).toLowerCase()]); });
   if(w.games) stats.push([`${hyGamesProgress(w, sess).done}/${w.games}`, 'Games']);
@@ -15035,7 +15358,7 @@ function hyRetiredLines(w, sess) {
     const done = st.sets.filter(s => s && s.done);
     if(!done.length && !st.done) return '';
     let known = null;
-    Object.keys(HY_WORKOUTS).some(wid => (HY_WORKOUTS[wid].sections || []).some(s => s.items.some(e => { if(e.id === id) known = e; return !!known; })));
+    [HY_WORKOUTS, HY_PHASES[2], HY_PHASES[3]].some(set => Object.keys(set).some(wid => (set[wid].sections || []).some(s => s.items.some(e => { if(e.id === id) known = e; return !!known; }))));
     const ex = known || { kind: done.some(s => s.w) ? 'strength' : 'bodyweight' };
     const name = known ? known.name : id.split('_').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join(' ');
     const text = done.length ? done.map(s => hyEsc(hySetText(ex, s))).join(' · ') : 'Done';
@@ -15120,7 +15443,7 @@ function hyDashHTML() {
   const rows = hyDaySlots(today).map(slot => {
     const wid = hySlotWorkoutId(today, slot);
     if(!wid) return '';
-    const w = hyWorkout(wid), sess = hyState.sessions[hySid(today, slot.key)];
+    const sess = hyState.sessions[hySid(today, slot.key)], w = hyWorkout(wid, sess);
     const state = sess ? (sess.status === 'completed' ? '✓ done' : sess.status === 'skipped' ? 'skipped' : `${hySessionProgress(w, sess).pct}%`) : '';
     return `<div class="dwc-ex">${hyEsc([slot.legacy ? '' : slot.time, w.name].filter(Boolean).join(' — '))}${state ? ` <span style="color:var(--pink);">· ${state}</span>` : ''}</div>`;
   }).join('');
@@ -15132,8 +15455,9 @@ function hyDashHTML() {
     const first = w0 && (w0.sections || []).map(sec => sec.items).flat().find(e => getExerciseImage(e.name));
     if(first) img = getExerciseImage(first.name) || '';
   } catch(e) {}
+  if(prog.cover) img = prog.cover;   // the program's own cover photo
   const week = (() => { try { return hyBlockWeek(); } catch(e) { return 0; } })();
-  return eHeroHTML({ img, chips: [`Today · ${HY_DAYS[today]}`, week ? `Week ${week} of 4` : ''].filter(Boolean),
+  return eHeroHTML({ img, chips: [`Today · ${HY_DAYS[today]}`, week ? `Week ${week}/12` : ''].filter(Boolean),
     eyebrow: hyEsc(prog.name), title: hyEsc(w0 ? (w0.short || w0.name) : HY_DAYS[today]),
     sub: '', extra: `<div class="dwc-exercises e-hero-rows">${rows}</div>${hyDashStartHTML(today)}<button onclick="event.stopPropagation();openCustomWorkout()" style="margin-top:10px;width:100%;padding:8px;border-radius:var(--radius);border:0.5px solid var(--border2);background:transparent;font-family:inherit;font-size:12px;color:var(--text3);cursor:pointer;">↔ Swap for custom workout</button>`,
     stats: w0 ? [[items || '—', 'exercises'], [hyDaySlots(today).length, hyDaySlots(today).length === 1 ? 'session' : 'sessions'], [w0.games ? w0.games : (w0.category === 'strength' ? 'Lift' : '—'), w0.games ? 'games' : 'type']] : null });
@@ -15719,7 +16043,7 @@ function cmLocalWorkouts() {
     Object.keys(sessions).forEach(sid => {
       const sess = sessions[sid];
       if(!sess || sess.status !== 'completed' || sess.restDay) return;
-      const w = hyWorkout(sess.workoutId); if(!w) return;
+      const w = hyWorkout(sess.workoutId, sess); if(!w) return;
       const payload = hySharePayload(w, sess, sid, true); if(!payload) return;
       try { const st = wtStatsFor('h:' + sid); if(st && st.share) payload.watch = wtStatsPayload('h:' + sid); } catch(e) {}
       out.push({ key: 'hy:' + sid, date: hyDoneDay(sess, sid), payload });
@@ -17038,7 +17362,7 @@ function wtHyCtxFor(sid) {
   if(!slot) return null;
   const sess = hyState.sessions[sid] || null;
   const workoutId = sess ? sess.workoutId : hySlotWorkoutId(dayIdx, slot);
-  const workout = workoutId ? hyWorkout(workoutId) : null;
+  const workout = workoutId ? hyWorkout(workoutId, sess) : null;
   if(!workout || !hyConfigured(workoutId)) return null;
   return { dayIdx, slot, sid, sess, workoutId, workout };
 }
@@ -18124,7 +18448,7 @@ function cmHybridWorkoutOptions() {
     Object.keys(sessions).forEach(sid => {
       const sess = sessions[sid];
       if(!sess || sess.status === 'skipped' || sess.restDay) return;
-      const w = hyWorkout(sess.workoutId);
+      const w = hyWorkout(sess.workoutId, sess);
       if(!w) return;
       const payload = hySharePayload(w, sess, sid);
       if(!payload) return;
