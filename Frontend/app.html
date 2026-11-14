@@ -13439,7 +13439,7 @@ const HY_WORKOUTS = {
         hyEx('back_squat', 'Back Squat', 'strength', 3, '4–5', { rest: 180, restText: '2–4 min', lighterSets: 2 }),
         hyEx('romanian_deadlift', 'Romanian Deadlift', 'strength', 3, '5–6', { rest: 150, restText: '2–3 min' }),
         hyEx('bulgarian_split_squat', 'Bulgarian Split Squat', 'strength', 2, '6 per leg', { rest: 105, restText: '90–120 sec', lighterOmit: true }),
-        hyEx('nordic_hamstring_curl', 'Nordic Hamstring Curl', 'bodyweight', 2, '3–5', { rest: 120, restText: '2 min', lighterOmit: true, alts: ['Hamstring Curl', 'Glute-Ham Raise'], cue: 'Lower yourself as slowly as you can control; use a band for help. Done on Tuesday so any soreness is gone by Sunday.' }),
+        hyEx('nordic_hamstring_curl', 'Nordic Hamstring Curl', 'bodyweight', 2, '3–5', { rest: 120, restText: '2 min', lighterOmit: true, alts: ['Leg Curl', 'Seated Leg Curl', 'Glute-Ham Raise'], cue: 'Lower yourself as slowly as you can control; use a band for help. Done on Tuesday so any soreness is gone by Sunday.' }),
         hyEx('standing_calf_raise', 'Standing Calf Raise', 'strength', 2, '10–12', { rest: 60, restText: '60 sec', acc: true }),
         hyEx('hanging_knee_raise', 'Hanging Knee Raise', 'bodyweight', 3, '8–12', { rest: 60, restText: '60 sec', acc: true })
       ] },
@@ -13727,7 +13727,7 @@ const HY_PHASES = {
           hyEx('contrast_box_jump', 'Contrast Box Jump', 'plyo', 4, '3', { rest: 180, restText: '2–3 min before the next squat set', impact: true, lighterSets: 3, alt: 'Squat Jump (bodyweight)', cue: 'Maximum height, soft landing, step down. Paired with each squat set.' }),
           hyEx('romanian_deadlift', 'Romanian Deadlift', 'strength', 3, '5', { rest: 150, restText: '2–3 min' }),
           hyEx('split_squat_jump', 'Split-Squat Jump', 'plyo', 3, '3 per leg', { rest: 90, restText: '90 sec', impact: true, lighterOmit: true, alt: 'Rear-Foot-Elevated Split Squat', cue: 'Switch legs in the air, land balanced. Kick and knee power.' }),
-          hyEx('nordic_hamstring_curl', 'Nordic Hamstring Curl', 'bodyweight', 2, '4–6', { rest: 120, restText: '2 min', lighterOmit: true, alts: ['Hamstring Curl', 'Glute-Ham Raise'] }),
+          hyEx('nordic_hamstring_curl', 'Nordic Hamstring Curl', 'bodyweight', 2, '4–6', { rest: 120, restText: '2 min', lighterOmit: true, alts: ['Leg Curl', 'Seated Leg Curl', 'Glute-Ham Raise'] }),
           hyEx('single_leg_calf_raise', 'Single-Leg Calf Raise', 'strength', 2, '10 per leg', { rest: 60, restText: '60 sec', acc: true }),
           hyEx('hanging_knee_raise', 'Hanging Knee Raise', 'bodyweight', 3, '10–12', { rest: 60, restText: '60 sec', acc: true })
         ] },
@@ -13854,7 +13854,7 @@ const HY_PHASES = {
           hyEx('depth_jump', 'Depth Jump', 'plyo', 4, '3', { rest: 120, restText: '2 min', impact: true, lighterSets: 3, alt: 'Box Jump', cue: 'Short ground contact — the floor is hot.' }),
           hyEx('single_leg_box_jump', 'Single-Leg Box Jump', 'plyo', 3, '3 per leg', { rest: 90, restText: '90 sec', impact: true, lighterOmit: true, alt: 'Single-Leg Step-Up', cue: 'Explosive one-leg drive — knee strikes and push-offs.' }),
           hyEx('single_leg_rdl', 'Single-Leg Romanian Deadlift', 'strength', 3, '6 per leg', { rest: 90, restText: '90 sec' }),
-          hyEx('nordic_hamstring_curl', 'Nordic Hamstring Curl', 'bodyweight', 2, '4', { rest: 120, restText: '2 min', lighterOmit: true, alts: ['Hamstring Curl', 'Glute-Ham Raise'], cue: 'Keeps the hamstrings safe at top speed.' }),
+          hyEx('nordic_hamstring_curl', 'Nordic Hamstring Curl', 'bodyweight', 2, '4', { rest: 120, restText: '2 min', lighterOmit: true, alts: ['Leg Curl', 'Seated Leg Curl', 'Glute-Ham Raise'], cue: 'Keeps the hamstrings safe at top speed.' }),
           hyEx('hanging_knee_raise', 'Hanging Knee Raise', 'bodyweight', 2, '10–12', { rest: 60, restText: '60 sec', acc: true })
         ] },
         { key: 'cooldown', title: 'OPTIONAL COOLDOWN', checkable: true, optional: true, items: [
@@ -14083,6 +14083,25 @@ function hyWorkout(id, ref) {
   if(!w) return null;
   const ph = hyPhase(hyWeekOfRef(ref)), o = HY_PHASES[ph] && HY_PHASES[ph][id];
   if(o) w = Object.assign({}, w, o, { phase: ph });
+  // A bodyweight exercise swapped for a loaded one (e.g. Nordic curl → Leg Curl) logs weight and reps
+  try {
+    const subs = hyState.subs && hyState.subs[id];
+    if(subs && w.sections) {
+      let changed = false;
+      const sections = w.sections.map(sec => {
+        const items = sec.items.map(ex => {
+          const sub = subs[sec.key + '.' + ex.id];
+          if(sub && ex.kind === 'bodyweight' && !isBodyweight(sub) && !/nordic|glute[- ]?ham|plank|hold|push[- ]?up|pull[- ]?up|chin[- ]?up|dip/i.test(sub)) {
+            changed = true;
+            return Object.assign({}, ex, { kind: 'strength' });
+          }
+          return ex;
+        });
+        return items === sec.items ? sec : Object.assign({}, sec, { items });
+      });
+      if(changed) w = Object.assign({}, w, { sections });
+    }
+  } catch(e) {}
   if(!w.placeholder) return w;
   const c = hyState.custom[id] || { primer: [], main: [] };
   const sections = [];
