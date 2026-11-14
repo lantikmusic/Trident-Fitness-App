@@ -3230,6 +3230,12 @@ body.ef-on .rest-mini{display:none !important;}
 #prPanel #prProgressList{background:none !important;border:none !important;border-radius:0 !important;}
 #prPanel .e-pr{background:none !important;border:none !important;border-top:0.5px solid rgba(255,255,255,0.08) !important;box-shadow:none !important;-webkit-backdrop-filter:none !important;backdrop-filter:none !important;border-radius:0 !important;padding:13px 0 !important;}
 #prPanel .e-pr:first-child{border-top:none !important;}
+.ef-tool.on{background:#fff;color:#000;border-color:transparent;}
+.ef-desc{cursor:default;animation:efInfoIn .22s ease;}
+@keyframes efInfoIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:none;}}
+.ef-stat.cal:not(.on) .ef-stat-val b{color:#6B6F76;}
+.ef-body .ef-tools{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:6px;}
+.ef-body .ef-tool{justify-content:center;gap:5px;height:40px;padding:0 6px;font-size:13px;white-space:nowrap;min-width:0;}
 /* ── Cancel workout ── */
 .ef-cancel{display:block;margin:6px auto 0;background:none;border:none;color:#FF6B6B;font:600 14px var(--tf-font);padding:12px 18px;}
 .wo-change-prog-btn.wo-cancel-btn,.hy-adjust .hy-cancel{color:#FF6B6B !important;}
@@ -9744,11 +9750,12 @@ function efRender() {
         ${noFields ? '' : `<span class="ef-badge">SET ${Math.min(doneN, total)}/${total}</span>`}
       </div>
       <div class="ef-tools">
-        <button class="ef-tool video" onclick="efVideo()"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>Watch video</button>
+        <button class="ef-tool video" onclick="efVideo()"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>Video</button>
         ${efCanProgress(it) ? `<button class="ef-tool" onclick="efProgress()"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Progress</button>` : ''}
         ${efCanSwap(it) ? `<button class="ef-tool" onclick="efSwap()"><span class="ef-tool-sym" aria-hidden="true">⇄</span>Swap</button>` : ''}
+        ${efDescHTML(it) ? `<button class="ef-tool${EF.info ? ' on' : ''}" onclick="efToggleInfo()" aria-expanded="${!!EF.info}"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5v.5"/></svg>Info</button>` : ''}
       </div>
-      ${efDescHTML(it)}
+      ${EF.info ? efDescHTML(it) : ''}
       ${efStatsHTML(M)}
       <section class="ef-panel">
         ${panel}
@@ -9875,12 +9882,11 @@ function efLive() {
 }
 function efStatsData(M) {
   const live = efLive(), body = efBody();
-  const mins = Math.max(0, (Date.now() - efStarted()) / 60000);
-  const est = Math.round(5 * 3.5 * (body.lbs / 2.2046) / 200 * mins);   // strength training ≈ 5 METs
   const vol = efVolume(M);
   const eq = EF_EQUIV.find(e => vol >= e[0]);
   const zone = live.hr ? EF_ZONES.find(z => live.hr / (220 - body.age) >= z[0]) : null;
-  return { live, cal: live.cal || est, calEst: !live.cal, vol, eq: vol ? `≈ ${eq[1]}` : 'Log a set', zone };
+  // Calories are only ever the watch's own total for this workout (no estimates)
+  return { live, cal: live.watch ? live.cal : null, calEst: !live.watch, vol, eq: vol ? `≈ ${eq[1]}` : 'Log a set', zone };
 }
 function efSparkPts() {
   const t = EFS.trace; if(t.length < 2) return '';
@@ -9899,8 +9905,8 @@ function efStatsHTML(M) {
     </div>
     <div class="ef-stat cal">
       <div class="ef-stat-lbl"><span class="ef-flame"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M12 2c.6 3.2-1.2 5-2.7 6.6C7.8 10.2 6.5 11.8 6.5 14.6 6.5 18.1 9 21 12 21s5.5-2.6 5.5-6.2c0-2.2-1-3.9-2-5.1-.3 1.4-1 2.4-2.1 2.9.4-3.6-.4-7.6-1.4-10.6z"/></svg></span>Calories</div>
-      <div class="ef-stat-val"><b id="efCal">${d.cal}</b><small>kcal</small></div>
-      <div class="ef-stat-foot" id="efCalFoot">${d.calEst ? 'Estimated' : 'From your watch'}</div>
+      <div class="ef-stat-val"><b id="efCal">${d.cal === null ? '--' : d.cal}</b><small>kcal</small></div>
+      <div class="ef-stat-foot" id="efCalFoot">${d.calEst ? 'Wear your watch' : 'From your watch'}</div>
     </div>
     <div class="ef-stat vol">
       <div class="ef-stat-lbl"><span class="ef-db"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg></span>Volume</div>
@@ -9922,7 +9928,8 @@ function efStatsTick() {
   box.querySelector('.hr').classList.toggle('on', !!d.live.hr);
   const heart = document.getElementById('efHeart'); if(heart && d.live.hr) heart.style.setProperty('--beat', (60 / d.live.hr).toFixed(2) + 's');
   const sp = document.getElementById('efSpark'); if(sp) sp.setAttribute('points', efSparkPts());
-  set('efCal', d.cal); set('efCalFoot', d.calEst ? 'Estimated' : 'From your watch');
+  set('efCal', d.cal === null ? '--' : d.cal); set('efCalFoot', d.calEst ? 'Wear your watch' : 'From your watch');
+  box.querySelector('.cal').classList.toggle('on', !d.calEst);
   set('efVol', efFmtBig(d.vol)); set('efVolFoot', d.eq);
   // A new set adds to the volume: the tile pops and shows how much it added.
   if(EFS.vol !== null && d.vol > EFS.vol) {
@@ -10213,11 +10220,13 @@ function efCoachNote(it) {
   if(!EF.id || !EF.id.startsWith('h:')) return '';
   try { const c = wtHyCtxFor(EF.id.slice(2)), f = c && c.workout && hyFind(c.workout, it.key); return (f && f.ex && f.ex.cue) || ''; } catch(e) { return ''; }
 }
+// Info button: shows or hides the description (stays open while you move between exercises)
+function efToggleInfo() { EF.info = !EF.info; efRender(); }
 function efDescHTML(it) {
   const how = exInfoFor(it.name), note = efCoachNote(it);
   if(!how && !note) return '';
-  return `<div class="ef-desc" onclick="this.classList.toggle('open')" role="button" aria-label="Show the full description">
-      ${how ? `<div class="ef-desc-lbl">How to do it</div><div class="ef-desc-body"><p class="ef-desc-txt">${efEsc(how)}</p>${how.length > 150 ? '<span class="ef-desc-more">More</span>' : ''}</div>` : ''}
+  return `<div class="ef-desc open">
+      ${how ? `<div class="ef-desc-lbl">How to do it</div><div class="ef-desc-body"><p class="ef-desc-txt">${efEsc(how)}</p></div>` : ''}
       ${note ? `<div class="ef-desc-note"><b>Coach's note</b> ${efEsc(note)}</div>` : ''}
     </div>`;
 }
