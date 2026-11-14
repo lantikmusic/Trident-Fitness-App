@@ -8059,6 +8059,7 @@ function restartWorkoutDay() {
   const key = getLogKey();
   delete workoutState.logs[key];
   try { const all = wtStatsAll(); if(all['c:' + key]) { delete all['c:' + key]; save(WT_STATS_KEY, all); } } catch(e) {}
+  laResetStart('c:' + key);
   save(WORKOUT_KEY, workoutState);
   if(isLoggedIn()) cloudPost('/workout', { program: workoutState.program, state: workoutCloudState() });
   setTimeout(() => { try { cmWoSync(true); } catch(e) {} }, 1500);
@@ -14564,6 +14565,7 @@ function hyRestart() {
   }
   delete hyState.sessions[c.sid];
   try { const all = wtStatsAll(); if(all['h:' + c.sid]) { delete all['h:' + c.sid]; save(WT_STATS_KEY, all); } } catch(e) {}
+  laResetStart('h:' + c.sid);
   hyView.exOpen = null;
   hySave(true); hyRender();
   setTimeout(() => { try { cmWoSync(true); } catch(e) {} }, 1500);
@@ -17512,6 +17514,17 @@ function laSoon() {
   if(!wtNative()) return;
   clearTimeout(LA.timer);
   LA.timer = setTimeout(laPush, 400);
+}
+// Restart workout: the elapsed clock (and the Lock Screen timer) start again from now.
+function laResetStart(id) {
+  try {
+    delete LA.started[id];
+    const all = load(LA_KEY) || {};
+    if(all[id]) { delete all[id]; save(LA_KEY, all); }
+    LA.last = '';
+    if(typeof efTick === 'function') efTick();
+    if(typeof laPush === 'function') laPush();
+  } catch(e) {}
 }
 function laStarted(id) {
   if(LA.started[id] && Date.now() - LA.started[id] < 8 * 3600e3) return LA.started[id];
