@@ -3157,6 +3157,14 @@ body.ef-on .rest-mini{display:none !important;}
 .ef-po.up{border-color:var(--pink-border);background:var(--pink-dim);}
 .ef-po.up b{color:var(--pink);}
 .ef-po.down b{color:#FF9F0A;}
+/* ── Community feed, Instagram style: posts run edge to edge (no card), photos fill the width, caption under the photo ── */
+#page-community .cm-post{margin:0 -16px 4px !important;padding:12px 0 14px !important;border-radius:0 !important;background:none !important;border:none !important;border-bottom:0.5px solid rgba(255,255,255,0.08) !important;box-shadow:none !important;-webkit-backdrop-filter:none !important;backdrop-filter:none !important;overflow:visible;}
+#page-community .cm-post .cm-pad{padding-left:14px;padding-right:14px;}
+#page-community .cm-post .cm-head{margin-bottom:10px;}
+#page-community .cm-post .cm-media{border-radius:0;border:none;margin:0;}
+#page-community .cm-post.has-media .cm-actions{margin-top:6px;margin-bottom:2px;}
+#page-community .cm-post .cm-body.cm-caption{font-size:14.5px;line-height:1.45;margin:2px 0 6px;}
+#page-community .cmp-postview .cm-post{border-bottom:none !important;}
 /* ── Exercise page tools + Reels-style video ── */
 .ef-tools{display:flex;gap:8px;margin:2px 0 14px;flex-wrap:wrap;}
 .ef-tool{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 14px;border-radius:19px;border:0.5px solid rgba(255,255,255,0.14);background:linear-gradient(160deg,rgba(255,255,255,0.12),rgba(255,255,255,0.05));color:#fff;font:700 13.5px var(--tf-font);box-shadow:inset 0 1px 0 rgba(255,255,255,0.14);}
@@ -16255,8 +16263,10 @@ function cmPostHTML(p) {
   const bodyText = String(p.body || '');
   const long = bodyText.length > 160 || (bodyText.match(/\n/g) || []).length > 2;
   const big = !photo && !attach && bodyText.length > 0 && bodyText.length <= 140;
+  // Photo posts: the caption sits under the photo, led by the poster's name (like Instagram)
+  const capName = photo ? `<button class="cm-cap-name" onclick="event.stopPropagation();cmOpenProfile('${uid}')">${handle || name}</button> ` : '';
   const body = bodyText
-    ? `<div class="cm-body${big ? ' big' : ''}${long ? ' clamp' : ''}">${cmBodyHTML(p)}${long ? `<button class="cm-more" onclick="cmMore(this)">more</button>` : ''}</div>`
+    ? `<div class="cm-body${big ? ' big' : ''}${photo ? ' cm-caption' : ''}${long ? ' clamp' : ''}">${capName}${cmBodyHTML(p)}${long ? `<button class="cm-more" onclick="cmMore(this)">more</button>` : ''}</div>`
     : '';
   const nC = cmNum(p.comment_count);
   const viewC = (!cmState.open[id] && nC) ? `<button class="cm-viewc" onclick="cmToggleComments('${id}')">${nC === 1 ? 'View 1 comment' : `View all ${nC} comments`}</button>` : '';
@@ -16277,7 +16287,7 @@ ${`    <div class="cm-pad cm-head">
       ${p.mine ? `<button class="cm-del" onclick="cmDeletePost('${id}')" aria-label="Delete post">${CM_TRASH}</button>` : (p.following ? '' : `<button class="cm-follow" onclick="cmToggleFollow('${uid}')">Follow</button>`)}
     </div>`}
     ${photo
-      ? `${body ? `<div class="cm-pad">${body}</div>` : ''}${cmMediaHTML(id, name, ov ? cmOvCardHTML(p.type, p.payload, ov) : '')}<div class="cm-pad">${actions}${attach}${viewC}</div>`
+      ? `${cmMediaHTML(id, name, ov ? cmOvCardHTML(p.type, p.payload, ov) : '')}<div class="cm-pad">${actions}${body}${attach}${viewC}</div>`
       : `<div class="cm-pad">${body}${attach}${actions}${viewC}</div>`}
     ${cmState.open[id] ? `<div class="cm-pad">${cmCommentsHTML(id)}</div>` : ''}
   </article>`;
