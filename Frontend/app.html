@@ -8155,7 +8155,7 @@ function beginWorkout() {
   showWorkoutScreen('active');
   renderActiveWorkout();
   try { if(!hyActive() && wtClassicParse(getLogKey())) setTimeout(() => efOpen('c:' + getLogKey()), 30); } catch(e) {}
-  try { if(!hyActive() && wtClassicParse(getLogKey())) wtStartWatch('c:' + getLogKey()); } catch(e) {}
+  try { if(!hyActive() && wtClassicParse(getLogKey())) { laMarkStart('c:' + getLogKey()); wtStartWatch('c:' + getLogKey()); } } catch(e) {}
   // Scroll to top of workout content
   setTimeout(() => {
     document.getElementById('activeWorkout')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -9704,7 +9704,8 @@ function efClose() {
   try { if(hyActive()) hyRender(); else if(_workoutScreen === 'active') renderActiveWorkout(); } catch(e) {}
 }
 function efStarted() {
-  try { return laStarted(EF.id); } catch(e) { return Date.now(); }
+  // Not started yet: the clock shows 00:00 until Start workout or the first set.
+  try { return laStarted(EF.id) || Date.now(); } catch(e) { return Date.now(); }
 }
 function efFmtClock(ms) {
   const s = Math.max(0, Math.floor(ms / 1000));
@@ -14841,7 +14842,6 @@ function hyEnsureSession() {
   };
   if(c.workout && c.workout.games) for(let i = 0; i < c.workout.games; i++) sess.games.push({ done: false, duration: '', rpe: null, result: '', notes: '' });
   hyState.sessions[c.sid] = sess;
-  try { wtStartWatch('h:' + c.sid); } catch(e) {}
   return sess;
 }
 // Impact work (sprints, jumps, bounds, cutting) is locked while return-to-impact is restricted,
@@ -15436,7 +15436,7 @@ function hySessionHTML() {
         </div>
       </div>`;
     })()}
-    ${!needsSetup && !c.future && !done && !skipped && w.category !== 'sport' ? `<button class="pink-btn ef-start" onclick="hyEnsureSession();hySave();efOpen('h:${c.sid}')">${tfIc('dumbbell', 18)}${hyHasData(sess) ? 'Continue workout' : 'Start workout'}</button>` : ''}
+    ${!needsSetup && !c.future && !done && !skipped && w.category !== 'sport' ? `<button class="pink-btn ef-start" onclick="hyEnsureSession();hySave();laMarkStart('h:${c.sid}');wtStartWatch('h:${c.sid}');efOpen('h:${c.sid}')">${tfIc('dumbbell', 18)}${hyHasData(sess) ? 'Continue workout' : 'Start workout'}</button>` : ''}
     ${banners.join('')}
     ${training && !needsSetup ? hyCheckHTML(c) : ''}
     ${middle}
@@ -18125,23 +18125,47 @@ function laResetStart(id) {
     if(typeof wtSoon === 'function') wtSoon();   // the watch gets the cleared sets and the new start time
   } catch(e) {}
 }
-function laStarted(id) {
+// Whether this workout has anything logged yet (a set, a checked item…).
+function laHasData(id) {
+  try {
+    if(String(id).startsWith('h:')) return hyHasData(hyState.sessions[id.slice(2)]);
+    const log = (workoutState.logs || {})[String(id).slice(2)] || {};
+    return Object.keys(log).some(k => (log[k] || []).some(x => x && (x.weight || x.reps)));
+  } catch(e) { return false; }
+}
+// The workout's start time. The clock starts when the workout is really started: Start workout,
+// a start on the watch, or the first logged set. Opening or browsing an exercise doesn't start it,
+// so until then this returns 0 (pass peek to only read, never start).
+function laStarted(id, peek) {
+  if(!id) return 0;
   if(LA.started[id] && Date.now() - LA.started[id] < 8 * 3600e3) return LA.started[id];
   let all = load(LA_KEY) || {};
   // A start time from more than 8 hours ago (a session opened the night before) starts fresh.
-  if(all[id] && Date.now() - all[id] > 8 * 3600e3) delete all[id];
+  if(all[id] && Date.now() - all[id] > 8 * 3600e3) { delete all[id]; save(LA_KEY, all); }
   if(!all[id]) {
-    let t = Date.now();
-    try { if(id.startsWith('h:')) { const sess = hyState.sessions[id.slice(2)]; if(sess && sess.startedAt && Date.now() - sess.startedAt < 8 * 3600e3) t = sess.startedAt; } } catch(e) {}
-    all = { [id]: t };                     // only the current workout is kept
+    if(peek || !laHasData(id)) return 0;
+    all = { [id]: Date.now() };          // first logged set: the workout starts now (only the current workout is kept)
     save(LA_KEY, all);
+    LA.started[id] = all[id];
+    try { wtStartWatch(id); } catch(e) {}
   }
   return (LA.started[id] = all[id]);
+}
+// Start workout pressed (or started on the watch): the clock starts now, unless it already runs.
+function laMarkStart(id) {
+  if(!id || laStarted(id, true)) return;
+  save(LA_KEY, { [id]: Date.now() });
+  LA.started[id] = Date.now();
+  LA.last = '';
+  try { if(typeof efTick === 'function') efTick(); } catch(e) {}
+  try { laPush(); } catch(e) {}
 }
 function laState() {
   const snap = wtSnapshot(), a = snap.active;   // (also picks up a LANTIK session already in progress)
   if(!WT.activeId) return null;
   if(!a || !Array.isArray(a.items) || !a.items.length) return null;
+  const started = laStarted(a.id);
+  if(!started) return null;               // not started yet: nothing on the Lock Screen
   const items = a.items, cur = Math.max(0, Math.min(a.cur || 0, items.length - 1)), it = items[cur];
   const finishedItem = x => ['done', 'skipped', 'omitted'].includes(x.status);
   const done = items.filter(finishedItem).length;
@@ -18157,7 +18181,7 @@ function laState() {
   }
   const r = snap.rest;
   return {
-    id: a.id, title: String(a.title || 'Workout').slice(0, 60), started: laStarted(a.id),
+    id: a.id, title: String(a.title || 'Workout').slice(0, 60), started,
     exercise: String(it.name || '').slice(0, 80), detail: detail.slice(0, 100), next: String(next).slice(0, 80),
     setsDone, setsTotal, done, total: items.length,
     restEnd: r && !r.paused ? (r.endsAt || 0) : 0, restLeft: r ? Math.max(0, Math.round(r.paused ? r.remaining : (r.endsAt - Date.now()) / 1000)) : 0,
@@ -18293,6 +18317,7 @@ function wtApply(a) {
   if(!id) return;
   if(a.t === 'discard') return wtDiscard(id);
   if(a.t === 'start' || !WT.activeId) WT.activeId = id;
+  if(a.t === 'start') { try { laMarkStart(id); } catch(e) {} }
   WT.applying = true;
   try {
     if(lantik) wtApplyHy(a, id.slice(2));
