@@ -3165,6 +3165,33 @@ body.ef-on .rest-mini{display:none !important;}
 #page-community .cm-post.has-media .cm-actions{margin-top:6px;margin-bottom:2px;}
 #page-community .cm-post .cm-body.cm-caption{font-size:14.5px;line-height:1.45;margin:2px 0 6px;}
 #page-community .cmp-postview .cm-post{border-bottom:none !important;}
+/* ── Live workout stats (exercise page) ── */
+.ef-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 4px;}
+.ef-stat{position:relative;overflow:hidden;border-radius:18px;padding:10px 11px 9px;min-height:92px;display:flex;flex-direction:column;gap:3px;
+  background:linear-gradient(160deg,rgba(255,255,255,0.10),rgba(255,255,255,0.035));border:0.5px solid rgba(255,255,255,0.13);box-shadow:inset 0 1px 0 rgba(255,255,255,0.12);}
+.ef-stat::after{content:'';position:absolute;inset:auto -30% -60% auto;width:90%;height:90%;border-radius:50%;filter:blur(22px);opacity:.28;pointer-events:none;}
+.ef-stat.hr::after{background:#FF375F;}.ef-stat.cal::after{background:#FF9F0A;}.ef-stat.vol::after{background:var(--pink);}
+.ef-stat-lbl{display:flex;align-items:center;gap:5px;font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#9BA0A8;}
+.ef-stat-val{display:flex;align-items:baseline;gap:3px;position:relative;}
+.ef-stat-val b{font-size:25px;font-weight:800;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;line-height:1.1;}
+.ef-stat-val small{font-size:11px;font-weight:700;color:#9BA0A8;}
+.ef-stat-foot{font-size:11px;font-weight:600;color:#C9CDD3;display:flex;align-items:center;gap:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative;z-index:1;}
+.ef-stat-foot i{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.ef-heart{color:#FF375F;display:inline-flex;}
+.ef-stat.hr.on .ef-heart{animation:efBeat var(--beat,1s) ease-in-out infinite;}
+@keyframes efBeat{0%,100%{transform:scale(1);}15%{transform:scale(1.28);}30%{transform:scale(.95);}45%{transform:scale(1.12);}}
+.ef-stat.hr:not(.on) .ef-stat-val b{color:#6B6F76;}
+.ef-spark{position:absolute;left:0;right:0;bottom:0;width:100%;height:30px;opacity:.55;}
+.ef-spark polyline{fill:none;stroke:#FF375F;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke;}
+.ef-flame{color:#FF9F0A;display:inline-flex;animation:efFlick 1.6s ease-in-out infinite;transform-origin:50% 90%;}
+@keyframes efFlick{0%,100%{transform:scale(1) rotate(0);}50%{transform:scale(1.08,1.14) rotate(-3deg);}}
+.ef-db{color:var(--pink);display:inline-flex;}
+.ef-stat.vol.bump{animation:efBump .5s cubic-bezier(.3,1.6,.5,1);}
+@keyframes efBump{0%{transform:scale(1);}40%{transform:scale(1.06);box-shadow:0 0 22px var(--pink-glow);}100%{transform:scale(1);}}
+.ef-vol-plus{position:absolute;right:0;top:-2px;font-style:normal;font-size:11px;font-weight:800;color:var(--pink);opacity:0;pointer-events:none;}
+.ef-vol-plus.go{animation:efPlus 1.4s ease-out;}
+@keyframes efPlus{0%{opacity:0;transform:translateY(6px);}15%{opacity:1;transform:none;}75%{opacity:1;}100%{opacity:0;transform:translateY(-10px);}}
+@media (prefers-reduced-motion: reduce){.ef-stat.hr.on .ef-heart,.ef-flame,.ef-stat.vol.bump,.ef-vol-plus.go{animation:none;}.ef-vol-plus.go{opacity:1;}}
 /* ── Exercise page tools + Reels-style video ── */
 .ef-tools{display:flex;gap:8px;margin:2px 0 14px;flex-wrap:wrap;}
 .ef-tool{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 14px;border-radius:19px;border:0.5px solid rgba(255,255,255,0.14);background:linear-gradient(160deg,rgba(255,255,255,0.12),rgba(255,255,255,0.05));color:#fff;font:700 13.5px var(--tf-font);box-shadow:inset 0 1px 0 rgba(255,255,255,0.14);}
@@ -9754,6 +9781,7 @@ function efRender() {
         ${efCanProgress(it) ? `<button class="ef-tool" onclick="efProgress()"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Progress</button>` : ''}
         ${efCanSwap(it) ? `<button class="ef-tool" onclick="efSwap()"><span class="ef-tool-sym" aria-hidden="true">⇄</span>Swap</button>` : ''}
       </div>
+      ${efStatsHTML(M)}
       <section class="ef-panel">
         ${panel}
         ${rows ? `<div class="ef-sets">${rows}</div>` : ''}
@@ -9853,9 +9881,93 @@ function reelMute(b) {
     : '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>';
 }
 
+// ── Live workout stats on the exercise page: heart rate, calories, volume ──
+// Heart rate and calories come live from the Apple Watch workout (every few seconds). Without the watch,
+// calories are estimated from time and body weight, and the heart tile asks for the watch.
+var EFS = { id: null, vol: null, trace: [], liveAt: 0, infoAt: 0 };
+const EF_EQUIV = [[300000, 'a blue whale'], [40000, 'a semi truck'], [25000, 'a school bus'], [12000, 'an elephant'], [6000, 'a hippo'],
+  [2500, 'a small car'], [900, 'a grand piano'], [400, 'a vending machine'], [1, 'a warm-up']];
+const EF_ZONES = [[0.9, 5, 'Max', '#FF375F'], [0.8, 4, 'Hard', '#FF9F0A'], [0.7, 3, 'Cardio', 'var(--pink)'], [0.6, 2, 'Fat burn', '#30D158'], [0, 1, 'Easy', '#9BA0A8']];
+function efVolume(M) {
+  let v = 0;
+  (M && M.items || []).forEach(it => {
+    if(!it.f1 || !it.f2 || !/rep/i.test(it.f2.label || '')) return;
+    if(!/weight|lb|kg/i.test(`${it.f1.label || ''} ${it.f1.unit || ''}`)) return;
+    (it.sets || []).forEach(x => { if(x && x.done) { const w = parseFloat(x.w), r = parseFloat(x.r); if(w > 0 && r > 0) v += w * r; } });
+  });
+  return Math.round(v);
+}
+function efFmtBig(n) { return n >= 10000 ? (n / 1000).toFixed(n >= 100000 ? 0 : 1).replace(/\.0$/, '') + 'k' : n.toLocaleString(); }
+function efBody() { const g = load(GOALS_KEY) || {}; return { lbs: parseFloat(g.currentWeight) || 170, age: parseInt(g.age || (appSettings && appSettings.age), 10) || 30 }; }
+function efLive() {
+  const i = (typeof WT !== 'undefined' && WT.info) || {};
+  const fresh = !!(i.running && i.liveAt && Date.now() - i.liveAt < 20000);
+  return { hr: fresh && i.hr > 0 ? Math.round(i.hr) : 0, cal: fresh && i.cal > 0 ? Math.round(i.cal) : 0, watch: fresh, liveAt: i.liveAt || 0 };
+}
+function efStatsData(M) {
+  const live = efLive(), body = efBody();
+  const mins = Math.max(0, (Date.now() - efStarted()) / 60000);
+  const est = Math.round(5 * 3.5 * (body.lbs / 2.2046) / 200 * mins);   // strength training ≈ 5 METs
+  const vol = efVolume(M);
+  const eq = EF_EQUIV.find(e => vol >= e[0]);
+  const zone = live.hr ? EF_ZONES.find(z => live.hr / (220 - body.age) >= z[0]) : null;
+  return { live, cal: live.cal || est, calEst: !live.cal, vol, eq: vol ? `≈ ${eq[1]}` : 'Log a set', zone };
+}
+function efSparkPts() {
+  const t = EFS.trace; if(t.length < 2) return '';
+  const lo = Math.min(...t) - 4, hi = Math.max(...t) + 4;
+  return t.map((v, i) => `${(i / (t.length - 1) * 100).toFixed(1)},${(22 - (v - lo) / (hi - lo) * 20).toFixed(1)}`).join(' ');
+}
+function efStatsHTML(M) {
+  if(EFS.id !== EF.id) { EFS.id = EF.id; EFS.vol = null; EFS.trace = []; }
+  const d = efStatsData(M);
+  return `<div class="ef-stats" aria-label="Workout stats">
+    <div class="ef-stat hr${d.live.hr ? ' on' : ''}">
+      <div class="ef-stat-lbl"><span class="ef-heart" id="efHeart" style="--beat:${d.live.hr ? (60 / d.live.hr).toFixed(2) : 1}s"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M12 21s-7.5-4.6-10-9.3C.4 8.4 2.3 4.5 6 4.1c2.1-.2 3.9.9 6 3 2.1-2.1 3.9-3.2 6-3 3.7.4 5.6 4.3 4 7.6C19.5 16.4 12 21 12 21z"/></svg></span>Heart</div>
+      <div class="ef-stat-val"><b id="efHr">${d.live.hr || '--'}</b><small>bpm</small></div>
+      <div class="ef-stat-foot" id="efHrFoot">${d.zone ? `<i style="background:${d.zone[3]}"></i>Z${d.zone[1]} · ${d.zone[2]}` : 'Wear your watch'}</div>
+      <svg class="ef-spark" viewBox="0 0 100 24" preserveAspectRatio="none" aria-hidden="true"><polyline id="efSpark" points="${efSparkPts()}"/></svg>
+    </div>
+    <div class="ef-stat cal">
+      <div class="ef-stat-lbl"><span class="ef-flame"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M12 2c.6 3.2-1.2 5-2.7 6.6C7.8 10.2 6.5 11.8 6.5 14.6 6.5 18.1 9 21 12 21s5.5-2.6 5.5-6.2c0-2.2-1-3.9-2-5.1-.3 1.4-1 2.4-2.1 2.9.4-3.6-.4-7.6-1.4-10.6z"/></svg></span>Calories</div>
+      <div class="ef-stat-val"><b id="efCal">${d.cal}</b><small>kcal</small></div>
+      <div class="ef-stat-foot" id="efCalFoot">${d.calEst ? 'Estimated' : 'From your watch'}</div>
+    </div>
+    <div class="ef-stat vol">
+      <div class="ef-stat-lbl"><span class="ef-db"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg></span>Volume</div>
+      <div class="ef-stat-val"><b id="efVol">${efFmtBig(d.vol)}</b><small>lb</small><em class="ef-vol-plus" id="efVolPlus"></em></div>
+      <div class="ef-stat-foot" id="efVolFoot">${d.eq}</div>
+    </div>
+  </div>`;
+}
+function efStatsTick() {
+  const box = document.querySelector('.ef-stats'); if(!box) return;
+  const M = efModel(); if(!M) return;
+  // Ask the phone's watch link for fresh numbers every 3 seconds.
+  if(Date.now() - EFS.infoAt > 3000 && typeof wtRefreshInfo === 'function') { EFS.infoAt = Date.now(); wtRefreshInfo().catch(() => {}); }
+  const d = efStatsData(M);
+  if(d.live.hr && d.live.liveAt !== EFS.liveAt) { EFS.liveAt = d.live.liveAt; EFS.trace.push(d.live.hr); if(EFS.trace.length > 30) EFS.trace.shift(); }
+  const set = (id, v) => { const e = document.getElementById(id); if(e && e.innerHTML !== String(v)) e.innerHTML = v; };
+  set('efHr', d.live.hr || '--');
+  set('efHrFoot', d.zone ? `<i style="background:${d.zone[3]}"></i>Z${d.zone[1]} · ${d.zone[2]}` : 'Wear your watch');
+  box.querySelector('.hr').classList.toggle('on', !!d.live.hr);
+  const heart = document.getElementById('efHeart'); if(heart && d.live.hr) heart.style.setProperty('--beat', (60 / d.live.hr).toFixed(2) + 's');
+  const sp = document.getElementById('efSpark'); if(sp) sp.setAttribute('points', efSparkPts());
+  set('efCal', d.cal); set('efCalFoot', d.calEst ? 'Estimated' : 'From your watch');
+  set('efVol', efFmtBig(d.vol)); set('efVolFoot', d.eq);
+  // A new set adds to the volume: the tile pops and shows how much it added.
+  if(EFS.vol !== null && d.vol > EFS.vol) {
+    const tile = box.querySelector('.vol'), plus = document.getElementById('efVolPlus');
+    if(plus) { plus.textContent = '+' + efFmtBig(d.vol - EFS.vol); plus.classList.remove('go'); void plus.offsetWidth; plus.classList.add('go'); }
+    if(tile) { tile.classList.remove('bump'); void tile.offsetWidth; tile.classList.add('bump'); }
+  }
+  EFS.vol = d.vol;
+}
+
 function efTick() {
   const c = document.getElementById('efClock');
   if(c) c.textContent = efFmtClock(Date.now() - efStarted());
+  try { efStatsTick(); } catch(e) {}
   const bar = document.getElementById('efRest');
   if(!bar) return;
   const open = document.getElementById('restOverlay')?.classList.contains('show');
