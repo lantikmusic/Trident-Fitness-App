@@ -17821,6 +17821,49 @@ function wtStartWatch(id) {
     wtPush();
   })();
 }
+// The workout was discarded on the watch: discard it here too (stop the clock, clear what was logged, end the Live Activity).
+// A workout that was already finished is left alone.
+function wtDiscard(id) {
+  const lantik = id.startsWith('h:'), key = id.slice(2);
+  let cleared = false;
+  try {
+    const overlay = document.getElementById('restOverlay');
+    if(overlay && overlay.classList.contains('show')) closeRest();
+  } catch(e) {}
+  try { if(EF.id === id) efClose(); } catch(e) {}
+  if(lantik) {
+    const sess = hyState.sessions[key];
+    if(sess && sess.status === 'in_progress') {
+      // Step the rotation back if this session moved it and nothing has moved it since (as Restart does).
+      if(sess.advanced && HY_ROTATION[(HY_ROTATION.indexOf(sess.workoutId) + 1) % HY_ROTATION.length] === HY_ROTATION[hyState.rotationIdx]) {
+        hyState.rotationIdx = HY_ROTATION.indexOf(sess.workoutId);
+        hyRotationNote('restarted', sess.workoutId, sess.id);
+      }
+      delete hyState.sessions[key];
+      hyView.exOpen = null;
+      hySave(true);
+      cleared = true;
+    }
+  } else if(!WT.finished[id]) {
+    delete workoutState.logs[key];
+    save(WORKOUT_KEY, workoutState);
+    try { if(isLoggedIn()) cloudPost('/workout', { program: workoutState.program, state: workoutCloudState() }); } catch(e) {}
+    cleared = true;
+  }
+  if(!cleared) return;
+  try { const all = wtStatsAll(); if(all[id]) { delete all[id]; save(WT_STATS_KEY, all); } } catch(e) {}
+  if(WT.activeId === id) WT.activeId = null;
+  delete WT.cur[id];
+  laResetStart(id);
+  laPush();
+  try {
+    if(lantik) { if(hyActive()) hyRender(); }
+    else if(key === getLogKey() && !hyActive()) { _workoutScreen = 'preview'; if(currentPage === 'workout') renderWorkout(); else renderWorkoutPreview(); }
+  } catch(e) {}
+  wtSoon();
+  setTimeout(() => { try { cmWoSync(true); } catch(e) {} }, 1500);
+  showToast('Workout discarded on your Apple Watch');
+}
 // A regular-program workout was finished on the phone.
 function wtClassicFinished(logKey) {
   const id = 'c:' + logKey;
@@ -17858,6 +17901,7 @@ function wtApply(a) {
   if(a.t === 'rest') return wtApplyRest(a);
   if(a.t === 'stats') return wtStatsStore(id, a.stats);
   if(!id) return;
+  if(a.t === 'discard') return wtDiscard(id);
   if(a.t === 'start' || !WT.activeId) WT.activeId = id;
   WT.applying = true;
   try {
