@@ -3165,6 +3165,9 @@ body.ef-on .rest-mini{display:none !important;}
 #page-community .cm-post.has-media .cm-actions{margin-top:6px;margin-bottom:2px;}
 #page-community .cm-post .cm-body.cm-caption{font-size:14.5px;line-height:1.45;margin:2px 0 6px;}
 #page-community .cmp-postview .cm-post{border-bottom:none !important;}
+/* ── Cancel workout ── */
+.ef-cancel{display:block;margin:6px auto 0;background:none;border:none;color:#FF6B6B;font:600 14px var(--tf-font);padding:12px 18px;}
+.wo-change-prog-btn.wo-cancel-btn,.hy-adjust .hy-cancel{color:#FF6B6B !important;}
 /* ── Exercise page: How to do it ── */
 .ef-desc{position:relative;border-radius:16px;padding:11px 14px 12px;background:rgba(255,255,255,0.045);border:0.5px solid rgba(255,255,255,0.09);cursor:pointer;-webkit-tap-highlight-color:transparent;}
 .ef-desc-lbl{font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--pink);margin-bottom:4px;}
@@ -8124,7 +8127,7 @@ function renderWorkoutPreview() {
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
         ${alreadyStarted ? 'Continue Workout' : 'Start Workout'}
       </button>
-      ${alreadyStarted ? `<button class="wo-change-prog-btn" onclick="restartWorkoutDay()">Restart this workout</button>` : ''}
+      ${alreadyStarted || laStarted('c:' + logKey, true) ? `<button class="wo-change-prog-btn wo-cancel-btn" onclick="wtCancelWorkout('c:${logKey}')">Cancel workout</button>` : ''}
       <button class="wo-change-prog-btn" onclick="showAllDays()">Do a different day →</button>
     </div>
     `}
@@ -9804,6 +9807,7 @@ function efRender() {
         <button onclick="efGoto(${cur - 1})" ${cur === 0 ? 'disabled' : ''}>‹ Previous</button>
         <button onclick="efGoto(${cur + 1})" ${cur >= M.items.length - 1 ? 'disabled' : ''}>Next ›</button>
       </div>
+      <button class="ef-cancel" onclick="wtCancelWorkout(EF.id)">Cancel workout</button>
     </div>
     <div class="ef-rest" id="efRest" hidden onclick="restExpand()" role="button" aria-label="Open rest timer">
       <div class="ef-ring"><svg width="48" height="48" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="20" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="4"/><circle id="efRing" cx="24" cy="24" r="20" fill="none" stroke="var(--pink)" stroke-width="4" stroke-linecap="round" stroke-dasharray="125.7" stroke-dashoffset="0" transform="rotate(-90 24 24)"/></svg></div>
@@ -15455,7 +15459,7 @@ function hySessionHTML() {
         ${w.recoveryOnlyOption && !done ? `<button onclick="hyToggleRecoveryOnly()">${sess && sess.recoveryOnly ? 'Back to the full session' : 'Make it recovery-only'}</button>` : ''}
         ${w.placeholder ? `<button onclick="hyEditor('${w.id}')">Edit exercises</button>` : ''}
         ${!done && !skipped ? `<button onclick="hySkipSheet()">Skip…</button>` : ''}
-        ${sess && !skipped ? `<button onclick="hyRestart()">Restart workout</button>` : ''}
+        ${sess && !done && !skipped ? `<button class="hy-cancel" onclick="wtCancelWorkout('h:${c.sid}')">Cancel workout</button>` : ''}
       </div>
       ${done ? `<button class="wo-start-btn" style="margin:10px 0 8px;" onclick="hyReopen()">Continue Workout</button>` : ''}
       ${w.restDayOption && !done && !skipped ? `<button class="ghost-btn" style="margin-bottom:8px;" onclick="hyRestDay()">Record a complete rest day</button>` : ''}
@@ -17986,7 +17990,7 @@ function wtSnapshot() {
   if(active && LA.restarted[active.id]) active.restarted = LA.restarted[active.id];
   let accent = '#32FCFD';
   try { accent = getAccentColor(); } catch(e) {}
-  return { v: 1, today, active, rest: wtRestState(), accent };
+  return { v: 1, today, active, rest: wtRestState(), accent, cancelled: WT.cancelled || null };
 }
 function wtRestState() {
   const overlay = document.getElementById('restOverlay');
@@ -18237,7 +18241,15 @@ function wtStartWatch(id) {
 }
 // The workout was discarded on the watch: discard it here too (stop the clock, clear what was logged, end the Live Activity).
 // A workout that was already finished is left alone.
-function wtDiscard(id) {
+// Cancel workout (phone): same as a watch discard, and the watch drops its recording too.
+// Afterwards the workout is back to Start workout, and the clock waits for Start or the first set.
+function wtCancelWorkout(id) {
+  if(!id) return;
+  if(!confirm('Cancel this workout? The sets you logged in it are cleared, the clock stops and nothing is saved to Apple Health. Press Start workout to begin again.')) return;
+  WT.cancelled = id + '@' + Date.now();
+  wtDiscard(id, true);
+}
+function wtDiscard(id, fromPhone) {
   const lantik = id.startsWith('h:'), key = id.slice(2);
   let cleared = false;
   try {
@@ -18276,7 +18288,7 @@ function wtDiscard(id) {
   } catch(e) {}
   wtSoon();
   setTimeout(() => { try { cmWoSync(true); } catch(e) {} }, 1500);
-  showToast('Workout discarded on your Apple Watch');
+  showToast(fromPhone ? 'Workout cancelled' : 'Workout discarded on your Apple Watch');
 }
 // A regular-program workout was finished on the phone.
 function wtClassicFinished(logKey) {
