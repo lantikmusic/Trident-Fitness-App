@@ -2448,7 +2448,7 @@ button,input,select,textarea{font-family:inherit;}
 /* Home: today's workout as a hero card (the Trident mark sits large and faint behind it) */
 .dash-workout-card{border-radius:var(--radius-xl);padding:20px;background:
   radial-gradient(140% 90% at 100% 0%,rgba(255,255,255,0.06),transparent 55%),rgba(255,255,255,0.045);}
-.dash-workout-card::before{content:'';position:absolute;right:-28px;top:-18px;width:190px;height:190px;background:url('Icons/trident-mark.png') center/contain no-repeat;opacity:.05;pointer-events:none;}
+.dash-workout-card::before{content:'';position:absolute;right:-28px;top:-18px;width:190px;height:190px;background:var(--tmark,url('Icons/trident-mark.png')) center/contain no-repeat;opacity:.05;pointer-events:none;}
 .dwc-title{font-size:24px;font-weight:800;letter-spacing:-0.025em;line-height:1.15;margin-bottom:6px;}
 .dwc-sub{font-size:14px;color:var(--text2);}
 .dwc-ex{font-size:14px;color:var(--text2);}
@@ -2555,7 +2555,7 @@ button,input,select,textarea{font-family:inherit;}
 .gyc-week{display:none;}
 .e-hero{position:relative;min-height:400px;border-radius:30px;overflow:hidden;margin-bottom:14px;cursor:pointer;
   background:radial-gradient(120% 80% at 100% 0%,rgba(255,255,255,0.07),transparent 60%),#16171A;border:0.5px solid rgba(255,255,255,0.1);display:flex;flex-direction:column;justify-content:flex-end;}
-.e-hero.no-img::before{content:'';position:absolute;right:-30px;top:-10px;width:230px;height:230px;background:url('Icons/trident-mark.png') center/contain no-repeat;opacity:.06;}
+.e-hero.no-img::before{content:'';position:absolute;right:-30px;top:-10px;width:230px;height:230px;background:var(--tmark,url('Icons/trident-mark.png')) center/contain no-repeat;opacity:.06;}
 .e-hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
 .e-hero-shade{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,9,10,0.97) 38%,rgba(8,9,10,0.35) 70%,rgba(8,9,10,0.1));pointer-events:none;}
 .e-hero-chips{position:absolute;top:16px;left:16px;right:16px;display:flex;justify-content:space-between;gap:8px;}
@@ -2575,7 +2575,7 @@ button,input,select,textarea{font-family:inherit;}
 .e-hero button[onclick*="openCustomWorkout"]{border-radius:999px !important;color:rgba(255,255,255,0.6) !important;background:rgba(255,255,255,0.05) !important;margin-top:0 !important;}
 /* ── Design E: LANTIK session ── */
 .hy-ehero{position:relative;min-height:330px;border-radius:30px;overflow:hidden;margin:0 0 14px;background:radial-gradient(120% 80% at 100% 0%,rgba(255,255,255,0.07),transparent 60%),#16171A;border:0.5px solid rgba(255,255,255,0.1);display:flex;flex-direction:column;justify-content:flex-end;}
-.hy-ehero.no-img::before{content:'';position:absolute;right:-30px;top:-10px;width:230px;height:230px;background:url('Icons/trident-mark.png') center/contain no-repeat;opacity:.06;}
+.hy-ehero.no-img::before{content:'';position:absolute;right:-30px;top:-10px;width:230px;height:230px;background:var(--tmark,url('Icons/trident-mark.png')) center/contain no-repeat;opacity:.06;}
 .hy-ehero .e-hero-body{padding-top:80px;}
 .hy-ehero .hy-overall{margin-top:2px;}
 .hy-eback{cursor:pointer;color:#fff !important;font-family:inherit;}
@@ -3236,6 +3236,21 @@ body.ef-on .rest-mini{display:none !important;}
 .ef-stat.cal:not(.on) .ef-stat-val b{color:#6B6F76;}
 .ef-body .ef-tools{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:6px;}
 .ef-body .ef-tool{justify-content:center;gap:5px;height:40px;padding:0 6px;font-size:13px;white-space:nowrap;min-width:0;}
+/* ── Midnight theme (black, grey, white) and the App icon picker ── */
+.color-swatch.sw-midnight{background:conic-gradient(#F2F2F7 0 50%,#1C1C1E 50% 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,0.35);}
+.ob-sw-midnight{--c:#F2F2F7;}
+html.theme-midnight{--bg:#000 !important;--bg2:#0A0A0A;--bg3:#121212;--bg4:#1C1C1E;--bg5:#2C2C2E;}
+html.theme-midnight body{background:#000 !important;}
+html.theme-midnight body::before{opacity:.25;}
+html.theme-midnight .ef,html.theme-midnight .th-page,html.theme-midnight .th-bar,html.theme-midnight .reel-empty{background:#000 !important;}
+html.theme-midnight .ef-photo-fade{background:linear-gradient(to top,#000 8%,rgba(0,0,0,0)) !important;}
+.ai-icons{flex-basis:100%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 8px;margin:10px 0 4px 36px;}
+.ai-ic{display:flex;flex-direction:column;align-items:center;gap:5px;background:none;border:none;padding:0;color:#C9CDD3;font:600 11.5px var(--tf-font);-webkit-tap-highlight-color:transparent;}
+.ai-ic img{width:54px;height:54px;border-radius:13px;border:2px solid transparent;box-shadow:0 4px 12px rgba(0,0,0,0.4);transition:transform .15s;}
+.ai-ic.on img{border-color:#fff;transform:scale(1.06);}
+.ai-ic.on{color:#fff;}
+.ai-ic span{display:flex;align-items:center;gap:4px;}
+.ai-match{width:6px;height:6px;border-radius:50%;background:var(--pink);display:inline-block;}
 /* ── Strava ── */
 .st-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px;}
 .st-sub{font-size:12.5px;color:#9BA0A8;margin-top:3px;}
@@ -3492,7 +3507,7 @@ body.reel-on{overflow:hidden;}
         <div class="ob-pv-ring"><svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="8"/><circle cx="40" cy="40" r="32" fill="none" stroke="var(--pink)" stroke-width="8" stroke-linecap="round" stroke-dasharray="201" stroke-dashoffset="66" transform="rotate(-90 40 40)" filter="url(#obPvGlow)"/><defs><filter id="obPvGlow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs></svg><b>1,240</b></div>
         <div class="ob-pv-side"><span class="ob-pv-eye">TODAY</span><span class="ob-pv-t">Upper A</span><span class="ob-pv-btn">Start workout</span></div>
       </div>
-      <div class="ob-sw-row"><button class="ob-sw" data-color="#32FCFD" onclick="obColor('#32FCFD','50,252,253','Trident cyan')" aria-label="Trident cyan" style="--c:#32FCFD"><span></span></button><button class="ob-sw" data-color="#0A84FF" onclick="obColor('#0A84FF','10,132,255','Ocean blue')" aria-label="Ocean blue" style="--c:#0A84FF"><span></span></button><button class="ob-sw" data-color="#BF5AF2" onclick="obColor('#BF5AF2','191,90,242','Purple')" aria-label="Purple" style="--c:#BF5AF2"><span></span></button><button class="ob-sw" data-color="#FF6B9D" onclick="obColor('#FF6B9D','255,107,157','Pink')" aria-label="Pink" style="--c:#FF6B9D"><span></span></button><button class="ob-sw" data-color="#FF9F0A" onclick="obColor('#FF9F0A','255,159,10','Orange')" aria-label="Orange" style="--c:#FF9F0A"><span></span></button><button class="ob-sw" data-color="#30D158" onclick="obColor('#30D158','48,209,88','Green')" aria-label="Green" style="--c:#30D158"><span></span></button><button class="ob-sw" data-color="#FF453A" onclick="obColor('#FF453A','255,69,58','Red')" aria-label="Red" style="--c:#FF453A"><span></span></button></div>
+      <div class="ob-sw-row"><button class="ob-sw" data-color="#32FCFD" onclick="obColor('#32FCFD','50,252,253','Trident cyan')" aria-label="Trident cyan" style="--c:#32FCFD"><span></span></button><button class="ob-sw" data-color="#0A84FF" onclick="obColor('#0A84FF','10,132,255','Ocean blue')" aria-label="Ocean blue" style="--c:#0A84FF"><span></span></button><button class="ob-sw" data-color="#BF5AF2" onclick="obColor('#BF5AF2','191,90,242','Purple')" aria-label="Purple" style="--c:#BF5AF2"><span></span></button><button class="ob-sw" data-color="#FF6B9D" onclick="obColor('#FF6B9D','255,107,157','Pink')" aria-label="Pink" style="--c:#FF6B9D"><span></span></button><button class="ob-sw" data-color="#FF9F0A" onclick="obColor('#FF9F0A','255,159,10','Orange')" aria-label="Orange" style="--c:#FF9F0A"><span></span></button><button class="ob-sw" data-color="#30D158" onclick="obColor('#30D158','48,209,88','Green')" aria-label="Green" style="--c:#30D158"><span></span></button><button class="ob-sw" data-color="#FF453A" onclick="obColor('#FF453A','255,69,58','Red')" aria-label="Red" style="--c:#FF453A"><span></span></button><button class="ob-sw ob-sw-midnight" data-color="#F2F2F7" onclick="obColor('#F2F2F7','242,242,247','Midnight')" aria-label="Midnight" style="--c:#F2F2F7"><span></span></button></div>
       <div class="ob-sw-name" id="ob-sw-name">Trident cyan</div>
       <div class="ob-foot"><button class="ob-next" id="ob-next-color" onclick="obNext()">Continue</button></div>
     </div>
@@ -4334,7 +4349,13 @@ body.reel-on{overflow:hidden;}
         <div class="color-swatch" style="background:#FF9F0A;" data-color="#FF9F0A" data-rgb="255,159,10" onclick="setAccentColor('#FF9F0A','255,159,10')"></div>
         <div class="color-swatch" style="background:#30D158;" data-color="#30D158" data-rgb="48,209,88" onclick="setAccentColor('#30D158','48,209,88')"></div>
         <div class="color-swatch" style="background:#FF453A;" data-color="#FF453A" data-rgb="255,69,58" onclick="setAccentColor('#FF453A','255,69,58')"></div>
+        <div class="color-swatch sw-midnight" data-color="#F2F2F7" data-rgb="242,242,247" onclick="setAccentColor('#F2F2F7','242,242,247')" title="Midnight" aria-label="Midnight"></div>
       </div>
+    </div>
+    <div class="settings-row e-color-row" id="appIconRow" style="display:none;">
+      <span class="e-row-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="4.5"/><path d="M12 8v8M9 10l3-2 3 2"/></svg></span>
+      <div class="settings-row-label">App icon</div>
+      <div class="ai-icons" id="appIconPicker"></div>
     </div>
     </div>
   </div>
@@ -12184,6 +12205,7 @@ function eSetNameSync() {
 }
 function openSettings() {
   try { stRefresh(); } catch(e) {}
+  try { appIconRender(); } catch(e) {}
   document.body.classList.add('e-set-on');
   loadSettingsInputs();
   try { eSetNameSync(); } catch(e) {}
@@ -12283,6 +12305,16 @@ function getAccentColorAlpha(opacity) {
 
 function applyAccentColor(hex, rgb) {
   const root = document.documentElement;
+  // Midnight: black, grey and white (pure black background, white accent, no colour glow)
+  root.classList.toggle('theme-midnight', String(hex).toUpperCase() === '#F2F2F7');
+  // The trident logo inside the app takes the theme colour too
+  try {
+    const src = tmarkSrc(hex);
+    root.style.setProperty('--tmark', `url('${src}')`);
+    document.querySelectorAll('img[src*="trident-mark.png"], img[src*="Icons/marks/"]').forEach(im => { if(!im.closest('.shr-wrap')) im.src = src; });
+    document.querySelectorAll('img.ah-sync-tf').forEach(im => { im.src = tmarkTile(hex); });
+  } catch(e) {}
+  try { appIconRender(); } catch(e) {}
   root.style.setProperty('--pink', hex);
   root.style.setProperty('--pink-dim', `rgba(${rgb},0.12)`);
   root.style.setProperty('--pink-glow', `rgba(${rgb},0.25)`);
@@ -12387,6 +12419,19 @@ if(appSettings.color && appSettings.colorRgb) {
   root.style.setProperty('--pink-border', `rgba(${appSettings.colorRgb},0.2)`);
   // Patch hardcoded SVG stroke attributes immediately
   document.querySelectorAll('[stroke="#32FCFD"]').forEach(el => el.setAttribute('stroke', appSettings.color));
+  // Midnight theme and the trident logo in the theme colour
+  root.classList.toggle('theme-midnight', String(appSettings.color).toUpperCase() === '#F2F2F7');
+  try {
+    const tm = tmarkSrc(appSettings.color);
+    root.style.setProperty('--tmark', `url('${tm}')`);
+    if(tm.indexOf('marks/') >= 0) {
+      const fix = () => {
+        document.querySelectorAll('img[src*="trident-mark.png"]').forEach(im => { im.src = tm; });
+        const sp = document.querySelector('#splashScreen .splash-logo img'); if(sp) sp.src = tmarkTile(appSettings.color);
+      };
+      fix(); document.addEventListener('DOMContentLoaded', fix);
+    }
+  } catch(e) {}
 }
 
 // ══════════════════════════════════════
@@ -12923,7 +12968,7 @@ async function obUnContinue() {
 }
 
 // ── Color ──
-const OB_COLOR_NAMES = { '#32FCFD': 'Trident cyan', '#0A84FF': 'Ocean blue', '#BF5AF2': 'Purple', '#FF6B9D': 'Pink', '#FF9F0A': 'Orange', '#30D158': 'Green', '#FF453A': 'Red' };
+const OB_COLOR_NAMES = { '#32FCFD': 'Trident cyan', '#0A84FF': 'Ocean blue', '#BF5AF2': 'Purple', '#FF6B9D': 'Pink', '#FF9F0A': 'Orange', '#30D158': 'Green', '#FF453A': 'Red', '#F2F2F7': 'Midnight' };
 function obColor(hex, rgb) {
   ob.color = hex; ob.colorRgb = rgb;
   setAccentColor(hex, rgb);   // the whole app (and the watch) changes color right away
@@ -16471,7 +16516,7 @@ function cmOvShapeFor(aspect) { return aspect >= 1 ? 'h' : 'v'; }
 function cmOvCardHTML(type, payload, ov, editable) {
   if(!payload || !cmOvOk(ov)) return '';
   const pos = `left:${(ov.x * 100).toFixed(2)}%;top:${(ov.y * 100).toFixed(2)}%;--s:${ov.s.toFixed(3)}`;
-  const mark = `<img src="Icons/trident-mark.png" alt="" onerror="this.remove()">`;
+  const mark = `<img src="${tmarkSrc()}" alt="" onerror="this.remove()">`;
   let inner;
   if(type === 'pr') {
     inner = `<div class="cm-ovc-main"><div class="cm-ovc-top">${mark}<span>New PR</span></div>
@@ -18410,6 +18455,43 @@ function wtDiscard(id, fromPhone) {
   wtSoon();
   setTimeout(() => { try { cmWoSync(true); } catch(e) {} }, 1500);
   showToast(fromPhone ? 'Workout cancelled' : 'Workout discarded on your Apple Watch');
+}
+
+// ══════════════════════════════════════
+// APP ICON: the logo's teal glow in each theme colour (iPhone app; iOS alternate icons)
+// ══════════════════════════════════════
+// The in-app trident logo for a theme colour (the original teal one for the default)
+function tmarkSrc(hex) {
+  hex = String(hex || (typeof getAccentColor === 'function' ? getAccentColor() : '') || '').toUpperCase();
+  const k = { '#0A84FF': 'Blue', '#BF5AF2': 'Purple', '#FF6B9D': 'Pink', '#FF9F0A': 'Orange', '#30D158': 'Green', '#FF453A': 'Red', '#F2F2F7': 'Midnight' }[hex];
+  return k ? `Icons/marks/${k}.png` : 'Icons/trident-mark.png';
+}
+// The app-icon tile (logo on black) in the theme colour
+function tmarkTile(hex) { const m = tmarkSrc(hex).match(/marks\/(\w+)\.png/); return m ? `Icons/appicons/${m[1]}.png` : 'Icons/icon-192.png'; }
+const APP_ICONS = [['Default', 'Trident', '#32FCFD'], ['Blue', 'Blue', '#0A84FF'], ['Purple', 'Purple', '#BF5AF2'], ['Pink', 'Pink', '#FF6B9D'],
+  ['Orange', 'Orange', '#FF9F0A'], ['Green', 'Green', '#30D158'], ['Red', 'Red', '#FF453A'], ['Midnight', 'Midnight', '#F2F2F7']];
+var appIconCur = null;
+function appIconNative() { try { return !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()); } catch(e) { return false; } }
+async function appIconRender() {
+  const row = document.getElementById('appIconRow'), box = document.getElementById('appIconPicker');
+  if(!row || !box) return;
+  if(!appIconNative()) { row.style.display = 'none'; return; }
+  if(appIconCur === null) {
+    try { const r = await window.Capacitor.nativePromise('AppIcon', 'get', {}); appIconCur = (r && r.name) || 'Default'; }
+    catch(e) { row.style.display = 'none'; return; }   // an older app version without icon switching
+  }
+  row.style.display = '';
+  const matchName = (APP_ICONS.find(i => i[2].toUpperCase() === String(getAccentColor()).toUpperCase()) || [])[0];
+  box.innerHTML = APP_ICONS.map(([k, label]) => `<button class="ai-ic${appIconCur === k ? ' on' : ''}" onclick="appIconSet('${k}')" aria-label="${label} app icon">
+      <img src="Icons/appicons/${k}.png" alt="" draggable="false"><span>${label}${matchName === k && appIconCur !== k ? '<i class="ai-match"></i>' : ''}</span></button>`).join('');
+}
+async function appIconSet(name) {
+  if(name === appIconCur) return;
+  try {
+    await window.Capacitor.nativePromise('AppIcon', 'set', { name: name === 'Default' ? '' : name });
+    appIconCur = name;
+    appIconRender();
+  } catch(e) { showToast('The icon couldn\'t be changed'); }
 }
 
 // ══════════════════════════════════════
@@ -20501,7 +20583,7 @@ function ahRenderHomeCard() {
   if(!want) { if(ahSheetIsOpen('connect')) ahSheetClose(); return; }
   const more = want === 'more';
   el.innerHTML = `<div class="ah-sync" role="button" tabindex="0" onclick="ahOpenConnectSheet()">
-    <div class="ah-sync-icons"><img src="${AH_HEALTH_ICON}" alt="" onerror="this.style.display='none'"><img src="Icons/icon-192.png" alt="" class="ah-sync-tf"></div>
+    <div class="ah-sync-icons"><img src="${AH_HEALTH_ICON}" alt="" onerror="this.style.display='none'"><img src="${tmarkTile()}" alt="" class="ah-sync-tf"></div>
     <div class="ah-sync-txt"><b>${more ? 'Add workouts & heart data' : 'Sync Apple Health'}</b>
       <span>${more ? 'Bring in Apple Watch & Apple Fitness workouts and heart health.' : 'Connect Apple Health & Apple Fitness for steps, sleep, workouts and heart insights.'}</span></div>
     <div class="ah-sync-chev">›</div>
