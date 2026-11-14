@@ -3165,6 +3165,11 @@ body.ef-on .rest-mini{display:none !important;}
 #page-community .cm-post.has-media .cm-actions{margin-top:6px;margin-bottom:2px;}
 #page-community .cm-post .cm-body.cm-caption{font-size:14.5px;line-height:1.45;margin:2px 0 6px;}
 #page-community .cmp-postview .cm-post{border-bottom:none !important;}
+/* ── Recent PRs (Progress): one glass card with padding, plain rows inside (not a card per row) ── */
+#prPanel{padding:20px 20px 8px !important;}
+#prPanel #prProgressList{background:none !important;border:none !important;border-radius:0 !important;}
+#prPanel .e-pr{background:none !important;border:none !important;border-top:0.5px solid rgba(255,255,255,0.08) !important;box-shadow:none !important;-webkit-backdrop-filter:none !important;backdrop-filter:none !important;border-radius:0 !important;padding:13px 0 !important;}
+#prPanel .e-pr:first-child{border-top:none !important;}
 /* ── Cancel workout ── */
 .ef-cancel{display:block;margin:6px auto 0;background:none;border:none;color:#FF6B6B;font:600 14px var(--tf-font);padding:12px 18px;}
 .wo-change-prog-btn.wo-cancel-btn,.hy-adjust .hy-cancel{color:#FF6B6B !important;}
@@ -3909,16 +3914,16 @@ body.reel-on{overflow:hidden;}
       <div id="progressStats"></div>
       <div class="e-wt-chart"><canvas id="weightChart"></canvas></div>
     </div>
-    <!-- PR Records panel -->
-    <div class="panel" style="margin-bottom:12px;" id="prPanel">
-      <div class="panel-title e-sec" style="margin-bottom:12px;">Recent PRs</div>
-      <div id="prProgressList"></div>
-    </div>
     <!-- Muscle growth -->
     <div class="panel" style="margin-bottom:12px;" id="muscleGrowthPanel">
       <div class="mg-head"><div class="panel-title" style="margin:0;">Muscle Growth</div></div>
       <div class="mg-sub">Based on how your lifts have progressed over the last 8 weeks</div>
       <div id="muscleGrowth"></div>
+    </div>
+    <!-- PR Records panel -->
+    <div class="panel" style="margin-bottom:12px;" id="prPanel">
+      <div class="panel-title e-sec" style="margin-bottom:12px;">Recent PRs</div>
+      <div id="prProgressList"></div>
     </div>
     <!-- Apple Health: workouts from Apple Watch / Fitness, then heart health (iPhone app only) -->
     <div class="panel ah-panel" id="ahWorkoutsPanel" style="display:none;margin-bottom:12px;"></div>
