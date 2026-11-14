@@ -3236,6 +3236,10 @@ body.ef-on .rest-mini{display:none !important;}
 .ef-stat.cal:not(.on) .ef-stat-val b{color:#6B6F76;}
 .ef-body .ef-tools{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:6px;}
 .ef-body .ef-tool{justify-content:center;gap:5px;height:40px;padding:0 6px;font-size:13px;white-space:nowrap;min-width:0;}
+/* ── Missed lift prompt (LANTIK) ── */
+.hy-missed{border-color:var(--pink-border) !important;background:var(--pink-dim) !important;}
+.hy-missed-btns{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
+.hy-missed-btns .pink-btn,.hy-missed-btns .ghost-btn{margin:0;}
 /* ── Midnight theme (black, grey, white) and the App icon picker ── */
 .color-swatch.sw-midnight{background:conic-gradient(#F2F2F7 0 50%,#1C1C1E 50% 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,0.35);}
 .ob-sw-midnight{--c:#F2F2F7;}
@@ -14957,8 +14961,74 @@ function hySlotWorkoutId(dayIdx, slot) {
   if(!slot.gym) return slot.workout;
   const existing = hyState.sessions[hySid(dayIdx, slot.key)];
   if(existing) return existing.workoutId;
-  // The calendar decides: each gym day always has its own lift, whatever happened earlier in the week.
+  // You chose to do a missed lift on a later gym day: from that day the lifts go on in order
+  // (skipping any already done this week). Otherwise the calendar decides.
+  const sh = hyState.liftShift;
+  if(sh && sh.week === hyWeekKey() && dayIdx >= sh.day) {
+    const done = new Set();
+    for(let d = 0; d < sh.day; d++) {
+      const g = hyGymSlot(d), x = g && hyState.sessions[hySid(d, g.key)];
+      if(x && (x.status === 'completed' || hyHasData(x))) done.add(x.workoutId);
+    }
+    let i = Math.max(0, HY_ROTATION.indexOf(sh.lift));
+    for(let d = sh.day; d <= dayIdx; d++) {
+      const g = hyGymSlot(d); if(!g) continue;
+      const x = hyState.sessions[hySid(d, g.key)];
+      let lift = x ? x.workoutId : null;
+      if(!lift) { let k = 0; while(k < 4 && done.has(HY_ROTATION[(i + k) % 4])) k++; lift = k < 4 ? HY_ROTATION[(i + k) % 4] : null; }
+      if(d === dayIdx) return lift || HY_CAL_LIFT[dayIdx] || null;
+      if(lift) { done.add(lift); if(HY_ROTATION.includes(lift)) i = (HY_ROTATION.indexOf(lift) + 1) % 4; }
+    }
+  }
   return HY_CAL_LIFT[dayIdx] || null;
+}
+// ── A missed lift: on the next gym day the app asks whether to do it instead of that day's lift ──
+function hyWeekKey() { return hyISO(hyDayDate(0)); }
+function hyGymSlot(d) { return (HY_WEEK[d] || []).find(sl => sl.gym) || null; }
+function hyLiftDoneThisWeek(lift) {
+  for(let d = 0; d < 7; d++) {
+    const g = hyGymSlot(d), x = g && hyState.sessions[hySid(d, g.key)];
+    if(x && x.workoutId === lift && (x.status === 'completed' || hyHasData(x))) return true;
+  }
+  return false;
+}
+// { lift, dayIdx, planned } for today's gym slot, or null
+function hyMissedLift() {
+  const today = hyDow(new Date()), g = hyGymSlot(today);
+  if(!g || hyState.sessions[hySid(today, g.key)]) return null;
+  const wk = hyWeekKey(), planned = hySlotWorkoutId(today, g);
+  for(let d = 0; d < today; d++) {
+    const gs = hyGymSlot(d); if(!gs) continue;
+    const x = hyState.sessions[hySid(d, gs.key)];
+    if(x && (x.status === 'completed' || x.status === 'skipped' || hyHasData(x))) continue;   // done, or skipped on purpose
+    const lift = x ? x.workoutId : hySlotWorkoutId(d, gs);
+    if(!lift || lift === planned || !HY_ROTATION.includes(lift)) continue;
+    if(hyLiftDoneThisWeek(lift) || (hyState.liftDeclined || {})[wk + ':' + lift]) continue;
+    return { lift, dayIdx: d, planned };
+  }
+  return null;
+}
+function hyMissedHTML() {
+  const m = hyMissedLift(); if(!m) return '';
+  const a = hyWorkout(m.lift), b = m.planned ? hyWorkout(m.planned) : null;
+  const an = hyEsc(a.short || a.name), bn = b ? hyEsc(b.short || b.name) : '';
+  return `<div class="hy-banner hy-missed"><strong>You missed ${an} on ${HY_DAYS[m.dayIdx]}.</strong> Do it today${bn ? ` instead of ${bn}` : ''}? The rest of the week goes on in order from there.
+    <div class="hy-missed-btns"><button class="pink-btn" onclick="event.stopPropagation();hyTakeMissed('${m.lift}')">Do ${an} today</button>${bn ? `<button class="ghost-btn" onclick="event.stopPropagation();hyKeepPlanned('${m.lift}')">Keep ${bn}</button>` : ''}</div></div>`;
+}
+function hyTakeMissed(lift) {
+  hyState.liftShift = { week: hyWeekKey(), day: hyDow(new Date()), lift };
+  hySave(true); hyRender();
+  try { renderDashboard(); } catch(e) {}
+  try { wtSoon(); } catch(e) {}
+  const w = hyWorkout(lift); showToast(`Today is ${w.short || w.name}`);
+}
+function hyKeepPlanned(lift) {
+  const wk = hyWeekKey(), all = hyState.liftDeclined || {};
+  Object.keys(all).forEach(k => { if(k.slice(0, 10) !== wk) delete all[k]; });   // only this week's answers are kept
+  all[wk + ':' + lift] = true;
+  hyState.liftDeclined = all;
+  hySave(true); hyRender();
+  try { renderDashboard(); } catch(e) {}
 }
 function hyCtx() {
   if(!hyView.open) return null;
@@ -15232,7 +15302,7 @@ function hyWeekHTML() {
   }).join('');
   // The four lifts of this week, one per gym day, with what happened to each.
   const lifts = HY_GYM_DAYS.map(d => {
-    const sess = hyState.sessions[hySid(d, 'gym')] || null, w = hyWorkout(sess ? sess.workoutId : HY_CAL_LIFT[d], sess);
+    const sess = hyState.sessions[hySid(d, 'gym')] || null, w = hyWorkout(sess ? sess.workoutId : (hySlotWorkoutId(d, hyGymSlot(d) || { key: 'gym', gym: true }) || HY_CAL_LIFT[d]), sess);
     const state = sess ? (sess.status === 'completed' ? '✓ Done' : sess.status === 'skipped' ? 'Skipped' : (d < today ? 'Not finished' : 'In progress'))
       : (d < today ? 'Missed' : d === today ? 'Today' : (w.placeholder && !w.configured ? 'Needs set-up' : 'Planned'));
     return `<button class="hy-hist" onclick="hyPickDay(${d})"><span>${HY_DAYS[d].slice(0, 3)} · ${hyEsc(w.short || w.name)}</span><span class="hy-muted">${hyEsc(state)}</span></button>`;
@@ -15256,6 +15326,7 @@ function hyWeekHTML() {
     </div>
     <div class="workout-day-tabs wo-days">${tabs}</div>
     <div class="hy-day-title">${HY_DAYS[dayIdx]} · ${hyEsc(hyDateLabel(iso).replace(/^\w+, /, ''))}${dayIdx === today ? ' · Today' : ''}</div>
+    ${dayIdx === today ? hyMissedHTML() : ''}
     ${slots}
     ${dayIdx === 5 ? `<div class="hy-banner">Saturday stays free of lifting before Sunday's games.</div>` : ''}
     <div class="hy-card">
@@ -15557,6 +15628,7 @@ function hySessionHTML() {
   if(c.future) banners.push(`<div class="hy-banner">This is planned for ${HY_DAYS[c.dayIdx]}. Want to do it today instead?<button class="pink-btn" style="margin-top:10px;" onclick="hyEarlySheet()">Skip to this workout</button></div>`);
   else if(c.later || (sess && sess.doneOn)) banners.push(`<div class="hy-banner">${HY_DAYS[c.dayIdx]}'s workout, ${done ? 'done' : 'doing it'} early${sess && sess.doneOn ? ' on ' + hyEsc(hyDateLabel(sess.doneOn)) : ' today'}.</div>`);
   if(skipped) banners.push(`<div class="hy-banner">Skipped. <button class="hy-link" onclick="hyUndoSkip()">Undo skip</button></div>`);
+  if(isGym && !sess && c.dayIdx === hyDow(new Date())) { const mh = hyMissedHTML(); if(mh) banners.unshift(mh); }
   if(sess && sess.restDay) banners.push(`<div class="hy-banner">Recorded as a complete rest day.</div>`);
   if(week && (w.category === 'strength' || w.category === 'field')) banners.push(`<div class="hy-banner"><strong>Phase ${hyPhase(week)} · ${HY_PHASE_INFO[hyPhase(week)].name} — Week ${week} of 12, ${HY_BLOCK[week].name}.</strong> ${hyEsc(HY_BLOCK[week].tip)}</div>`);
   if(hasImpact && hyImpactBlocked(sess)) banners.push(sess && sess.noImpact && status !== 'restricted'
