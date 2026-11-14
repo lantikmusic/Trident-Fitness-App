@@ -2592,7 +2592,7 @@ button,input,select,textarea{font-family:inherit;}
 .ef.show{display:block;}
 body.ef-on{overflow:hidden;}
 body:not([data-page="workout"]) .ef{display:none !important;}
-body.ef-on:not(.ef-edit) #restOverlay{display:none !important;}
+body.rest-min #restOverlay{display:none !important;}
 .ef-photo{position:absolute;left:0;right:0;top:0;height:calc(250px + env(safe-area-inset-top));background:#1B1D21;overflow:hidden;}
 .ef-photo img{width:100%;height:100%;object-fit:cover;display:block;}
 .ef-photo.no-img{background:#17181B;}
@@ -3148,6 +3148,9 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 }
 .ob-pick.selected,.rd-card.rd-empty{}
 .ob-pick.selected{border-color:var(--pink) !important;box-shadow:inset 0 1px 0 rgba(255,255,255,0.16),0 0 0 1px var(--pink),0 0 22px var(--pink-glow) !important;}
+.rest-mini{z-index:97;cursor:pointer;}
+body.ef-on .rest-mini{display:none !important;}
+.ef-rest{cursor:pointer;}
 /* Line icons that replaced emoji */
 .wn-ic,.ah-wo-ic{color:var(--pink);font-size:0;}
 .ah-home-item i{display:flex;justify-content:center;color:var(--pink);font-style:normal;}
@@ -4007,7 +4010,7 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 <div class="rest-overlay" id="restOverlay">
   <div class="rest-timer-card">
     <div class="rt-head">
-      <button class="rt-back" onclick="skipRest()" aria-label="Close rest timer">‹</button>
+      <button class="rt-back" onclick="restMinimize()" aria-label="Minimize rest timer">‹</button>
       <div class="rest-timer-label">Rest Timer</div>
       <div class="rt-head-sp"></div>
     </div>
@@ -4070,6 +4073,14 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 
     <button class="rest-timer-skip" onclick="skipRest()">Skip Rest →</button>
   </div>
+</div>
+
+<!-- Minimized rest timer (anywhere in the app; tap to open the big one) -->
+<div class="ef-rest rest-mini" id="restMini" hidden onclick="restExpand()" role="button" aria-label="Open rest timer">
+  <div class="ef-ring"><svg width="48" height="48" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="20" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="4"/><circle id="restMiniRing" cx="24" cy="24" r="20" fill="none" stroke="var(--pink)" stroke-width="4" stroke-linecap="round" stroke-dasharray="125.7" stroke-dashoffset="0" transform="rotate(-90 24 24)"/></svg></div>
+  <div class="ef-rest-txt"><span id="restMiniLbl">Rest</span><b id="restMiniTime">0:00</b></div>
+  <button onclick="event.stopPropagation();adjustRest(15)">+15s</button>
+  <button onclick="event.stopPropagation();skipRest()">Skip</button>
 </div>
 
 <!-- COMMUNITY -->
@@ -9637,11 +9648,11 @@ function efRender() {
         <button onclick="efGoto(${cur + 1})" ${cur >= M.items.length - 1 ? 'disabled' : ''}>Next ›</button>
       </div>
     </div>
-    <div class="ef-rest" id="efRest" hidden>
+    <div class="ef-rest" id="efRest" hidden onclick="restExpand()" role="button" aria-label="Open rest timer">
       <div class="ef-ring"><svg width="48" height="48" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="20" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="4"/><circle id="efRing" cx="24" cy="24" r="20" fill="none" stroke="var(--pink)" stroke-width="4" stroke-linecap="round" stroke-dasharray="125.7" stroke-dashoffset="0" transform="rotate(-90 24 24)"/></svg></div>
       <div class="ef-rest-txt"><span id="efRestLbl">Rest</span><b id="efRestTime">0:00</b></div>
-      <button onclick="adjustRest(15)">+15s</button>
-      <button onclick="efSkipRest()">Skip</button>
+      <button onclick="event.stopPropagation();adjustRest(15)">+15s</button>
+      <button onclick="event.stopPropagation();efSkipRest()">Skip</button>
     </div>`;
   efTick();
 }
@@ -9663,7 +9674,7 @@ function efTick() {
     efRender(); return;
   }
   EF.wasOpen = !!open;
-  bar.hidden = !open;
+  bar.hidden = !(open && document.body.classList.contains('rest-min'));
   if(!open) return;
   const left = restTimer.endsAt ? Math.max(0, Math.round((restTimer.endsAt - Date.now()) / 1000)) : Math.max(0, restTimer.remaining || 0);
   document.getElementById('efRestTime').textContent = `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`;
@@ -11406,15 +11417,47 @@ function closeRest() {
   restTimer.paused = false;
   restElapsedReset();
   document.getElementById('restOverlay').classList.remove('show');
+  document.body.classList.remove('rest-min');
   document.querySelectorAll('.rest-btn').forEach(b => b.classList.remove('resting'));
   // Reset for next use
   restTimer.remaining = restTimer.duration;
   hyRestReset(); // put the sheet back if the Hybrid program re-labelled it
 }
 
+// ── Big rest timer ⇄ small bar ──
+// Logging a set opens the big timer. Its back arrow (or a tap outside it) minimizes it to a small bar at the
+// bottom while the rest keeps counting; tapping the bar opens the big timer again.
+function restMinimize() { document.body.classList.add('rest-min'); restMiniTick(); try { efTick(); } catch(e) {} }
+function restExpand() { document.body.classList.remove('rest-min'); restMiniTick(); try { efTick(); } catch(e) {} }
+function restMiniTick() {
+  const bar = document.getElementById('restMini'); if(!bar) return;
+  const open = document.getElementById('restOverlay').classList.contains('show');
+  const show = open && document.body.classList.contains('rest-min') && !document.body.classList.contains('ef-on');
+  bar.hidden = !show;
+  if(!show) return;
+  const left = restTimer.endsAt ? Math.max(0, Math.round((restTimer.endsAt - Date.now()) / 1000)) : Math.max(0, restTimer.remaining || 0);
+  document.getElementById('restMiniTime').textContent = `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`;
+  const ex = (document.getElementById('restTimerEx') || {}).textContent || '';
+  document.getElementById('restMiniLbl').textContent = restTimer.paused ? 'Rest · paused' : (ex && !/coming up/i.test(ex) ? ex : 'Rest');
+  const pct = restTimer.duration > 0 ? left / restTimer.duration : 0;
+  const ring = document.getElementById('restMiniRing');
+  if(ring) ring.setAttribute('stroke-dashoffset', String(125.7 * (1 - Math.max(0, Math.min(1, pct)))));
+}
+setInterval(() => { try { restMiniTick(); } catch(e) {} }, 500);
+// Every new rest (a set logged on the phone or the watch) opens the big timer
+(function restWatchOpen() {
+  const ov = document.getElementById('restOverlay'); if(!ov) return;
+  let was = ov.classList.contains('show');
+  new MutationObserver(() => {
+    const now = ov.classList.contains('show');
+    if(now && !was) document.body.classList.remove('rest-min');
+    was = now;
+    restMiniTick();
+  }).observe(ov, { attributes: true, attributeFilter: ['class'] });
+})();
 // Tap backdrop to close
 document.getElementById('restOverlay').addEventListener('click', function(e) {
-  if(e.target === this) closeRest();
+  if(e.target === this) restMinimize();
 });
 
 // ══════════════════════════════════════
