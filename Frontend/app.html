@@ -3165,6 +3165,61 @@ body.ef-on .rest-mini{display:none !important;}
 #page-community .cm-post.has-media .cm-actions{margin-top:6px;margin-bottom:2px;}
 #page-community .cm-post .cm-body.cm-caption{font-size:14.5px;line-height:1.45;margin:2px 0 6px;}
 #page-community .cmp-postview .cm-post{border-bottom:none !important;}
+/* ── Goals (redesign) ── */
+.gl-hero,.gl-card{border-radius:24px;padding:18px;margin-bottom:12px;background:linear-gradient(155deg,rgba(255,255,255,0.105) 0%,rgba(255,255,255,0.04) 42%,rgba(255,255,255,0.055) 100%);border:0.5px solid rgba(255,255,255,0.13);box-shadow:inset 0 1px 0 rgba(255,255,255,0.16),0 12px 30px rgba(0,0,0,0.32);}
+.gl-hero{background:radial-gradient(120% 90% at 0% 0%,var(--pink-dim),transparent 60%),linear-gradient(155deg,rgba(255,255,255,0.11),rgba(255,255,255,0.04));}
+.gl-eyebrow{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--pink);}
+.gl-title{font-size:30px;font-weight:800;letter-spacing:-0.02em;margin-top:4px;line-height:1.1;}
+.gl-title small{font-size:15px;font-weight:700;color:#9BA0A8;letter-spacing:0;}
+.gl-sub{font-size:14px;color:#C9CDD3;line-height:1.45;margin-top:6px;}
+.gl-sub2{font-size:12.5px;color:#9BA0A8;margin:-4px 0 12px;}
+.gl-bar{height:10px;border-radius:5px;background:rgba(255,255,255,0.09);margin:16px 0 8px;overflow:hidden;}
+.gl-bar i{display:block;height:100%;border-radius:5px;background:var(--pink);box-shadow:0 0 12px var(--pink-glow);}
+.gl-ends{display:flex;justify-content:space-between;font-size:14px;font-weight:700;}
+.gl-ends span{display:flex;flex-direction:column;}
+.gl-ends span.mid{align-items:center;color:var(--pink);}
+.gl-ends span:last-child{align-items:flex-end;}
+.gl-ends em{font-style:normal;font-size:11px;font-weight:600;color:#9BA0A8;}
+.gl-pace{display:flex;align-items:flex-start;gap:8px;margin-top:14px;font-size:13px;color:#C9CDD3;line-height:1.4;}
+.gl-pill{flex-shrink:0;display:inline-flex;align-items:center;height:22px;padding:0 9px;border-radius:11px;font-size:11.5px;font-weight:800;background:rgba(255,255,255,0.1);color:#fff;white-space:nowrap;}
+.gl-pill.good{background:rgba(48,209,88,0.16);color:#30D158;}.gl-pill.warn{background:rgba(255,159,10,0.16);color:#FF9F0A;}.gl-pill.bad{background:rgba(255,69,58,0.16);color:#FF6B6B;}
+.gl-card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;}
+.gl-card-title{font-size:19px;font-weight:800;}
+.gl-badge{font-size:11.5px;font-weight:800;padding:4px 10px;border-radius:11px;background:var(--pink-dim);color:var(--pink);}
+.gl-badge.custom{background:rgba(255,255,255,0.1);color:#fff;}
+.gl-cal{font-size:36px;font-weight:800;letter-spacing:-0.02em;line-height:1;}
+.gl-cal small{font-size:14px;font-weight:700;color:#9BA0A8;margin-left:6px;letter-spacing:0;}
+.gl-t-why{font-size:12.5px;color:#9BA0A8;line-height:1.45;margin-top:4px;}
+.gl-cal-why{margin:6px 0 4px;}
+.gl-ts{display:flex;flex-direction:column;margin-top:10px;}
+.gl-t{padding:11px 0;border-top:0.5px solid rgba(255,255,255,0.08);}
+.gl-t-top{display:flex;align-items:center;gap:8px;}
+.gl-t-top b{font-size:15px;font-weight:700;flex:1;}
+.gl-dot{width:9px;height:9px;border-radius:50%;}
+.gl-t-v{font-size:18px;font-weight:800;font-variant-numeric:tabular-nums;}
+.gl-t-v small{font-size:12px;color:#9BA0A8;margin-left:1px;}
+.gl-actions{display:flex;gap:8px;margin-top:6px;}
+.gl-btn{flex:1;height:42px;border-radius:21px;border:0.5px solid var(--pink-border);background:var(--pink-dim);color:var(--pink);font:700 14px var(--tf-font);}
+.gl-btn.ghost{border-color:rgba(255,255,255,0.14);background:rgba(255,255,255,0.06);color:#fff;}
+.gl-empty{font-size:14px;color:#9BA0A8;line-height:1.45;}
+.gl-wk{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;}
+.gl-wk-stat{border-radius:16px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.08);padding:10px 11px;display:flex;flex-direction:column;gap:2px;min-width:0;}
+.gl-wk-stat span{font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#9BA0A8;}
+.gl-wk-stat b{font-size:21px;font-weight:800;font-variant-numeric:tabular-nums;}
+.gl-wk-stat b small{font-size:11px;color:#9BA0A8;}
+.gl-wk-stat em{font-style:normal;font-size:11px;color:#C9CDD3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.gl-hist{margin-top:12px;}
+.gl-hist-row{display:grid;grid-template-columns:1fr auto;grid-template-areas:"d p" "v p";column-gap:10px;padding:10px 0;border-top:0.5px solid rgba(255,255,255,0.08);align-items:center;}
+.gl-hist-d{grid-area:d;font-size:13.5px;font-weight:700;}
+.gl-hist-v{grid-area:v;font-size:12.5px;color:#9BA0A8;}
+.gl-hist-v em{font-style:normal;font-weight:700;color:#C9CDD3;}.gl-hist-v em.good{color:#30D158;}
+.gl-hist-row .gl-pill{grid-area:p;}
+.gl-saved{font-size:11.5px;color:#9BA0A8;font-weight:600;}
+.gl-chips{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.gl-chip{height:42px;border-radius:21px;border:0.5px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.05);color:#fff;font:700 14px var(--tf-font);}
+.gl-chip.on{background:var(--pink);color:#000;border-color:transparent;box-shadow:0 0 14px var(--pink-glow);}
+.gl-weightnote{font-size:12.5px;color:#9BA0A8;margin-top:12px;line-height:1.5;}
+.gl-weightnote b{color:#fff;}
 /* ── Body weight page (opened from the Progress graph) ── */
 .e-wt{cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent;}
 .e-wt:active{transform:scale(.99);}
@@ -3946,126 +4001,7 @@ body.reel-on{overflow:hidden;}
   </div>
   <div class="container">
     <div style="height:14px;"></div>
-
-    <!-- Progress rings -->
-    <div class="goal-ring-row" id="goalRings"></div>
-
-    <!-- Goal Focus Selector -->
-    <div class="panel" style="margin-bottom:12px;">
-      <div class="panel-title">What's your focus?</div>
-      <div style="display:flex;flex-direction:column;gap:8px;" id="goalFocusSelector">
-        <div class="goal-focus-card" data-focus="fat_loss" onclick="selectGoalFocus('fat_loss')">
-          <div class="goal-focus-icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M12 2c0 6-6 8-6 13a6 6 0 0 0 12 0c0-5-6-7-6-13z"/><path d="M10 19c0-3 2-4 2-7"/></svg></div>
-          <div class="goal-focus-info">
-            <div class="goal-focus-name">Fat Loss</div>
-            <div class="goal-focus-desc">Burn fat through a calorie deficit · preserve muscle</div>
-          </div>
-          <div class="goal-focus-check" id="check-fat_loss"></div>
-        </div>
-        <div class="goal-focus-card" data-focus="muscle_gain" onclick="selectGoalFocus('muscle_gain')">
-          <div class="goal-focus-icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg></div>
-          <div class="goal-focus-info">
-            <div class="goal-focus-name">Muscle Gain</div>
-            <div class="goal-focus-desc">Build lean muscle with a moderate calorie surplus</div>
-          </div>
-          <div class="goal-focus-check" id="check-muscle_gain"></div>
-        </div>
-        <div class="goal-focus-card" data-focus="recomp" onclick="selectGoalFocus('recomp')">
-          <div class="goal-focus-icon"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
-          <div class="goal-focus-info">
-            <div class="goal-focus-name">Body Recomposition</div>
-            <div class="goal-focus-desc">Burn fat and build muscle simultaneously · maintenance calories</div>
-          </div>
-          <div class="goal-focus-check" id="check-recomp"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Body Stats for TDEE -->
-    <div class="panel" style="margin-bottom:12px;">
-      <div class="panel-title">Your Stats</div>
-      <div class="two-col" style="margin-bottom:10px;">
-        <div class="field"><label>Age</label><div class="iw"><input type="number" id="goalAge" placeholder="25" min="13" max="99" oninput="calcTDEE()"><span class="unit">yrs</span></div></div>
-        <div class="field"><label>Current Weight</label><div class="iw"><input type="number" id="goalCurrentWeight" placeholder="135" step="0.5" oninput="calcTDEE()"><span class="unit">lbs</span></div></div>
-      </div>
-      <div class="two-col" style="margin-bottom:10px;">
-        <div class="field"><label>Height</label><div class="iw"><input type="number" id="goalHeightFt" placeholder="5" min="3" max="8" oninput="calcTDEE()" style="width:48px;"><span class="unit">ft</span><input type="number" id="goalHeightIn" placeholder="6" min="0" max="11" oninput="calcTDEE()" style="width:48px;"><span class="unit">in</span></div></div>
-        <div class="field"><label>Target Weight</label><div class="iw"><input type="number" id="goalWeight" placeholder="120" step="0.5" oninput="calcTDEE()"><span class="unit">lbs</span></div></div>
-      </div>
-      <div class="field" style="margin-bottom:10px;">
-        <label>Activity Level</label>
-        <div class="iw"><select id="goalActivity" onchange="calcTDEE()">
-          <option value="1.2">Sedentary (little or no exercise)</option>
-          <option value="1.375">Lightly Active (1-3 days/week)</option>
-          <option value="1.55" selected>Moderately Active (3-5 days/week)</option>
-          <option value="1.725">Very Active (6-7 days/week)</option>
-          <option value="1.9">Extra Active (physical job + training)</option>
-        </select></div>
-      </div>
-      <div class="field">
-        <label>Timeline</label>
-        <div class="iw"><select id="goalTimeline" onchange="calcTDEE()">
-          <option value="2">2 weeks</option>
-          <option value="4">4 weeks</option>
-          <option value="6">6 weeks</option>
-          <option value="8" selected>8 weeks</option>
-          <option value="10">10 weeks</option>
-          <option value="12">12 weeks</option>
-          <option value="16">16 weeks</option>
-          <option value="20">20 weeks</option>
-          <option value="24">24 weeks</option>
-        </select></div>
-      </div>
-    </div>
-
-    <!-- Calculated Targets (shown after TDEE calc) -->
-    <div id="goalTargetsPanel" style="display:none;margin-bottom:12px;">
-      <div class="panel" style="margin-bottom:12px;">
-        <div class="panel-title">Your Daily Targets</div>
-        <!-- TDEE breakdown -->
-        <div class="tdee-breakdown" id="tdeeBreakdown"></div>
-        <!-- Macro targets -->
-        <div class="goal-macro-targets" id="goalMacroTargets"></div>
-      </div>
-      <!-- Weekly fat burn / timeline projection -->
-      <div class="panel" style="margin-bottom:12px;">
-        <div class="panel-title">Projection</div>
-        <div id="goalProjection"></div>
-      </div>
-    </div>
-
-    <!-- Manual override -->
-    <div class="panel" style="margin-bottom:12px;">
-      <div class="panel-title" style="margin-bottom:4px;">Manual Override</div>
-      <div style="font-size:11px;color:var(--text3);margin-bottom:12px;">Targets are auto-calculated above, or set your own below</div>
-      <div class="field" style="margin-bottom:10px;"><label>Daily Calories</label><div class="iw"><input type="number" id="goalCal" placeholder="e.g. 1600" min="0"><span class="unit">kcal</span></div></div>
-      <div class="three-col">
-        <div class="field"><label>Protein</label><div class="iw"><input type="number" id="goalProtein" placeholder="0" min="0"><span class="unit">g</span></div></div>
-        <div class="field"><label>Carbs</label><div class="iw"><input type="number" id="goalCarbs" placeholder="0" min="0"><span class="unit">g</span></div></div>
-        <div class="field"><label>Fat</label><div class="iw"><input type="number" id="goalFat" placeholder="0" min="0"><span class="unit">g</span></div></div>
-      </div>
-    </div>
-
-    <div class="panel" style="margin-bottom:12px;">
-      <div class="panel-title">Profile</div>
-      <div class="field"><label>Target Body Fat %</label><div class="iw"><input type="number" id="goalBF" placeholder="0.0" step="0.1"><span class="unit">%</span></div></div>
-    </div>
-
-    <button class="pink-btn" onclick="saveGoals()">Save Goals</button>
-    <div style="height:12px;"></div>
-
-    <!-- Weekly Check-in -->
-    <div class="panel" style="margin-bottom:12px;" id="weeklyCheckinPanel">
-      <div class="panel-title">Weekly Check-in</div>
-      <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">Log this week's results to track if you're on pace for your goal</div>
-      <div class="two-col" style="margin-bottom:10px;">
-        <div class="field"><label>This week's weight</label><div class="iw"><input type="number" id="checkinWeight" placeholder="0.0" step="0.1"><span class="unit">lbs</span></div></div>
-        <div class="field"><label>Avg daily calories</label><div class="iw"><input type="number" id="checkinCals" placeholder="0"><span class="unit">kcal</span></div></div>
-      </div>
-      <div class="field" style="margin-bottom:10px;"><label>Workouts completed this week</label><div class="iw"><input type="number" id="checkinWorkouts" placeholder="0" min="0" max="7"><span class="unit">days</span></div></div>
-      <button class="pink-btn" onclick="saveCheckin()">Log Check-in</button>
-      <div id="checkinHistory" style="margin-top:14px;"></div>
-    </div>
+    <div id="goalsRoot"></div>
   </div>
 </div>
 
@@ -10926,192 +10862,338 @@ const FOCUS_CONFIG = {
   maintain:    { label:'Maintain',     deficit:0,     proteinMult:0.9, carbPct:0.40, fatPct:0.30 },   // offered at sign-up
 };
 
-function selectGoalFocus(focus) {
-  goalsData.focus = focus;
-  document.querySelectorAll('.goal-focus-card').forEach(c => c.classList.remove('selected'));
-  document.querySelectorAll('.goal-focus-check').forEach(c => c.textContent = '');
-  const card = document.querySelector(`[data-focus="${focus}"]`);
-  if(card) { card.classList.add('selected'); document.getElementById(`check-${focus}`).textContent = '✓'; }
-  calcTDEE();
-}
-
-function calcTDEE() {
-  const age     = parseFloat(document.getElementById('goalAge').value) || 0;
-  const wtLbs   = parseFloat(document.getElementById('goalCurrentWeight').value) || 0;
-  const ft      = parseFloat(document.getElementById('goalHeightFt').value) || 0;
-  const inch    = parseFloat(document.getElementById('goalHeightIn').value) || 0;
-  const target  = parseFloat(document.getElementById('goalWeight').value) || 0;
-  const act     = parseFloat(document.getElementById('goalActivity').value) || 1.55;
-  const weeks   = parseInt(document.getElementById('goalTimeline').value) || 8;
-  const focus   = goalsData.focus;
-  const gender  = appSettings.gender || 'female';
-
-  if(!age || !wtLbs || !ft || !focus) {
-    document.getElementById('goalTargetsPanel').style.display = 'none';
-    return;
-  }
-
-  // Step 1: Calculate TDEE
-  const wtKg = wtLbs * 0.453592;
-  const htCm = (ft * 30.48) + (inch * 2.54);
-  const bmr  = gender === 'male'
-    ? (10 * wtKg) + (6.25 * htCm) - (5 * age) + 5
-    : (10 * wtKg) + (6.25 * htCm) - (5 * age) - 161;
-  const tdee = Math.round(bmr * act);
-
-  // Step 2: Calculate daily calorie adjustment from user's goal
-  // lbs to change x 3500 = total cals needed
-  // total cals / (weeks x 7) = daily adjustment
-  let dailyAdjustment = 0;
-  let lbsToChange = 0;
-
-  if(focus === 'fat_loss') {
-    lbsToChange = target && target < wtLbs ? wtLbs - target : 0;
-    if(lbsToChange > 0) {
-      dailyAdjustment = Math.round((lbsToChange * 3500) / (weeks * 7));
-      dailyAdjustment = Math.min(1200, Math.max(250, dailyAdjustment));
-    } else {
-      dailyAdjustment = 500;
-    }
-  } else if(focus === 'muscle_gain') {
-    lbsToChange = target && target > wtLbs ? target - wtLbs : 0;
-    if(lbsToChange > 0) {
-      dailyAdjustment = -Math.round((lbsToChange * 3500) / (weeks * 7));
-      dailyAdjustment = Math.max(-800, Math.min(-200, dailyAdjustment));
-    } else {
-      dailyAdjustment = -300;
-    }
-  }
-
-  const targetCal = Math.max(1200, tdee - dailyAdjustment);
-
-  // Step 3: Macros
-  const cfg = FOCUS_CONFIG[focus] || FOCUS_CONFIG.maintain || FOCUS_CONFIG.recomp;
-  const proteinG = Math.round(wtLbs * cfg.proteinMult);
-  const fatG     = Math.round((targetCal * cfg.fatPct) / 9);
-  const carbG    = Math.max(0, Math.round((targetCal - proteinG * 4 - fatG * 9) / 4));
-
-  // Step 4: Projection
-  const totalCalChange = Math.abs(dailyAdjustment) * weeks * 7;
-  const totalLbsChange = Math.round((totalCalChange / 3500) * 10) / 10;
-  const projWeight = focus === 'fat_loss'
-    ? Math.round((wtLbs - totalLbsChange) * 10) / 10
-    : focus === 'muscle_gain'
-      ? Math.round((wtLbs + totalLbsChange) * 10) / 10
-      : wtLbs;
-  const lbsPerWeek = Math.round((totalLbsChange / weeks) * 10) / 10;
-
-  let weeksNeeded = null;
-  if(target && wtLbs && dailyAdjustment !== 0) {
-    const lbsDiff = Math.abs(wtLbs - target);
-    const calsNeeded = lbsDiff * 3500;
-    const daysNeeded = calsNeeded / Math.abs(dailyAdjustment);
-    weeksNeeded = Math.ceil(daysNeeded / 7);
-  }
-  const onPace = !target || weeksNeeded === null || weeksNeeded <= weeks;
-
-  // Save
-  goalsData.tdee          = tdee;
-  goalsData.cal           = targetCal;
-  goalsData.protein       = proteinG;
-  goalsData.carbs         = carbG;
-  goalsData.fat           = fatG;
-  goalsData.deficitPerDay = dailyAdjustment;
-  goalsData.weeks         = weeks;
-  goalsData.goalWeight    = target || goalsData.goalWeight;
-  goalsData.currentWeight = wtLbs;
-
-  document.getElementById('goalCal').value     = targetCal;
-  document.getElementById('goalProtein').value = proteinG;
-  document.getElementById('goalCarbs').value   = carbG;
-  document.getElementById('goalFat').value     = fatG;
-
-  // Render Daily Targets
-  const adjustLabel = dailyAdjustment > 0 ? 'Deficit' : dailyAdjustment < 0 ? 'Surplus' : 'No change';
-  const adjustColor = dailyAdjustment > 0 ? 'var(--pink)' : dailyAdjustment < 0 ? 'var(--green)' : 'var(--text3)';
-  document.getElementById('tdeeBreakdown').innerHTML = `
-    <div class="tdee-row"><span class="tdee-label">Your maintenance (TDEE)</span><span class="tdee-val">${tdee.toLocaleString()} kcal</span></div>
-    <div class="tdee-row"><span class="tdee-label">Daily ${adjustLabel}</span><span class="tdee-val" style="color:${adjustColor}">${dailyAdjustment > 0 ? '\u2212' : dailyAdjustment < 0 ? '+' : ''}${Math.abs(dailyAdjustment)} kcal</span></div>
-    <div class="tdee-row"><span class="tdee-label">Your daily calorie target</span><span class="tdee-val highlight">${targetCal.toLocaleString()} kcal</span></div>
-  `;
-
-  document.getElementById('goalMacroTargets').innerHTML = [
-    [targetCal.toLocaleString(),'','Calories'],
-    [proteinG+'g','','Protein'],
-    [carbG+'g','','Carbs'],
-    [fatG+'g','','Fat'],
-  ].map(([v,u,l])=>`<div class="gmt-card"><div class="gmt-val">${v}</div><div class="gmt-lbl">${l}</div></div>`).join('');
-
-  // Render Projection
-  const endDate = new Date();
-  endDate.setDate(endDate.getDate() + weeks * 7);
-  const weeklyCalChange = Math.abs(dailyAdjustment) * 7;
-  let projHTML = '';
-
-  if(focus === 'fat_loss') {
-    projHTML = `
-      <div class="proj-stat"><span class="proj-label">Daily deficit</span><span class="proj-val">${Math.abs(dailyAdjustment).toLocaleString()} kcal/day</span></div>
-      <div class="proj-stat"><span class="proj-label">Weekly deficit</span><span class="proj-val">${weeklyCalChange.toLocaleString()} kcal/week</span></div>
-      <div class="proj-stat"><span class="proj-label">Fat loss rate</span><span class="proj-val">${lbsPerWeek} lbs/week</span></div>
-      <div class="proj-stat"><span class="proj-label">Total loss in ${weeks} weeks</span><span class="proj-val">${totalLbsChange} lbs</span></div>
-      <div class="proj-stat"><span class="proj-label">Projected weight</span><span class="proj-val ${onPace?'good':'warn'}">${projWeight} lbs</span></div>
-      ${target?`<div class="proj-stat"><span class="proj-label">Weeks to reach ${target} lbs</span><span class="proj-val ${onPace?'good':'warn'}">${weeksNeeded} weeks${onPace?' \u2713':''}</span></div>`:''}
-      <div class="proj-stat"><span class="proj-label">Goal date</span><span class="proj-val">${endDate.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span></div>
-      <div style="margin-top:12px;font-size:11px;color:var(--text3);">3,500 kcal deficit = 1 lb of fat lost</div>`;
-  } else if(focus === 'muscle_gain') {
-    projHTML = `
-      <div class="proj-stat"><span class="proj-label">Daily surplus</span><span class="proj-val">+${Math.abs(dailyAdjustment).toLocaleString()} kcal/day</span></div>
-      <div class="proj-stat"><span class="proj-label">Weekly surplus</span><span class="proj-val">${weeklyCalChange.toLocaleString()} kcal/week</span></div>
-      <div class="proj-stat"><span class="proj-label">Weight gain rate</span><span class="proj-val">${lbsPerWeek} lbs/week</span></div>
-      <div class="proj-stat"><span class="proj-label">Total gain in ${weeks} weeks</span><span class="proj-val">+${totalLbsChange} lbs</span></div>
-      <div class="proj-stat"><span class="proj-label">Projected weight</span><span class="proj-val ${onPace?'good':'warn'}">${projWeight} lbs</span></div>
-      ${target?`<div class="proj-stat"><span class="proj-label">Weeks to reach ${target} lbs</span><span class="proj-val ${onPace?'good':'warn'}">${weeksNeeded} weeks${onPace?' \u2713':''}</span></div>`:''}
-      <div class="proj-stat"><span class="proj-label">Goal date</span><span class="proj-val">${endDate.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span></div>
-      <div style="margin-top:12px;font-size:11px;color:var(--text3);">3,500 kcal surplus \u2248 1 lb gained</div>`;
-  } else {
-    projHTML = `
-      <div class="proj-stat"><span class="proj-label">Daily calories</span><span class="proj-val">${targetCal.toLocaleString()} kcal (maintenance)</span></div>
-      <div class="proj-stat"><span class="proj-label">Strategy</span><span class="proj-val">Eat at TDEE \u00b7 high protein \u00b7 progressive overload</span></div>
-      <div class="proj-stat"><span class="proj-label">Expected outcome in ${weeks} weeks</span><span class="proj-val good">Gradual body recomposition</span></div>
-      <div style="margin-top:12px;font-size:11px;color:var(--text3);">Weight may stay similar while body composition improves</div>`;
-  }
-
-  document.getElementById('goalProjection').innerHTML = projHTML;
-  document.getElementById('goalTargetsPanel').style.display = 'block';
-}
 
 
-function saveGoals() {
-  goalsData.name    = appSettings.name || goalsData.name || '';
-  goalsData.cal     = parseFloat(document.getElementById('goalCal').value) || goalsData.cal || 0;
-  goalsData.protein = parseFloat(document.getElementById('goalProtein').value) || goalsData.protein || 0;
-  goalsData.carbs   = parseFloat(document.getElementById('goalCarbs').value) || goalsData.carbs || 0;
-  goalsData.fat     = parseFloat(document.getElementById('goalFat').value) || goalsData.fat || 0;
-  goalsData.goalWeight  = parseFloat(document.getElementById('goalWeight').value) || goalsData.goalWeight || 0;
-  goalsData.goalBF      = parseFloat(document.getElementById('goalBF').value) || 0;
-  goalsData.age         = parseFloat(document.getElementById('goalAge').value) || 0;
-  goalsData.currentWeight = parseFloat(document.getElementById('goalCurrentWeight').value) || 0;
-  goalsData.activity    = document.getElementById('goalActivity').value;
-  goalsData.weeks       = parseInt(document.getElementById('goalTimeline').value) || 8;
-  // The goal's clock restarts only when the goal itself changes (not when macros are tweaked)
-  const prevGoal = load(GOALS_KEY) || {};
-  const goalChanged = prevGoal.focus !== goalsData.focus || Number(prevGoal.goalWeight) !== Number(goalsData.goalWeight)
-    || Number(prevGoal.startWeight || prevGoal.currentWeight) !== Number(goalsData.currentWeight) || Number(prevGoal.weeks) !== Number(goalsData.weeks);
-  if(goalChanged || !goalsData.startDate) goalsData.startDate = new Date().toISOString();
-  if(goalsData.currentWeight) goalsData.startWeight = goalsData.currentWeight;
-  save(GOALS_KEY, goalsData);
-  // Cloud sync
-  cloudPost('/user/goals', {
-    focus: goalsData.focus, cal: goalsData.cal, protein: goalsData.protein,
-    carbs: goalsData.carbs, fat: goalsData.fat, tdee: goalsData.tdee,
-    deficit_per_day: goalsData.deficitPerDay, weeks: goalsData.weeks,
-    current_weight: goalsData.currentWeight, goal_weight: goalsData.goalWeight
+
+
+// ══════════════════════════════════════
+// GOALS (redesign): goal card from real weigh-ins, recommended daily targets with reasons,
+// an automatic weekly check-in, and a plan card that saves as you change it.
+// Stored in GOALS_KEY with the same fields as before (focus, cal, protein, carbs, fat, goalWeight,
+// startWeight, startDate, weeks, activity, age, currentWeight) so Home and Macros keep working.
+// New: targetMode 'auto' (recommended, follows your weight) | 'custom' (your own numbers).
+// ══════════════════════════════════════
+const GL_FOCUS = {
+  fat_loss:    { label: 'Fat loss',    short: 'Fat loss',    proteinPerLb: 1.0, fatPct: 0.30 },
+  muscle_gain: { label: 'Muscle gain', short: 'Muscle gain', proteinPerLb: 0.9, fatPct: 0.25 },
+  recomp:      { label: 'Recomp',      short: 'Recomp',      proteinPerLb: 1.0, fatPct: 0.28 },
+  maintain:    { label: 'Maintain',    short: 'Maintain',    proteinPerLb: 0.8, fatPct: 0.30 },
+};
+const GL_ACTIVITY = [['1.2', 'Sedentary', 'little or no exercise'], ['1.375', 'Lightly active', '1–3 days a week'], ['1.55', 'Moderately active', '3–5 days a week'],
+  ['1.725', 'Very active', '6–7 days a week'], ['1.9', 'Extra active', 'physical job + training']];
+const GL_WEEKS = [4, 6, 8, 10, 12, 16, 20, 24, 32, 52];
+
+// Weigh-ins, oldest first: [{ ts, w }]
+function glWeighIns() {
+  const out = [];
+  (progressData || []).forEach(e => {
+    const w = parseFloat(e && e.weight), ts = Number(e && e.ts) || Date.parse(e && e.date);
+    if(w > 0 && isFinite(ts)) out.push({ ts, w });
   });
-  const s = load('trident_settings_v1') || {};
-  if(goalsData.name) { s.name = goalsData.name; save('trident_settings_v1', s); }
-  showToast('Goals saved!', 5000);
+  return out.sort((a, b) => a.ts - b.ts);
+}
+function glCurrentWeight(g) { const w = glWeighIns(); return w.length ? w[w.length - 1].w : (parseFloat(g.currentWeight) || 0); }
+// Pounds per week over the last 4 weeks of weigh-ins (least squares); null if there isn't enough.
+function glTrend() {
+  const pts = glWeighIns().filter(p => p.ts >= Date.now() - 28 * 86400000);
+  if(pts.length < 2 || pts[pts.length - 1].ts - pts[0].ts < 5 * 86400000) return null;
+  const n = pts.length, xs = pts.map(p => p.ts / (7 * 86400000)), ys = pts.map(p => p.w);
+  const mx = xs.reduce((a, b) => a + b) / n, my = ys.reduce((a, b) => a + b) / n;
+  let num = 0, den = 0;
+  for(let i = 0; i < n; i++) { num += (xs[i] - mx) * (ys[i] - my); den += (xs[i] - mx) ** 2; }
+  return den ? num / den : null;
+}
+function glProfile(g) {
+  const age = parseFloat(g.age || appSettings.age) || 0;
+  const ft = parseFloat(appSettings.heightFt) || 0, inch = parseFloat(appSettings.heightIn) || 0;
+  const weeks = parseInt(g.weeks, 10) || 12;
+  // Weeks left until the goal date (at least 2), so the pace fits the time that's actually left
+  const left = Math.max(2, ((Date.parse(g.startDate) || Date.now()) + weeks * 7 * 86400000 - Date.now()) / (7 * 86400000));
+  return { age, ft, inch, gender: appSettings.gender === 'male' ? 'male' : 'female', weight: glCurrentWeight(g),
+    activity: parseFloat(g.activity) || 1.55, weeks, weeksLeft: left, target: parseFloat(g.goalWeight) || 0, focus: GL_FOCUS[g.focus] ? g.focus : 'maintain' };
+}
+// The recommendation: calories from maintenance (Mifflin-St Jeor × activity) adjusted for the goal,
+// protein from body weight, fat as a share of calories, carbs fill the rest (so a cut is lower-carb
+// and a bulk higher-carb). Returns null until age, height and weight are known.
+function glRecommend(g) {
+  const p = glProfile(g);
+  if(!p.age || !p.ft || !p.weight) return null;
+  const kg = p.weight * 0.453592, cm = p.ft * 30.48 + p.inch * 2.54;
+  const bmr = 10 * kg + 6.25 * cm - 5 * p.age + (p.gender === 'male' ? 5 : -161);
+  const tdee = Math.round(bmr * p.activity / 10) * 10;
+  const floor = p.gender === 'male' ? 1500 : 1200;
+  let adj = 0, why = '';
+  const toGo = p.target ? p.target - p.weight : 0;
+  if(p.focus === 'fat_loss') {
+    // Deficit to reach the target in the timeline, kept between 300 and 25% of maintenance (max 1,000)
+    // At least a 15% deficit (so calories are clearly lower), more if the timeline needs it, at most 25% / 1,000
+    const need = toGo < 0 ? Math.round(-toGo * 3500 / (p.weeksLeft * 7)) : Math.round(tdee * 0.2);
+    adj = -Math.min(Math.max(need, Math.round(tdee * 0.15), 300), Math.min(1000, Math.round(tdee * 0.25)));
+    why = `${Math.abs(adj).toLocaleString()} below your maintenance of ${tdee.toLocaleString()}, about ${(Math.abs(adj) * 7 / 3500).toFixed(1)} lb of fat a week.`;
+  } else if(p.focus === 'muscle_gain') {
+    // A lean surplus: enough to build, small enough to limit fat gain
+    const need = toGo > 0 ? Math.round(toGo * 3500 / (p.weeksLeft * 7)) : Math.round(tdee * 0.1);
+    adj = Math.min(Math.max(need, 200), 500);
+    why = `${adj.toLocaleString()} above your maintenance of ${tdee.toLocaleString()} for a lean gain of about ${(adj * 7 / 3500).toFixed(1)} lb a week.`;
+  } else if(p.focus === 'recomp') {
+    adj = -Math.round(tdee * 0.1 / 10) * 10;
+    why = `A small ${Math.abs(adj)} kcal deficit from your maintenance of ${tdee.toLocaleString()}, so you lose fat while high protein and lifting build muscle.`;
+  } else {
+    why = `Your maintenance: about what you burn in a day, so your weight holds steady.`;
+  }
+  const cal = Math.max(floor, Math.round((tdee + adj) / 10) * 10);
+  if(cal === floor && tdee + adj < floor) why += ` Kept at a safe minimum of ${floor.toLocaleString()}.`;
+  const cfg = GL_FOCUS[p.focus];
+  // Protein per pound: of goal weight when cutting toward a lower target (so it isn't inflated), else current
+  const protBase = p.focus === 'fat_loss' && p.target && p.target < p.weight ? p.target : p.weight;
+  const protein = Math.round(protBase * cfg.proteinPerLb / 5) * 5;
+  const fat = Math.max(Math.round(p.weight * 0.3), Math.round(cal * cfg.fatPct / 9));
+  const carbs = Math.max(0, Math.round((cal - protein * 4 - fat * 9) / 4));
+  const pct = x => Math.round(x / cal * 100);
+  // Carbs at maintenance (same protein, maintenance fat share), to show how much lower or higher they are
+  const mFat = Math.max(Math.round(p.weight * 0.3), Math.round(tdee * GL_FOCUS.maintain.fatPct / 9));
+  const mCarbs = Math.max(0, Math.round((tdee - protein * 4 - mFat * 9) / 4));
+  return {
+    tdee, adj, cal, protein, carbs, fat,
+    why: {
+      cal: why,
+      protein: `${cfg.proteinPerLb} g per lb of ${protBase === p.weight ? 'body weight' : 'goal weight'} (${Math.round(protBase)} lb) ${p.focus === 'fat_loss' ? 'protects your muscle while you cut' : p.focus === 'muscle_gain' ? 'gives your muscles what they need to grow' : 'keeps you building and recovering'}.`,
+      carbs: p.focus === 'fat_loss' ? `Lower carbs: ${carbs} g vs about ${mCarbs} g at maintenance, to fit the deficit. Eat most of them around your workouts.`
+        : p.focus === 'muscle_gain' ? `Higher carbs: ${carbs} g vs about ${mCarbs} g at maintenance, to fuel heavy training and help you grow.`
+        : `${pct(carbs * 4)}% of calories: enough to fuel your training.`,
+      fat: `${pct(fat * 9)}% of calories for hormones, recovery and staying full.`,
+    }
+  };
+}
+// Applies the recommendation to the saved targets when in auto mode (they follow your weight).
+function glSync(g) {
+  const r = glRecommend(g);
+  if(!r) return null;
+  g.tdee = r.tdee; g.deficitPerDay = -r.adj;
+  if(g.targetMode !== 'custom') {
+    const changed = g.cal !== r.cal || g.protein !== r.protein || g.carbs !== r.carbs || g.fat !== r.fat;
+    g.cal = r.cal; g.protein = r.protein; g.carbs = r.carbs; g.fat = r.fat;
+    return { r, changed };
+  }
+  return { r, changed: false };
+}
+function glSave(g, quiet) {
+  g.name = appSettings.name || g.name || '';
+  g.currentWeight = glCurrentWeight(g) || g.currentWeight;
+  goalsData = g;
+  save(GOALS_KEY, g);
+  try {
+    cloudPost('/user/goals', { focus: g.focus, cal: g.cal, protein: g.protein, carbs: g.carbs, fat: g.fat, tdee: g.tdee,
+      deficit_per_day: g.deficitPerDay, weeks: g.weeks, current_weight: g.currentWeight, goal_weight: g.goalWeight });
+  } catch(e) {}
+  try { renderDashboard(); } catch(e) {}
+  if(!quiet) showToast('Saved');
+}
+// A plan change: the goal's clock restarts when the goal itself changes.
+function glSet(field, value) {
+  const g = Object.assign({}, load(GOALS_KEY) || {}, goalsData);
+  const before = { focus: g.focus, goalWeight: Number(g.goalWeight) || 0, weeks: Number(g.weeks) || 0 };
+  if(field === 'heightFt' || field === 'heightIn') {
+    appSettings[field] = parseInt(value, 10) || 0;
+    appSettings.height = `${appSettings.heightFt || 0}'${appSettings.heightIn || 0}"`;
+    save(SETTINGS_KEY, appSettings);
+  } else if(field === 'age') { g.age = parseInt(value, 10) || ''; appSettings.age = String(g.age || ''); save(SETTINGS_KEY, appSettings); }
+  else if(field === 'goalWeight') g.goalWeight = parseFloat(value) || 0;
+  else if(field === 'weeks') g.weeks = parseInt(value, 10) || 12;
+  else g[field] = value;
+  const after = { focus: g.focus, goalWeight: Number(g.goalWeight) || 0, weeks: Number(g.weeks) || 0 };
+  if(JSON.stringify(before) !== JSON.stringify(after) || !g.startDate) {
+    g.startDate = new Date().toISOString();
+    g.startWeight = glCurrentWeight(g) || g.startWeight;
+  }
+  glSync(g);
+  glSave(g, true);
   renderGoals();
-  renderDashboard();
+}
+function selectGoalFocus(focus) { glSet('focus', focus); }
+function calcTDEE() { renderGoals(); }
+function saveGoals() { const g = goalsData; glSync(g); glSave(g); renderGoals(); }
+
+// ── Goal card ──
+function glGoalCardHTML(g) {
+  const p = glProfile(g), cur = p.weight, target = p.target;
+  const focusLbl = GL_FOCUS[p.focus].label;
+  if(!cur) return `<div class="gl-hero"><div class="gl-eyebrow">${focusLbl}</div><div class="gl-title">Log your weight to start</div>
+    <div class="gl-sub">Your goal, pace and daily targets all start from your weight.</div><button class="pink-btn" style="margin-top:14px;" onclick="navTo('progress');setTimeout(()=>thOpen('weight'),250)">Log weight</button></div>`;
+  if(!target || p.focus === 'maintain' || p.focus === 'recomp') {
+    return `<div class="gl-hero"><div class="gl-eyebrow">${focusLbl}</div>
+      <div class="gl-title">${cur.toFixed(1)} <small>lb</small></div>
+      <div class="gl-sub">${p.focus === 'maintain' ? 'Holding steady. Your targets keep your weight where it is.' : p.focus === 'recomp' ? 'Lose fat and build muscle at the same time. Watch your lifts and photos more than the scale.' : 'Set a target weight below to see your pace and finish date.'}</div>
+      ${glPaceHTML(g, p, null)}</div>`;
+  }
+  const start = parseFloat(g.startWeight) || cur;
+  const total = target - start, done = cur - start;
+  const pct = total ? Math.max(0, Math.min(1, done / total)) : 0;
+  const lose = target < start;
+  const left = Math.abs(target - cur);
+  const reached = lose ? cur <= target : cur >= target;
+  return `<div class="gl-hero">
+    <div class="gl-eyebrow">${focusLbl}</div>
+    <div class="gl-title">${reached ? 'Goal reached' : `${lose ? 'Lose' : 'Gain'} ${left.toFixed(1)} <small>lb to go</small>`}</div>
+    <div class="gl-bar"><i style="width:${(pct * 100).toFixed(1)}%"></i></div>
+    <div class="gl-ends"><span>${start.toFixed(1)} lb<em>Start</em></span><span class="mid">${cur.toFixed(1)} lb<em>Now</em></span><span>${target.toFixed(1)} lb<em>Goal</em></span></div>
+    ${glPaceHTML(g, p, { start, cur, target, lose, reached })}
+  </div>`;
+}
+function glPaceHTML(g, p, t) {
+  const trend = glTrend();
+  const fmt = d => d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const deadline = new Date((Date.parse(g.startDate) || Date.now()) + (parseInt(g.weeks, 10) || 12) * 7 * 86400000);
+  const rate = trend === null ? '' : `${trend > 0 ? '+' : trend < 0 ? '−' : ''}${Math.abs(trend).toFixed(1)} lb/week`;
+  let pill = '', note = '';
+  if(!t) {
+    if(trend !== null) { pill = Math.abs(trend) < 0.3 ? '<span class="gl-pill good">Steady</span>' : `<span class="gl-pill">${trend > 0 ? 'Gaining' : 'Losing'}</span>`; note = `${rate} over the last 4 weeks`; }
+    else note = 'Weigh in a few times a week to see your trend.';
+  } else if(t.reached) { pill = '<span class="gl-pill good">Done</span>'; note = 'Set a new target in Your plan below.'; }
+  else if(trend === null) note = `Goal date ${fmt(deadline)}. Weigh in a few times a week to see if you're on pace.`;
+  else if((t.lose && trend >= -0.05) || (!t.lose && trend <= 0.05)) { pill = '<span class="gl-pill bad">Off track</span>'; note = `Your weight is moving the wrong way (${rate}).`; }
+  else {
+    const eta = new Date(Date.now() + Math.abs(t.target - t.cur) / Math.abs(trend) * 7 * 86400000);
+    const ok = eta <= new Date(deadline.getTime() + 4 * 86400000);
+    pill = ok ? `<span class="gl-pill good">On track</span>` : `<span class="gl-pill warn">Behind</span>`;
+    note = ok ? `${rate}. At this pace you'll hit ${t.target.toFixed(0)} lb around ${fmt(eta)} (goal ${fmt(deadline)}).`
+      : `${rate}. At this pace: ${fmt(eta)}, after your goal date of ${fmt(deadline)}.`;
+  }
+  return `<div class="gl-pace">${pill}<span>${note}</span></div>`;
+}
+
+// ── Daily targets ──
+function glTargetsHTML(g, rec) {
+  if(!rec) return `<div class="gl-card"><div class="gl-card-head"><div class="gl-card-title">Daily targets</div></div>
+    <div class="gl-empty">Add your age, height and a weigh-in in Your plan, and the app will recommend your calories and macros.</div></div>`;
+  const custom = g.targetMode === 'custom';
+  const v = custom ? { cal: g.cal, protein: g.protein, carbs: g.carbs, fat: g.fat } : rec;
+  const row = (k, name, unit, color) => `<div class="gl-t">
+      <div class="gl-t-top"><span class="gl-dot" style="background:${color}"></span><b>${name}</b><span class="gl-t-v">${Math.round(v[k] || 0).toLocaleString()}<small>${unit}</small></span></div>
+      ${!custom ? `<div class="gl-t-why">${rec.why[k]}</div>` : (Math.round(v[k]) !== rec[k] ? `<div class="gl-t-why">Recommended: ${rec[k].toLocaleString()}${unit}</div>` : '')}
+    </div>`;
+  return `<div class="gl-card">
+    <div class="gl-card-head"><div class="gl-card-title">Daily targets</div><span class="gl-badge${custom ? ' custom' : ''}">${custom ? 'Custom' : 'Recommended'}</span></div>
+    <div class="gl-cal">${Math.round(v.cal || 0).toLocaleString()}<small>kcal a day</small></div>
+    ${!custom ? `<div class="gl-t-why gl-cal-why">${rec.why.cal}</div>` : (Math.round(v.cal) !== rec.cal ? `<div class="gl-t-why gl-cal-why">Recommended: ${rec.cal.toLocaleString()} kcal</div>` : '')}
+    <div class="gl-ts">${row('protein', 'Protein', 'g', '#FF6B8A')}${row('carbs', 'Carbs', 'g', '#FFC72C')}${row('fat', 'Fat', 'g', '#7AB8FF')}</div>
+    <div class="gl-actions">
+      <button class="gl-btn" onclick="glAdjust()">Adjust</button>
+      ${custom ? `<button class="gl-btn ghost" onclick="glUseRecommended()">Use recommended</button>` : ''}
+    </div>
+  </div>`;
+}
+function glAdjust() {
+  const g = goalsData;
+  hySheet(`<div class="cm-sheet-title">Your daily targets</div>
+    <div class="hy-muted" style="margin-bottom:12px;">Set your own numbers. You can go back to the recommended ones any time.</div>
+    <div class="field" style="margin-bottom:10px;"><label>Calories</label><div class="iw"><input type="number" id="glCal" inputmode="numeric" value="${Math.round(g.cal || 0) || ''}"><span class="unit">kcal</span></div></div>
+    <div class="three-col" style="margin-bottom:14px;">
+      <div class="field"><label>Protein</label><div class="iw"><input type="number" id="glP" inputmode="numeric" value="${Math.round(g.protein || 0) || ''}"><span class="unit">g</span></div></div>
+      <div class="field"><label>Carbs</label><div class="iw"><input type="number" id="glC" inputmode="numeric" value="${Math.round(g.carbs || 0) || ''}"><span class="unit">g</span></div></div>
+      <div class="field"><label>Fat</label><div class="iw"><input type="number" id="glF" inputmode="numeric" value="${Math.round(g.fat || 0) || ''}"><span class="unit">g</span></div></div>
+    </div>
+    <button class="pink-btn" onclick="glSaveCustom()">Save targets</button>
+    <button class="ghost-btn" style="margin-top:8px;" onclick="hySheetClose()">Cancel</button>`);
+}
+function glSaveCustom() {
+  const n = id => Math.max(0, Math.round(parseFloat(document.getElementById(id).value) || 0));
+  const g = goalsData;
+  const cal = n('glCal'); if(!cal) { showToast('Enter your calories'); return; }
+  g.cal = cal; g.protein = n('glP'); g.carbs = n('glC'); g.fat = n('glF'); g.targetMode = 'custom';
+  hySheetClose(); glSave(g); renderGoals();
+}
+function glUseRecommended() { const g = goalsData; g.targetMode = 'auto'; glSync(g); glSave(g); renderGoals(); }
+
+// ── This week (automatic check-in) ──
+function glWeekStart(off) { const m = mxMonday(off || 0); m.setHours(0, 0, 0, 0); return m; }
+function glAvgWeight(from, to) { const w = glWeighIns().filter(p => p.ts >= from && p.ts < to); return w.length ? w.reduce((a, b) => a + b.w, 0) / w.length : null; }
+function glWeekCalories(off) {
+  // Average of the days that have food logged
+  let wk = null;
+  if(!off) wk = (mxWeekOff === 0 ? macroData : mxThisWeek) || macroData;
+  else { const past = load(MX_PAST_KEY) || {}; wk = past[localISO(glWeekStart(off))] || null; }
+  if(!wk) return null;
+  const days = [];
+  for(let i = 0; i < 7; i++) { try { const t = dayTotals(wk[i]); if(t && t.cal > 0) days.push(t.cal); } catch(e) {} }
+  return days.length ? { avg: Math.round(days.reduce((a, b) => a + b) / days.length), n: days.length } : null;
+}
+function glWeekWorkouts(off) {
+  const a = glWeekStart(off), b = new Date(a.getTime() + 7 * 86400000);
+  const lo = localISO(a), hi = localISO(b);
+  try { return gymDaysAll().filter(d => d >= lo && d < hi).length; } catch(e) { return 0; }
+}
+function glWeekHTML(g) {
+  const rows = [];
+  for(let off = 0; off >= -5; off--) {
+    const a = glWeekStart(off).getTime(), b = a + 7 * 86400000;
+    const w = glAvgWeight(a, b), wPrev = glAvgWeight(a - 7 * 86400000, a);
+    const c = glWeekCalories(off), wo = glWeekWorkouts(off);
+    if(off < 0 && w === null && !c && !wo) continue;
+    rows.push({ off, a, w, d: w !== null && wPrev !== null ? w - wPrev : null, c, wo });
+  }
+  const goalDir = g.focus === 'fat_loss' ? -1 : g.focus === 'muscle_gain' ? 1 : 0;
+  const verdict = r => {
+    const calOk = r.c && g.cal ? Math.abs(r.c.avg - g.cal) <= Math.max(150, g.cal * 0.08) : null;
+    const wOk = r.d === null ? null : goalDir === 0 ? Math.abs(r.d) <= 1 : r.d * goalDir > 0.1;
+    if(calOk === null && wOk === null) return '';
+    return (calOk !== false && wOk !== false) ? '<span class="gl-pill good">On track</span>' : '<span class="gl-pill warn">Off track</span>';
+  };
+  const fmt = t => new Date(t).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const cur = rows[0];
+  const stat = (lbl, val, sub) => `<div class="gl-wk-stat"><span>${lbl}</span><b>${val}</b><em>${sub}</em></div>`;
+  const wTxt = cur.w === null ? '—' : cur.w.toFixed(1);
+  const wSub = cur.d === null ? 'avg weigh-in' : `${cur.d > 0 ? '+' : cur.d < 0 ? '−' : ''}${Math.abs(cur.d).toFixed(1)} lb vs last week`;
+  return `<div class="gl-card">
+    <div class="gl-card-head"><div class="gl-card-title">This week</div>${verdict(cur)}</div>
+    <div class="gl-sub2">Filled in for you from your weigh-ins, food log and workouts.</div>
+    <div class="gl-wk">
+      ${stat('Weight', wTxt + (cur.w === null ? '' : '<small> lb</small>'), wSub)}
+      ${stat('Calories', cur.c ? cur.c.avg.toLocaleString() : '—', cur.c ? `avg · goal ${Math.round(g.cal || 0).toLocaleString()}` : 'log food to see')}
+      ${stat('Workouts', cur.wo, 'this week')}
+    </div>
+    ${rows.length > 1 ? `<div class="gl-hist">${rows.slice(1).map(r => `<div class="gl-hist-row">
+        <span class="gl-hist-d">Week of ${fmt(r.a)}</span>
+        <span class="gl-hist-v">${r.w !== null ? r.w.toFixed(1) + ' lb' : '—'}${r.d !== null ? ` <em class="${r.d * (goalDir || -1) > 0 ? 'good' : ''}">${r.d > 0 ? '+' : r.d < 0 ? '−' : ''}${Math.abs(r.d).toFixed(1)}</em>` : ''} · ${r.c ? r.c.avg.toLocaleString() + ' kcal' : '— kcal'} · ${r.wo} workout${r.wo === 1 ? '' : 's'}</span>
+        ${verdict(r)}
+      </div>`).join('')}</div>` : ''}
+  </div>`;
+}
+
+// ── Your plan (saves as you change it) ──
+function glPlanHTML(g) {
+  const p = glProfile(g);
+  const chip = (k) => `<button class="gl-chip${p.focus === k ? ' on' : ''}" onclick="glSet('focus','${k}')">${GL_FOCUS[k].label}</button>`;
+  const opt = (v, cur, label) => `<option value="${v}"${String(cur) === String(v) ? ' selected' : ''}>${label}</option>`;
+  const weeks = GL_WEEKS.includes(p.weeks) ? GL_WEEKS : GL_WEEKS.concat([p.weeks]).sort((a, b) => a - b);
+  return `<div class="gl-card">
+    <div class="gl-card-head"><div class="gl-card-title">Your plan</div><span class="gl-saved">Saves automatically</span></div>
+    <div class="gl-chips">${chip('fat_loss')}${chip('muscle_gain')}${chip('recomp')}${chip('maintain')}</div>
+    <div class="two-col" style="margin-bottom:10px;">
+      <div class="field"><label>Target weight</label><div class="iw"><input type="number" inputmode="decimal" step="0.5" placeholder="${p.weight ? Math.round(p.weight) : '170'}" value="${p.target || ''}" onchange="glSet('goalWeight',this.value)"><span class="unit">lbs</span></div></div>
+      <div class="field"><label>Timeline</label><div class="iw"><select onchange="glSet('weeks',this.value)">${weeks.map(w => opt(w, p.weeks, w + ' weeks')).join('')}</select></div></div>
+    </div>
+    <div class="field" style="margin-bottom:10px;"><label>Activity</label><div class="iw"><select onchange="glSet('activity',this.value)">${GL_ACTIVITY.map(a => opt(a[0], String(g.activity || '1.55'), `${a[1]} (${a[2]})`)).join('')}</select></div></div>
+    <div class="two-col">
+      <div class="field"><label>Age</label><div class="iw"><input type="number" inputmode="numeric" min="13" max="99" placeholder="25" value="${p.age || ''}" onchange="glSet('age',this.value)"><span class="unit">yrs</span></div></div>
+      <div class="field"><label>Height</label><div class="iw"><input type="number" inputmode="numeric" min="3" max="8" placeholder="5" value="${p.ft || ''}" onchange="glSet('heightFt',this.value)" style="width:44px;"><span class="unit">ft</span><input type="number" inputmode="numeric" min="0" max="11" placeholder="10" value="${p.ft ? p.inch : ''}" onchange="glSet('heightIn',this.value)" style="width:44px;"><span class="unit">in</span></div></div>
+    </div>
+    <div class="gl-weightnote">Current weight ${p.weight ? `<b>${p.weight.toFixed(1)} lb</b>, from your latest weigh-in` : 'comes from your weigh-ins'}. <button class="hy-link" onclick="navTo('progress');setTimeout(()=>thOpen('weight'),250)">Log weight</button></div>
+  </div>`;
+}
+
+function renderGoals() {
+  const root = document.getElementById('goalsRoot');
+  if(!root) return;
+  const g = Object.assign({}, load(GOALS_KEY) || {}, goalsData || {});
+  if(!GL_FOCUS[g.focus]) g.focus = g.focus === 'maintain' ? 'maintain' : (g.focus || 'maintain');
+  if(!g.targetMode) g.targetMode = 'auto';
+  if(!g.startWeight) g.startWeight = glCurrentWeight(g) || g.currentWeight;
+  if(!g.startDate) g.startDate = new Date().toISOString();
+  const s = glSync(g);
+  // Auto targets follow your weight: save when they moved
+  if(s && s.changed) glSave(g, true); else { goalsData = g; save(GOALS_KEY, g); }
+  root.innerHTML = glGoalCardHTML(g) + glTargetsHTML(g, s && s.r) + glWeekHTML(g) + glPlanHTML(g);
 }
 
 function saveCheckin() {
@@ -11143,61 +11225,6 @@ function saveCheckin() {
   showToast('Check-in saved!');
 }
 
-function renderGoals() {
-  const g = load(GOALS_KEY) || {};
-
-  // Restore fields
-  document.getElementById('goalAge').value     = g.age || '';
-  document.getElementById('goalCurrentWeight').value = g.currentWeight || '';
-  { const ft = document.getElementById('goalHeightFt'), inn = document.getElementById('goalHeightIn');
-    if(ft && !ft.value && appSettings.heightFt) ft.value = appSettings.heightFt;
-    if(inn && !inn.value && appSettings.heightFt) inn.value = appSettings.heightIn || 0; }
-  document.getElementById('goalWeight').value  = g.goalWeight || '';
-  document.getElementById('goalBF').value      = g.goalBF || '';
-  document.getElementById('goalCal').value     = g.cal || '';
-  document.getElementById('goalProtein').value = g.protein || '';
-  document.getElementById('goalCarbs').value   = g.carbs || '';
-  document.getElementById('goalFat').value     = g.fat || '';
-  if(g.activity) document.getElementById('goalActivity').value = g.activity;
-  if(g.weeks)    document.getElementById('goalTimeline').value = g.weeks;
-
-  // Restore focus
-  if(g.focus) selectGoalFocus(g.focus);
-
-  // Daily progress rings
-  const t = dayTotals(macroData[cur]);
-  const rings = [
-    {label:'Calories',  cur:t.cal,     goal:g.cal||2000,    color:getAccentColor()},
-    {label:'Protein',   cur:t.protein, goal:g.protein||150, color:getAccentColorAlpha(0.8)},
-    {label:'Carbs',     cur:t.carbs,   goal:g.carbs||200,   color:getAccentColorAlpha(0.55)},
-    {label:'Fat',       cur:t.fat,     goal:g.fat||65,      color:getAccentColorAlpha(0.35)},
-  ];
-  const C = 163.36;
-  document.getElementById('goalRings').innerHTML = rings.map(r => {
-    const pct=Math.min(r.cur/(r.goal||1),1), offset=C*(1-pct), pctDisp=Math.round(pct*100);
-    return`<div class="goal-ring-card">
-      <svg viewBox="0 0 56 56"><circle cx="28" cy="28" r="26" fill="none" stroke="var(--bg4)" stroke-width="5"/><circle cx="28" cy="28" r="26" fill="none" stroke="${r.color}" stroke-width="5" stroke-dasharray="${C}" stroke-dashoffset="${offset}" stroke-linecap="round"/></svg>
-      <div class="grc-pct">${pctDisp}%</div>
-      <div class="grc-label">${r.label}</div>
-      <div class="grc-val">${r.cur} / ${r.goal}</div>
-    </div>`;
-  }).join('');
-
-  // Re-run TDEE calc if we have enough data
-  if(g.age && g.currentWeight && g.focus) calcTDEE();
-
-  // Check-in history
-  const hist = load(CHECKIN_KEY) || [];
-  const histEl = document.getElementById('checkinHistory');
-  histEl.innerHTML = hist.length === 0
-    ? '<div style="font-size:12px;color:var(--text3);text-align:center;padding:8px 0;">No check-ins yet</div>'
-    : hist.slice(0,6).map(e=>`<div class="checkin-entry">
-        <div><strong>${e.date}</strong> · ${e.weight?e.weight+' lbs':''}${e.calories?' · '+e.calories+' kcal':''}${e.workouts?' · '+e.workouts+' workouts':''}</div>
-        <span class="checkin-on-track" style="background:${e.onTrack?'rgba(48,209,88,.15)':'rgba(255,69,58,.1)'};color:${e.onTrack?'var(--green)':'var(--red)'}">
-          ${e.onTrack?'On Track':'Off Track'}
-        </span>
-      </div>`).join('');
-}
 
 // ══════════════════════════════════════
 // TODAY'S MACROS (home screen rings)
