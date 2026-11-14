@@ -14786,7 +14786,7 @@ function hyExerciseHTML(c, section, ex) {
   const key = section.key + '.' + ex.id;
   const info = hyExStatus(c.workout, section, ex, c.sess);
   const st = c.sess ? c.sess.ex[key] : null;
-  const open = hyView.exOpen === key;
+  const open = false; // the list never opens; logging happens on the exercise page
   const locked = info.status === 'omitted' && info.rx.restricted;
   const name = hyEsc(info.rx.alt || hyExName(c.workout.id, key, ex));
   const subbed = !info.rx.alt && hyState.subs[c.workout.id] && hyState.subs[c.workout.id][key];
@@ -14858,7 +14858,7 @@ function hyExerciseHTML(c, section, ex) {
   return `<div class="hy-ex${open ? ' open' : ''}${info.status ? ' ' + info.status : ''}" id="hyex-${key.replace('.', '-')}">
     <div class="hy-ex-head" onclick="hyExTap('${key}')">
       ${lead}
-      <div class="hy-ex-title"><div class="hy-ex-name">${name}${tags}</div>${rxLine ? `<div class="hy-ex-rx">${hyEsc(rxLine)}</div>` : ''}${tools}</div>
+      <div class="hy-ex-title"><div class="hy-ex-name">${name}${tags}</div>${rxLine ? `<div class="hy-ex-rx">${hyEsc(rxLine)}</div>` : ''}</div>
       ${right}<span class="hy-chev">›</span>
     </div>${body}
   </div>`;
@@ -15079,13 +15079,15 @@ function hySessionHTML() {
 function hyExTap(key) {
   const c = hyCtx();
   const w = c && c.workout;
-  if(!c || c.future || (w && w.placeholder && !w.configured) || w.category === 'sport' || (c.sess && (c.sess.status === 'completed' || c.sess.status === 'skipped'))) { hyToggleEx(key); return; }
+  if(!c) return;
+  if(c.future) { hyEarlySheet(); return; }
+  if((w && w.placeholder && !w.configured) || (w && w.category === 'sport')) return;
   try {
     hyEnsureSession(); hySave();
     efOpen('h:' + c.sid);
     const M = efModel(), i = M ? M.items.findIndex(it => it.key === key) : -1;
     if(i >= 0) efGoto(i);
-  } catch(e) { console.warn('Exercise screen not opened:', e); hyToggleEx(key); }
+  } catch(e) { console.warn('Exercise screen not opened:', e); showToast('Could not open this exercise'); }
 }
 function hyToggleEx(key) { hyView.exOpen = hyView.exOpen === key ? null : key; hyRender(); }
 function hyToggleSection(key) { hyView.collapsed[key] = !hyView.collapsed[key]; hyRender(); }
