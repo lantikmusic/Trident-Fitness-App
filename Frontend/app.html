@@ -3162,6 +3162,7 @@ body.ef-on .rest-mini{display:none !important;}
 .ef-tool{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 14px;border-radius:19px;border:0.5px solid rgba(255,255,255,0.14);background:linear-gradient(160deg,rgba(255,255,255,0.12),rgba(255,255,255,0.05));color:#fff;font:700 13.5px var(--tf-font);box-shadow:inset 0 1px 0 rgba(255,255,255,0.14);}
 .ef-tool.video{background:var(--pink);color:#000;border-color:transparent;box-shadow:0 0 16px var(--pink-glow);}
 .ef-tool:active{transform:scale(.96);}
+.ef-tool-sym{font-size:16px;line-height:1;font-weight:700;}
 .ex-card-po{font-weight:700;color:#fff;}
 .ex-card-po.up{color:var(--pink);}.ex-card-po.down{color:#FF9F0A;}
 .reel{position:fixed;inset:0;z-index:700;background:#000;display:none;overflow:hidden;touch-action:none;}
@@ -9742,8 +9743,8 @@ function efRender() {
       </div>
       <div class="ef-tools">
         <button class="ef-tool video" onclick="efVideo()"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>Watch video</button>
-        ${efCanProgress(it) ? `<button class="ef-tool" onclick="efProgress()"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg>Progress</button>` : ''}
-        ${efCanSwap(it) ? `<button class="ef-tool" onclick="efSwap()"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4 3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/></svg>Swap</button>` : ''}
+        ${efCanProgress(it) ? `<button class="ef-tool" onclick="efProgress()"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Progress</button>` : ''}
+        ${efCanSwap(it) ? `<button class="ef-tool" onclick="efSwap()"><span class="ef-tool-sym" aria-hidden="true">⇄</span>Swap</button>` : ''}
       </div>
       <section class="ef-panel">
         ${panel}
