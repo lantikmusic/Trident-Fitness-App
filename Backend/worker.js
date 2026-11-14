@@ -261,6 +261,128 @@ async function validateSession(request, DB) {
 }
 
 // ══════════════════════════════════════════════════════
+// STRAVA
+// A member connects their own Strava account (OAuth); the Worker keeps the tokens and fetches that
+// member's activities for them. Strava data is only ever shown to the member it belongs to (Strava's
+// API terms), never on Community. Needs env.STRAVA_CLIENT_ID (wrangler.toml [vars]) and the secret
+// env.STRAVA_CLIENT_SECRET. Tables: strava_links, strava_states (schema.sql).
+// ══════════════════════════════════════════════════════
+const STRAVA_SCOPE = 'read,activity:read_all';
+function stravaReady(env) { return !!(env.STRAVA_CLIENT_ID && env.STRAVA_CLIENT_SECRET); }
+function stravaRedirect(request) { return new URL('/strava/callback', request.url).toString(); }
+
+async function stravaConnect(request, env) {
+  const user = await validateSession(request, env.DB);
+  if (!user) return error('Unauthorized', 401);
+  if (!stravaReady(env)) return error('Strava is not set up yet', 503);
+  const state = toHex(crypto.getRandomValues(new Uint8Array(24)));
+  const now = Date.now();
+  await env.DB.prepare('DELETE FROM strava_states WHERE created_at < ? OR user_id = ?').bind(now - 15 * 60000, user.user_id).run();
+  await env.DB.prepare('INSERT INTO strava_states (state, user_id, created_at) VALUES (?, ?, ?)').bind(state, user.user_id, now).run();
+  const q = new URLSearchParams({ client_id: env.STRAVA_CLIENT_ID, redirect_uri: stravaRedirect(request), response_type: 'code',
+    approval_prompt: 'auto', scope: STRAVA_SCOPE, state });
+  // The mobile address opens the Strava app when it's installed; the web one works everywhere
+  return json({ url: 'https://www.strava.com/oauth/authorize?' + q, mobileUrl: 'https://www.strava.com/oauth/mobile/authorize?' + q });
+}
+
+function stravaPage(title, text, ok) {
+  const esc = v => String(v).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  return new Response(`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${esc(title)}</title><style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0D0E10;color:#fff;font:16px -apple-system,BlinkMacSystemFont,sans-serif;text-align:center;padding:24px;box-sizing:border-box}
+.c{max-width:360px}.i{width:64px;height:64px;border-radius:50%;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;font-size:30px;background:${ok ? 'rgba(48,209,88,.15);color:#30D158' : 'rgba(255,69,58,.15);color:#FF6B6B'}}
+h1{font-size:22px;margin:0 0 8px}p{color:#9BA0A8;line-height:1.5;margin:0}</style></head>
+<body><div class="c"><div class="i">${ok ? '&#10003;' : '!'}</div><h1>${esc(title)}</h1><p>${esc(text)}</p></div></body></html>`,
+    { status: ok ? 200 : 400, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } });
+}
+
+async function stravaCallback(request, env) {
+  const url = new URL(request.url);
+  const state = url.searchParams.get('state') || '', code = url.searchParams.get('code') || '';
+  if (url.searchParams.get('error')) return stravaPage('Strava not connected', 'You can close this page and go back to Trident Fitness.', false);
+  if (!/^[0-9a-f]{48}$/.test(state) || !code) return stravaPage('Something went wrong', 'Go back to Trident Fitness and try Connect Strava again.', false);
+  const row = await env.DB.prepare('SELECT user_id, created_at FROM strava_states WHERE state = ?').bind(state).first();
+  await env.DB.prepare('DELETE FROM strava_states WHERE state = ?').bind(state).run();
+  if (!row || Date.now() - row.created_at > 15 * 60000) return stravaPage('That link expired', 'Go back to Trident Fitness and tap Connect Strava again.', false);
+  const scope = url.searchParams.get('scope') || '';
+  if (!/activity:read/.test(scope)) return stravaPage('Strava not connected', 'Trident needs permission to see your activities. Go back and connect again, leaving "View data about your activities" on.', false);
+  if (!stravaReady(env)) return stravaPage('Strava is not set up yet', 'Please try again later.', false);
+  const r = await fetch('https://www.strava.com/oauth/token', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ client_id: env.STRAVA_CLIENT_ID, client_secret: env.STRAVA_CLIENT_SECRET, code, grant_type: 'authorization_code' }) });
+  if (!r.ok) return stravaPage('Strava not connected', 'Strava didn\'t accept the connection. Go back to Trident Fitness and try again.', false);
+  const t = await r.json();
+  const a = t.athlete || {};
+  const name = [a.firstname, a.lastname].filter(Boolean).join(' ').slice(0, 80);
+  const now = new Date().toISOString();
+  await env.DB.prepare(`INSERT INTO strava_links (user_id, athlete_id, athlete_name, access_token, refresh_token, expires_at, scope, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(user_id) DO UPDATE SET athlete_id = excluded.athlete_id, athlete_name = excluded.athlete_name, access_token = excluded.access_token,
+        refresh_token = excluded.refresh_token, expires_at = excluded.expires_at, scope = excluded.scope, updated_at = excluded.updated_at`)
+    .bind(row.user_id, a.id || null, name, t.access_token, t.refresh_token, t.expires_at || 0, scope, now, now).run();
+  return stravaPage('Strava connected', `${name ? name + ', your' : 'Your'} Strava activities will show in Trident Fitness. You can close this page and go back to the app.`, true);
+}
+
+// A valid access token for this member (refreshed when it's about to expire), or null if not connected.
+async function stravaToken(env, userId) {
+  const link = await env.DB.prepare('SELECT * FROM strava_links WHERE user_id = ?').bind(userId).first();
+  if (!link) return null;
+  if (link.expires_at && link.expires_at * 1000 > Date.now() + 5 * 60000) return { link, token: link.access_token };
+  const r = await fetch('https://www.strava.com/oauth/token', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ client_id: env.STRAVA_CLIENT_ID, client_secret: env.STRAVA_CLIENT_SECRET, grant_type: 'refresh_token', refresh_token: link.refresh_token }) });
+  if (!r.ok) {
+    // The member revoked access on Strava (or the token is gone): forget the link
+    if (r.status === 400 || r.status === 401) await env.DB.prepare('DELETE FROM strava_links WHERE user_id = ?').bind(userId).run();
+    return null;
+  }
+  const t = await r.json();
+  await env.DB.prepare('UPDATE strava_links SET access_token = ?, refresh_token = ?, expires_at = ?, updated_at = ? WHERE user_id = ?')
+    .bind(t.access_token, t.refresh_token || link.refresh_token, t.expires_at || 0, new Date().toISOString(), userId).run();
+  return { link, token: t.access_token };
+}
+
+async function stravaStatus(request, env) {
+  const user = await validateSession(request, env.DB);
+  if (!user) return error('Unauthorized', 401);
+  if (!stravaReady(env)) return json({ available: false, connected: false });
+  const link = await env.DB.prepare('SELECT athlete_name, athlete_id FROM strava_links WHERE user_id = ?').bind(user.user_id).first();
+  return json({ available: true, connected: !!link, name: link ? link.athlete_name : '', athleteId: link ? link.athlete_id : null });
+}
+
+// Recent activities (default: the last 30 days, newest first), in the app's own shape.
+async function stravaActivities(request, env) {
+  const user = await validateSession(request, env.DB);
+  if (!user) return error('Unauthorized', 401);
+  if (!stravaReady(env)) return error('Strava is not set up yet', 503);
+  const tk = await stravaToken(env, user.user_id);
+  if (!tk) return json({ connected: false, activities: [] });
+  const url = new URL(request.url);
+  const days = Math.min(90, Math.max(1, parseInt(url.searchParams.get('days') || '30', 10) || 30));
+  const after = Math.floor(Date.now() / 1000) - days * 86400;
+  const r = await fetch(`https://www.strava.com/api/v3/athlete/activities?after=${after}&per_page=60`, { headers: { Authorization: 'Bearer ' + tk.token } });
+  if (r.status === 429) return error('Strava is busy, try again in a few minutes', 429);
+  if (r.status === 401) { await env.DB.prepare('DELETE FROM strava_links WHERE user_id = ?').bind(user.user_id).run(); return json({ connected: false, activities: [] }); }
+  if (!r.ok) return error('Could not reach Strava', 502);
+  const list = await r.json();
+  const activities = (Array.isArray(list) ? list : []).map(a => ({
+    id: String(a.id), name: String(a.name || '').slice(0, 120), type: a.sport_type || a.type || 'Workout',
+    start: a.start_date, startLocal: a.start_date_local, moving: a.moving_time || 0, elapsed: a.elapsed_time || 0,
+    distance: a.distance || 0, elevation: a.total_elevation_gain || 0, avgHr: a.average_heartrate || null, maxHr: a.max_heartrate || null,
+    kj: a.kilojoules || null, sufferScore: a.suffer_score || null
+  })).sort((x, y) => String(y.start).localeCompare(String(x.start)));
+  return json({ connected: true, name: tk.link.athlete_name || '', activities });
+}
+
+async function stravaDisconnect(request, env) {
+  const user = await validateSession(request, env.DB);
+  if (!user) return error('Unauthorized', 401);
+  try {
+    const tk = stravaReady(env) ? await stravaToken(env, user.user_id) : null;
+    if (tk) await fetch('https://www.strava.com/oauth/deauthorize', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'access_token=' + encodeURIComponent(tk.token) });
+  } catch (e) {}
+  await env.DB.prepare('DELETE FROM strava_links WHERE user_id = ?').bind(user.user_id).run();
+  return json({ ok: true });
+}
+
+// ══════════════════════════════════════════════════════
 // MAIN FETCH HANDLER
 // ══════════════════════════════════════════════════════
 export default {
@@ -322,6 +444,13 @@ export default {
     // ── Sleep ──
     if (path === '/sleep'         && request.method === 'GET')  return getSleep(request, env.DB);
     if (path === '/sleep'         && request.method === 'POST') return saveSleep(request, env.DB);
+
+    // ── Strava (connect an account, import its activities) ──
+    if (path === '/strava/connect'    && request.method === 'POST') return stravaConnect(request, env);
+    if (path === '/strava/callback'   && request.method === 'GET')  return stravaCallback(request, env);
+    if (path === '/strava/status'     && request.method === 'GET')  return stravaStatus(request, env);
+    if (path === '/strava/activities' && request.method === 'GET')  return stravaActivities(request, env);
+    if (path === '/strava/disconnect' && request.method === 'POST') return stravaDisconnect(request, env);
 
     // ── Progress Photos ──
     if (path === '/photos'        && request.method === 'GET')  return getPhotos(request, env.DB);

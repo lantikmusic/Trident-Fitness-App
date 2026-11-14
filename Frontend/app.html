@@ -3236,6 +3236,19 @@ body.ef-on .rest-mini{display:none !important;}
 .ef-stat.cal:not(.on) .ef-stat-val b{color:#6B6F76;}
 .ef-body .ef-tools{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:6px;}
 .ef-body .ef-tool{justify-content:center;gap:5px;height:40px;padding:0 6px;font-size:13px;white-space:nowrap;min-width:0;}
+/* ── Strava ── */
+.st-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:12px;}
+.st-sub{font-size:12.5px;color:#9BA0A8;margin-top:3px;}
+.st-sync{width:34px;height:34px;border-radius:50%;border:0.5px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.06);color:#fff;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;}
+.st-row{display:flex;gap:12px;padding:12px 0;border-top:0.5px solid rgba(255,255,255,0.08);}
+.st-ic-b{width:40px;height:40px;border-radius:12px;background:rgba(252,82,0,0.14);color:#FC5200;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.st-main{min-width:0;flex:1;}
+.st-name{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.st-when{font-size:12px;color:#9BA0A8;margin-top:1px;}
+.st-chips{font-size:13px;color:#D5D8DD;margin-top:4px;}
+.st-view{display:inline-block;margin-top:6px;font-size:13px;font-weight:700;color:#FC5200;text-decoration:underline;text-underline-offset:2px;}
+.st-powered{margin-top:12px;padding-top:10px;border-top:0.5px solid rgba(255,255,255,0.08);font-size:11.5px;font-weight:700;color:#9BA0A8;text-align:right;}
+.push-btn.ghost{background:rgba(255,255,255,0.08) !important;color:#fff !important;}
 /* ── Workout bar (above the tab bar while a workout runs) + pause ── */
 .wo-bar{position:fixed;left:14px;right:14px;max-width:560px;margin:0 auto;bottom:calc(max(10px, env(safe-area-inset-bottom) - 12px) + 74px);height:62px;border-radius:31px;
   background:linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0.04)),rgba(30,32,36,0.72);-webkit-backdrop-filter:blur(26px) saturate(170%);backdrop-filter:blur(26px) saturate(170%);
@@ -4021,6 +4034,7 @@ body.reel-on{overflow:hidden;}
     </div>
     <!-- Apple Health: workouts from Apple Watch / Fitness, then heart health (iPhone app only) -->
     <div class="panel ah-panel" id="ahWorkoutsPanel" style="display:none;margin-bottom:12px;"></div>
+    <div class="panel st-panel" id="stPanel" style="display:none;margin-bottom:12px;"></div>
     <div class="panel ah-panel" id="ahHeartPanel" style="display:none;margin-bottom:12px;"></div>
   </div>
 </div>
@@ -4291,6 +4305,18 @@ body.reel-on{overflow:hidden;}
       <label class="toggle-wrap" style="flex-shrink:0;"><input type="checkbox" id="ahGymToggle" onchange="ahSetGymCount(this.checked)"><span class="toggle-slider"></span></label>
     </div>
     <div class="ah-set-help">Read-only: Trident never changes your Health data, and it stays on this iPhone (it isn't sent to Trident's servers). To change what Trident can read, open the <b>Health</b> app → tap your picture → <b>Apps</b> → <b>Trident Fitness</b>.</div>
+    </div>
+  </div>
+
+  <div class="settings-section" id="stSettings" style="display:none;">
+    <div class="settings-section-label">Connected apps</div>
+    <div class="e-card">
+    <div class="settings-row">
+      <span class="e-row-ic st-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></span>
+      <div style="min-width:0;padding-right:10px;"><div class="settings-row-label">Strava</div><div class="settings-row-sub" id="stSetStatus">Bring your runs, rides and other activities into Trident</div></div>
+      <div class="settings-row-right"><button class="push-btn" id="stSetBtn" onclick="stSettingsButton()">Connect</button></div>
+    </div>
+    <div class="ah-set-help">Only you see your Strava activities in Trident; they're never posted to Community. Disconnecting removes Trident's access on Strava too.</div>
     </div>
   </div>
 
@@ -10815,6 +10841,7 @@ function renderMuscleGrowth(animate) {
 }
 
 function renderProgress(){
+  try { stRefresh(); } catch(e) {}
   try { if(typeof ahRenderFitness === 'function') { ahRenderFitness(); ahLoadFitness(false); } } catch(e) {}  // Apple Health panels (iPhone app)
   try { renderMuscleGrowth(true); } catch(e) { console.warn('Muscle growth skipped:', e); }
   const weights=progressData.filter(e=>e.weight).map(e=>e.weight);
@@ -12156,6 +12183,7 @@ function eSetNameSync() {
   if(el) el.textContent = v.trim() || 'Your profile';
 }
 function openSettings() {
+  try { stRefresh(); } catch(e) {}
   document.body.classList.add('e-set-on');
   loadSettingsInputs();
   try { eSetNameSync(); } catch(e) {}
@@ -18382,6 +18410,127 @@ function wtDiscard(id, fromPhone) {
   wtSoon();
   setTimeout(() => { try { cmWoSync(true); } catch(e) {} }, 1500);
   showToast(fromPhone ? 'Workout cancelled' : 'Workout discarded on your Apple Watch');
+}
+
+// ══════════════════════════════════════
+// STRAVA: connect your account (Settings), see your activities (Progress)
+// The Worker holds the Strava tokens; this page only asks it for status and activities.
+// Shown only to the account owner (Strava's terms), never posted to Community.
+// ══════════════════════════════════════
+const ST_KEY = 'trident_strava_v1';            // { name, activities, at } — this account's last sync
+var ST = { status: null, loading: false, waiting: false, showAll: false };
+function stCache() { return load(ST_KEY) || null; }
+async function stRefresh(force) {
+  const sec = document.getElementById('stSettings');
+  if(!isLoggedIn()) { if(sec) sec.style.display = 'none'; stRender(); return; }
+  if(ST.loading) return;
+  ST.loading = true;
+  try {
+    const st = await cloudGet('/strava/status');
+    if(st) ST.status = st;
+    if(st && st.connected) {
+      const c = stCache();
+      if(force || !c || Date.now() - (c.at || 0) > 15 * 60000) {
+        const r = await cloudGet('/strava/activities?days=30');
+        if(r && r.connected) save(ST_KEY, { name: r.name || st.name || '', activities: r.activities || [], at: Date.now() });
+        else if(r && r.connected === false) { ST.status = { available: true, connected: false }; try { localStorage.removeItem(ST_KEY); } catch(e) {} }
+      }
+    } else if(st && !st.connected) { try { localStorage.removeItem(ST_KEY); } catch(e) {} }
+  } finally { ST.loading = false; }
+  stRender();
+}
+function stRender() { stRenderSettings(); stRenderPanel(); }
+function stRenderSettings() {
+  const sec = document.getElementById('stSettings'); if(!sec) return;
+  const st = ST.status;
+  sec.style.display = isLoggedIn() && st && st.available ? '' : 'none';
+  const sub = document.getElementById('stSetStatus'), btn = document.getElementById('stSetBtn');
+  if(!sub || !btn) return;
+  if(st && st.connected) {
+    sub.textContent = `Connected${st.name ? ' as ' + st.name : ''} · activities show on Progress`;
+    btn.textContent = 'Disconnect'; btn.classList.add('ghost');
+  } else {
+    sub.textContent = 'Bring your runs, rides and other activities into Trident';
+    btn.textContent = ST.waiting ? 'Checking…' : 'Connect'; btn.classList.remove('ghost');
+  }
+}
+function stSettingsButton() { if(ST.status && ST.status.connected) stDisconnect(); else stConnect(); }
+async function stConnect() {
+  const r = await cloudPost('/strava/connect', {});
+  if(!r || !r.url) { showToast('Strava isn\'t available right now'); return; }
+  ST.waiting = true; stRenderSettings();
+  // On the iPhone the mobile address opens the Strava app if it's installed
+  const native = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+  window.open(native ? (r.mobileUrl || r.url) : r.url, '_blank');
+}
+async function stDisconnect() {
+  if(!confirm('Disconnect Strava? Your Strava activities will no longer show in Trident.')) return;
+  await cloudPost('/strava/disconnect', {});
+  ST.status = { available: true, connected: false };
+  try { localStorage.removeItem(ST_KEY); } catch(e) {}
+  stRender();
+  showToast('Strava disconnected');
+}
+// Back from Strava's approval page: check whether it worked
+document.addEventListener('visibilitychange', () => {
+  if(document.hidden || !ST.waiting) return;
+  setTimeout(async () => {
+    await stRefresh(true);
+    if(ST.status && ST.status.connected) { ST.waiting = false; showToast('Strava connected'); stRender(); }
+  }, 600);
+});
+window.addEventListener('focus', () => { if(ST.waiting) setTimeout(() => stRefresh(true).then(() => { if(ST.status && ST.status.connected) { ST.waiting = false; showToast('Strava connected'); stRender(); } }), 600); });
+
+const ST_TYPES = { Run: 'Run', TrailRun: 'Trail run', VirtualRun: 'Virtual run', Ride: 'Ride', MountainBikeRide: 'Mountain bike', GravelRide: 'Gravel ride', VirtualRide: 'Virtual ride',
+  EBikeRide: 'E-bike ride', Walk: 'Walk', Hike: 'Hike', Swim: 'Swim', WeightTraining: 'Weight training', Workout: 'Workout', Crossfit: 'CrossFit', HighIntensityIntervalTraining: 'HIIT',
+  Yoga: 'Yoga', Pilates: 'Pilates', Rowing: 'Rowing', Elliptical: 'Elliptical', StairStepper: 'Stair stepper', Soccer: 'Soccer', Tennis: 'Tennis', Basketball: 'Basketball' };
+function stTypeLabel(t) { return ST_TYPES[t] || String(t || 'Workout').replace(/([a-z])([A-Z])/g, '$1 $2'); }
+function stTypeIcon(t) {
+  const P = {
+    run: '<path d="M13 4a1.5 1.5 0 1 0 0-.01M10 21l2-5 3 2v4M8 12l3-3 3 2 2 3 3 1M7 21l3-6"/>',
+    ride: '<circle cx="6" cy="16" r="3.5"/><circle cx="18" cy="16" r="3.5"/><path d="M6 16l4-7h5l3 7M10 9 8 6H6M15 9l-2 7"/>',
+    walk: '<path d="M12 4a1.5 1.5 0 1 0 0-.01M10 21l1-6-2-3 1-4 3 1 2 3h2M9 12l-2 2"/>',
+    swim: '<path d="M3 17c2 0 2-1.5 4.5-1.5S9.5 17 12 17s2-1.5 4.5-1.5S19 17 21 17M7 13l4-4 3 2 3-3"/><circle cx="16" cy="6" r="1.5"/>',
+    lift: '<path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/>',
+    other: '<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>'
+  };
+  const k = /Run/.test(t) ? 'run' : /Ride|Bike/.test(t) ? 'ride' : /Walk|Hike/.test(t) ? 'walk' : /Swim/.test(t) ? 'swim' : /Weight|Crossfit|Workout|HighIntensity/.test(t) ? 'lift' : 'other';
+  return `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[k]}</svg>`;
+}
+function stDur(s) { s = Math.round(s || 0); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60; return h ? `${h}:${String(m).padStart(2, '0')}:${String(x).padStart(2, '0')}` : `${m}:${String(x).padStart(2, '0')}`; }
+function stRenderPanel() {
+  const el = document.getElementById('stPanel'); if(!el) return;
+  const st = ST.status, c = stCache();
+  if(!isLoggedIn() || !st || !st.connected) { el.style.display = 'none'; return; }
+  el.style.display = '';
+  const list = (c && c.activities) || [];
+  const esc = v => String(v == null ? '' : v).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+  const totS = list.reduce((t, a) => t + (a.moving || a.elapsed || 0), 0), totMi = list.reduce((t, a) => t + (a.distance || 0), 0) / 1609.34;
+  const shown = ST.showAll ? list : list.slice(0, 5);
+  let html = `<div class="st-head"><div><div class="panel-title" style="margin:0;">Strava</div><div class="st-sub">Your activities · last 30 days</div></div>
+    <button class="st-sync" onclick="stRefresh(true)" aria-label="Sync Strava now"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/></svg></button></div>`;
+  if(!c) html += '<div class="ah-note" style="padding:14px 4px;text-align:center;">Syncing with Strava…</div>';
+  else if(!list.length) html += '<div class="ah-note" style="padding:14px 4px;text-align:center;">No Strava activities in the last 30 days.</div>';
+  else {
+    html += `<div class="ah-ws"><div><b>${list.length}</b><span>Activities</span></div><div><b>${totS >= 3600 ? Math.floor(totS / 3600) + 'h ' + Math.round(totS % 3600 / 60) + 'm' : Math.round(totS / 60) + 'm'}</b><span>Total time</span></div><div><b>${totMi >= 0.1 ? totMi.toFixed(1) : '0'}</b><span>Miles</span></div></div>`;
+    html += shown.map(a => {
+      const d = new Date(a.start);
+      const chips = [stDur(a.moving || a.elapsed)];
+      if(a.distance > 30) chips.push((a.distance / 1609.34).toFixed(2) + ' mi');
+      if(a.elevation > 3) chips.push(Math.round(a.elevation * 3.28084) + ' ft');
+      if(a.avgHr) chips.push(`<span style="color:#FF453A;">♥</span> ${Math.round(a.avgHr)} bpm`);
+      return `<div class="st-row">
+        <div class="st-ic-b">${stTypeIcon(a.type)}</div>
+        <div class="st-main"><div class="st-name">${esc(a.name || stTypeLabel(a.type))}</div>
+          <div class="st-when">${esc(stTypeLabel(a.type))} · ${d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</div>
+          <div class="st-chips">${chips.join(' · ')}</div>
+          <a class="st-view" href="https://www.strava.com/activities/${encodeURIComponent(a.id)}" target="_blank" rel="noopener">View on Strava</a></div>
+      </div>`;
+    }).join('');
+    if(list.length > 5) html += `<button class="hy-link" style="margin-top:8px;" onclick="ST.showAll=!ST.showAll;stRenderPanel()">${ST.showAll ? 'Show less' : `Show all ${list.length}`}</button>`;
+  }
+  html += `<div class="st-powered">Powered by Strava</div>`;
+  el.innerHTML = html;
 }
 
 // ══════════════════════════════════════

@@ -287,3 +287,22 @@ CREATE TABLE IF NOT EXISTS auth_limits (
 -- Live database, run once before deploying the worker that uses email_verified (2026-11):
 --   ALTER TABLE users ADD COLUMN email_verified INTEGER NOT NULL DEFAULT 0;
 --   UPDATE users SET email_verified = 1;   -- accounts made before email confirmation existed count as confirmed
+
+-- ── Strava: a member's connected Strava account (tokens are only used by the Worker) ──
+CREATE TABLE IF NOT EXISTS strava_links (
+  user_id TEXT PRIMARY KEY,
+  athlete_id INTEGER,
+  athlete_name TEXT,
+  access_token TEXT NOT NULL,
+  refresh_token TEXT NOT NULL,
+  expires_at INTEGER NOT NULL,    -- seconds since 1970 (Strava's format)
+  scope TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+-- One-time states for the Connect Strava round trip (15 minutes)
+CREATE TABLE IF NOT EXISTS strava_states (
+  state TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  created_at INTEGER NOT NULL     -- ms since 1970
+);
