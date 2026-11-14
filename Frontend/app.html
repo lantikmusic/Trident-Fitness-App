@@ -3165,6 +3165,11 @@ body.ef-on .rest-mini{display:none !important;}
 #page-community .cm-post.has-media .cm-actions{margin-top:6px;margin-bottom:2px;}
 #page-community .cm-post .cm-body.cm-caption{font-size:14.5px;line-height:1.45;margin:2px 0 6px;}
 #page-community .cmp-postview .cm-post{border-bottom:none !important;}
+/* ── Body weight page (opened from the Progress graph) ── */
+.e-wt{cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent;}
+.e-wt:active{transform:scale(.99);}
+.e-wt-open{display:flex;align-items:center;justify-content:center;gap:4px;margin:10px -18px -4px;padding-top:11px;border-top:0.5px solid rgba(255,255,255,0.08);font-size:13px;font-weight:700;color:var(--pink);}
+#th-weight .panel{margin-bottom:12px;}
 /* ── Recent PRs (Progress): one glass card with padding, plain rows inside (not a card per row) ── */
 #prPanel{padding:20px 20px 8px !important;}
 #prPanel #prProgressList{background:none !important;border:none !important;border-radius:0 !important;}
@@ -3910,9 +3915,10 @@ body.reel-on{overflow:hidden;}
   </div>
   <div class="container">
     <div style="height:14px;"></div>
-    <div class="e-wt">
+    <div class="e-wt" role="button" tabindex="0" onclick="thOpen('weight')" aria-label="Open body weight: log today, entries and photos">
       <div id="progressStats"></div>
       <div class="e-wt-chart"><canvas id="weightChart"></canvas></div>
+      <div class="e-wt-open">Log weight &amp; photos<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></div>
     </div>
     <!-- Muscle growth -->
     <div class="panel" style="margin-bottom:12px;" id="muscleGrowthPanel">
@@ -3928,26 +3934,6 @@ body.reel-on{overflow:hidden;}
     <!-- Apple Health: workouts from Apple Watch / Fitness, then heart health (iPhone app only) -->
     <div class="panel ah-panel" id="ahWorkoutsPanel" style="display:none;margin-bottom:12px;"></div>
     <div class="panel ah-panel" id="ahHeartPanel" style="display:none;margin-bottom:12px;"></div>
-    <!-- Log weight -->
-    <div class="panel" style="margin-bottom:12px;">
-      <div class="panel-title">Log Today</div>
-      <div class="field" style="margin-bottom:10px;"><label>Weight</label><div class="iw"><input type="number" id="logWeight" placeholder="0.0" step="0.1" min="0"><span class="unit">lbs</span></div></div>
-      <div class="field" style="margin-bottom:12px;"><label>Body Fat %</label><div class="iw"><input type="number" id="logBF" placeholder="0.0" step="0.1" min="0"><span class="unit">%</span></div></div>
-      <button class="pink-btn" onclick="saveProgress()">Save Entry</button>
-    </div>
-    <!-- Log history -->
-    <div class="panel">
-      <div class="panel-title">Recent Entries</div>
-      <div id="progressLog"></div>
-    </div>
-    <!-- Progress Photos -->
-    <div class="panel" style="margin-top:12px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-        <div class="panel-title" style="margin:0;">Progress Photos</div>
-        <button onclick="openProgressPhoto()" style="padding:6px 14px;border-radius:99px;border:0.5px solid var(--pink-border);background:var(--pink-dim);font-family:inherit;font-size:12px;font-weight:600;color:var(--pink);cursor:pointer;">+ Add</button>
-      </div>
-      <div id="progressPhotosGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"></div>
-    </div>
   </div>
 </div>
 
@@ -4417,6 +4403,31 @@ body.reel-on{overflow:hidden;}
 </div>
 
 <!-- ══ STEPS PAGE (opened from the Home widget) ══ -->
+<div class="th-page" id="th-weight" aria-hidden="true">
+  <div class="th-bar"><button class="e-circ" onclick="thClose()" aria-label="Back"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><div class="th-title">Body Weight</div><span style="width:44px"></span></div>
+  <div class="th-body">
+    <!-- Log weight -->
+    <div class="panel" style="margin-bottom:12px;">
+      <div class="panel-title">Log Today</div>
+      <div class="field" style="margin-bottom:10px;"><label>Weight</label><div class="iw"><input type="number" id="logWeight" placeholder="0.0" step="0.1" min="0"><span class="unit">lbs</span></div></div>
+      <div class="field" style="margin-bottom:12px;"><label>Body Fat %</label><div class="iw"><input type="number" id="logBF" placeholder="0.0" step="0.1" min="0"><span class="unit">%</span></div></div>
+      <button class="pink-btn" onclick="saveProgress()">Save Entry</button>
+    </div>
+    <!-- Log history -->
+    <div class="panel">
+      <div class="panel-title">Recent Entries</div>
+      <div id="progressLog"></div>
+    </div>
+    <!-- Progress Photos -->
+    <div class="panel" style="margin-top:12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div class="panel-title" style="margin:0;">Progress Photos</div>
+        <button onclick="openProgressPhoto()" style="padding:6px 14px;border-radius:99px;border:0.5px solid var(--pink-border);background:var(--pink-dim);font-family:inherit;font-size:12px;font-weight:600;color:var(--pink);cursor:pointer;">+ Add</button>
+      </div>
+      <div id="progressPhotosGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;"></div>
+    </div>
+  </div>
+</div>
 <div class="th-page" id="th-steps" aria-hidden="true">
   <div class="th-bar"><button class="e-circ" onclick="thClose()" aria-label="Back"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><div class="th-title">Steps</div><span style="width:44px"></span></div>
   <div class="th-body">
