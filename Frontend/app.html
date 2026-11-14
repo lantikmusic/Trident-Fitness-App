@@ -3151,6 +3151,11 @@ body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;
 .rest-mini{z-index:97;cursor:pointer;}
 body.ef-on .rest-mini{display:none !important;}
 .ef-rest{cursor:pointer;}
+.ef-po{display:flex;align-items:center;gap:8px;margin-top:8px;padding:8px 12px;border-radius:14px;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.1);font-size:12.5px;color:#C9CDD3;}
+.ef-po b{font-size:16px;font-weight:800;color:#fff;white-space:nowrap;}
+.ef-po.up{border-color:var(--pink-border);background:var(--pink-dim);}
+.ef-po.up b{color:var(--pink);}
+.ef-po.down b{color:#FF9F0A;}
 /* Line icons that replaced emoji */
 .wn-ic,.ah-wo-ic{color:var(--pink);font-size:0;}
 .ah-home-item i{display:flex;justify-content:center;color:var(--pink);font-style:normal;}
@@ -8593,17 +8598,79 @@ function switchWorkoutDay(i){workoutDayIdx=i;activeExerciseIdx=0;workoutState.da
 function getLogKey(){return`${selectedProgram}_w${workoutWeek}_d${workoutDayIdx}`;}
 function getPrevLogKey(){return`${selectedProgram}_w${workoutWeek-1}_d${workoutDayIdx}`;}
 
-function getSuggestedWeight(exIdx){
-  if(workoutWeek===0)return null;
-  const prevKey=getPrevLogKey();
-  const prevLog=workoutState.logs[prevKey];
-  if(!prevLog||!prevLog[exIdx])return null;
-  const prevWeights=prevLog[exIdx].map(s=>parseFloat(s.weight)||0).filter(w=>w>0);
-  if(!prevWeights.length)return null;
-  const avg=prevWeights.reduce((a,b)=>a+b,0)/prevWeights.length;
-  return Math.round((avg*1.05)/2.5)*2.5; // ~5% increase, round to nearest 2.5
+// ══════════════════════════════════════
+// PROGRESSIVE OVERLOAD — "double progression", the same rule for every program:
+// every working set reached the top of the rep range last time → add weight
+// (+10 lb big lower-body lifts, +5 lb upper-body lifts and dumbbells, +2.5 lb small isolation moves);
+// otherwise keep the weight and beat last time's reps; most sets under the bottom of the range → about 5% lighter.
+// Deload weeks and lighter / tired sessions hold the weight. It's a suggestion: you can always change the number.
+// ══════════════════════════════════════
+function poRange(reps) {
+  const m = String(reps || '').match(/(\d+)(?:\s*[–-]\s*(\d+))?/);
+  return m ? { low: Number(m[1]), high: Number(m[2] || m[1]) } : null;
 }
-
+function poRound(w) { return Math.max(0, Math.round(w / 2.5) * 2.5); }
+function poInc(name, w) {
+  const n = String(name || '').toLowerCase();
+  if(w < 20) return 2.5;
+  if(/dumbbell|\bdb\b|kettlebell/.test(n)) return 5;
+  if(/leg curl|leg extension|hamstring curl/.test(n)) return 5;
+  if(/curl|raise|fly|flye|extension|pushdown|push-down|kickback|face pull|pull-apart|shrug|calf|crunch|woodchop|pallof|rotation|abduct|adduct|neck/.test(n)) return 2.5;
+  if(/squat|deadlift|\brdl\b|romanian|leg press|hip thrust|trap bar|hack|good morning|glute bridge|sled/.test(n)) return 10;
+  return 5;
+}
+// last: the sets done last time [{w, r}]. Returns { w, from, dir: 'up'|'same'|'down', note, short } or null.
+function poSuggest(o) {
+  const last = (o.last || []).filter(s => s && (parseFloat(s.w) || 0) > 0);
+  if(!last.length) return null;
+  const top = Math.max(...last.map(s => parseFloat(s.w) || 0));
+  const work = last.filter(s => (parseFloat(s.w) || 0) === top);
+  const reps = work.map(s => parseInt(s.r, 10) || 0);
+  const rg = poRange(o.reps), want = Math.max(1, Number(o.sets) || work.length);
+  const lastTxt = `${top} lb × ${reps.join(', ')}`;
+  if(o.hold) return { w: top, from: top, dir: 'same', short: 'Hold', note: `Same weight this time (${o.holdWhy || 'lighter week'})` };
+  if(!rg) return { w: top, from: top, dir: 'same', short: 'Same', note: `Last time ${lastTxt}` };
+  const hitTop = reps.length >= Math.min(want, last.length) && reps.length >= want && reps.every(r => r >= rg.high);
+  const floor = rg.low === rg.high ? rg.low - 2 : rg.low;   // a fixed target (e.g. 12) allows a near miss
+  const under = reps.filter(r => r < floor).length;
+  if(hitTop) {
+    const inc = poInc(o.name, top), w = poRound(top + inc);
+    return { w, from: top, dir: 'up', short: `+${inc}`, note: `↑ +${inc} lb — you hit ${rg.high} reps on every set last time` };
+  }
+  if(under > reps.length / 2 && reps.length >= 2) {
+    const w = poRound(top * 0.95);
+    return { w, from: top, dir: 'down', short: `−${Math.round(top - w)}`, note: `↓ A little lighter — last time most sets were under ${floor} reps` };
+  }
+  const best = Math.max(...reps, 0);
+  return { w: top, from: top, dir: 'same', short: 'Same', note: best >= rg.high ? `Same weight — get ${rg.high} reps on every set to move up` : `Same weight — beat ${best} rep${best === 1 ? '' : 's'} (aim for ${rg.high} on every set)` };
+}
+// Regular programs: the last time this exercise (by name) was logged in this program, before today's workout.
+function poClassicLast(prog, name, logKey) {
+  const cur = /^(.*)_w(\d+)_d(\d+)$/.exec(String(logKey || '')); if(!cur) return null;
+  const pid = cur[1], cw = Number(cur[2]), cd = Number(cur[3]);
+  let best = null, bestOrder = -1;
+  Object.keys(workoutState.logs || {}).forEach(k => {
+    const m = /^(.*)_w(\d+)_d(\d+)$/.exec(k); if(!m || m[1] !== pid || k === logKey) return;
+    const w = Number(m[2]), d = Number(m[3]);
+    if(w > cw || (w === cw && d >= cd)) return;                 // only workouts before this one
+    const order = w * 100 + d; if(order <= bestOrder) return;
+    let exs; try { exs = getDayExercises(prog, d); } catch(e) { exs = (prog.days[d] || {}).exercises || []; }
+    const i = (exs || []).findIndex(e => e && e.name === name); if(i < 0) return;
+    const sets = ((workoutState.logs[k] || [])[i] || []).filter(s => s && (s.weight || s.reps)).map(s => ({ w: s.weight, r: s.reps }));
+    if(!sets.some(s => parseFloat(s.w) > 0)) return;
+    best = sets; bestOrder = order;
+  });
+  return best;
+}
+function getSuggestion(exIdx, logKey) {
+  try {
+    logKey = logKey || getLogKey();
+    const p = wtClassicParse(logKey); if(!p) return null;
+    const ex = p.exercises[exIdx]; if(!ex || isBodyweight(ex.name)) return null;
+    return poSuggest({ name: ex.name, reps: ex.reps, sets: ex.sets, last: poClassicLast(p.prog, ex.name, logKey) });
+  } catch(e) { return null; }
+}
+function getSuggestedWeight(exIdx) { const s = getSuggestion(exIdx); return s ? s.w : null; }
 
 // ══════════════════════════════════════
 // EXERCISE ILLUSTRATIONS (SVG)
@@ -9368,7 +9435,8 @@ function getExerciseImageFallbacks(exName) {
 function renderExerciseCard(ex, ei) {
   const logKey=getLogKey();
   const log=workoutState.logs[logKey]?.[ei] || [];
-  const suggested=getSuggestedWeight(ei);
+  const sugInfo=getSuggestion(ei);
+  const suggested=sugInfo?sugInfo.w:null;
   const numSets=log.length > 0 ? log.length : ex.sets;
   const pr=getExercisePR(ex.name);
   const photo=getExPhoto(ex.name);
@@ -9380,7 +9448,7 @@ function renderExerciseCard(ex, ei) {
     const sw = log[s]?.weight || '';
     const sr = log[s]?.reps   || '';
     const isDone = bw ? !!sr : (sw || sr);
-    const sugText = (!bw && !sw && suggested) ? `${suggested} lbs suggested` : '';
+    const sugText = (!bw && !sw && suggested) ? `${suggested} lbs${sugInfo && sugInfo.dir !== 'same' ? ' ' + (sugInfo.dir === 'up' ? '↑' : '↓') : ''} this time` : '';
     const wDisplay = sw ? `${sw}` : '—';
     const rDisplay = sr ? `${sr}` : '—';
     const btnClass = isDone ? 'done' : '';
@@ -9600,7 +9668,7 @@ function efRender() {
   const img = efPhoto(it.name);
   const lastTxt = (() => {
     const ls = sets.filter(s => s && s.done).slice(-1)[0];
-    return ls ? `last ${efSetText(it, ls)}` : (it.tw ? `${it.tw} lb suggested` : '');
+    return ls ? `last ${efSetText(it, ls)}` : '';
   })();
   const segs = M.items.map((x, i) => `<button class="ef-seg ${['done', 'skipped', 'omitted'].includes(x.status) ? 'on' : i === cur ? 'cur' : ''}" aria-label="Go to ${efEsc(x.name)}" onclick="efGoto(${i})"></button>`).join('');
   const field = (which, f, v, act) => `<div class="ef-field${act ? ' act' : ''}"><span>${efEsc(efFieldLabel(f))}</span><div class="ef-row">
@@ -9636,6 +9704,7 @@ function efRender() {
           <div class="ef-eyebrow">EXERCISE ${cur + 1} OF ${M.items.length}${it.section && M.id.startsWith('h:') ? ` · ${efEsc(String(it.section).toUpperCase())}` : ''}</div>
           <h1 class="ef-name">${efEsc(it.name)}</h1>
           <div class="ef-sub">${efEsc([it.target, lastTxt].filter(Boolean).join(' · '))}</div>
+          ${it.tw && !sets.some(s => s && s.done) ? `<div class="ef-po ${it.twDir || 'same'}"><b>${efEsc(String(it.tw))} lb</b><span>${efEsc(it.twNote || 'Suggested')}</span></div>` : ''}
         </div>
         ${noFields ? '' : `<span class="ef-badge">SET ${Math.min(doneN, total)}/${total}</span>`}
       </div>
@@ -13366,7 +13435,7 @@ const HY_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturd
 const HY_BLOCK = [
   null,
   { name: 'Baseline', tip: 'Establish baseline loads and clean technique.' },
-  { name: 'Build', tip: 'Add a little load or a rep where last week left 2+ reps in reserve. Your call — nothing is increased for you.' },
+  { name: 'Build', tip: 'Trident suggests each lift\'s weight from last time: hit the top of the rep range on every set and it goes up.' },
   { name: 'Top week', tip: 'Highest planned load of the phase. No maxing out and no grinding reps.' },
   { name: 'Deload', tip: 'Lifting sets are cut by about a third and sprint and jump volume is trimmed. Keep the movement sharp.' },
   { name: 'Contrast intro', tip: 'New Strength-Power exercises. Start conservative and learn the heavy-then-jump pairs.' },
@@ -14408,7 +14477,23 @@ function hyRepTop(reps) {
 }
 // Never applied for the athlete, and silent whenever fatigue, pain, a deload or a baseline week is
 // in play. It only speaks up from what was actually logged last time.
+// LANTIK's suggestion for a loaded lift (same rule as every program); holds during deloads, lighter or tired sessions.
+function hyPO(sess, sid, section, ex) {
+  try {
+    if(ex.kind !== 'strength' || hyFields(ex).f1 !== HY_F.lbs) return null;
+    const last = hyHistory(ex.id, section.key, sid)[0];
+    if(!last) return null;
+    const week = sess ? sess.blockWeek : hyBlockWeek();
+    let holdWhy = '';
+    if(hyIsDeload(week)) holdWhy = hyPhaseWeek(week) === 4 && week === 12 ? 'test and taper week' : 'deload week';
+    else if(sess && (sess.lighter || sess.check === 'tired' || sess.check === 'pain')) holdWhy = 'lighter session';
+    else if(hyState.readiness.status !== 'normal') holdWhy = 'reduced training status';
+    return poSuggest({ name: ex.name, reps: ex.reps, sets: hyRx({ sections: [section] }, section, ex, sess).sets, last: last.sets, hold: !!holdWhy, holdWhy });
+  } catch(e) { return null; }
+}
 function hyProgressHint(c, section, ex, last) {
+  const po = hyPO(c.sess, c.sid, section, ex);
+  if(po) return `Next: ${po.w} lb. ${po.note}.`;
   if(section.key !== 'main' || ex.kind !== 'strength' || !last) return '';
   const week = c.sess ? c.sess.blockWeek : hyBlockWeek();
   if(hyPhaseWeek(week) === 1 || hyIsDeload(week) || hyState.readiness.status !== 'normal') return '';
@@ -14671,7 +14756,8 @@ function hyEBlock(c, section, ex, key, info, st, f, name, rxLine, last) {
   for(let i = 0; i < total; i++) { if(!(sets[i] && sets[i].done)) { next = i; break; } }
   const prev = next > 0 ? sets[next - 1] : null;
   const fromLast = last && last.sets && (last.sets[next] || last.sets[last.sets.length - 1]);
-  const v1 = f.f1 ? ((prev && prev.done && prev.w) || (f.f1 === HY_F.lbs && fromLast && fromLast.w) || '') : '';
+  const po = hyPO(c.sess, c.sid, section, ex);
+  const v1 = f.f1 ? ((prev && prev.done && prev.w) || (po && po.w) || (f.f1 === HY_F.lbs && fromLast && fromLast.w) || '') : '';
   const repN = parseInt(String(ex.reps || '').match(/\d+/)?.[0] || '', 10);
   const v2 = f.f2 ? ((prev && prev.done && prev.r) || (f.f2 === HY_F.reps && repN) || '') : '';
   const step = fl => { const n = parseFloat(fl.step); return n > 0 ? (fl === HY_F.lbs || fl === HY_F.add ? 5 : n) : 1; };
@@ -15187,7 +15273,7 @@ function hySetStatus(status) {
 function hyBlockSheet() {
   const week = hyBlockWeek();
   hySheet(`<div class="cm-sheet-title">12-week program</div>
-    <div class="hy-muted" style="margin-bottom:12px;">Three 4-week phases, each with its own exercises. Weeks 4 and 8 are lighter, week 12 is test and taper. Pick the week you are on. Loads are never raised for you.</div>
+    <div class="hy-muted" style="margin-bottom:12px;">Three 4-week phases, each with its own exercises. Weeks 4 and 8 are lighter, week 12 is test and taper. Pick the week you are on. Each lift's weight is suggested from what you logged last time, and you can always change it.</div>
     ${[1, 2, 3].map(p => `<div class="hy-phase-h"><b>Phase ${p} · ${HY_PHASE_INFO[p].name}</b><span>${HY_PHASE_INFO[p].weeks} — ${hyEsc(HY_PHASE_INFO[p].tip)}</span></div>
       ${[1, 2, 3, 4].map(i => (p - 1) * 4 + i).map(n => `<button class="cm-pick" onclick="hySetBlockWeek(${n})">Week ${n} — ${HY_BLOCK[n].name}${week === n ? ' ✓' : ''}<small>${hyEsc(HY_BLOCK[n].tip)}</small></button>`).join('')}`).join('')}
     <button class="cm-pick" onclick="hySetBlockWeek(0)">Turn the program off${week ? '' : ' ✓'}<small>Stays on Phase 1 exercises, same every week.</small></button>
@@ -17426,10 +17512,10 @@ function wtClassicWorkout(logKey) {
     const total = log.length > 0 ? log.length : (Number(ex.sets) || 1);
     const sets = log.map(s => ({ w: String((s && s.weight) || ''), r: String((s && s.reps) || ''), done: !!(s && (bw ? s.reps : (s.weight || s.reps))) }));
     const done = sets.filter(s => s.done).length;
-    const tw = !bw && visible ? getSuggestedWeight(ei) : null;
+    const po = !bw ? getSuggestion(ei, logKey) : null, tw = po ? po.w : null;
     return { key: String(ei), name: ex.name, check: false, f1: bw ? null : wtField({ label: 'Weight (lbs)', unit: '', step: '2.5' }),
       f2: wtField({ label: 'Reps', unit: '', step: '1' }), req: true, rest: (hyRest ? hyRest.duration : restTimer.duration) || 60,
-      target: `${ex.sets} × ${ex.reps}`, tw: tw || null, total, sets, status: done >= total ? 'done' : '' };
+      target: `${ex.sets} × ${ex.reps}`, tw: tw || null, twNote: po ? po.note : '', twDir: po ? po.dir : '', total, sets, status: done >= total ? 'done' : '' };
   });
   const cur = visible ? activeExerciseIdx : (WT.cur['c:' + logKey] || 0);
   return { id: 'c:' + logKey, title: p.day.name, sub: `${p.prog.name} · ${items.length} exercises`, activity: 'strength',
@@ -17469,14 +17555,15 @@ function wtHyWorkout(sid) {
     const f = hyFields(ex);
     const st = sess && sess.ex[key];
     const check = (!f.f1 && !f.f2) || (!!section.checkable && !f.f1);
-    let tw = null;
+    let tw = null, po = null;
     if(f.f1 === HY_F.lbs) {
+      po = hyPO(sess, sid, section, ex);
       const last = hyHistory(ex.id, section.key, sid)[0];
-      const n = last && parseFloat((last.sets[0] || {}).w);
+      const n = po ? po.w : (last && parseFloat((last.sets[0] || {}).w));
       if(n > 0) tw = n;
     }
     items.push({ key, name: info.rx.alt || hyExName(w.id, key, ex), check, f1: wtField(f.f1), f2: wtField(f.f2), req: !!f.required,
-      rest: Number(ex.rest) || 0, target: hyRxText(ex, info.rx.sets) || '', tw, total: Math.max(1, info.rx.sets || 1),
+      rest: Number(ex.rest) || 0, target: hyRxText(ex, info.rx.sets) || '', tw, twNote: po ? po.note : '', twDir: po ? po.dir : '', total: Math.max(1, info.rx.sets || 1),
       sets: ((st && st.sets) || []).map(x => ({ w: String((x && x.w) || ''), r: String((x && x.r) || ''), done: !!(x && x.done) })),
       status: info.status, section: section.title || section.key });
   }));
