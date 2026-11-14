@@ -3236,6 +3236,32 @@ body.ef-on .rest-mini{display:none !important;}
 .ef-stat.cal:not(.on) .ef-stat-val b{color:#6B6F76;}
 .ef-body .ef-tools{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:6px;}
 .ef-body .ef-tool{justify-content:center;gap:5px;height:40px;padding:0 6px;font-size:13px;white-space:nowrap;min-width:0;}
+/* ── Workout bar (above the tab bar while a workout runs) + pause ── */
+.wo-bar{position:fixed;left:14px;right:14px;max-width:560px;margin:0 auto;bottom:calc(max(10px, env(safe-area-inset-bottom) - 12px) + 74px);height:62px;border-radius:31px;
+  background:linear-gradient(180deg,rgba(255,255,255,0.12),rgba(255,255,255,0.04)),rgba(30,32,36,0.72);-webkit-backdrop-filter:blur(26px) saturate(170%);backdrop-filter:blur(26px) saturate(170%);
+  border:0.5px solid rgba(255,255,255,0.15);box-shadow:0 10px 30px rgba(0,0,0,0.45),inset 0 1px 0 rgba(255,255,255,0.14);display:flex;align-items:center;gap:11px;padding:0 14px 0 8px;z-index:96;cursor:pointer;-webkit-tap-highlight-color:transparent;animation:woBarIn .3s cubic-bezier(.22,.9,.3,1);}
+.wo-bar[hidden]{display:none;}
+@keyframes woBarIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
+.wo-bar-pp{width:46px;height:46px;border-radius:50%;border:none;background:var(--pink);color:#000;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 14px var(--pink-glow);padding:0;}
+.wo-bar-pp .i-play{display:none;}
+.wo-bar-pp[data-state="play"] .i-play{display:block;margin-left:2px;}
+.wo-bar-pp[data-state="play"] .i-pause{display:none;}
+.wo-bar-txt{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.2;}
+.wo-bar-live{display:flex;align-items:center;gap:5px;font-size:9.5px;font-weight:800;letter-spacing:.1em;color:var(--pink);}
+.wo-bar-live i{width:6px;height:6px;border-radius:50%;background:var(--pink);box-shadow:0 0 6px var(--pink);animation:woPulse 1.6s ease-in-out infinite;}
+@keyframes woPulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+.wo-bar-txt b{font-size:14.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.wo-bar-txt span:last-child{font-size:12px;color:#B5BAC1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.wo-bar-time{font-size:17px;font-weight:800;font-variant-numeric:tabular-nums;}
+.wo-bar-chev{color:#9BA0A8;flex-shrink:0;}
+.wo-bar.paused .wo-bar-live{color:#FF9F0A;}
+.wo-bar.paused .wo-bar-live i{background:#FF9F0A;box-shadow:none;animation:none;}
+.wo-bar.paused .wo-bar-time{color:#FF9F0A;}
+body.wo-bar-on .page{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 92px);}
+.ef-time{cursor:pointer;}
+.ef-time.paused{color:#FF9F0A;}
+.ef-time.paused i{background:#FF9F0A !important;box-shadow:none !important;}
+.wo-list-back{flex-shrink:0;}
 /* ── Cancel workout ── */
 .ef-cancel{display:block;margin:6px auto 0;background:none;border:none;color:#FF6B6B;font:600 14px var(--tf-font);padding:12px 18px;}
 .wo-change-prog-btn.wo-cancel-btn,.hy-adjust .hy-cancel{color:#FF6B6B !important;}
@@ -3889,8 +3915,9 @@ body.reel-on{overflow:hidden;}
     </div>
     <!-- Active workout -->
     <div id="activeWorkout" style="display:none;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-        <div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:12px;">
+        <button class="e-circ wo-list-back" onclick="woBackToMain()" aria-label="Back to the Workout tab"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <div style="flex:1;min-width:0;">
           <div style="font-size:11px;font-weight:600;color:var(--pink);text-transform:uppercase;letter-spacing:.1em;" id="activeProgramName"></div>
           <div style="font-size:20px;font-weight:700;letter-spacing:-0.02em;" id="activeDayName"></div>
         </div>
@@ -4095,6 +4122,15 @@ body.reel-on{overflow:hidden;}
 </div>
 
 <!-- Minimized rest timer (anywhere in the app; tap to open the big one) -->
+<div class="wo-bar" id="woBar" hidden onclick="woBarOpen()" role="button" aria-label="Back to your workout">
+  <button class="wo-bar-pp" id="woBarPP" data-state="pause" onclick="event.stopPropagation();woTogglePause()" aria-label="Pause workout">
+    <svg class="i-pause" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1.2"/><rect x="14" y="5" width="4" height="14" rx="1.2"/></svg>
+    <svg class="i-play" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>
+  </button>
+  <div class="wo-bar-txt"><span class="wo-bar-live"><i></i>WORKOUT</span><b id="woBarTitle">Workout</b><span id="woBarSub"></span></div>
+  <div class="wo-bar-time" id="woBarTime">0:00</div>
+  <svg class="wo-bar-chev" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+</div>
 <div class="ef-rest rest-mini" id="restMini" hidden onclick="restExpand()" role="button" aria-label="Open rest timer">
   <div class="ef-ring"><svg width="48" height="48" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="20" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="4"/><circle id="restMiniRing" cx="24" cy="24" r="20" fill="none" stroke="var(--pink)" stroke-width="4" stroke-linecap="round" stroke-dasharray="125.7" stroke-dashoffset="0" transform="rotate(-90 24 24)"/></svg></div>
   <div class="ef-rest-txt"><span id="restMiniLbl">Rest</span><b id="restMiniTime">0:00</b></div>
@@ -9735,7 +9771,7 @@ function efRender() {
     <div class="ef-photo${img ? '' : ' no-img'}">${img ? `<img src="${img}" alt="" onerror="this.parentNode.classList.add('no-img');this.remove()">` : ''}<div class="ef-photo-fade"></div></div>
     <div class="ef-top">
       <button class="ef-glass ef-round" aria-label="Back to the workout list" onclick="efClose()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg></button>
-      <span class="ef-glass ef-time"><i></i><b id="efClock">${efFmtClock(Date.now() - efStarted())}</b></span>
+      <button class="ef-glass ef-time${woPausedAt(EF.id) ? ' paused' : ''}" id="efTimeBtn" onclick="woTogglePause(EF.id)" aria-label="Pause or resume the workout"><i></i><b id="efClock">${efFmtClock(woElapsed(EF.id))}</b></button>
       <button class="ef-glass ef-finish" onclick="efFinish()">Finish</button>
     </div>
     <div class="ef-body">
@@ -9942,7 +9978,8 @@ function efStatsTick() {
 
 function efTick() {
   const c = document.getElementById('efClock');
-  if(c) c.textContent = efFmtClock(Date.now() - efStarted());
+  if(c) c.textContent = efFmtClock(woElapsed(EF.id));
+  const tb = document.getElementById('efTimeBtn'); if(tb) tb.classList.toggle('paused', !!woPausedAt(EF.id));
   try { efStatsTick(); } catch(e) {}
   const bar = document.getElementById('efRest');
   if(!bar) return;
@@ -18042,7 +18079,7 @@ function wtSnapshot() {
   if(active && LA.restarted[active.id]) active.restarted = LA.restarted[active.id];
   let accent = '#32FCFD';
   try { accent = getAccentColor(); } catch(e) {}
-  return { v: 1, today, active, rest: wtRestState(), accent, cancelled: WT.cancelled || null };
+  return { v: 1, today, active, rest: wtRestState(), accent, cancelled: WT.cancelled || null, paused: active && woPausedAt(active.id) ? active.id : null };
 }
 function wtRestState() {
   const overlay = document.getElementById('restOverlay');
@@ -18171,6 +18208,7 @@ function laSoon() {
 // Restart workout: the elapsed clock (and the Lock Screen timer) start again from now.
 function laResetStart(id) {
   try {
+    woClearPause(id);
     LA.restarted[id] = Date.now();
     delete LA.started[id];
     const all = load(LA_KEY) || {};
@@ -18201,6 +18239,7 @@ function laStarted(id, peek) {
   if(!all[id]) {
     if(peek || !laHasData(id)) return 0;
     all = { [id]: Date.now() };          // first logged set: the workout starts now (only the current workout is kept)
+    woMarkDone(id, false);
     save(LA_KEY, all);
     LA.started[id] = all[id];
     try { wtStartWatch(id); } catch(e) {}
@@ -18209,6 +18248,7 @@ function laStarted(id, peek) {
 }
 // Start workout pressed (or started on the watch): the clock starts now, unless it already runs.
 function laMarkStart(id) {
+  woMarkDone(id, false);
   if(!id || laStarted(id, true)) return;
   save(LA_KEY, { [id]: Date.now() });
   LA.started[id] = Date.now();
@@ -18242,6 +18282,7 @@ function laState() {
     setsDone, setsTotal, done, total: items.length,
     restEnd: r && !r.paused ? (r.endsAt || 0) : 0, restLeft: r ? Math.max(0, Math.round(r.paused ? r.remaining : (r.endsAt - Date.now()) / 1000)) : 0,
     restTotal: r ? (r.duration || 60) : 0, restPaused: !!(r && r.paused),
+    pausedFor: woPausedAt(a.id) ? Math.round((woPausedAt(a.id) - started) / 1000) : null,
     finished: !!a.finished, accent: snap.accent || '#32FCFD'
   };
 }
@@ -18342,9 +18383,113 @@ function wtDiscard(id, fromPhone) {
   setTimeout(() => { try { cmWoSync(true); } catch(e) {} }, 1500);
   showToast(fromPhone ? 'Workout cancelled' : 'Workout discarded on your Apple Watch');
 }
+
+// ══════════════════════════════════════
+// ACTIVE WORKOUT: pause, the workout bar above the tab bar, back from the list
+// ══════════════════════════════════════
+const WO_PAUSE_KEY = 'trident_wo_pause_v1';   // { id, at }: the workout's clock is paused since `at`
+const WO_DONE_KEY = 'trident_wo_done_v1';     // { [id]: true } regular-program workouts that were finished
+function woPausedAt(id) { const p = load(WO_PAUSE_KEY); return p && id && p.id === id ? Number(p.at) || 0 : 0; }
+function woClearPause(id) { const p = load(WO_PAUSE_KEY); if(p && (!id || p.id === id)) { try { localStorage.removeItem(WO_PAUSE_KEY); } catch(e) {} } }
+// Time in the workout so far, without paused time (0 before it starts)
+function woElapsed(id) {
+  const st = id ? laStarted(id, true) : 0;
+  if(!st) return 0;
+  return Math.max(0, (woPausedAt(id) || Date.now()) - st);
+}
+function woTogglePause(id) {
+  id = id || woActiveId();
+  if(!id || !laStarted(id, true)) { showToast('Start the workout first'); return; }
+  const pa = woPausedAt(id);
+  if(pa) {
+    // Resume: move the start forward by the paused time, so it isn't counted
+    const all = load(LA_KEY) || {};
+    all[id] = (all[id] || LA.started[id]) + (Date.now() - pa);
+    save(LA_KEY, all);
+    LA.started[id] = all[id];
+    woClearPause(id);
+    showToast('Workout resumed');
+  } else {
+    save(WO_PAUSE_KEY, { id, at: Date.now() });
+    showToast('Workout paused');
+  }
+  LA.last = '';
+  try { laPush(); } catch(e) {}
+  try { wtSoon(); } catch(e) {}
+  try { efTick(); } catch(e) {}
+  woBarTick();
+}
+function woMarkDone(id, done) {
+  if(!id || !String(id).startsWith('c:')) return;
+  const all = load(WO_DONE_KEY) || {};
+  if(done) all[id] = true; else if(all[id]) delete all[id]; else return;
+  save(WO_DONE_KEY, all);
+}
+// The workout in progress: started, not finished
+function woActiveId() {
+  const ids = [];
+  try { if(WT.activeId) ids.push(WT.activeId); } catch(e) {}
+  try { Object.keys(load(LA_KEY) || {}).forEach(k => { if(!ids.includes(k)) ids.push(k); }); } catch(e) {}
+  for(const id of ids) {
+    if(!laStarted(id, true)) continue;
+    if(id.startsWith('h:')) {
+      const sess = hyState.sessions[id.slice(2)];
+      if(!sess || sess.status !== 'in_progress') continue;
+    } else {
+      if((WT.finished && WT.finished[id]) || (load(WO_DONE_KEY) || {})[id]) continue;
+      if(!wtClassicParse(id.slice(2))) continue;
+    }
+    return id;
+  }
+  return null;
+}
+function woBarOpen() {
+  const id = woActiveId(); if(!id) return;
+  try { navTo('workout'); } catch(e) {}
+  setTimeout(() => { try { efOpen(id); } catch(e) {} }, 60);
+}
+function woBarTick() {
+  const bar = document.getElementById('woBar'); if(!bar) return;
+  let id = null, M = null;
+  try {
+    id = woActiveId();
+    if(id) M = id.startsWith('h:') ? wtHyWorkout(id.slice(2)) : wtClassicWorkout(id.slice(2));
+  } catch(e) { id = null; }
+  const restBar = document.getElementById('restMini');
+  // Not over the exercise page, a full page or the minimized rest timer (that one takes this spot)
+  const show = !!(id && M && !M.finished && !document.body.classList.contains('ef-on') && !document.body.classList.contains('th-on') && !(restBar && !restBar.hidden));
+  bar.hidden = !show;
+  document.body.classList.toggle('wo-bar-on', !!show);
+  if(!show) return;
+  const paused = !!woPausedAt(id);
+  const items = M.items || [], cur = items[Math.max(0, Math.min(M.cur || 0, items.length - 1))];
+  let sub = '';
+  if(paused) sub = 'Paused';
+  else if(cur) {
+    const done = (cur.sets || []).filter(x => x && x.done).length, total = Math.max(cur.total || 0, (cur.sets || []).length);
+    sub = cur.check || !total ? cur.name : `${cur.name} · Set ${Math.min(done + 1, total)} of ${total}`;
+  }
+  const t = woElapsed(id), sec = Math.floor(t / 1000);
+  const time = sec >= 3600 ? `${Math.floor(sec / 3600)}:${String(Math.floor(sec % 3600 / 60)).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}` : `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
+  const set = (k, v) => { const e = document.getElementById(k); if(e && e.textContent !== v) e.textContent = v; };
+  set('woBarTitle', String(M.title || 'Workout'));
+  set('woBarSub', sub);
+  set('woBarTime', time);
+  bar.classList.toggle('paused', paused);
+  const pp = document.getElementById('woBarPP');
+  if(pp) { pp.setAttribute('aria-label', paused ? 'Resume workout' : 'Pause workout'); pp.dataset.state = paused ? 'play' : 'pause'; }
+}
+setInterval(() => { try { woBarTick(); } catch(e) {} }, 1000);
+// Back from the workout list to the main Workout tab (the workout keeps running; the bar brings you back)
+function woBackToMain() {
+  _workoutScreen = 'preview';
+  try { renderWorkout(); } catch(e) {}
+  window.scrollTo(0, 0);
+}
 // A regular-program workout was finished on the phone.
 function wtClassicFinished(logKey) {
   const id = 'c:' + logKey;
+  woMarkDone(id, true);
   if(WT.activeId === id || !WT.activeId) { WT.activeId = id; WT.finished[id] = true; }
   wtSoon();
 }
