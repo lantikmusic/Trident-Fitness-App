@@ -17347,6 +17347,11 @@ function wtClassicParse(logKey) {
   if(!day || !day.exercises || !day.exercises.length || day.type === 'recovery' || day.name === 'Recovery' || day.name === 'Rest') return null;
   return { prog, dayIdx, day, exercises: getDayExercises(prog, dayIdx) };
 }
+// The program photo the watch shows behind a workout card ('lantik-cover', 'pushpull-cover'), or none.
+function wtCoverName(prog) {
+  const c = prog && prog.cover ? String(prog.cover) : '';
+  return c ? c.split('/').pop().replace(/\.[a-z]+$/i, '') : undefined;
+}
 function wtClassicWorkout(logKey) {
   const p = wtClassicParse(logKey);
   if(!p) return null;
@@ -17364,7 +17369,7 @@ function wtClassicWorkout(logKey) {
   });
   const cur = visible ? activeExerciseIdx : (WT.cur['c:' + logKey] || 0);
   return { id: 'c:' + logKey, title: p.day.name, sub: `${p.prog.name} · ${items.length} exercises`, activity: 'strength',
-    cur: Math.max(0, Math.min(cur, items.length - 1)), items, finished: !!WT.finished['c:' + logKey] };
+    cur: Math.max(0, Math.min(cur, items.length - 1)), items, finished: !!WT.finished['c:' + logKey], cover: wtCoverName(p.prog) };
 }
 
 // LANTIK Hybrid: one session (its sid, e.g. 2026-11-11_gym).
@@ -17422,7 +17427,7 @@ function wtHyWorkout(sid) {
   if(ctx && ctx.sid === sid && hyView.exOpen) { const i = items.findIndex(it => it.key === hyView.exOpen); if(i >= 0) cur = i; }
   if(cur == null) { cur = items.findIndex(it => !['done', 'skipped', 'omitted'].includes(it.status)); if(cur < 0) cur = 0; }
   return { id, title: w.short || w.name, sub: `${w.tag || 'LANTIK Hybrid'} · ${items.length} items`, activity: wtHyActivity(w),
-    cur: Math.max(0, Math.min(cur, Math.max(0, items.length - 1))), items, finished: !!(sess && sess.status === 'completed') };
+    cur: Math.max(0, Math.min(cur, Math.max(0, items.length - 1))), items, finished: !!(sess && sess.status === 'completed'), cover: wtCoverName(getProgram('lantikHybrid')) };
 }
 // Points the LANTIK screen at a session, so the normal hy* functions work on it.
 function wtHyFocus(sid) {
