@@ -17606,6 +17606,8 @@ function wtSnapshot() {
     if(w && !w.finished) today.push(w);
   }
   if(WT.activeId) active = WT.activeId.startsWith('h:') ? wtHyWorkout(WT.activeId.slice(2)) : wtClassicWorkout(WT.activeId.slice(2));
+  // When this workout was last restarted on the phone: the watch starts its workout over to match.
+  if(active && LA.restarted[active.id]) active.restarted = LA.restarted[active.id];
   let accent = '#32FCFD';
   try { accent = getAccentColor(); } catch(e) {}
   return { v: 1, today, active, rest: wtRestState(), accent };
@@ -17727,7 +17729,7 @@ function wtHyFocus(sid) {
 // ── Live Activity: the workout on the iPhone's Lock Screen and Dynamic Island (iPhone app only) ──
 // Shows the workout in progress: current exercise and set, workout time, and the rest countdown.
 // The timers tick by themselves; the app only sends an update when something changes.
-var LA = { timer: null, last: '', id: null, started: {} };
+var LA = { timer: null, last: '', id: null, started: {}, restarted: {} };
 const LA_KEY = 'trident_live_activity_v1';   // { [workout id]: start time (ms) }
 function laSoon() {
   if(!wtNative()) return;
@@ -17737,12 +17739,14 @@ function laSoon() {
 // Restart workout: the elapsed clock (and the Lock Screen timer) start again from now.
 function laResetStart(id) {
   try {
+    LA.restarted[id] = Date.now();
     delete LA.started[id];
     const all = load(LA_KEY) || {};
     if(all[id]) { delete all[id]; save(LA_KEY, all); }
     LA.last = '';
     if(typeof efTick === 'function') efTick();
     if(typeof laPush === 'function') laPush();
+    if(typeof wtSoon === 'function') wtSoon();   // the watch gets the cleared sets and the new start time
   } catch(e) {}
 }
 function laStarted(id) {
