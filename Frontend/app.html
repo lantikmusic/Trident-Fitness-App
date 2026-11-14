@@ -3165,6 +3165,16 @@ body.ef-on .rest-mini{display:none !important;}
 #page-community .cm-post.has-media .cm-actions{margin-top:6px;margin-bottom:2px;}
 #page-community .cm-post .cm-body.cm-caption{font-size:14.5px;line-height:1.45;margin:2px 0 6px;}
 #page-community .cmp-postview .cm-post{border-bottom:none !important;}
+/* ── Exercise page: How to do it ── */
+.ef-desc{position:relative;border-radius:16px;padding:11px 14px 12px;background:rgba(255,255,255,0.045);border:0.5px solid rgba(255,255,255,0.09);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.ef-desc-lbl{font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--pink);margin-bottom:4px;}
+.ef-desc-txt{margin:0;font-size:14px;line-height:1.5;color:#D5D8DD;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.ef-desc.open .ef-desc-txt{display:block;-webkit-line-clamp:unset;}
+.ef-desc-note{margin-top:8px;font-size:13px;line-height:1.45;color:#C9CDD3;padding-top:8px;border-top:0.5px solid rgba(255,255,255,0.08);}
+.ef-desc-note b{color:#fff;font-weight:700;margin-right:3px;}
+.ef-desc-body{position:relative;}
+.ef-desc-more{position:absolute;right:0;bottom:0;font-size:13px;font-weight:700;color:var(--pink);background:linear-gradient(90deg,rgba(25,27,30,0),#1A1C1F 35%);padding-left:26px;}
+.ef-desc.open .ef-desc-more{display:none;}
 /* ── Live workout stats (exercise page) ── */
 .ef-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 4px;}
 .ef-stat{position:relative;overflow:hidden;border-radius:18px;padding:10px 11px 9px;min-height:92px;display:flex;flex-direction:column;gap:3px;
@@ -8611,9 +8621,10 @@ function showWorkoutSummary(day, logKey, prs, phaseAdvanced) {
   overlay.style.display = 'block';
   requestAnimationFrame(()=>{ overlay.classList.add('open'); sheet.classList.add('open'); });
 
-  // If there are PRs from the last exercise, show them first
-  if(prs.length > 0) {
-    showPRPopup(prs, 0, ()=>{
+  // If there are PRs from the last exercise, show them first (ones already celebrated during the workout aren't repeated)
+  const popPRs = prs.filter(p => !efPRAlreadyShown(logKey, p));
+  if(popPRs.length > 0) {
+    showPRPopup(popPRs, 0, ()=>{
       if(phaseAdvanced) setTimeout(()=>showPhaseAdvancementPrompt(), 500);
     });
   } else if(phaseAdvanced) {
@@ -9781,6 +9792,7 @@ function efRender() {
         ${efCanProgress(it) ? `<button class="ef-tool" onclick="efProgress()"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Progress</button>` : ''}
         ${efCanSwap(it) ? `<button class="ef-tool" onclick="efSwap()"><span class="ef-tool-sym" aria-hidden="true">⇄</span>Swap</button>` : ''}
       </div>
+      ${efDescHTML(it)}
       ${efStatsHTML(M)}
       <section class="ef-panel">
         ${panel}
@@ -10019,6 +10031,256 @@ function efNextEx() {
   if(n === cur) efFinish(); else efGoto(n);
 }
 // Log set: saves the numbers (same path as the watch), then starts the rest timer.
+// ── Exercise descriptions (shown on the exercise page under Watch video / Progress / Swap) ──
+// Each entry: [names that share it, how to do it]. Names are matched without case or punctuation.
+const EX_INFO_LIST = [
+  // ── Chest ──
+  [['Bench Press', 'Barbell Bench Press', 'Bench Press Warm-Up Sets'], 'Lie on the bench with eyes under the bar, feet flat and shoulder blades pinched together. Lower the bar to mid-chest with elbows about 45° from your body, then press back up over your shoulders. Works chest, front delts and triceps.'],
+  [['Speed Bench Press'], 'A lighter bench press (about 50–60%) done fast. Lower the bar under control, then press it up as explosively as you can. Every rep should move quickly; stop the set if the bar slows down. Builds pressing power.'],
+  [['Dumbbell Bench Press', 'DB Bench Press', 'Single Arm DB Press'], 'Lie flat with a dumbbell in each hand over your chest. Lower them to the sides of your chest with elbows about 45° out, then press up and slightly together. Dumbbells let each side work evenly. Works chest, front delts and triceps.'],
+  [['Incline Bench Press', 'Incline Barbell Press'], 'Set the bench to about 30°. Lower the bar to your upper chest, just under the collarbone, then press up over your shoulders. Keep your shoulder blades back and feet planted. Targets the upper chest and front delts.'],
+  [['Incline Dumbbell Press', 'Incline DB Press'], 'On a bench set to about 30°, lower the dumbbells to the sides of your upper chest, then press them up and slightly together. Control the way down. Targets the upper chest and front delts.'],
+  [['Machine Chest Press', 'Incline Machine Press'], 'Set the seat so the handles line up with your mid-chest (upper chest for incline). Press the handles out until your arms are nearly straight, then return slowly without letting the weight stack touch. A stable way to load the chest.'],
+  [['Floor Press'], 'Lie on the floor holding a barbell or dumbbells over your chest. Lower until your upper arms touch the floor, pause, then press back up. The floor limits the range, which is easy on the shoulders and builds lockout strength.'],
+  [['Cable Chest Fly', 'Cable Fly', 'Cable Crossover', 'Low Cable Fly'], 'Stand between the cables with a slight bend in your elbows. Bring the handles together in a wide hugging arc in front of your chest, squeeze, then open back up slowly until you feel a stretch. Low-to-high cables hit the upper chest.'],
+  [['Dumbbell Fly'], 'Lie flat with dumbbells over your chest and a soft bend in your elbows. Open your arms wide until you feel a stretch across your chest, then bring them back together in the same arc. Keep the weight moderate.'],
+  [['Pec Deck'], 'Sit with your back flat against the pad and arms on the handles at chest height. Squeeze the handles together in front of you, hold for a moment, then let them open slowly. Isolates the chest.'],
+  [['Push-Ups'], 'Hands slightly wider than your shoulders, body in a straight line from head to heels. Lower your chest to just above the floor with elbows about 45° out, then push back up. Brace your core so your hips don\'t sag. Works chest, shoulders and triceps.'],
+  [['Diamond Push-Ups'], 'A push-up with your hands close together under your chest, thumbs and index fingers forming a diamond. Keep your elbows close to your sides as you lower. Puts more work on the triceps.'],
+  [['Plyo Push-Ups', 'Plyometric Push-Ups', 'Explosive Push-Ups', 'Clap Push-Ups'], 'From a push-up position, lower under control, then push up hard enough that your hands leave the floor (add a clap if you can). Land with soft elbows and go straight into the next rep. Builds upper-body power.'],
+  [['Scapular Push-Ups'], 'In a push-up position with straight arms, let your chest sink between your shoulder blades, then push the floor away to spread them apart. Your elbows stay locked the whole time. Strengthens the muscles that keep your shoulders healthy.'],
+  [['Dips', 'Tricep Dips', 'Chest Dip Machine'], 'Support yourself on the bars with straight arms. Lower until your upper arms are about parallel to the floor, then press back up. Lean forward slightly for more chest, stay upright for more triceps. Stop short if your shoulders complain.'],
+  [['Medicine-Ball Chest Pass', 'Med Ball Throw'], 'Hold the ball at your chest, step forward and throw it as hard as you can straight ahead (to a wall or partner). Extend your arms fully and follow through. Catch, reset and repeat. Builds explosive pushing power.'],
+  [['Landmine Press'], 'Hold the end of a barbell anchored in a landmine at shoulder height. Press it up and forward until your arm is straight, then lower it back to your shoulder. The angled path is shoulder-friendly. Works shoulders, upper chest and core.'],
+
+  // ── Shoulders ──
+  [['Overhead Press', 'Shoulder Press'], 'Stand with the bar at your collarbones, hands just outside your shoulders. Squeeze your glutes and brace your core, then press the bar straight up, moving your head back slightly so it passes your face. Finish with the bar over your mid-foot. Works shoulders and triceps.'],
+  [['Dumbbell Shoulder Press', 'DB Shoulder Press', 'Machine Shoulder Press'], 'Seated or standing, start with the weights at shoulder height, palms forward. Press straight up until your arms are nearly locked, then lower back to your shoulders under control. Keep your ribs down and don\'t arch your lower back.'],
+  [['Arnold Press'], 'Start with dumbbells in front of your shoulders, palms facing you. As you press up, rotate your palms to face forward at the top, then reverse the turn on the way down. Hits all three heads of the shoulder.'],
+  [['Push Press'], 'Bar on your collarbones. Dip a few inches by bending your knees, then drive up hard with your legs and use that momentum to press the bar overhead. Lock out with the bar over your mid-foot. Lets you move more weight than a strict press.'],
+  [['Lateral Raise', 'Lateral Raises', 'DB Lateral Raises', 'DB Lateral Raise', 'Cable Lateral Raise', 'Machine Lateral Raise'], 'Stand tall with weights at your sides and a slight bend in your elbows. Raise your arms out to the sides until they\'re level with your shoulders, leading with your elbows, then lower slowly. Use a light weight you can control. Builds the side delts for wider shoulders.'],
+  [['Rear Delt Fly', 'Reverse Pec Deck'], 'Hinge forward with a flat back (or face the pec deck). With a slight elbow bend, sweep the weights out to the sides and squeeze your shoulder blades at the top, then lower slowly. Works the rear delts and upper back.'],
+  [['Face Pulls'], 'Set a rope at upper-chest height. Pull it toward your face, splitting the rope apart and driving your hands back beside your ears, elbows high. Squeeze for a moment, then return. Great for rear delts, upper back and shoulder health.'],
+  [['Band Pull-Aparts'], 'Hold a band in front of your chest with straight arms. Pull it apart until it touches your chest, squeezing your shoulder blades together, then return slowly. Builds the upper back and helps posture.'],
+  [['Band External Rotations'], 'Elbow bent 90° and tucked at your side, holding a band anchored across your body. Rotate your forearm outward without letting your elbow leave your side, then return slowly. Strengthens the rotator cuff.'],
+  [['High Pull'], 'Hold a barbell or dumbbells at your thighs. Extend your hips and knees explosively, shrug, and pull the weight up to chest height with your elbows high and out. Lower and reset. Builds power through the hips and upper back.'],
+
+  // ── Back ──
+  [['Deadlift', 'Conventional Deadlift'], 'Bar over your mid-foot, hands just outside your legs. Brace your core, flatten your back and push the floor away to stand up, keeping the bar close to your legs. Lock out with hips and knees together, then lower with control. Works your whole back side.'],
+  [['Sumo Deadlift'], 'Wide stance with toes turned out, hands inside your knees. Keep your chest up and back flat, and push your knees out as you drive through the floor to stand. A shorter pull that loads the hips and inner thighs more.'],
+  [['Trap Bar Deadlift'], 'Stand inside the trap bar and grip the handles at your sides. Brace, keep your chest up, and stand up by pushing through the floor. The centered load is easier on your back and makes it a great power lift.'],
+  [['Rack Pull'], 'A deadlift from pins set around knee height. Brace, pull the bar up to lockout and squeeze your glutes, then lower to the pins. Overloads the top of the deadlift and builds the upper back and traps.'],
+  [['Romanian Deadlift', 'Stiff-Leg Deadlift', 'Good Mornings'], 'Stand tall with soft knees. Push your hips back and lower the weight along your legs with a flat back until you feel a strong hamstring stretch, then drive your hips forward to stand. Works hamstrings, glutes and lower back.'],
+  [['Single-Leg Romanian Deadlift', 'Single Leg RDL'], 'Balance on one leg with a soft knee. Hinge forward as your free leg reaches straight back, keeping your hips square, until you feel a hamstring stretch. Stand back up by squeezing the glute. Builds balance, hamstrings and glutes.'],
+  [['Barbell Row'], 'Hinge forward to about 45° with a flat back and the bar hanging at your knees. Pull it to your lower ribs, driving your elbows back, then lower under control. Don\'t jerk with your hips. Works lats, upper back and biceps.'],
+  [['Dumbbell Row', 'One-Arm Dumbbell Row'], 'One hand and knee on a bench, back flat. Pull the dumbbell toward your hip, keeping your elbow close, then lower until your arm is straight. Think "elbow to back pocket". Works the lats and upper back.'],
+  [['Chest-Supported Row', 'Machine Row', 'T-Bar Row'], 'Chest on the pad (or straddling the T-bar), pull the handles toward your ribs, squeezing your shoulder blades together, then return slowly. The support takes your lower back out of it so the upper back does the work.'],
+  [['Cable Row', 'Seated Cable Row'], 'Sit tall with a slight knee bend. Pull the handle to your lower ribs while squeezing your shoulder blades back, then reach forward slowly to stretch. Keep your torso still. Works lats, mid back and biceps.'],
+  [['Lat Pulldown'], 'Grip the bar slightly wider than your shoulders and lock your thighs under the pad. Pull the bar to your upper chest by driving your elbows down, chest up, then let it rise slowly. Builds the lats for a wider back.'],
+  [['Pull-Ups', 'Assisted Pull-Ups', 'Weighted Pull-Ups'], 'Hang with hands a bit wider than shoulders, palms facing away. Pull your chest toward the bar until your chin clears it, then lower all the way down with control. Use assistance or add weight to stay in your rep range. Works lats, upper back and biceps.'],
+  [['Chin-Ups'], 'Hang with palms facing you, hands shoulder-width. Pull until your chin is over the bar, then lower slowly to a full hang. Works the lats and puts more work on the biceps than a pull-up.'],
+  [['Explosive Pull-Ups'], 'From a dead hang, pull as fast and high as you can, aiming to get your chest to the bar. Lower under control and reset before the next rep. Quality over quantity. Builds pulling power.'],
+  [['Cable Pullover'], 'Face a high cable with straight arms holding a bar or rope. Sweep your hands down to your thighs in an arc, keeping your arms almost straight, then let them rise slowly. Isolates the lats.'],
+  [['Back Extension', 'Superman', 'Reverse Hyperextension'], 'Hips on the pad (or face down on the floor), lower your upper body (or legs) and lift back up by squeezing your glutes and lower back until your body is in a straight line. Don\'t over-arch at the top. Strengthens the lower back and glutes.'],
+  [['Farmer Carry'], 'Pick up heavy weights in each hand and walk with tall posture, shoulders back and core braced. Take short, steady steps and don\'t let the weights swing. Builds grip, traps and core.'],
+
+  // ── Arms ──
+  [['Barbell Curl', 'EZ-Bar Curl'], 'Stand tall with elbows at your sides. Curl the bar up by bending at the elbows only, squeeze at the top, then lower slowly to full extension. Don\'t swing your body. Works the biceps.'],
+  [['Bicep Curl', 'Biceps Curl', 'Dumbbell Curl', 'Dumbbell Bicep Curl', 'Cable Curl', 'Swiss Ball Curl'], 'Elbows pinned at your sides, palms facing up. Curl the weight up until your biceps are fully squeezed, then lower slowly all the way down. Keep your shoulders still and avoid swinging.'],
+  [['Hammer Curl', 'Hammer Curls', 'Cable Hammer Curl', 'Cross-Body Hammer Curl'], 'Hold the weights with palms facing each other (thumbs up). Curl up without turning your wrists, then lower slowly. Works the biceps plus the brachialis and forearms for thicker arms.'],
+  [['Reverse Curl'], 'Hold the bar with palms facing down. Curl up keeping your wrists straight, then lower slowly. Builds the forearms and brachialis.'],
+  [['Tricep Pushdown', 'Tricep Pushdowns', 'Cable Triceps Pressdown'], 'Face a high cable, elbows tucked at your sides. Push the handle down until your arms are straight and squeeze, then let it rise to about chest height without your elbows moving. Works the triceps.'],
+  [['Overhead Tricep Extension', 'Tricep Overhead Extension', 'Cable Overhead Extension'], 'Hold the weight overhead with elbows pointing up. Lower it behind your head by bending only at the elbows, then extend back up. Keep your elbows narrow. Stretches and builds the long head of the triceps.'],
+  [['Skull Crushers'], 'Lie on a bench holding the bar over your forehead with arms straight. Bend your elbows to lower the bar toward your forehead (or just behind it), then extend back up. Keep your upper arms still. Works the triceps.'],
+  [['Close-Grip Bench', 'Close-Grip Bench Press'], 'A bench press with hands about shoulder-width apart. Keep your elbows tucked close as you lower the bar to your lower chest, then press up. Puts more work on the triceps.'],
+
+  // ── Legs: squats and presses ──
+  [['Back Squat', 'Squat', 'Smith Machine Squat'], 'Bar across your upper back, feet about shoulder-width. Brace your core, then sit down and back until your hips are at or below your knees, keeping your chest up and knees tracking over your toes. Drive up through your whole foot. Works quads, glutes and core.'],
+  [['Speed Back Squat'], 'A lighter squat (about 50–60%) done fast. Squat down under control, then drive up as explosively as you can. Every rep should be fast; stop the set if the bar slows. Builds leg power for sprinting and jumping.'],
+  [['Front Squat'], 'Bar resting on the front of your shoulders, elbows high. Squat straight down keeping your torso upright, then drive back up. The front load hits the quads hard and demands a strong upper back.'],
+  [['Goblet Squat'], 'Hold a dumbbell or kettlebell at your chest. Squat down between your knees with your chest tall, then stand back up. A great way to learn squat form and work the quads and glutes.'],
+  [['Sumo Squat', 'Plie Squat'], 'Wide stance with toes turned out, holding a weight between your legs. Squat straight down keeping your knees pushed out over your toes, then stand and squeeze your glutes. Works inner thighs, glutes and quads.'],
+  [['Bodyweight Squats'], 'Feet about shoulder-width, arms out for balance. Sit down and back until your thighs are about parallel, chest tall, then stand back up. A warm-up and a way to groove good squat form.'],
+  [['Hack Squat'], 'Back flat against the pad, feet shoulder-width on the platform. Lower until your knees are bent at least 90°, then drive up through your whole foot. Keeps the load on the quads with little back strain.'],
+  [['Sissy Squat'], 'Holding a support, rise onto your toes and lean back as you bend your knees forward, lowering until you feel a deep quad stretch. Drive back up. A tough quad isolation move, so start with bodyweight.'],
+  [['Leg Press', 'Wide-Stance Leg Press'], 'Feet shoulder-width on the platform. Lower it until your knees are about 90° without your lower back lifting off the pad, then press back up without locking your knees. Builds quads and glutes.'],
+  [['Leg Press (High Foot)'], 'Place your feet high on the platform. Lower until your hips are well bent, keeping your lower back on the pad, then press through your heels. The high foot position shifts work to the glutes and hamstrings.'],
+  [['Wall Sit'], 'Back flat against a wall, slide down until your thighs are parallel to the floor and knees over ankles. Hold the position and keep breathing. Builds quad endurance.'],
+  [['Leg Extension'], 'Sit with the pad on your lower shins and knees in line with the machine\'s pivot. Straighten your legs, squeeze your quads at the top, then lower slowly. Isolates the quads.'],
+
+  // ── Legs: lunges and single-leg ──
+  [['Bulgarian Split Squat'], 'Rear foot on a bench, front foot about two feet ahead. Lower straight down until your back knee nearly touches the floor, keeping your front knee over your foot, then drive up through the front heel. Works quads and glutes one leg at a time.'],
+  [['Walking Lunges'], 'Step forward and lower until both knees are bent about 90°, back knee just above the floor. Push off the front foot and step straight into the next lunge. Keep your torso tall. Works quads, glutes and balance.'],
+  [['Reverse Lunge', 'Side Lunge'], 'Step back (or out to the side) and lower into a lunge, keeping your weight on the front (or bent) leg and your chest up. Push through that foot to return. Easier on the knees than forward lunges. Works quads and glutes.'],
+  [['Curtsy Lunge'], 'Step one foot diagonally behind the other, like a curtsy, and lower until your front thigh is about parallel. Push through the front heel to stand. Targets the glutes, especially the sides of the hips.'],
+  [['Step-Ups'], 'Place your whole foot on a box or bench. Drive through that heel to stand on top, without pushing off the back foot, then step down slowly. Works quads and glutes one leg at a time.'],
+  [['Explosive Step-Up'], 'Foot on a box, drive up through that leg as fast as you can, punching the other knee up high (you can leave the box briefly). Step down and reset. Builds single-leg power for sprinting and cutting.'],
+
+  // ── Glutes and hamstrings ──
+  [['Hip Thrust', 'Barbell Hip Thrust', 'Smith Machine Hip Thrust'], 'Upper back on a bench, bar over your hips (use a pad). Feet flat, knees bent. Drive through your heels to lift your hips until your body is flat from shoulders to knees, squeeze your glutes hard, then lower. Keep your chin tucked.'],
+  [['Single Leg Hip Thrust', 'Side-Lying Hip Raise'], 'Upper back on a bench with one foot planted and the other leg raised. Drive through the planted heel to lift your hips level, squeeze, then lower slowly. Keep your hips from tilting. Builds each glute separately.'],
+  [['Glute Bridge', 'Glute Bridges', 'Banded Glute Bridge'], 'Lie on your back, knees bent, feet flat. Press through your heels to lift your hips until your body is straight from shoulders to knees, squeeze your glutes, then lower. With a band, push your knees out against it.'],
+  [['Glute Bridge Hold'], 'Lift into a glute bridge and hold the top position, squeezing your glutes and keeping your hips level. Breathe steadily. Builds glute endurance and activation.'],
+  [['Cable Pull-Through'], 'Face away from a low cable with the rope between your legs. Hinge your hips back with a flat back, then drive them forward to stand tall and squeeze your glutes. A hip hinge that teaches the glutes to work.'],
+  [['Glute Kickback', 'Cable Kickback', 'Glute Kickback Machine', 'Donkey Kicks'], 'Brace your core and kick one leg straight back, squeezing the glute at the top without arching your lower back. Lower slowly and repeat. Isolates the glutes.'],
+  [['Fire Hydrants'], 'On hands and knees, keep your knee bent and lift one leg out to the side until your thigh is about level with your hip. Lower slowly. Keep your hips square. Works the outer glutes.'],
+  [['Banded Clamshells', 'Side-Lying Clam'], 'Lie on your side with knees bent and a band above them. Keep your feet together and open your top knee as far as you can without rolling your hips back, then close slowly. Works the outer glutes.'],
+  [['Banded Lateral Walk', 'Banded Side Walk', 'Lateral Band Walk'], 'Band above your knees or at your ankles, in a quarter squat. Step sideways, keeping tension on the band and your toes pointing forward, without letting your feet come together. Lights up the side glutes.'],
+  [['Cable Hip Abduction', 'Side-Lying Hip Abduction'], 'Standing at a low cable (or lying on your side), lift your leg out to the side with your toes pointing forward, then lower slowly. Keep your torso still. Works the outer glutes.'],
+  [['Kettlebell Swings', 'Dumbbell Swings'], 'Hinge at your hips and hike the bell back between your legs, then snap your hips forward to float it to chest height. Your arms just guide it, the hips do the work. Let it swing back and repeat. Builds explosive hips and conditioning.'],
+  [['Leg Curl', 'Seated Leg Curl'], 'Set the pad just above your heels. Curl your heels toward your glutes, squeeze the hamstrings, then lower slowly. Keep your hips down on the pad. Isolates the hamstrings.'],
+  [['Nordic Curl', 'Nordic Hamstring Curl', 'Glute Ham Raise'], 'Kneel with your ankles anchored. Keeping your body straight from knees to head, lower yourself forward as slowly as you can, catch yourself with your hands, then push back up. One of the best moves for hamstring strength and injury prevention.'],
+
+  // ── Calves ──
+  [['Calf Raises', 'Standing Calf Raise', 'Standing Calf Raises', 'Calf Press', 'Smith Machine Calf Raise', 'Donkey Calf Raise'], 'Balls of your feet on an edge. Lower your heels for a full stretch, then rise as high as you can onto your toes and pause at the top. Go slow, no bouncing. Builds the calves.'],
+  [['Seated Calf Raise'], 'Sit with the pad on your lower thighs and balls of your feet on the platform. Lower your heels for a stretch, then push up as high as you can and pause. Works the deeper calf muscle (soleus).'],
+  [['Single-Leg Calf Raise', 'Single Leg Calf Raise'], 'Stand on one foot on an edge, holding something for balance. Lower your heel all the way, then rise onto your toes and pause at the top. Builds calf strength and ankle stability for running and jumping.'],
+
+  // ── Core ──
+  [['Plank'], 'Forearms under your shoulders, body in a straight line from head to heels. Squeeze your glutes and brace your abs like you\'re about to be punched. Don\'t let your hips sag or pike up. Hold and keep breathing.'],
+  [['Copenhagen Plank'], 'Side plank with your top leg on a bench and the bottom leg hanging free (or bent knee on the bench for an easier version). Lift your hips into a straight line and hold. Strengthens the inner thighs and helps prevent groin strains.'],
+  [['Ab Wheel'], 'Kneel holding the wheel under your shoulders. Brace your abs and roll forward as far as you can without your lower back sagging, then pull back using your core. Start with short rollouts.'],
+  [['Hanging Knee Raise'], 'Hang from a bar with straight arms. Curl your knees up toward your chest by tilting your pelvis, then lower slowly without swinging. Works the lower abs and grip.'],
+  [['Bicycle Crunches'], 'On your back with hands by your head, bring one elbow toward the opposite knee as you extend the other leg, then switch sides in a pedaling motion. Move with control and rotate through your torso. Works abs and obliques.'],
+  [['Russian Twist', 'Oblique Crunch'], 'Sit leaning back with your chest up and knees bent (feet down or lifted). Rotate your torso to tap the weight beside each hip, moving your shoulders, not just your arms. Works the obliques.'],
+  [['Mountain Climbers'], 'From a high plank, drive one knee toward your chest, then switch legs quickly, keeping your hips low and shoulders over your hands. Works your core and gets your heart rate up.'],
+  [['Pallof Press'], 'Stand side-on to a cable set at chest height, handle at your chest. Press it straight out and hold for a moment without letting the cable twist you, then bring it back. Builds anti-rotation core strength.'],
+  [['Landmine Rotation', 'Cable Woodchop'], 'Hold the end of the landmine (or cable handle) with straight arms. Rotate it from one hip to the other by turning through your hips and torso, pivoting your back foot. Control the weight across your body. Builds rotational power.'],
+  [['Dead Bug'], 'On your back with arms up and knees over hips at 90°. Press your lower back into the floor, then slowly extend the opposite arm and leg toward the floor and return. Alternate sides without your back arching. Teaches core control.'],
+  [['Hollow Hold'], 'On your back, press your lower back into the floor and lift your shoulders and legs slightly, arms reaching overhead. Hold the banana shape and keep breathing. Builds a strong, braced core.'],
+  [['Neck Flexion and Extension'], 'With light resistance (your hand, a band or a plate on a towel), slowly nod your chin toward your chest, then tilt your head back, moving through a comfortable range. Go slowly with light loads. Strengthens the neck for contact and striking.'],
+
+  // ── Olympic lifts and power ──
+  [['Power Cleans', 'Hang Power Clean', 'Hang Clean', 'Dumbbell Clean', 'Kettlebell Clean'], 'From the hang (just above your knees) or the floor, jump the weight up by explosively extending your hips, knees and ankles, then pull yourself under it and catch it on your shoulders in a quarter squat. Builds full-body explosive power. Technique first.'],
+  [['Hang Snatch', 'Dumbbell Snatch', 'Kettlebell Snatch'], 'Start with the weight just above your knees. Explode through your hips and legs, pull high, then punch the weight overhead and catch it with a locked arm in a quarter squat. Stand up to finish. A fast, technical power lift.'],
+  [['Thruster'], 'Hold the weight at your shoulders and squat down, then drive up out of the squat and use that momentum to press it straight overhead in one movement. Lower to your shoulders and repeat. Full-body strength and conditioning.'],
+  [['Trap Bar Jump'], 'Stand inside a lightly loaded trap bar. Dip into a quarter squat, then jump as high as you can, landing softly with bent knees. Reset between reps. Builds explosive leg power with the load in your hands.'],
+  [['Med Ball Slams', 'Med Ball Slam', 'Medicine-Ball Overhead Slam', 'Slam Ball'], 'Raise the ball overhead and rise onto your toes, then slam it into the floor as hard as you can, hinging at your hips and bracing your abs. Catch it on the bounce and repeat. Builds full-body power.'],
+  [['Rotational Medicine-Ball Scoop Toss', 'Rotational Medicine-Ball Shot Put'], 'Stand side-on to a wall. Load your back hip, then rotate explosively through your hips and torso to throw the ball into the wall as hard as you can. Let the power start from your legs. Builds rotational power for strikes and throws.'],
+  [['Band-Resisted Punches'], 'With a band anchored behind you and looped around your hands, throw fast, sharp punches, rotating through your hips and returning your hand to your guard each time. Keep your core tight. Builds punching speed and power.'],
+  [['Battle Ropes'], 'Hold a rope end in each hand in a half squat. Whip the ropes up and down quickly in waves (alternating or together), keeping your core braced. Go hard for the work interval. Great conditioning for arms, shoulders and lungs.'],
+  [['Sled Push', 'Prowler Push'], 'Hands on the sled handles, body leaning forward at about 45°. Drive with short, powerful steps, pushing through the balls of your feet. Keep your back flat. Builds leg drive and conditioning.'],
+
+  // ── Jumps and plyometrics ──
+  [['Box Jumps', 'Contrast Box Jump'], 'Stand in front of a box, swing your arms and jump up, landing softly on the box with both feet and knees bent. Step down, don\'t jump down, and reset. Focus on height and a quiet landing.'],
+  [['Single-Leg Box Jump'], 'Stand on one leg in front of a low box. Swing your arms and jump onto the box, landing softly on the same leg. Step down and reset. Builds single-leg power and landing control.'],
+  [['Broad Jumps', 'Standing Broad Jump', 'Standing Long Jump'], 'Feet hip-width, swing your arms back and jump forward as far as you can, driving your arms forward. Land softly on both feet with bent knees and hold the landing. Reset fully between jumps.'],
+  [['Single-Leg Broad Jump', 'Single-Leg Forward Hops'], 'Balance on one leg, then jump (or hop) forward and land on the same leg with a soft knee, holding the landing for a second. Keep your knee in line with your toes. Builds single-leg power and stability.'],
+  [['Countermovement Jump', 'Vertical Jumps', 'Squat Jumps', 'Tuck Jumps'], 'Dip quickly into a quarter squat while swinging your arms back, then jump straight up as high as you can. Land softly with bent knees. Reset fully between jumps so every rep is a max effort.'],
+  [['Depth Jump', 'Depth Jumps', 'Drop Jumps'], 'Step off a low box, land on both feet, and immediately jump up as high as you can, spending as little time on the ground as possible. Land softly. A high-intensity drill for reactive power, so keep reps low.'],
+  [['Split-Squat Jump', 'Jump Lunges'], 'From a lunge position, jump up explosively and switch legs in the air, landing softly in a lunge with the other leg forward. Keep your torso upright. Builds leg power and coordination.'],
+  [['Hurdle Hops'], 'Jump over a row of low hurdles with both feet, bouncing off the ground quickly between each one. Keep your knees up and ground contact short. Builds reactive, springy legs.'],
+  [['Pogo Hops', 'Pogo Jumps'], 'Hop in place on the balls of your feet with nearly straight knees, bouncing quickly off the ground like a pogo stick. Keep contacts short and stiff. Builds ankle stiffness for speed.'],
+  [['Lateral Bounds', 'Skater Bounds'], 'Push off one leg and leap sideways, landing softly on the other leg and holding the landing briefly before bounding back. Keep your knee in line with your toes. Builds side-to-side power for cutting.'],
+  [['Jump Rope', 'Jump Rope HIIT'], 'Jump with small, quick bounces on the balls of your feet, turning the rope with your wrists and keeping your elbows close. For HIIT, go hard for the work interval, then rest. Builds footwork and conditioning.'],
+  [['Explosive Knee Drive'], 'From a split stance, drive your back knee up hard to hip height while pushing off the ground and swinging the opposite arm, like a sprint start. Reset and repeat. Builds sprint and striking hip power.'],
+
+  // ── Sprints and speed ──
+  [['10-Yard Acceleration', '10-Yard Accelerations', '20-Yard Acceleration', 'Progressive 10-Yard Accelerations'], 'From a two-point stance, lean forward and drive out hard with short, powerful steps, pushing the ground behind you. Stay low for the first few steps and pump your arms. Walk back and rest fully between reps.'],
+  [['20-Yard Sprints', '40-Yard Dash', 'Flying 10-Yard Sprint', 'Banded Sprints'], 'Sprint all-out for the distance with tall posture, high knees and fast arms. For a flying sprint, build up over a run-in, then hit top speed through the timed zone. Rest fully between reps so each one is fast.'],
+  [['Hill Sprints', 'Hill Sprint'], 'Sprint up a moderate hill with a forward lean, powerful knee drive and strong arm swing. Walk back down to recover fully. Builds acceleration and leg power with less stress on the hamstrings.'],
+  [['Resisted Sprint (Sled or Band)'], 'Sprint while pulling a light sled or against a partner holding a band. Lean forward and drive hard with each step. Keep the load light enough that your form doesn\'t break down. Builds acceleration strength.'],
+  [['200m Intervals', '400m Intervals'], 'Run the distance at a hard, steady pace you can repeat, then rest for the set time before the next one. Aim to keep every interval at about the same time. Builds speed endurance.'],
+  [['Suicide Drills'], 'Sprint to the first line and back, then the next line and back, and so on, touching each line. Turn quickly and stay low on the changes of direction. Tough conditioning with lots of starts and stops.'],
+  [['Progressive Runs'], 'Run several stretches, starting easy and getting a bit faster on each one, finishing at about 80–90% effort. Stay relaxed and smooth. A warm-up for faster sprinting.'],
+  [['Easy Jog', 'Easy Jog and Dynamic Mobility'], 'Jog at an easy, conversational pace to raise your body temperature. Follow with leg swings, lunges and arm circles if listed. You should finish feeling warm and loose, not tired.'],
+  [['Easy Walk', 'Easy Walk or Low-Intensity Cycling'], 'Walk or ride at an easy, conversational pace. This is active recovery: keep it light and let your body recover from harder days.'],
+
+  // ── Agility and drills ──
+  [['5-10-5 Pro Agility', '5-10-5 Shuttle'], 'Start straddling the middle line. Sprint 5 yards to one side and touch the line, sprint 10 yards back the other way, then 5 yards back through the middle. Stay low on the turns and push off the outside foot.'],
+  [['Cone Drills', 'Ladder Drills', 'Footwork and Planned Change of Direction'], 'Move through the set pattern of cones or ladder boxes with quick, light feet. Stay low on the cuts, keep your eyes up and plant on the outside foot to change direction. Quality and speed over getting it done fast and sloppy.'],
+  [['Reactive Agility', 'Reactive Cuts'], 'Start in an athletic stance and react to a partner\'s signal, a point or a call, cutting and sprinting in that direction as fast as you can. Stay low and ready. Trains game-speed reactions.'],
+  [['Lateral Shuffles', 'A-Skips and Lateral Shuffles'], 'In an athletic stance, shuffle sideways with quick steps without letting your feet cross or click together. Stay low with your chest up. Builds lateral speed and footwork.'],
+  [['A-Skips'], 'Skip forward, driving one knee up to hip height with your toes pulled up, then snapping that foot down under your hip. Swing your arms in rhythm. A sprint drill for knee drive and foot strike.'],
+  [['B-Skips'], 'Like an A-skip, but after the knee comes up, extend the lower leg forward and paw it back down under your hip. Stay tall and rhythmic. A sprint drill that trains the hamstrings and ground contact.'],
+  [['High Knees'], 'Run in place or move forward, driving your knees up to hip height quickly with fast arm swings. Stay on the balls of your feet. A warm-up and sprint mechanics drill.'],
+  [['Bear Crawls'], 'On hands and feet with your knees just off the floor, crawl forward moving opposite hand and foot together. Keep your back flat and hips low. Works shoulders, core and coordination.'],
+  [['Stance and First-Step Mechanics', 'Receiver Stance and First Step'], 'Get into your receiver stance with weight on the balls of your feet, then explode out with a short, powerful first step without false-stepping. Repeat, focusing on a fast, clean start.'],
+  [['Wide-Receiver Releases', 'Receiver Releases'], 'From your stance, practice getting off the line past a defender: quick feet, a sharp head or shoulder fake, and a burst into your route. Use your hands to keep the defender off you.'],
+  [['Route Breaks and Controlled Cuts', 'Route Breaks and Hard Cuts', 'Route Breaks and Sharp Cuts', 'Controlled Route Breaks', 'Deceleration and Route Breaks', 'Controlled Deceleration and Route Breaks'], 'Run the route stem at speed, then sink your hips, chop your feet to slow down and plant hard on the outside foot to break. Snap your head around and accelerate out of the cut. Start controlled, then build speed.'],
+  [['Route Tree at Game Speed'], 'Run each route in the tree at full game speed: a sharp release, a convincing stem, clean breaks and an explosive finish. Rest between routes so every one is fast.'],
+  [['Route Timing and Catching', 'Easy Route Timing and Catching'], 'Run routes with a QB or partner, focusing on breaking at the right depth and catching the ball with your hands away from your body. Look the ball in and tuck it away.'],
+  [['Catching While Moving', 'Catching on the Move', 'Catching and Short-Route Preparation'], 'Catch passes while jogging or running short routes. Make a diamond with your hands, catch the ball away from your body, watch it into your hands and tuck it right away.'],
+
+  // ── Warm-up and mobility ──
+  [['Dynamic Warm-Up', 'Low-Intensity Movement Preparation'], 'Move through a series of light movements (leg swings, lunges, skips, arm circles) to raise your heart rate and loosen your joints. Start easy and build. You should feel warm and ready, not tired.'],
+  [['Leg Swings'], 'Hold onto something for balance and swing one leg forward and back, then side to side, gradually increasing the range. Keep your torso still. Loosens the hips and hamstrings before running.'],
+  [['90/90 Hip Rotations'], 'Sit with both knees bent at 90°, one leg in front and one to the side. Rotate your knees to the other side so both legs switch positions, keeping your chest tall. Opens up the hips.'],
+  [['Hip Airplanes'], 'Balance on one leg, hinged forward. Rotate your torso and hips open toward the ceiling, then back down toward the floor, keeping your balance. Builds hip control and stability.'],
+  [['Adductor Rock-Backs'], 'On hands and knees, extend one leg straight out to the side. Rock your hips back toward your heel until you feel an inner-thigh stretch, then return. Loosens the groin.'],
+  [['Ankle Mobility', 'Ankle Rocks'], 'In a half-kneeling position or standing, drive your front knee forward over your toes while keeping your heel down, then rock back. Improves ankle range for squats, sprints and jumps.'],
+  [['Gentle Mobility', 'Gentle Hamstring Mobility', 'Hip and Hamstring Mobility'], 'Move slowly through gentle stretches for the hips and hamstrings, easing into each position without forcing it. Breathe deeply and relax. Helps you recover and move better.'],
+];
+// Generic fallbacks by keyword, for exercises without their own entry (swaps and custom names).
+const EX_INFO_KEYWORDS = [
+  [/curl/i, 'Keep your elbows still at your sides and curl the weight up by bending at the elbows, squeeze, then lower slowly to full extension. Avoid swinging. Works the biceps.'],
+  [/pushdown|pressdown|tricep|skull/i, 'Keep your upper arms still and straighten your elbows against the resistance, squeezing the triceps at the end, then return slowly. Works the triceps.'],
+  [/lateral raise|side raise/i, 'With a slight elbow bend, raise your arms out to the sides to shoulder height, leading with your elbows, then lower slowly. Light and controlled. Works the side delts.'],
+  [/fly|pec deck|crossover/i, 'With a soft bend in your elbows, bring your arms together in a wide hugging arc, squeeze your chest, then open slowly to a stretch. Works the chest.'],
+  [/row/i, 'Brace your core and pull the weight toward your ribs, squeezing your shoulder blades together, then return slowly to a full stretch. Works the lats and upper back.'],
+  [/pull-?up|chin-?up|pulldown/i, 'Pull your elbows down and back to bring your chest toward the bar, then return slowly to a full stretch. Works the lats and biceps.'],
+  [/bench|chest press|push-?up|dip/i, 'Keep your shoulder blades back and lower the weight under control, then press back up powerfully. Works the chest, shoulders and triceps.'],
+  [/shoulder press|overhead press|military/i, 'Brace your core and press the weight straight overhead until your arms are nearly locked, then lower back to your shoulders under control. Works the shoulders and triceps.'],
+  [/deadlift|rdl|hinge|good morning/i, 'Push your hips back with a flat back, keeping the weight close to your legs, then drive your hips forward to stand tall. Works the hamstrings, glutes and back.'],
+  [/hip thrust|bridge|kickback|abduction|clam/i, 'Brace your core and drive through your heel to squeeze your glutes hard at the top, then lower with control. Don\'t arch your lower back. Works the glutes.'],
+  [/squat|leg press/i, 'Brace your core and lower until your hips are about level with your knees, chest up and knees tracking over your toes, then drive up through your whole foot. Works the quads and glutes.'],
+  [/lunge|split|step-?up/i, 'Keep your torso tall and lower until both knees are bent about 90°, then drive through your front heel to stand. Works quads and glutes one leg at a time.'],
+  [/leg curl|hamstring/i, 'Curl your heels toward your glutes, squeeze your hamstrings, then lower slowly. Works the hamstrings.'],
+  [/calf/i, 'Lower your heels for a full stretch, then rise as high as you can onto your toes and pause. No bouncing. Works the calves.'],
+  [/plank|hold|hollow/i, 'Brace your abs, squeeze your glutes and hold a straight, steady position while breathing. Works the core.'],
+  [/crunch|twist|raise|ab|core|woodchop|rotation/i, 'Move slowly and keep tension on your abs the whole time, exhaling as you curl or rotate. Works the core.'],
+  [/jump|hop|bound|plyo/i, 'Jump as explosively as you can and land softly with bent knees, holding each landing. Rest fully between reps so each one is powerful.'],
+  [/sprint|dash|acceleration|run/i, 'Run with tall posture, powerful knee drive and fast arms. Rest fully between reps so every one is fast.'],
+  [/clean|snatch|swing|slam|throw|toss/i, 'Generate power from your hips and legs first, then transfer it through your body explosively. Reset between reps and keep technique sharp.'],
+  [/mobility|stretch|warm/i, 'Move slowly and easily through each position without forcing it. Breathe deeply. You should finish feeling looser, not tired.'],
+];
+const EX_INFO = (() => {
+  const m = {};
+  EX_INFO_LIST.forEach(([names, text]) => names.forEach(n => { m[exInfoKey(n)] = text; }));
+  return m;
+})();
+function exInfoKey(n) { return String(n || '').toLowerCase().replace(/\(.*?\)/g, '').replace(/[^a-z0-9]/g, ''); }
+function exInfoFor(name) {
+  const k = exInfoKey(name);
+  if(EX_INFO[k]) return EX_INFO[k];
+  // Try without the equipment prefix ("Dumbbell ", "Cable ", "Barbell ") or a trailing "s".
+  const bare = exInfoKey(String(name || '').replace(/^(dumbbell|db|cable|barbell|machine|smith machine|banded|weighted|single[- ]leg|single[- ]arm)\s+/i, ''));
+  if(EX_INFO[bare]) return EX_INFO[bare];
+  if(EX_INFO[k.replace(/s$/, '')]) return EX_INFO[k.replace(/s$/, '')];
+  const kw = EX_INFO_KEYWORDS.find(([re]) => re.test(String(name || '')));
+  return kw ? kw[1] : '';
+}
+
+// The "How to" card on the exercise page: the exercise's description, plus the program's coaching note (LANTIK).
+function efCoachNote(it) {
+  if(!EF.id || !EF.id.startsWith('h:')) return '';
+  try { const c = wtHyCtxFor(EF.id.slice(2)), f = c && c.workout && hyFind(c.workout, it.key); return (f && f.ex && f.ex.cue) || ''; } catch(e) { return ''; }
+}
+function efDescHTML(it) {
+  const how = exInfoFor(it.name), note = efCoachNote(it);
+  if(!how && !note) return '';
+  return `<div class="ef-desc" onclick="this.classList.toggle('open')" role="button" aria-label="Show the full description">
+      ${how ? `<div class="ef-desc-lbl">How to do it</div><div class="ef-desc-body"><p class="ef-desc-txt">${efEsc(how)}</p>${how.length > 150 ? '<span class="ef-desc-more">More</span>' : ''}</div>` : ''}
+      ${note ? `<div class="ef-desc-note"><b>Coach's note</b> ${efEsc(note)}</div>` : ''}
+    </div>`;
+}
+
+// ── PRs on the exercise page: a set heavier than your best for that lift shows the trophy card right away ──
+// (The best is saved when the workout is finished, as before; one already shown here isn't shown again then.)
+var EF_PR_SHOWN = {};
+function efClassicPR(it, w) {
+  const wt = parseFloat(w);
+  if(!(wt > 0) || !it || !it.name) return null;
+  try { if(isBodyweight(it.name)) return null; } catch(e) {}
+  const prData = load(PR_KEY) || {};
+  const exKey = it.name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+  const prev = (prData[exKey] && prData[exKey].weight) || 0;
+  const k = EF.id + '|' + it.name;
+  if(wt > prev && wt > (EF_PR_SHOWN[k] || 0)) { EF_PR_SHOWN[k] = wt; return { name: it.name, weight: wt, prev }; }
+  return null;
+}
+function efPRAlreadyShown(logKey, pr) { return (EF_PR_SHOWN['c:' + logKey + '|' + pr.name] || 0) >= pr.weight; }
+
 function efLog(s) {
   const M = efModel(); if(!M) return;
   const cur = Math.max(0, Math.min(M.cur || 0, M.items.length - 1)), it = M.items[cur];
@@ -10026,6 +10288,8 @@ function efLog(s) {
   const r = it.f2 ? String(document.getElementById('ef-r')?.value || '').trim() : '';
   if(it.req && !w && !r) { showToast('Enter your numbers first'); return; }
   wtApply({ t: 'log', id: EF.id, key: it.key, set: s, w, r });
+  const pr = EF.id.startsWith('c:') && it.f1 ? efClassicPR(it, w) : null;
+  if(pr) setTimeout(() => showPRPopup([pr], 0, () => {}), 250);
   const after = efModel(), a = after && after.items[cur];
   const finished = a && (a.sets || []).filter(x => x && x.done).length >= Math.max(a.total || 1, 1);
   // Rest for this set (the phone's own timer: the watch and Lock Screen follow it)
@@ -18127,7 +18391,10 @@ function wtApplyHy(a, sid) {
     hyRender();
     if(!(empty && f.required) && logged >= target) {
       const pr = hyCheckPR(c.workout, a.key, sess);
-      if(pr) showToast(`New PR: ${pr.name} ${pr.weight} lbs`);
+      if(pr) {
+        if(document.body.classList.contains('ef-on')) setTimeout(() => showPRPopup([pr], 0, () => {}), 250);
+        else showToast(`New PR: ${pr.name} ${pr.weight} lbs`);
+      }
     }
     return;
   }
