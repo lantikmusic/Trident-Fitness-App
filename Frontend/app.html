@@ -2591,6 +2591,7 @@ button,input,select,textarea{font-family:inherit;}
 .ef{display:none;position:fixed;inset:0;z-index:95;background:#0D0E10;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:calc(190px + env(safe-area-inset-bottom));}
 .ef.show{display:block;}
 body.ef-on{overflow:hidden;}
+body.ef-on .bottom-nav{display:none !important;}
 body:not([data-page="workout"]) .ef{display:none !important;}
 body.rest-min #restOverlay{display:none !important;}
 .ef-photo{position:absolute;left:0;right:0;top:0;height:calc(250px + env(safe-area-inset-top));background:#1B1D21;overflow:hidden;}
@@ -3156,6 +3157,37 @@ body.ef-on .rest-mini{display:none !important;}
 .ef-po.up{border-color:var(--pink-border);background:var(--pink-dim);}
 .ef-po.up b{color:var(--pink);}
 .ef-po.down b{color:#FF9F0A;}
+/* ── Exercise page tools + Reels-style video ── */
+.ef-tools{display:flex;gap:8px;margin:2px 0 14px;flex-wrap:wrap;}
+.ef-tool{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 14px;border-radius:19px;border:0.5px solid rgba(255,255,255,0.14);background:linear-gradient(160deg,rgba(255,255,255,0.12),rgba(255,255,255,0.05));color:#fff;font:700 13.5px var(--tf-font);box-shadow:inset 0 1px 0 rgba(255,255,255,0.14);}
+.ef-tool.video{background:var(--pink);color:#000;border-color:transparent;box-shadow:0 0 16px var(--pink-glow);}
+.ef-tool:active{transform:scale(.96);}
+.ex-card-po{font-weight:700;color:#fff;}
+.ex-card-po.up{color:var(--pink);}.ex-card-po.down{color:#FF9F0A;}
+.reel{position:fixed;inset:0;z-index:700;background:#000;display:none;overflow:hidden;touch-action:none;}
+.reel.open{display:block;}
+body.reel-on{overflow:hidden;}
+.reel-track,.reel-slide{position:absolute;inset:0;}
+.reel-slide{animation:reelIn .32s cubic-bezier(.22,.9,.3,1);}
+.reel-slide.from-below{animation-name:reelUp;}.reel-slide.from-above{animation-name:reelDown;}
+@keyframes reelIn{from{opacity:0}to{opacity:1}}
+@keyframes reelUp{from{transform:translateY(40%);opacity:0}to{transform:none;opacity:1}}
+@keyframes reelDown{from{transform:translateY(-40%);opacity:0}to{transform:none;opacity:1}}
+.reel-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.reel-empty{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:0 40px;background:radial-gradient(80% 50% at 50% 40%,var(--pink-dim),transparent 70%),linear-gradient(180deg,#121417,#060708);}
+.reel-empty-ic{width:92px;height:92px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#9BA0A8;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.12);margin-bottom:6px;}
+.reel-empty b{font-size:24px;font-weight:800;}
+.reel-empty span{font-size:15px;color:#9BA0A8;line-height:1.45;}
+.reel-shade{position:absolute;left:0;right:0;bottom:0;height:45%;background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,0.75));pointer-events:none;}
+.reel-close,.reel-mute{position:absolute;width:44px;height:44px;border-radius:50%;border:0.5px solid rgba(255,255,255,0.2);background:rgba(0,0,0,0.35);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);color:#fff;display:flex;align-items:center;justify-content:center;padding:0;z-index:2;}
+.reel-close{top:calc(env(safe-area-inset-top) + 10px);left:14px;}
+.reel-mute{right:14px;bottom:calc(env(safe-area-inset-bottom) + 120px);}
+.reel-count{position:absolute;top:calc(env(safe-area-inset-top) + 20px);right:16px;z-index:2;font-size:13px;font-weight:800;color:rgba(255,255,255,0.85);}
+.reel-info{position:absolute;left:18px;right:80px;bottom:calc(env(safe-area-inset-bottom) + 34px);z-index:2;}
+.reel-eyebrow{font-size:11px;font-weight:800;letter-spacing:.1em;color:var(--pink);}
+.reel-name{font-size:26px;font-weight:800;letter-spacing:-0.02em;line-height:1.15;margin-top:3px;}
+.reel-target{font-size:14px;color:rgba(255,255,255,0.75);font-weight:600;margin-top:4px;}
+.reel-hint{font-size:12px;color:rgba(255,255,255,0.55);margin-top:10px;}
 /* Line icons that replaced emoji */
 .wn-ic,.ah-wo-ic{color:var(--pink);font-size:0;}
 .ah-home-item i{display:flex;justify-content:center;color:var(--pink);font-style:normal;}
@@ -8254,8 +8286,8 @@ function renderActiveWorkout(){
       ? `<span class="ex-card-status" style="color:var(--green);font-size:11px;font-weight:600;">✓ ${doneCount}/${log.length||ex.sets} sets</span>`
       : `<span class="ex-card-status" style="color:var(--text3);font-size:11px;">${ex.sets} × ${ex.reps}</span>`;
 
-    // Expanded body — rendered into DOM only when active
-    const bodyHTML = isActive ? `
+    // Logging happens on the exercise page (tap the card); the list only shows each exercise
+    const bodyHTML = false ? `
       <div class="exercise-card-body">
         ${renderExerciseCard(ex,ei).replace(/^<div class="exercise-card[^>]*>/, '').replace(/<\/div>\s*$/, '')}
         ${!isLast ? `<button class="next-workout-btn${!allSetsDone ? ' locked' : ''}" onclick="nextWorkout(event)">Next: ${exercises[ei+1].name} →</button>` : ''}      </div>` : '';
@@ -8265,7 +8297,7 @@ function renderActiveWorkout(){
         <div class="ex-card-icon">${hasLog ? '<span style="display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;background:rgba(48,209,88,0.2);color:#30D158;font-size:11px;font-weight:700;">✓</span>' : isActive ? '▶' : '○'}</div>
         <div class="ex-card-title">
           <div class="ex-card-name">${ex.name}${pr?` <span class="summary-pr-badge">${tfIc('trophy', 12)} ${pr.weight}lbs</span>`:''}</div>
-          <div class="ex-card-meta">${ex.sets} sets · ${ex.reps} reps</div>
+          <div class="ex-card-meta">${ex.sets} sets · ${ex.reps} reps${(() => { try { const sg = isBodyweight(ex.name) ? null : getSuggestion(ei, logKey); return sg ? ` · <span class="ex-card-po ${sg.dir}">${sg.w} lb${sg.dir === 'up' ? ' ↑' : sg.dir === 'down' ? ' ↓' : ''}</span>` : ''; } catch(e) { return ''; } })()}</div>
         </div>
         ${statusEl}
         <span class="ex-card-chevron">›</span>
@@ -9708,6 +9740,11 @@ function efRender() {
         </div>
         ${noFields ? '' : `<span class="ef-badge">SET ${Math.min(doneN, total)}/${total}</span>`}
       </div>
+      <div class="ef-tools">
+        <button class="ef-tool video" onclick="efVideo()"><svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>Watch video</button>
+        ${efCanProgress(it) ? `<button class="ef-tool" onclick="efProgress()"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8M15 7h6v6"/></svg>Progress</button>` : ''}
+        ${efCanSwap(it) ? `<button class="ef-tool" onclick="efSwap()"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4 3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/></svg>Swap</button>` : ''}
+      </div>
       <section class="ef-panel">
         ${panel}
         ${rows ? `<div class="ef-sets">${rows}</div>` : ''}
@@ -9726,6 +9763,87 @@ function efRender() {
     </div>`;
   efTick();
 }
+// ── Exercise page tools: video, progress, swap ──
+function efCurItem() { const M = efModel(); return M && M.items[Math.max(0, Math.min(M.cur || 0, M.items.length - 1))]; }
+function efCanProgress(it) { return !!(it && !it.check && (it.f1 || it.f2) && it.status !== 'omitted'); }
+function efCanSwap(it) { return !!(it && it.status !== 'omitted'); }
+// LANTIK's sheets work on the open session: point them at the one on this page
+function efHyFocus() {
+  const sid = EF.id.slice(2), slot = sid.slice(11);
+  for(let d = 0; d < 7; d++) if(hySid(d, slot) === sid) { hyView.dayIdx = d; hyView.open = slot; return true; }
+  return false;
+}
+function efProgress() {
+  const it = efCurItem(); if(!it) return;
+  if(EF.id.startsWith('h:')) { if(efHyFocus()) hyProgress(it.key); else openExProgress(it.name); }
+  else openExProgress(it.name);
+}
+function efSwap() {
+  const it = efCurItem(); if(!it) return;
+  if(EF.id.startsWith('h:')) { if(efHyFocus()) hySubSheet(it.key); else showToast('Open this workout from its day to swap'); return; }
+  const p = wtClassicParse(EF.id.slice(2)), ex = p && p.exercises[Number(it.key)];
+  if(ex) openSwap(Number(it.key), ex.name, ex.sets, ex.reps);
+}
+function efRefreshIfOpen() { try { if(document.body.classList.contains('ef-on')) efRender(); } catch(e) {} }
+
+// ── Exercise videos: full screen, vertical, swipe between the workout's exercises (like Reels) ──
+// Add a video by its exercise name (lower case): EX_VIDEOS['barbell bench press'] = 'videos/bench.mp4'
+const EX_VIDEOS = {};
+const RV = { list: [], i: 0 };
+function exVideoFor(name) { const k = String(name || '').toLowerCase().trim(); return EX_VIDEOS[k] || ''; }
+function efVideo() {
+  const M = efModel(); if(!M) return;
+  RV.list = M.items.map(x => ({ name: x.name, target: x.target || '' }));
+  RV.i = Math.max(0, Math.min(M.cur || 0, RV.list.length - 1));
+  let ov = document.getElementById('reelView');
+  if(!ov) {
+    ov = document.createElement('div'); ov.id = 'reelView'; ov.className = 'reel';
+    ov.innerHTML = '<div class="reel-track" id="reelTrack"></div>';
+    document.body.appendChild(ov);
+    let y0 = null, t0 = 0;
+    ov.addEventListener('touchstart', e => { y0 = e.touches[0].clientY; t0 = Date.now(); }, { passive: true });
+    ov.addEventListener('touchend', e => {
+      if(y0 === null) return; const dy = e.changedTouches[0].clientY - y0; y0 = null;
+      if(Math.abs(dy) < 60 || Date.now() - t0 > 900) return;
+      reelGo(dy < 0 ? 1 : -1);
+    });
+  }
+  reelDraw(0);
+  ov.classList.add('open');
+  document.body.classList.add('reel-on');
+}
+function reelClose() {
+  const ov = document.getElementById('reelView'); if(!ov) return;
+  ov.querySelectorAll('video').forEach(v => { try { v.pause(); } catch(e) {} });
+  ov.classList.remove('open'); document.body.classList.remove('reel-on');
+}
+function reelGo(d) {
+  const n = RV.i + d; if(n < 0 || n >= RV.list.length) return;
+  RV.i = n; reelDraw(d);
+}
+function reelDraw(dir) {
+  const t = document.getElementById('reelTrack'); if(!t) return;
+  const x = RV.list[RV.i] || {}, url = exVideoFor(x.name), esc = v => String(v || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const media = url
+    ? `<video class="reel-video" src="${esc(url)}" playsinline autoplay loop muted></video>`
+    : `<div class="reel-empty"><div class="reel-empty-ic"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="13" height="14" rx="3"/><path d="m16 10 5-3v10l-5-3M3 3l18 18"/></svg></div><b>No video yet</b><span>A demo for ${esc(x.name)} is coming soon.</span></div>`;
+  t.innerHTML = `<div class="reel-slide ${dir > 0 ? 'from-below' : dir < 0 ? 'from-above' : ''}">
+      ${media}
+      <div class="reel-shade"></div>
+      <button class="reel-close" onclick="reelClose()" aria-label="Close video"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <div class="reel-count">${RV.i + 1} / ${RV.list.length}</div>
+      ${url ? `<button class="reel-mute" onclick="reelMute(this)" aria-label="Sound on">${'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4zM22 9l-6 6M16 9l6 6"/></svg>'}</button>` : ''}
+      <div class="reel-info"><div class="reel-eyebrow">EXERCISE ${RV.i + 1}</div><div class="reel-name">${esc(x.name)}</div>${x.target ? `<div class="reel-target">${esc(x.target)}</div>` : ''}
+        ${RV.list.length > 1 ? `<div class="reel-hint">Swipe up or down for the ${RV.i < RV.list.length - 1 ? 'next' : 'previous'} exercise</div>` : ''}</div>
+    </div>`;
+}
+function reelMute(b) {
+  const v = document.querySelector('#reelTrack video'); if(!v) return;
+  v.muted = !v.muted;
+  b.innerHTML = v.muted ? '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4zM22 9l-6 6M16 9l6 6"/></svg>'
+    : '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>';
+}
+
 function efTick() {
   const c = document.getElementById('efClock');
   if(c) c.textContent = efFmtClock(Date.now() - efStarted());
@@ -11129,6 +11247,7 @@ function confirmSwap(newExName) {
 
   closeSwap();
   renderActiveWorkout();
+  efRefreshIfOpen();
   showToast(`Swapped to ${newExName}!`);
 }
 
@@ -14960,7 +15079,7 @@ function hySessionHTML() {
 function hyExTap(key) {
   const c = hyCtx();
   const w = c && c.workout;
-  if(!c || c.future || (w && w.placeholder && !w.configured) || w.category === 'sport' || (c.sess && c.sess.status !== 'in_progress')) { hyToggleEx(key); return; }
+  if(!c || c.future || (w && w.placeholder && !w.configured) || w.category === 'sport' || (c.sess && (c.sess.status === 'completed' || c.sess.status === 'skipped'))) { hyToggleEx(key); return; }
   try {
     hyEnsureSession(); hySave();
     efOpen('h:' + c.sid);
@@ -15304,7 +15423,7 @@ function hySub(choice) {
   if(choice === -1 && !name) { showToast('Type an exercise name'); return; }
   if(!hyState.subs[c.workout.id]) hyState.subs[c.workout.id] = {};
   if(name) hyState.subs[c.workout.id][key] = name.slice(0, 60); else delete hyState.subs[c.workout.id][key];
-  hySave(true); hySheetClose(); hyRender();
+  hySave(true); hySheetClose(); hyRender(); efRefreshIfOpen();
 }
 // Same chart sheet as the other programs, filled from this program's logged sessions.
 function hyProgress(key) {
