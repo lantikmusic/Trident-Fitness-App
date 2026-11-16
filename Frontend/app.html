@@ -3236,6 +3236,7 @@ body.ef-on .rest-mini{display:none !important;}
 .ef-stat.cal:not(.on) .ef-stat-val b{color:#6B6F76;}
 .ef-body .ef-tools{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:6px;}
 .ef-body .ef-tool{justify-content:center;gap:5px;height:40px;padding:0 6px;font-size:13px;white-space:nowrap;min-width:0;}
+.rd-set{margin-top:10px;font-size:12px;font-weight:600;color:#9BA0A8;}
 /* ── Missed lift prompt (LANTIK) ── */
 .hy-missed{border-color:var(--pink-border) !important;background:var(--pink-dim) !important;}
 .hy-missed-btns{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
@@ -20685,7 +20686,7 @@ function ahOpenConnectSheet() {
 // that saves to Health), each input compared with the person's own 30-day baseline. In memory only, like
 // everything else from Apple Health: never saved and never sent anywhere.
 // ══════════════════════════════════════
-const RD = { loading: false, loadedAt: 0, hrv: {}, rhr: {}, resp: {}, spo2: {}, temp: {} };
+const RD = { loading: false, loadedAt: 0, hrv: {}, rhr: {}, resp: {}, spo2: {}, temp: {}, win: {} };
 const RD_DAYS = 40;
 // Measurements taken overnight belong to the morning they end (8 pm – 8 pm, keyed by the later date)
 function rdNightKey(t) { return ahKey(new Date(new Date(t).getTime() + 4 * 3600000)); }
@@ -20696,13 +20697,36 @@ async function ahLoadReadiness(force) {
   const now = new Date(), iso = d => d.toISOString();
   const from = ahDayStart(now); from.setDate(from.getDate() - RD_DAYS);
   const extra = !ahState.needsReady;
-  const [hrvR, rhrR, respR, spoR, tmpR] = await Promise.all([
+  const [hrvR, rhrR, respR, spoR, tmpR, slpR, rhrS] = await Promise.all([
     ahSafe(ahCall('readSamples', { dataType: 'heartRateVariability', startDate: iso(from), endDate: iso(now), limit: 8000, ascending: true })),
     ahSafe(ahCall('queryAggregated', { dataType: 'restingHeartRate', startDate: iso(from), endDate: iso(now), bucket: 'day', aggregation: 'average' })),
     extra ? ahSafe(ahCall('readSamples', { dataType: 'respiratoryRate', startDate: iso(from), endDate: iso(now), limit: 8000, ascending: true })) : null,
     extra ? ahSafe(ahCall('readSamples', { dataType: 'oxygenSaturation', startDate: iso(from), endDate: iso(now), limit: 12000, ascending: true })) : null,
-    extra ? ahSafe(ahCall('readSamples', { dataType: 'appleSleepingWristTemperature', startDate: iso(from), endDate: iso(now), limit: 400, ascending: true })) : null
+    extra ? ahSafe(ahCall('readSamples', { dataType: 'appleSleepingWristTemperature', startDate: iso(from), endDate: iso(now), limit: 400, ascending: true })) : null,
+    ahSafe(ahCall('readSamples', { dataType: 'sleep', startDate: iso(from), endDate: iso(now), limit: 20000, ascending: true })),
+    ahSafe(ahCall('readSamples', { dataType: 'restingHeartRate', startDate: iso(from), endDate: iso(now), limit: 2000, ascending: true }))
   ]);
+  // Each night's sleep window (first to last moment asleep). Only readings taken while asleep count,
+  // so daytime readings from the watch don't move the score. No sleep recorded: 9 pm – 9 am.
+  RD.win = {};
+  {
+    const all = ((slpR && slpR.ok && slpR.v && slpR.v.samples) || []).filter(x => x && x.startDate && x.endDate);
+    const asleep = x => ['rem', 'core', 'deep', 'asleep', 'light'].includes(x.sleepState);
+    for(let d = new Date(from); d <= now; d.setDate(d.getDate() + 1)) {
+      const end = new Date(d); end.setHours(18, 0, 0, 0);
+      const start = new Date(end); start.setDate(start.getDate() - 1);
+      const k = ahKey(d);
+      const inN = all.filter(x => { const t = new Date(x.startDate); return t >= start && t < end; });
+      const use = inN.filter(asleep).length ? inN.filter(asleep) : inN.filter(x => x.sleepState !== 'awake');
+      if(use.length) RD.win[k] = { start: Math.min(...use.map(x => new Date(x.startDate).getTime())), end: Math.max(...use.map(x => new Date(x.endDate).getTime())), sleep: true };
+      else { const a = new Date(d); a.setDate(a.getDate() - 1); a.setHours(21, 0, 0, 0); const b = new Date(d); b.setHours(9, 0, 0, 0); RD.win[k] = { start: a.getTime(), end: b.getTime(), sleep: false }; }
+    }
+  }
+  const inSleep = (t, pad) => {
+    t = new Date(t).getTime();
+    for(const k in RD.win) { const w = RD.win[k]; if(t >= w.start - (pad || 15 * 60000) && t <= w.end + 15 * 60000) return k; }
+    return null;
+  };
   const byNight = (r, keyOf, fix) => {
     const by = {};
     ((r && r.ok && r.v && r.v.samples) || []).forEach(x => {
@@ -20713,10 +20737,23 @@ async function ahLoadReadiness(force) {
     Object.keys(by).forEach(k => { out[k] = by[k].reduce((a, b) => a + b, 0) / by[k].length; });
     return out;
   };
-  RD.hrv = byNight(hrvR, x => rdNightKey(x.startDate));
-  RD.rhr = byNight(rhrR, x => ahKey(x.startDate));
-  RD.resp = byNight(respR, x => rdNightKey(x.startDate));
-  RD.spo2 = byNight(spoR, x => rdNightKey(x.startDate), v => v > 0 && v <= 1.5 ? v * 100 : v);   // Health gives 0–1
+  const sleepOnly = r => r && r.ok && r.v ? { ok: true, v: { samples: (r.v.samples || []).filter(x => inSleep(x.startDate)) } } : r;
+  RD.hrv = byNight(sleepOnly(hrvR), x => inSleep(x.startDate));
+  RD.resp = byNight(sleepOnly(respR), x => inSleep(x.startDate));
+  RD.spo2 = byNight(sleepOnly(spoR), x => inSleep(x.startDate), v => v > 0 && v <= 1.5 ? v * 100 : v);   // Health gives 0–1
+  // Resting heart rate: the readings that end during sleep or by 4 hours after waking (Apple keeps
+  // recalculating it through the day); days without one use Health's daily value.
+  {
+    const rhrW = {};
+    ((rhrS && rhrS.ok && rhrS.v && rhrS.v.samples) || []).forEach(x => {
+      const t = new Date(x.endDate || x.startDate).getTime(), v = ahNum(x.value);
+      if(!(v > 0)) return;
+      for(const k in RD.win) { const w = RD.win[k]; if(t >= w.start && t <= w.end + 4 * 3600000) { (rhrW[k] = rhrW[k] || []).push(v); break; } }
+    });
+    const daily = byNight(rhrR, x => ahKey(x.startDate));
+    RD.rhr = {};
+    Object.keys(Object.assign({}, daily, rhrW)).forEach(k => { RD.rhr[k] = rhrW[k] ? rhrW[k].reduce((a, b) => a + b, 0) / rhrW[k].length : daily[k]; });
+  }
   RD.temp = byNight(tmpR, x => ahKey(x.endDate), v => v);   // °C while asleep (absolute; compared with the person's usual)
   RD.loading = false;
   RD.loadedAt = Date.now();
@@ -20737,8 +20774,30 @@ function rdBase(map, key) {
   for(let i = 1; i <= 30; i++) { const d = new Date(end); d.setDate(d.getDate() - i); const v = map[ahKey(d)]; if(v) vals.push(v); }
   return vals.length >= 4 ? vals.reduce((a, b) => a + b, 0) / vals.length : null;
 }
-// Score for one morning, with each contributor. null when there isn't enough to go on.
+// The score is set once each morning and then stays the same all day (like Oura and Whoop):
+// it locks once you're up (30 min after your sleep ended) and HRV, resting heart rate and sleep are in,
+// or at noon with whatever is there. Earlier days lock as soon as they're read.
+const RD_LOCK_KEY = 'trident_rd_lock_v1';   // { 'YYYY-MM-DD': { score, c, at } }
 function rdScore(key) {
+  const locks = load(RD_LOCK_KEY) || {};
+  const L = locks[key];
+  if(L && L.score !== null && L.score !== undefined) return { score: L.score, c: L.c || [], locked: true, at: L.at };
+  const r = rdScoreLive(key);
+  if(r.score === null || !RD.loadedAt) return r;
+  const today = ahKey(new Date()), w = RD.win[key], now = Date.now();
+  const has = k => r.c.some(x => x.k === k);
+  const up = w && w.sleep && now > w.end + 30 * 60000;
+  const ready = key < today || new Date().getHours() >= 12 || (up && has('hrv') && has('rhr') && has('sleep'));
+  if(ready) {
+    locks[key] = { score: r.score, c: r.c, at: now };
+    Object.keys(locks).sort().slice(0, -60).forEach(k => delete locks[k]);   // keep 60 days
+    save(RD_LOCK_KEY, locks);
+    return Object.assign({}, r, { locked: true, at: now });
+  }
+  return r;
+}
+// Score for one morning, with each contributor. null when there isn't enough to go on.
+function rdScoreLive(key) {
   const c = [];
   const hrv = RD.hrv[key], hrvB = rdBase(RD.hrv, key);
   if(hrv && hrvB) c.push({ k: 'hrv', w: 30, v: hrv, b: hrvB, s: rdLerp(hrv / hrvB, [[0.7, 20], [0.85, 55], [1, 82], [1.1, 95], [1.2, 100]]) });
@@ -20855,7 +20914,7 @@ function rdRenderPage() {
   const days = [];
   for(let i = 6; i >= 0; i--) { const d = new Date(); d.setDate(d.getDate() - i); const k = ahKey(d); days.push({ k, d, s: rdScore(k).score }); }
   const bars = days.map(x => `<div class="rd-bar"><div class="rd-bar-col"><i style="height:${x.s ? Math.max(6, x.s) : 4}%;background:${x.s ? rdLevel(x.s).color : 'rgba(255,255,255,0.12)'}"></i></div><b>${x.s || '—'}</b><span>${x.d.toLocaleDateString('en-US', { weekday: 'short' }).slice(0, 2)}</span></div>`).join('');
-  const how = `<div class="rd-how"><b>How it works</b>Your score compares last night with your own usual over the past 30 days: heart rate variability, resting heart rate and sleep count most, then wrist temperature, respiratory rate and blood oxygen. It uses whatever your Apple Watch, Oura Ring or other device saves to Apple Health. Read-only, stays on this iPhone. Not medical advice.</div>`;
+  const how = `<div class="rd-how"><b>How it works</b>Your score is set once each morning from readings taken while you slept, then stays the same all day. It compares last night with your own usual over the past 30 days: heart rate variability, resting heart rate and sleep count most, then wrist temperature, respiratory rate and blood oxygen. It uses whatever your Apple Watch, Oura Ring or other device saves to Apple Health. Read-only, stays on this iPhone. Not medical advice.</div>`;
   if(r.score === null) {
     el.innerHTML = `<div class="rd-hero"><div class="rd-hero-ring">${rdRingSVG(0, 190, 14, 'var(--pink)')}<div class="rd-hero-num">—</div></div>
       <div class="rd-hero-label">Not enough data yet</div><div class="rd-hero-tip">Wear your Apple Watch or Oura Ring to sleep for a few nights. Your score appears once Trident knows your usual HRV, resting heart rate and sleep.</div></div>${how}`;
@@ -20872,7 +20931,8 @@ function rdRenderPage() {
   }).join('');
   const missing = order.filter(k => !r.c.find(x => x.k === k)).map(k => RD_META[k].name.toLowerCase());
   el.innerHTML = `<div class="rd-hero"><div class="rd-hero-ring">${rdRingSVG(r.score, 190, 14, lv.color)}<div class="rd-hero-num">${r.score}</div></div>
-      <div class="rd-hero-label" style="color:${lv.color}">${lv.label}</div><div class="rd-hero-tip">${lv.tip}</div></div>
+      <div class="rd-hero-label" style="color:${lv.color}">${lv.label}</div><div class="rd-hero-tip">${lv.tip}</div>
+      <div class="rd-set">${r.locked ? `Set this morning at ${new Date(r.at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })} · stays the same all day` : 'Updating until your morning data is in'}</div></div>
     <div class="rd-sec">Contributors</div><div class="rd-list">${rows}</div>
     ${missing.length ? `<div class="rd-miss">No ${missing.join(', ')} for last night, so ${missing.length > 1 ? 'they were' : 'it was'} left out.</div>` : ''}
     <div class="rd-sec">Last 7 days</div><div class="rd-week">${bars}</div>${how}`;
