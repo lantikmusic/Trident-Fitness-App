@@ -5444,7 +5444,9 @@ function shrSubject() {
   if(it) return { title: it.name || label, label, cal: Number(it.cal) || 0, protein: Number(it.protein) || 0, carbs: Number(it.carbs) || 0, fat: Number(it.fat) || 0 };
   if(items.length) {
     const sum = k => items.reduce((s, x) => s + (Number(x[k]) || 0), 0);
-    return { title: items.length === 1 ? (items[0].name || label) : items.map(x => x.name).filter(Boolean).join(', '), label, cal: sum('cal'), protein: sum('protein'), carbs: sum('carbs'), fat: sum('fat') };
+    // Several foods: listed one per line under the numbers (not one long title)
+    const list = items.length > 1 ? items.map(x => ({ name: String(x.name || 'Food'), cal: Number(x.cal) || 0 })) : null;
+    return { title: items.length === 1 ? (items[0].name || label) : '', list, label: list ? `${label} · ${items.length} foods` : label, cal: sum('cal'), protein: sum('protein'), carbs: sum('carbs'), fat: sum('fat') };
   }
   return { title: label, label, cal: calcMealCal(meal), protein: meal.protein || 0, carbs: meal.carbs || 0, fat: meal.fat || 0 };
 }
@@ -5595,9 +5597,13 @@ async function shrDraw(style) {
   const TITLE_LH = 60;
   const meas = document.createElement('canvas').getContext('2d');
   meas.font = shrFont(700, 50);
-  const titleLines = shrWrap(meas, s.title, 1080 - 200);
-  const dy = (titleLines.length - 1) * TITLE_LH;
-  const W = 1080, H = 720 + dy, glass = style === 'glass';
+  const titleLines = s.title ? shrWrap(meas, s.title, 1080 - 200) : [];
+  const dy = s.title ? (titleLines.length - 1) * TITLE_LH : -70;   // no title line when the foods are listed
+  // The food list: each food on its own line (long names wrap), its calories on the right
+  const LIST_X = 110, LIST_W = 1080 - 220, NAME_W = LIST_W * 0.72, ROW_LH = 46;
+  const rows = (s.list || []).map(f => { meas.font = shrFont(600, 38); return { lines: shrWrap(meas, f.name, NAME_W), cal: Math.round(f.cal).toLocaleString() }; });
+  const listH = rows.length ? 56 + rows.reduce((h, r) => h + 30 + r.lines.length * ROW_LH, 0) + 10 : 0;
+  const W = 1080, H = 720 + dy + listH, glass = style === 'glass';
   const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
   const ctx = cv.getContext('2d');
   let acc = getAccentColor(); if(!/^#[0-9a-f]{3,6}$/i.test(acc)) acc = '#32FCFD';
@@ -5651,6 +5657,20 @@ async function shrDraw(style) {
     ctx.beginPath(); ctx.arc(mx - lw / 2 - 18, 633, 10, 0, Math.PI * 2); ctx.fillStyle = mxColor(k); ctx.fill();
     ctx.fillStyle = dim; shrSpaced(ctx, lbl, mx + 4, 643, 3);
   });
+  if(rows.length) {
+    let y = 690;
+    shadow(false); ctx.fillStyle = glass ? 'rgba(255,255,255,.12)' : 'rgba(255,255,255,.5)'; ctx.fillRect(LIST_X, y, LIST_W, 2);
+    y += 30;
+    rows.forEach(r => {
+      shadow(true);
+      ctx.textAlign = 'left'; ctx.font = shrFont(600, 38); ctx.fillStyle = '#fff';
+      r.lines.forEach((ln, i) => ctx.fillText(ln, LIST_X, y + 38 + i * ROW_LH));
+      ctx.textAlign = 'right'; ctx.font = shrFont(600, 36); ctx.fillStyle = dim;
+      ctx.fillText(r.cal, LIST_X + LIST_W, y + 38);
+      y += 30 + r.lines.length * ROW_LH;
+    });
+    ctx.textAlign = 'center';
+  }
   return cv;
 }
 function shrIsNative() { try { return !!(window.Capacitor && Capacitor.isNativePlatform && Capacitor.isNativePlatform()); } catch(e) { return false; } }
