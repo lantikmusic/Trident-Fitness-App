@@ -3238,6 +3238,46 @@ body.ef-on .rest-mini{display:none !important;}
 .ef-body .ef-tool{justify-content:center;gap:5px;height:40px;padding:0 6px;font-size:13px;white-space:nowrap;min-width:0;}
 .rd-set{margin-top:10px;font-size:12px;font-weight:600;color:#9BA0A8;}
 .shr-chip-watch.on{background:rgba(255,69,58,0.16) !important;color:#FF6B6B !important;border-color:rgba(255,69,58,0.35) !important;}
+/* ── Messages: Glass chat ── */
+.cm-dm{background:radial-gradient(120% 45% at 50% 0%,var(--pink-dim),transparent 60%),var(--bg) !important;}
+.dm-head{border-bottom:none !important;background:transparent !important;padding:14px 16px 6px !important;}
+.cm-dm .cm-dm-head{background:transparent !important;border-bottom:none !important;-webkit-backdrop-filter:none;backdrop-filter:none;}
+.cm-dm .cm-dm-head .cm-who .cm-avatar{box-shadow:0 0 0 2px var(--pink);}
+.dm-title{font-size:26px !important;font-weight:800 !important;letter-spacing:-0.02em;}
+.cm-dm-new{width:40px;height:40px;}
+.dm-body{padding-top:4px !important;}
+.dm-people{display:flex;gap:14px;overflow-x:auto;padding:6px 2px 14px;scrollbar-width:none;}
+.dm-people::-webkit-scrollbar{display:none;}
+.dm-pp{display:flex;flex-direction:column;align-items:center;gap:5px;background:none;border:none;padding:0;color:#fff;font:inherit;flex-shrink:0;width:60px;}
+.dm-pp-av{border-radius:50%;padding:2.5px;background:rgba(255,255,255,0.12);display:block;}
+.dm-pp.on .dm-pp-av{background:var(--pink);box-shadow:0 0 12px var(--pink-glow);}
+.dm-pp-av .cm-avatar{width:52px !important;height:52px !important;border:2.5px solid var(--bg) !important;display:flex !important;align-items:center;justify-content:center;font-size:19px !important;}
+.dm-pp-n{font-size:12px;color:#C9CDD3;max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.dm-pp.on .dm-pp-n{color:#fff;font-weight:700;}
+.dm-card{border-radius:22px;overflow:hidden;background:linear-gradient(155deg,rgba(255,255,255,0.10),rgba(255,255,255,0.04));border:0.5px solid rgba(255,255,255,0.13);box-shadow:inset 0 1px 0 rgba(255,255,255,0.14);}
+.dm-row{display:flex;align-items:center;gap:12px;width:100%;background:none;border:none;padding:12px 14px;color:inherit;font:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.dm-row+.dm-row{border-top:0.5px solid rgba(255,255,255,0.07);}
+.dm-row:active{background:rgba(255,255,255,0.05);}
+.dm-row-av{flex-shrink:0;border-radius:50%;}
+.dm-row.unread .dm-row-av{box-shadow:0 0 0 2px var(--pink);}
+.dm-row-av .cm-avatar{width:46px !important;height:46px !important;display:flex !important;align-items:center;justify-content:center;font-size:17px !important;}
+.dm-row-main{flex:1;min-width:0;}
+.dm-row-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
+.dm-row-name{font-size:15.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.dm-row-time{font-size:12px;color:#9BA0A8;flex-shrink:0;}
+.dm-row-last{font-size:13.5px;color:#9BA0A8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px;}
+.dm-row.unread .dm-row-last{color:#fff;font-weight:600;}
+.dm-dot{width:10px;height:10px;border-radius:50%;background:var(--pink);box-shadow:0 0 8px var(--pink-glow);flex-shrink:0;}
+.dm-day{align-self:center;font-size:11.5px;font-weight:700;color:#9BA0A8;margin:12px 0 6px;letter-spacing:.02em;}
+.cm-msgs{gap:3px !important;}
+.cm-msg{background:rgba(255,255,255,0.09) !important;border:0.5px solid rgba(255,255,255,0.08);color:#fff;border-radius:20px !important;border-bottom-left-radius:6px !important;padding:10px 14px !important;font-size:15px;margin-top:5px;}
+.cm-msg.cont{margin-top:0;border-top-left-radius:6px !important;}
+.cm-msg.mine{background:var(--pink) !important;color:var(--pink-ink,#04131A) !important;border:none;border-radius:20px !important;border-bottom-right-radius:6px !important;}
+.cm-msg.mine.cont{border-top-right-radius:6px !important;}
+.cm-dm-bar{border-top:none !important;align-items:center !important;background:transparent;}
+.cm-dm-bar textarea{background:rgba(255,255,255,0.08) !important;border:0.5px solid rgba(255,255,255,0.14) !important;border-radius:22px !important;}
+.dm-send{width:42px;height:42px;border-radius:50% !important;padding:0 !important;display:flex;align-items:center;justify-content:center;background:var(--pink) !important;color:var(--pink-ink,#04131A) !important;border:none;flex-shrink:0;box-shadow:0 0 14px var(--pink-glow);}
+.dm-send:disabled{opacity:.5;}
 /* ── New message (DMs) ── */
 .cm-dm-new{width:36px;height:36px;border-radius:50%;border:none;background:var(--pink-dim);color:var(--pink);display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;}
 .cm-new-sec{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#9BA0A8;margin:4px 4px 2px;}
@@ -12380,6 +12420,7 @@ function applyAccentColor(hex, rgb) {
   const root = document.documentElement;
   // Midnight: black, grey and white (pure black background, white accent, no colour glow)
   root.classList.toggle('theme-midnight', String(hex).toUpperCase() === '#F2F2F7');
+  root.style.setProperty('--pink-ink', accentInk(hex));
   // The trident logo inside the app takes the theme colour too
   try {
     const src = tmarkSrc(hex);
@@ -12494,6 +12535,7 @@ if(appSettings.color && appSettings.colorRgb) {
   document.querySelectorAll('[stroke="#32FCFD"]').forEach(el => el.setAttribute('stroke', appSettings.color));
   // Midnight theme and the trident logo in the theme colour
   root.classList.toggle('theme-midnight', String(appSettings.color).toUpperCase() === '#F2F2F7');
+  root.style.setProperty('--pink-ink', accentInk(appSettings.color));
   try {
     const tm = tmarkSrc(appSettings.color);
     root.style.setProperty('--tmark', `url('${tm}')`);
@@ -18026,23 +18068,32 @@ function cmInboxHTML() {
   if(t === null) body = `<div class="cm-empty">Loading…</div>`;
   else if(t === false) body = `<div class="cm-empty">Messages could not be loaded.<br><br><button class="cm-chip" onclick="cmLoadInbox()">Try again</button></div>`;
   else if(!t.length) body = `<div class="cm-empty">No messages yet.<br><br><button class="cm-chip" onclick="cmNewDm()">Start a conversation</button></div>`;
-  else body = t.map(th => {
-    const uid = cmSafeId(th.user_id); if(!uid) return '';
-    return `<button class="cm-thread${th.unread ? ' unread' : ''}" onclick="cmOpenThread('${uid}')">
-      ${cmAvatarHTML({ user_id: uid, author_name: th.name, has_avatar: th.has_avatar })}
-      <div class="cm-thread-main">
-        <div class="cm-thread-top"><span class="cm-thread-name">${cmEsc(th.name || 'Member')}</span><span class="cm-time" style="margin:0;flex-shrink:0;">${cmEsc(cmTimeAgo(th.last_at))}</span></div>
-        <div class="cm-thread-last">${th.last_mine ? 'You: ' : ''}${cmEsc(th.last_body)}</div>
-      </div>
-      ${th.unread ? `<span class="cm-unread">${cmNum(th.unread)}</span>` : ''}
-    </button>`;
-  }).join('');
+  else {
+    // People you talk to, unread first (a ring in your colour), then the chats in one glass card
+    const ppl = t.slice().sort((a, b) => (b.unread ? 1 : 0) - (a.unread ? 1 : 0)).slice(0, 12).map(th => {
+      const uid = cmSafeId(th.user_id); if(!uid) return '';
+      const first = String(th.name || 'Member').trim().split(/\s+/)[0];
+      return `<button class="dm-pp${th.unread ? ' on' : ''}" onclick="cmOpenThread('${uid}')"><span class="dm-pp-av">${cmAvatarHTML({ user_id: uid, author_name: th.name, has_avatar: th.has_avatar })}</span><span class="dm-pp-n">${cmEsc(first)}</span></button>`;
+    }).join('');
+    const rows = t.map(th => {
+      const uid = cmSafeId(th.user_id); if(!uid) return '';
+      return `<button class="dm-row${th.unread ? ' unread' : ''}" onclick="cmOpenThread('${uid}')">
+        <span class="dm-row-av">${cmAvatarHTML({ user_id: uid, author_name: th.name, has_avatar: th.has_avatar })}</span>
+        <div class="dm-row-main">
+          <div class="dm-row-top"><span class="dm-row-name">${cmEsc(th.name || 'Member')}</span><span class="dm-row-time">${cmEsc(cmTimeAgo(th.last_at))}</span></div>
+          <div class="dm-row-last">${th.last_mine ? 'You: ' : ''}${cmEsc(th.last_body)}</div>
+        </div>
+        ${th.unread ? `<span class="dm-dot" aria-label="${cmNum(th.unread)} unread"></span>` : ''}
+      </button>`;
+    }).join('');
+    body = `<div class="dm-people">${ppl}</div><div class="dm-card">${rows}</div>`;
+  }
   const nudge = window._pushState === 'off'
     ? `<div class="cm-push-card"><div style="flex:1;">Get a notification when someone messages you.</div><button class="push-btn" onclick="pushEnable().then(()=>{ if(cmDm.view==='inbox') cmDmShow(cmInboxHTML()); })">Turn on</button></div>` : '';
-  return `<div class="cm-dm-head"><div class="cm-dm-title">Messages</div>
-      <button class="cm-dm-new" onclick="cmNewDm()" aria-label="New message"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>
+  return `<div class="cm-dm-head dm-head"><div class="cm-dm-title dm-title">Messages</div>
+      <button class="cm-dm-new" onclick="cmNewDm()" aria-label="New message"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.8-.8L3 20.5l1.4-4.3A8 8 0 0 1 3 11.5 8.5 8.5 0 0 1 12 3a8.5 8.5 0 0 1 9 8.5z"/><path d="M12 8v7M8.5 11.5h7"/></svg></button>
       <button class="cm-dm-x" onclick="cmCloseDm()">Done</button></div>
-    <div class="cm-dm-body">${nudge}${body}</div>`;
+    <div class="cm-dm-body dm-body">${nudge}${body}</div>`;
 }
 async function cmLoadInbox() {
   const r = await cmApi('/dm/threads');
@@ -18128,14 +18179,19 @@ function cmThreadHTML() {
   else if(t === false) body = `<div class="cm-empty">This conversation could not be loaded.</div>`;
   else if(!t.messages.length) body = `<div class="cm-empty">Say hi to ${name}.</div>`;
   else {
+    const dayOf = iso => { const d = new Date(iso); return isNaN(d) ? '' : localISO(d); };
+    const dayLbl = iso => { const d = new Date(iso), k = localISO(d), today = localISO(new Date()), y = new Date(); y.setDate(y.getDate() - 1);
+      return k === today ? 'Today' : k === localISO(y) ? 'Yesterday' : d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }); };
     body = '<div class="cm-msgs">' + t.messages.map((m, i) => {
-      const next = t.messages[i + 1];
+      const next = t.messages[i + 1], prev = t.messages[i - 1];
+      const sep = !prev || dayOf(prev.created_at) !== dayOf(m.created_at) ? `<div class="dm-day">${cmEsc(dayLbl(m.created_at))}</div>` : '';
+      const grouped = prev && prev.mine === m.mine && !sep ? ' cont' : '';
       const showTime = !next || next.mine !== m.mine || (Date.parse(next.created_at) - Date.parse(m.created_at)) > 600000;
-      return `<div class="cm-msg${m.mine ? ' mine' : ''}">${cmEsc(m.body)}</div>${showTime ? `<div class="cm-msg-time${m.mine ? ' mine' : ''}">${cmEsc(cmTimeAgo(m.created_at))}${m.mine && !next && m.read ? ' · Seen' : ''}</div>` : ''}`;
+      return `${sep}<div class="cm-msg${m.mine ? ' mine' : ''}${grouped}">${cmEsc(m.body)}</div>${showTime ? `<div class="cm-msg-time${m.mine ? ' mine' : ''}">${cmEsc(cmTimeAgo(m.created_at))}${m.mine && !next && m.read ? ' · Seen' : ''}</div>` : ''}`;
     }).join('') + '</div>';
   }
   const bar = !t || t === false ? '' : (t.can_send
-    ? `<div class="cm-dm-bar"><textarea id="cmDmInput" rows="1" maxlength="1000" placeholder="Message ${name}" aria-label="Message" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea><button class="cm-send" id="cmDmSend" onclick="cmSendDm()">Send</button></div>`
+    ? `<div class="cm-dm-bar"><textarea id="cmDmInput" rows="1" maxlength="1000" placeholder="Message ${name}" aria-label="Message" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea><button class="cm-send dm-send" id="cmDmSend" onclick="cmSendDm()" aria-label="Send"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button></div>`
     : `<div class="cm-dm-note">${t.blocked ? `You blocked ${name}. Unblock them from their profile to message again.` : `You can't message ${name}.`}</div>`);
   return `<div class="cm-dm-head">
       <button class="cm-dm-x" onclick="cmOpenInbox()" aria-label="Back to messages">‹</button>
@@ -18661,6 +18717,13 @@ function wtDiscard(id, fromPhone) {
 // ══════════════════════════════════════
 // APP ICON: the logo's teal glow in each theme colour (iPhone app; iOS alternate icons)
 // ══════════════════════════════════════
+// Text on top of the accent colour: dark on light colours, white on dark ones (blue, purple, red)
+function accentInk(hex) {
+  const m = String(hex || '').match(/^#?([0-9a-f]{6})$/i); if(!m) return '#04131A';
+  const n = parseInt(m[1], 16), r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+  const L = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return L > 0.6 ? '#04131A' : '#FFFFFF';
+}
 // The in-app trident logo for a theme colour (the original teal one for the default)
 function tmarkSrc(hex) {
   hex = String(hex || (typeof getAccentColor === 'function' ? getAccentColor() : '') || '').toUpperCase();
