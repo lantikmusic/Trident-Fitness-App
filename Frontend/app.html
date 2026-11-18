@@ -3282,6 +3282,92 @@ body.ef-on .rest-mini{display:none !important;}
 .cm-dm-new{width:36px;height:36px;border-radius:50%;border:none;background:var(--pink-dim);color:var(--pink);display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;}
 .cm-new-sec{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#9BA0A8;margin:4px 4px 2px;}
 .cm-new-go{color:#6B6F76;flex-shrink:0;display:flex;}
+
+/* ── Trident Athlete program: Game Day Engine ── */
+.ath-card{background:var(--bg3);border:0.5px solid var(--pink-border);border-radius:var(--radius-xl);padding:16px;margin-bottom:12px;cursor:pointer;}
+#page-workout .ath-card{background:var(--wo-card, var(--bg3));}
+.ath-top{display:flex;align-items:center;gap:12px;}
+.ath-ic{width:42px;height:42px;border-radius:12px;background:var(--pink-dim, rgba(255,255,255,.06));display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+.ath-ic.big{width:64px;height:64px;font-size:34px;border-radius:18px;margin:0 auto 10px;}
+.ath-eyebrow{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--pink);}
+.ath-title{font-size:17px;font-weight:700;letter-spacing:-.02em;margin-top:2px;}
+.ath-today{margin-top:12px;display:flex;flex-direction:column;gap:8px;}
+.ath-row{display:flex;gap:10px;font-size:13px;line-height:1.4;color:var(--text2);}
+.ath-row b{color:var(--text);}
+.ath-k{flex:0 0 48px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);padding-top:2px;}
+.ath-foot{margin-top:12px;padding-top:10px;border-top:0.5px solid var(--border);font-size:12px;color:var(--text3);}
+.ath-foot b{color:var(--text);font-weight:600;}
+.ath-rate-cta{margin-top:12px;width:100%;padding:11px;border:none;border-radius:12px;background:var(--pink);color:var(--pink-ink, #000);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;}
+.ath-h{font-size:17px;font-weight:700;letter-spacing:-.02em;margin:18px 0 10px;}
+.ath-h:first-child{margin-top:4px;}
+.ath-sport-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.ath-sport{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px;border-radius:14px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-family:inherit;font-size:11.5px;font-weight:600;line-height:1.2;text-align:center;cursor:pointer;}
+.ath-sport-ic{font-size:26px;line-height:1;}
+.ath-sport.on{border-color:var(--pink);background:var(--pink-dim, rgba(255,255,255,.06));color:var(--text);}
+.ath-dow{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+.ath-dow4{grid-template-columns:repeat(4,1fr);margin-bottom:12px;}
+.ath-res{grid-template-columns:repeat(3,1fr);margin:12px 0;}
+.ath-chip{padding:10px 0;border-radius:12px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;}
+.ath-chip.on{border-color:var(--pink);background:var(--pink);color:var(--pink-ink, #000);}
+.ath-chip.today:not(.on){border-color:var(--pink-border);color:var(--text);}
+.ath-chip-wide{width:100%;margin-top:8px;}
+.ath-note{margin-top:14px;font-size:12.5px;line-height:1.45;color:var(--text3);}
+.wo-start-btn:disabled{opacity:.4;}
+.ath-hero{text-align:center;padding:8px 0 6px;}
+.ath-hero-t{font-size:28px;font-weight:800;letter-spacing:-.04em;margin-top:4px;}
+.ath-hero-s{font-size:13px;color:var(--text3);margin-top:2px;}
+.ath-sec{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin:20px 4px 8px;}
+.ath-box{background:var(--bg3);border:0.5px solid var(--border);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:9px;}
+.ath-rate{border-color:var(--pink-border);margin-top:16px;}
+.ath-rate-t{font-size:18px;font-weight:700;letter-spacing:-.02em;}
+.ath-stars{display:flex;justify-content:space-between;gap:6px;}
+.ath-stars button{flex:1;padding:8px 0;border:none;background:var(--bg4);border-radius:12px;font-size:24px;color:var(--text3);cursor:pointer;}
+.ath-stars button.on{background:var(--pink-dim, rgba(255,255,255,.08));color:var(--pink);}
+.ath-stars-l{display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-top:-4px;}
+.ath-stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px;}
+.ath-stat{display:flex;flex-direction:column;gap:4px;font-size:11px;font-weight:600;color:var(--text3);}
+.ath-stat input{width:100%;box-sizing:border-box;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--bg4);color:var(--text);font-family:inherit;font-size:16px;font-weight:700;text-align:center;}
+.ath-unlock{display:flex;gap:6px;}
+.ath-unlock span{flex:1;height:6px;border-radius:99px;background:var(--bg4);}
+.ath-unlock span.on{background:var(--pink);}
+.ath-ins{font-size:13.5px;line-height:1.45;color:var(--text2);}
+.ath-ins b{color:var(--text);}
+.ath-f{display:flex;justify-content:space-between;font-size:12.5px;color:var(--text2);padding:6px 0;border-top:0.5px solid var(--border);}
+.ath-f b.up{color:var(--green);} .ath-f b.down{color:var(--red, #FF453A);}
+.ath-bars{display:flex;align-items:flex-end;gap:5px;height:110px;margin-top:6px;}
+.ath-bar-col{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;}
+.ath-bar{width:100%;border-radius:6px 6px 3px 3px;background:var(--bg4);}
+.ath-bar.hit{background:var(--pink);}
+.ath-bar-lbl{font-size:9px;color:var(--text3);}
+.ath-legend{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3);flex-wrap:wrap;}
+.ath-legend span{width:10px;height:10px;border-radius:3px;background:var(--bg4);display:inline-block;margin-left:6px;}
+.ath-legend span.hit{background:var(--pink);margin-left:0;}
+.ath-hist{gap:0;padding:4px 14px;}
+.ath-h-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-top:0.5px solid var(--border);}
+.ath-h-row:first-child{border-top:none;}
+.ath-h-d{font-size:13.5px;font-weight:600;}
+.ath-h-m{font-size:11.5px;color:var(--text3);margin-top:2px;}
+.ath-h-r{color:var(--pink);font-size:13px;white-space:nowrap;}
+.ath-h-r span{color:var(--bg4);}
+.ath-tour{position:fixed;inset:0;z-index:420;display:none;}
+.ath-tour.on{display:block;}
+.ath-tour-hole{position:fixed;border-radius:20px;box-shadow:0 0 0 9999px rgba(0,0,0,.72);border:1.5px solid var(--pink);transition:all .35s cubic-bezier(.32,0,.15,1);pointer-events:none;}
+.ath-tour-pop{position:fixed;left:16px;right:16px;background:var(--bg2, #1C1C1E);border:0.5px solid var(--pink-border);border-radius:20px;padding:16px;box-shadow:0 12px 40px rgba(0,0,0,.5);opacity:0;transform:translateY(8px);transition:opacity .25s, transform .25s, top .35s cubic-bezier(.32,0,.15,1);}
+.ath-tour-pop.up{transform:translateY(-8px);}
+.ath-tour-pop.in{opacity:1;transform:none;}
+.ath-tour-step{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--pink);}
+.ath-tour-t{font-size:18px;font-weight:700;letter-spacing:-.02em;margin:4px 0 6px;}
+.ath-tour-x{font-size:14px;line-height:1.45;color:var(--text2);}
+.ath-tour-dots{display:flex;gap:5px;margin:14px 0 12px;}
+.ath-tour-dots span{width:6px;height:6px;border-radius:99px;background:var(--bg4);transition:width .25s;}
+.ath-tour-dots span.on{width:18px;background:var(--pink);}
+.ath-tour-btns{display:flex;justify-content:space-between;align-items:center;}
+.ath-tour-btns button{font-family:inherit;font-size:14px;font-weight:700;border:none;border-radius:99px;padding:10px 18px;cursor:pointer;}
+.ath-tour-skip{background:transparent;color:var(--text3);padding-left:0 !important;}
+.ath-tour-back{background:var(--bg4);color:var(--text);}
+.ath-tour-next{background:var(--pink);color:var(--pink-ink, #000);}
+html.theme-midnight .ath-tour-pop{background:#111;}
+html.theme-midnight .ath-card,html.theme-midnight .ath-box,html.theme-midnight .ath-sport,html.theme-midnight .ath-chip:not(.on){background:#111;}
 /* ── Missed lift prompt (LANTIK) ── */
 .hy-missed{border-color:var(--pink-border) !important;background:var(--pink-dim) !important;}
 .hy-missed-btns{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
@@ -4615,6 +4701,15 @@ body.reel-on{overflow:hidden;}
       <div class="sleep-tip" id="sleepTip"></div>
     </div>
   </div>
+</div>
+<!-- ══ ATHLETE PROGRAM: sport setup and Game Day pages ══ -->
+<div class="th-page" id="th-athSetup" aria-hidden="true">
+  <div class="th-bar"><button class="e-circ" onclick="thClose()" aria-label="Back"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><div class="th-title">Athlete Program</div><span style="width:44px"></span></div>
+  <div class="th-body" id="athSetupBody"></div>
+</div>
+<div class="th-page" id="th-athGame" aria-hidden="true">
+  <div class="th-bar"><button class="e-circ" onclick="thClose()" aria-label="Back"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button><div class="th-title">Game Day</div><span style="width:44px"></span></div>
+  <div class="th-body" id="athGamePage"></div>
 </div>
 <!-- ══ READINESS PAGE (opened from the Home card) ══ -->
 <div class="th-page" id="th-ready" aria-hidden="true">
@@ -8249,6 +8344,8 @@ function renderWorkoutPreview() {
       ${getPhase() < 3 ? `<button onclick="if(confirm('Skip to Phase ${getPhase()+1}? This will advance your program phase.')) { advancePhase(); renderWorkoutPreview(); }" style="margin-top:10px;width:100%;padding:8px;border:0.5px solid var(--border2);background:transparent;border-radius:var(--radius);font-family:inherit;font-size:12px;font-weight:500;color:var(--text3);cursor:pointer;">Skip to Phase ${getPhase()+1} →</button>` : ''}
     </div>
 
+    ${prog.athlete ? athCardHTML() : ''}
+
     <!-- Today's workout card -->
     ${isRest ? `
     <div class="wo-preview-day-card" style="border-color:var(--border);">
@@ -8335,6 +8432,7 @@ function renderProgramGrid(){
     upperlower:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="24" height="24"><rect x="3" y="3" width="18" height="8" rx="2"/><rect x="3" y="13" width="18" height="8" rx="2"/></svg>`,
     glutes:    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="24" height="24"><path d="M12 21c-4 0-7-3.5-7-7.5a7 7 0 0 1 14 0c0 4-3 7.5-7 7.5z"/><path d="M12 3v4"/></svg>`,
     hourglass: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="24" height="24"><path d="M5 3h14M5 21h14M7 3v4l5 5-5 5v4M17 3v4l-5 5 5 5v4"/></svg>`,
+    trophy:    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="24" height="24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0V4z"/><path d="M17 5h3v2a4 4 0 0 1-3 4M7 5H4v2a4 4 0 0 0 3 4"/></svg>`,
     star:      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="24" height="24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`,
   };
 
@@ -8366,6 +8464,7 @@ function renderProgramGrid(){
 
 function selectProg(k){selectedProgram=k;renderProgramGrid();}
 function startProgram(){
+  if(selectedProgram === 'tridentAthlete' && !athSport()) { athOpenSetup('start'); return; }
   workoutState.program=selectedProgram;
   workoutState.weekOffset=0;
   workoutWeek=0;
@@ -10370,6 +10469,14 @@ const EX_INFO_LIST = [
   [['Hip Airplanes'], 'Balance on one leg, hinged forward. Rotate your torso and hips open toward the ceiling, then back down toward the floor, keeping your balance. Builds hip control and stability.'],
   [['Adductor Rock-Backs'], 'On hands and knees, extend one leg straight out to the side. Rock your hips back toward your heel until you feel an inner-thigh stretch, then return. Loosens the groin.'],
   [['Ankle Mobility', 'Ankle Rocks'], 'In a half-kneeling position or standing, drive your front knee forward over your toes while keeping your heel down, then rock back. Improves ankle range for squats, sprints and jumps.'],
+  [['Ball Mastery'], 'With a ball at your feet, move it constantly with both feet: toe taps, sole rolls, inside-outside touches and quick changes of direction. Stay on the balls of your feet with your head up. Sharpens touch and quick footwork.'],
+  [['Defensive Slides'], 'In a low athletic stance, push off your trailing foot and slide sideways without crossing your feet or standing up. Change direction on a cue. Builds lateral quickness for defense.'],
+  [['Approach Jumps'], 'Take a 2–3 step approach, plant both feet, swing your arms hard and jump as high as you can, reaching up with one or both hands. Land softly on both feet. Builds jump height for spiking, blocking and rebounding.'],
+  [['Split-Step Reactions'], 'Do a small hop as your partner or a cue goes, land balanced on the balls of your feet, then explode in the direction called. Reset and repeat. Builds first-step reaction for court sports.'],
+  [['Shadow Boxing'], 'Move around in your stance throwing combinations at an imaginary opponent: jab, cross, hooks, kicks and knees, with head movement and footwork. Stay relaxed, snap your strikes and keep your hands up. Builds rhythm, technique and fight conditioning.'],
+  [['Heavy Bag Rounds'], 'Work the heavy bag in timed rounds: sharp combinations, power shots and footwork, staying in your stance and keeping your guard up between strikes. Rest a minute between rounds. Builds striking power and conditioning.'],
+  [['Sprawls'], 'From your stance, drop your hips to the floor and shoot your legs back as if stopping a takedown, chest down and hips heavy, then pop straight back to your feet. Repeat fast. Builds explosive takedown defense and conditioning.'],
+  [['Tempo Runs'], 'Run at about 70–75% effort, smooth and relaxed, with walking or easy jogging between reps. You should finish able to talk. Builds aerobic fitness and recovery without beating up your legs.'],
   [['Gentle Mobility', 'Gentle Hamstring Mobility', 'Hip and Hamstring Mobility'], 'Move slowly through gentle stretches for the hips and hamstrings, easing into each position without forcing it. Breathe deeply and relax. Helps you recover and move better.'],
 ];
 // Generic fallbacks by keyword, for exercises without their own entry (swaps and custom names).
@@ -14198,6 +14305,582 @@ function drawExProgressChart(sessions, bodyweight) {
       ctx.fillText(labels[i], x, H - 8);
     });
   }
+}
+
+// ══════════════════════════════════════
+// TRIDENT ATHLETE TRAINING PROGRAM + GAME DAY ENGINE
+// The person picks a sport and the day they usually play. The week is built backwards from game day:
+// heavy legs 5 days out, upper body 4 days out, the last leg power day 72 hours out, speed and skill
+// 2 days out, a short primer the day before, the game, then a recovery day.
+// The Game Day Engine adds the 3-day peak plan (training, carbs, sleep), a rating after each game,
+// and, after 5 rated games, what the person's best games had in common.
+// ══════════════════════════════════════
+const ATH_KEY = 'trident_athlete_v1';   // { sport, gameDow (0 = Mon … 6 = Sun, -1 = no set day), gameTime 'HH:MM', games: [...] }
+const ATH_DOW = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const ATH_DOW_LONG = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+// Per sport: what the speed day drills, conditioning, an extra power and upper move, the stats rated after a game,
+// what a game is called and how much the carbs go up the day before.
+const ATH_SPORTS = {
+  football:   { name: 'Football', ic: '🏈', noun: 'Game', load: 1.3,
+    drills: ['Stance and First-Step Mechanics', '5-10-5 Pro Agility', 'Resisted Sprint (Sled or Band)', '20-Yard Sprints'],
+    cond: ['Sled Push', 'Battle Ropes'], power: 'Power Cleans', upper: 'Neck Flexion and Extension',
+    stats: ['Tackles', 'Yards', 'TDs'] },
+  flag:       { name: 'Flag Football', ic: '🚩', noun: 'Game', load: 1.3,
+    drills: ['Wide-Receiver Releases', 'Route Breaks and Controlled Cuts', 'Catching While Moving', '10-Yard Acceleration'],
+    cond: ['Suicide Drills'], power: 'Lateral Bounds', upper: 'Band External Rotations',
+    stats: ['Catches', 'Flag pulls', 'TDs'] },
+  soccer:     { name: 'Soccer', ic: '⚽', noun: 'Match', load: 1.35,
+    drills: ['Ball Mastery', 'Cone Drills', 'Reactive Agility', '20-Yard Sprints'],
+    cond: ['200m Intervals', 'Progressive Runs'], power: 'Single-Leg Broad Jump', upper: 'Copenhagen Plank',
+    stats: ['Goals', 'Assists', 'Minutes'] },
+  basketball: { name: 'Basketball', ic: '🏀', noun: 'Game', load: 1.3,
+    drills: ['Defensive Slides', 'Lateral Shuffles', 'Reactive Agility', 'Approach Jumps'],
+    cond: ['Suicide Drills', 'Jump Rope'], power: 'Depth Jump', upper: 'Hanging Knee Raise',
+    stats: ['Points', 'Rebounds', 'Assists'] },
+  baseball:   { name: 'Baseball / Softball', ic: '⚾', noun: 'Game', load: 1.15,
+    drills: ['10-Yard Acceleration', 'Rotational Medicine-Ball Scoop Toss', 'Lateral Bounds', 'Reactive Agility'],
+    cond: ['20-Yard Sprints'], power: 'Med Ball Slams', upper: 'Band External Rotations',
+    stats: ['Hits', 'RBIs', 'Runs'] },
+  hockey:     { name: 'Hockey', ic: '🏒', noun: 'Game', load: 1.3,
+    drills: ['Lateral Bounds', 'Single-Leg Broad Jump', 'Cone Drills', 'Resisted Sprint (Sled or Band)'],
+    cond: ['Sled Push', 'Battle Ropes'], power: 'Split-Squat Jump', upper: 'Copenhagen Plank',
+    stats: ['Goals', 'Assists', 'Shots'] },
+  volleyball: { name: 'Volleyball', ic: '🏐', noun: 'Match', load: 1.2,
+    drills: ['Approach Jumps', 'Lateral Shuffles', 'Reactive Agility', 'Med Ball Slams'],
+    cond: ['Jump Rope'], power: 'Depth Jump', upper: 'Band External Rotations',
+    stats: ['Kills', 'Digs', 'Blocks'] },
+  tennis:     { name: 'Tennis / Pickleball', ic: '🎾', noun: 'Match', load: 1.25,
+    drills: ['Split-Step Reactions', 'Lateral Shuffles', 'Cone Drills', 'Rotational Medicine-Ball Scoop Toss'],
+    cond: ['200m Intervals'], power: 'Lateral Bounds', upper: 'Band External Rotations',
+    stats: ['Aces', 'Winners', 'Errors'] },
+  muaythai:   { name: 'Muay Thai / Kickboxing', ic: '🥊', noun: 'Fight', load: 1.2,
+    drills: ['Shadow Boxing', 'Heavy Bag Rounds', 'Band-Resisted Punches', 'Explosive Knee Drive'],
+    cond: ['Jump Rope', 'Battle Ropes'], power: 'Rotational Medicine-Ball Scoop Toss', upper: 'Neck Flexion and Extension',
+    stats: ['Rounds', 'Knockdowns'] },
+  boxing:     { name: 'Boxing', ic: '🥊', noun: 'Fight', load: 1.2,
+    drills: ['Shadow Boxing', 'Heavy Bag Rounds', 'Band-Resisted Punches', 'Lateral Shuffles'],
+    cond: ['Jump Rope', '200m Intervals'], power: 'Plyo Push-Ups', upper: 'Neck Flexion and Extension',
+    stats: ['Rounds', 'Knockdowns'] },
+  mma:        { name: 'MMA / Wrestling / BJJ', ic: '🤼', noun: 'Fight', load: 1.2,
+    drills: ['Sprawls', 'Shadow Boxing', 'Bear Crawls', 'Explosive Knee Drive'],
+    cond: ['Battle Ropes', 'Sled Push'], power: 'Med Ball Slams', upper: 'Farmer Carry',
+    stats: ['Rounds', 'Takedowns', 'Submissions'] },
+  rugby:      { name: 'Rugby', ic: '🏉', noun: 'Match', load: 1.3,
+    drills: ['Resisted Sprint (Sled or Band)', '5-10-5 Pro Agility', 'Reactive Agility', 'Bear Crawls'],
+    cond: ['Sled Push', 'Suicide Drills'], power: 'Power Cleans', upper: 'Neck Flexion and Extension',
+    stats: ['Tries', 'Tackles', 'Carries'] },
+  lacrosse:   { name: 'Lacrosse', ic: '🥍', noun: 'Game', load: 1.3,
+    drills: ['Cone Drills', 'Reactive Agility', '20-Yard Sprints', 'Rotational Medicine-Ball Scoop Toss'],
+    cond: ['200m Intervals'], power: 'Lateral Bounds', upper: 'Band External Rotations',
+    stats: ['Goals', 'Assists', 'Ground balls'] },
+  sprint:     { name: 'Track · Sprints', ic: '⚡', noun: 'Meet', load: 1.15, timeStat: 'Time (sec)',
+    drills: ['A-Skips', 'B-Skips', '10-Yard Acceleration', 'Hill Sprints'],
+    cond: ['Tempo Runs'], power: 'Hurdle Hops', upper: 'Plank',
+    stats: ['Time (sec)', 'Place'] },
+  running:    { name: 'Distance Running', ic: '🏃', noun: 'Race', load: 1.6, endurance: true,
+    drills: ['A-Skips', 'Tempo Runs', 'Hill Sprints', 'Progressive Runs'],
+    cond: ['Easy Jog'], power: 'Pogo Hops', upper: 'Plank',
+    stats: ['Time (min)', 'Distance (mi)'] },
+};
+
+function athState() {
+  const s = load(ATH_KEY) || {};
+  if(!Array.isArray(s.games)) s.games = [];
+  if(!Number.isInteger(s.gameDow)) s.gameDow = 6;
+  if(!/^\d\d:\d\d$/.test(String(s.gameTime || ''))) s.gameTime = '10:00';
+  return s;
+}
+function athSave(s) { save(ATH_KEY, s); }
+function athSport() { const s = athState(); return ATH_SPORTS[s.sport] || null; }
+function athIsOn() { return selectedProgram === 'tridentAthlete' && !!athSport(); }
+
+// ── The week ──
+// u = days until game (0 = game day … 6 = day after the game)
+// Off-season (no set game day): two strength days, two power/speed days and three recovery days, no game.
+const ATH_OFF_U = [5, 4, 6, 3, 2, 6, 6];
+function athU(dayIdx, gameDow) { return gameDow < 0 ? ATH_OFF_U[dayIdx] : (gameDow - dayIdx + 7) % 7; }
+const athEx = (name, sets, reps, extra) => Object.assign({ name, sets, reps }, extra || {});
+function athDayFor(u, sp) {
+  const n = sp.noun;
+  if(u === 0) return { name: `${n} Day`, type: 'game', exercises: [
+    athEx('Dynamic Warm-Up', 1, '10 min'),
+    athEx(sp.drills[0], 2, '3 reps · game speed', { type: 'speed' }),
+    athEx('Countermovement Jump', 2, '3', { type: 'explosive' }),
+  ] };
+  if(u === 1) return { name: `Primer · ${n} Tomorrow`, type: 'field', exercises: [
+    athEx('Dynamic Warm-Up', 1, '10 min'),
+    athEx('Pogo Hops', 2, '15', { type: 'explosive' }),
+    athEx('10-Yard Acceleration', 3, '1', { type: 'speed' }),
+    athEx('Countermovement Jump', 3, '3', { type: 'explosive' }),
+    athEx('Band Pull-Aparts', 2, '15'),
+  ] };
+  if(u === 2) return { name: `${sp.name} Speed & Skill`, type: 'field', exercises: [
+    athEx('Dynamic Warm-Up', 1, '10 min'),
+    athEx('A-Skips', 2, '20 meters', { type: 'speed' }),
+    ...sp.drills.map(d => athEx(d, 4, sp.endurance ? '1 rep' : '4 reps', { type: /agility|cone|shuffle|slide|reactive|split-step|sprawl/i.test(d) ? 'agility' : 'speed' })),
+    athEx('Pallof Press', 3, '10 each'),
+  ] };
+  if(u === 3) return { name: 'Lower Power', exercises: [
+    athEx('Box Jumps', 4, '4', { type: 'explosive', p2: { sets: 5, reps: '3' }, p3: { sets: 5, reps: '3' } }),
+    athEx(sp.power, 4, '5', { type: 'explosive' }),
+    athEx('Trap Bar Jump', 3, '5', { p2: { sets: 4, reps: '4' }, p3: { sets: 4, reps: '3' } }),
+    athEx('Single-Leg Romanian Deadlift', 3, '8 each', { p2: { sets: 3, reps: '6 each' }, p3: { sets: 3, reps: '5 each' } }),
+    athEx('Explosive Step-Up', 3, '5 each'),
+    athEx('Copenhagen Plank', 3, '20s each'),
+  ] };
+  if(u === 4) return { name: 'Upper Strength + Conditioning', exercises: [
+    athEx('Bench Press', 4, '8', { p2: { sets: 4, reps: '6' }, p3: { sets: 5, reps: '4' } }),
+    athEx('Pull-Ups', 4, '8', { p2: { sets: 4, reps: '6' }, p3: { sets: 5, reps: '5' } }),
+    athEx('Landmine Press', 3, '8 each', { p2: { sets: 3, reps: '6 each' }, p3: { sets: 4, reps: '5 each' } }),
+    athEx('Chest-Supported Row', 3, '10', { p2: { sets: 4, reps: '8' }, p3: { sets: 4, reps: '6' } }),
+    athEx(sp.upper, 3, /copenhagen/i.test(sp.upper) ? '20s each' : /plank/i.test(sp.upper) ? '45s' : /carry/i.test(sp.upper) ? '40 meters' : '12'),
+    athEx('Face Pulls', 3, '15'),
+    ...sp.cond.map(c => athEx(c, sp.endurance ? 1 : 4, sp.endurance ? '25 min' : /rope|jump rope/i.test(c) ? '30s' : '20 meters', { type: 'conditioning' })),
+  ] };
+  if(u === 5) return { name: 'Lower Strength', exercises: sp.endurance ? [
+    athEx('Back Squat', 3, '8', { p2: { sets: 3, reps: '6' }, p3: { sets: 4, reps: '5' } }),
+    athEx('Romanian Deadlift', 3, '8', { p2: { sets: 3, reps: '6' }, p3: { sets: 4, reps: '5' } }),
+    athEx('Step-Ups', 3, '10 each'),
+    athEx('Single-Leg Calf Raise', 3, '15 each'),
+    athEx('Nordic Curl', 3, '5'),
+    athEx('Dead Bug', 3, '10 each'),
+  ] : [
+    athEx('Trap Bar Deadlift', 4, '6', { p2: { sets: 4, reps: '5' }, p3: { sets: 5, reps: '3' } }),
+    athEx('Back Squat', 4, '6', { p2: { sets: 4, reps: '5' }, p3: { sets: 5, reps: '3' } }),
+    athEx('Bulgarian Split Squat', 3, '8 each', { p2: { sets: 3, reps: '6 each' }, p3: { sets: 4, reps: '5 each' } }),
+    athEx('Nordic Curl', 3, '5', { p2: { sets: 3, reps: '6' }, p3: { sets: 4, reps: '6' } }),
+    athEx('Calf Raises', 3, '12'),
+    athEx('Dead Bug', 3, '10 each'),
+  ] };
+  return { name: 'Recovery', type: 'recovery', exercises: [
+    athEx('Easy Walk', 1, '20 min'),
+    athEx('Gentle Mobility', 1, '10 min'),
+    athEx('90/90 Hip Rotations', 2, '8 each'),
+    athEx('Ankle Mobility', 2, '10 each'),
+  ] };
+}
+function athWeek() {
+  const s = athState(), sp = ATH_SPORTS[s.sport] || ATH_SPORTS.flag;
+  return ATH_DOW_LONG.map((dn, i) => {
+    const d = athDayFor(athU(i, s.gameDow), sp);
+    return Object.assign(d, { name: `${dn} — ${d.name}` });
+  });
+}
+const ATH_PROGRAM = {
+  name: 'Trident Athlete Training Program',
+  short: 'Athlete',
+  icon: 'trophy',
+  calendarAligned: true,
+  athlete: true,
+  get desc() {
+    const s = athState(), sp = ATH_SPORTS[s.sport];
+    if(!sp) return 'Pick your sport and the day you play. Your week is built backwards from game day — heavy legs early, the last power day 72 hours out, a primer the day before — with the Game Day Engine planning your training, carbs and sleep for every game.';
+    return `Built for ${sp.name}. ${sp.noun}s on ${s.gameDow < 0 ? 'any day' : ATH_DOW_LONG[s.gameDow] + 's'}: heavy legs 5 days out, upper body and conditioning 4 days out, explosive leg power 72 hours out, ${sp.name.toLowerCase()} speed and skill 2 days out, a short primer the day before, then recovery. The Game Day Engine plans your training, carbs and sleep for every ${sp.noun.toLowerCase()}.`;
+  },
+  get daysPerWeek() { const sp = athSport(); return sp ? `${sp.ic} ${sp.name} · built around ${sp.noun.toLowerCase()} day` : 'Any sport · built around game day'; },
+  get days() { return athWeek(); },
+};
+// Shown first in the program list, for everyone
+[PROGRAMS, PROGRAMS_MALE].forEach(P => {
+  const rest = Object.assign({}, P);
+  Object.keys(P).forEach(k => delete P[k]);
+  Object.defineProperty(P, 'tridentAthlete', { value: ATH_PROGRAM, enumerable: true, configurable: true, writable: true });
+  Object.assign(P, rest);
+});
+['ball mastery', 'defensive slides', 'approach jumps', 'split-step reactions', 'shadow boxing', 'heavy bag rounds', 'sprawls', 'tempo runs']
+  .forEach(n => { try { BODYWEIGHT_EXERCISES.add(n); } catch(e) {} });
+
+// ── Next game, and where today sits in the countdown ──
+function athNextGame(from) {
+  const s = athState(), now = from || new Date();
+  if(s.gameDow < 0) return null;
+  const [hh, mm] = s.gameTime.split(':').map(Number);
+  const d = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hh, mm);
+  const todayIdx = (now.getDay() + 6) % 7;
+  d.setDate(d.getDate() + ((s.gameDow - todayIdx + 7) % 7));
+  if(d.getTime() + 3 * 3600000 < now.getTime()) d.setDate(d.getDate() + 7);   // today's game finished (3 h after kickoff)
+  return d;
+}
+function athDaysUntil(d, from) {
+  const a = from || new Date(), x = new Date(a.getFullYear(), a.getMonth(), a.getDate()), y = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  return Math.round((y - x) / 86400000);
+}
+function athFmtTime(hhmm) {
+  const [h, m] = hhmm.split(':').map(Number);
+  return `${(h % 12) || 12}:${String(m).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`;
+}
+function athShiftTime(hhmm, mins) {
+  const [h, m] = hhmm.split(':').map(Number), t = ((h * 60 + m + mins) % 1440 + 1440) % 1440;
+  return `${String(Math.floor(t / 60)).padStart(2, '0')}:${String(t % 60).padStart(2, '0')}`;
+}
+
+// The peak plan for a day u days before the game: training, carbs and sleep
+function athPlan(u, sp, s) {
+  const g = mxGoals(), c = g.carbs || 200, game = athFmtTime(s.gameTime);
+  const r = (x) => Math.round(c * x / 5) * 5;
+  const n = sp.noun.toLowerCase();
+  if(u === 0) return {
+    train: `${sp.noun} at ${game}. Warm up 40 minutes before: dynamic warm-up, then a few ${sp.drills[0].toLowerCase()} at game speed.`,
+    carbs: r(1.15), carbsNote: `Big carb breakfast 3–4 hours before (${athFmtTime(athShiftTime(s.gameTime, -210))}), a small carb snack 60 minutes before, and water with salt.`,
+    sleep: 'Up at least 3 hours before kickoff so you\'re fully awake.', sleepH: null };
+  if(u === 1) return {
+    train: '15-minute primer only: a few short sprints and jumps to wake up your legs. No hard training.',
+    carbs: r(sp.load), carbsNote: `Carb-load day: rice, pasta, potatoes, fruit. Keep fat and fiber lower at dinner so you feel light for the ${n}.`,
+    sleep: `In bed by ${athFmtTime(athShiftTime(s.gameTime, -11 * 60 - 30))}. This is the night that matters most.`, sleepH: 8 };
+  if(u === 2) return {
+    train: `${sp.name} speed and skill: short, sharp, full rest. Stop while you still feel fast.`,
+    carbs: r(1.1), carbsNote: 'Carbs a little higher than usual to top up your energy stores.',
+    sleep: 'Aim for 8 hours. Sleep two nights before still counts.', sleepH: 8 };
+  if(u === 3) return {
+    train: 'Last leg session before the game: jumps and explosive lifts, low volume. Your legs have 72 hours to recover.',
+    carbs: r(1), carbsNote: 'Normal day. Hit your protein.', sleep: 'Aim for 7.5+ hours.', sleepH: 7.5 };
+  if(u === 6) return {
+    train: `Recovery: walk, mobility and stretching. Rate yesterday's ${n} if you haven't yet.`,
+    carbs: r(1), carbsNote: 'Refuel: protein and carbs to repair after the game.', sleep: 'Sleep in if you can: 8+ hours.', sleepH: 8 };
+  return { train: u === 5 ? 'Heavy leg day. The furthest from the game, so you can push hard.' : 'Upper-body strength and conditioning.',
+    carbs: r(1), carbsNote: 'Normal day. Hit your protein.', sleep: 'Aim for 7.5+ hours.', sleepH: 7.5 };
+}
+
+// ── Data from the rest of the app, saved with each rated game ──
+function athCarbsOn(iso) {
+  try {
+    const d = new Date(iso + 'T12:00:00'), mon = new Date(d); mon.setDate(mon.getDate() - ((d.getDay() + 6) % 7));
+    const idx = (d.getDay() + 6) % 7;
+    let week = null;
+    if(localISO(mon) === localISO(macroWeekMonday())) week = macroData;
+    else week = mxPastGet(localISO(mon));
+    if(!week || !week[idx]) return null;
+    const t = dayTotals(week[idx]);
+    return t.carbs > 0 ? t.carbs : null;
+  } catch(e) { return null; }
+}
+function athSleepFor(iso) {
+  try { const n = ahState.nights[iso]; const m = n ? (n.asleep > 0 ? n.asleep : n.inBed) : 0; return m > 60 ? m : null; } catch(e) { return null; }
+}
+function athReadyFor(iso) { try { const r = rdScore(iso); return r && r.score != null ? r.score : null; } catch(e) { return null; } }
+function athPrevISO(iso) { const d = new Date(iso + 'T12:00:00'); d.setDate(d.getDate() - 1); return localISO(d); }
+
+// The game that still needs a rating: the most recent game day (today once the game is over, up to 4 days back)
+function athUnrated() {
+  const s = athState(); if(s.gameDow < 0) return null;
+  const now = new Date();
+  for(let back = 0; back <= 4; back++) {
+    const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - back);
+    if((d.getDay() + 6) % 7 !== s.gameDow) continue;
+    if(back === 0) { const [h, m] = s.gameTime.split(':').map(Number); if(now.getHours() * 60 + now.getMinutes() < h * 60 + m + 60) return null; }
+    const iso = localISO(d);
+    if(s.since && iso < s.since) return null;   // before the program was set up
+    if(s.games.some(g => g.date === iso) || (s.skipped || []).includes(iso)) return null;
+    return iso;
+  }
+  return null;
+}
+
+// ── What the best games had in common (needs 5 rated games) ──
+const ATH_MIN_GAMES = 5;
+function athFactors(s) {
+  const g = mxGoals();
+  return [
+    { k: 'sleep', label: '7.5h+ of sleep the night before', test: x => x.sleep != null ? x.sleep >= 450 : null },
+    { k: 'carbs', label: `a carb load the day before (${Math.round((g.carbs || 200) * 1.2)}g+)`, test: x => x.carbs != null ? x.carbs >= (g.carbs || 200) * 1.2 : null },
+    { k: 'ready', label: 'a readiness score of 75+', test: x => x.ready != null ? x.ready >= 75 : null },
+    { k: 'primer', label: 'doing the primer the day before', test: x => x.primer != null ? !!x.primer : null },
+  ];
+}
+function athInsights(s) {
+  const rated = s.games.filter(x => x.rating > 0);
+  if(rated.length < ATH_MIN_GAMES) return { rated: rated.length, rows: [] };
+  const avg = a => a.reduce((t, x) => t + x.rating, 0) / a.length;
+  const rows = athFactors(s).map(f => {
+    const yes = rated.filter(x => f.test(x) === true), no = rated.filter(x => f.test(x) === false);
+    if(yes.length < 2 || no.length < 2) return null;
+    return { k: f.k, label: f.label, yes: avg(yes), no: avg(no), nYes: yes.length, nNo: no.length, diff: avg(yes) - avg(no) };
+  }).filter(Boolean).sort((a, b) => b.diff - a.diff);
+  return { rated: rated.length, rows };
+}
+// Did the person do the primer the day before? Noted when the Workout tab shows a primer day with sets logged.
+function athNotePrimer() {
+  try {
+    const s = athState(); if(!s.sport) return;
+    const idx = getTodayIdx();
+    if(athU(idx, s.gameDow) !== 1 || selectedProgram !== 'tridentAthlete') return;
+    const log = workoutState.logs[`tridentAthlete_w${workoutWeek}_d${idx}`];
+    const any = log && Object.values(log).some(sets => (sets || []).some(x => x && (x.weight || x.reps || x.done)));
+    const today = localISO(new Date());
+    if(any && !(s.primerDays || []).includes(today)) { s.primerDays = (s.primerDays || []).concat(today).slice(-60); athSave(s); }
+  } catch(e) {}
+}
+function athPrimerDone(gameIso) {
+  const s = athState(), prev = athPrevISO(gameIso);
+  if((s.primerDays || []).includes(prev)) return true;
+  return s.since && s.since <= prev ? false : null;
+}
+
+// ── Card on the Workout tab ──
+function athCardHTML() {
+  const s = athState(), sp = ATH_SPORTS[s.sport];
+  if(!sp) return '';
+  athNotePrimer();
+  athTourMaybe();
+  const unrated = athUnrated();
+  const next = athNextGame();
+  const u = next ? athDaysUntil(next) : null;
+  const plan = u == null ? { train: 'Off-season: build strength, power and speed. Set a game day when your season starts to get a peak plan before every game.', carbs: mxGoals().carbs || 200, carbsNote: 'Normal day. Hit your protein.', sleep: 'Aim for 7.5+ hours.' } : athPlan(Math.min(u, 6), sp, s);
+  const ins = athInsights(s);
+  const when = u == null ? 'Off-season' : u === 0 ? `Today · ${athFmtTime(s.gameTime)}` : u === 1 ? `Tomorrow · ${athFmtTime(s.gameTime)}` : `${ATH_DOW_LONG[s.gameDow]} · in ${u} days`;
+  const top = ins.rows[0];
+  return `<div class="ath-card" onclick="athOpenPage()">
+    <div class="ath-top">
+      <div class="ath-ic">${sp.ic}</div>
+      <div style="flex:1;min-width:0;">
+        <div class="ath-eyebrow">Game Day Engine</div>
+        <div class="ath-title">${u == null ? 'Off-season' : `Next ${sp.noun.toLowerCase()}: ${when}`}</div>
+      </div>
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text3);flex-shrink:0;"><path d="M9 18l6-6-6-6"/></svg>
+    </div>
+    ${unrated ? `<button class="ath-rate-cta" onclick="event.stopPropagation();athOpenPage(true)">Rate your ${sp.noun.toLowerCase()} from ${ATH_DOW_LONG[(new Date(unrated + 'T12:00:00').getDay() + 6) % 7]} →</button>` : ''}
+    <div class="ath-today">
+      <div class="ath-row"><span class="ath-k">Train</span><span>${hyEsc(plan.train)}</span></div>
+      <div class="ath-row"><span class="ath-k">Carbs</span><span><b>${plan.carbs}g</b> · ${hyEsc(plan.carbsNote)}</span></div>
+      <div class="ath-row"><span class="ath-k">Sleep</span><span>${hyEsc(plan.sleep)}</span></div>
+    </div>
+    <div class="ath-foot">${top && top.diff > 0.2 ? `Your best ${sp.noun.toLowerCase()}s came after <b>${hyEsc(top.label)}</b>` : `Rate ${Math.max(0, ATH_MIN_GAMES - ins.rated)} more ${sp.noun.toLowerCase()}${ATH_MIN_GAMES - ins.rated === 1 ? '' : 's'} to unlock your game day formula`}</div>
+  </div>`;
+}
+
+// ── Setup: sport, game day, game time ──
+let athDraft = null;
+function athOpenSetup(after) {
+  const s = athState();
+  athDraft = { sport: s.sport || null, gameDow: s.gameDow, gameTime: s.gameTime, after: after || null };
+  athRenderSetup();
+  thOpen('athSetup');
+}
+function athRenderSetup() {
+  const d = athDraft, el = document.getElementById('athSetupBody'); if(!el) return;
+  el.innerHTML = `
+    <div class="ath-h">What's your sport?</div>
+    <div class="ath-sport-grid">${Object.entries(ATH_SPORTS).map(([k, sp]) => `<button class="ath-sport${d.sport === k ? ' on' : ''}" onclick="athDraft.sport='${k}';athRenderSetup()"><span class="ath-sport-ic">${sp.ic}</span><span>${sp.name}</span></button>`).join('')}</div>
+    <div class="ath-h">Which day do you usually ${d.sport && ATH_SPORTS[d.sport].noun === 'Fight' ? 'fight or spar hardest' : 'play'}?</div>
+    <div class="ath-dow">${ATH_DOW.map((n, i) => `<button class="ath-chip${d.gameDow === i ? ' on' : ''}" onclick="athDraft.gameDow=${i};athRenderSetup()">${n}</button>`).join('')}</div>
+    <button class="ath-chip ath-chip-wide${d.gameDow === -1 ? ' on' : ''}" onclick="athDraft.gameDow=-1;athRenderSetup()">No set day (off-season)</button>
+    ${d.gameDow >= 0 ? `<div class="ath-h">What time does it start?</div>
+    <div class="field"><div class="iw"><input type="time" id="athTime" value="${d.gameTime}" oninput="athDraft.gameTime=this.value||'10:00'"></div></div>` : ''}
+    <div class="ath-note">Your week is built backwards from ${d.gameDow >= 0 ? ATH_DOW_LONG[d.gameDow] : 'Sunday'}: heavy legs 5 days out, the last leg power day 72 hours out, a primer the day before, and recovery the day after.</div>
+    <button class="wo-start-btn" style="margin-top:18px;" ${d.sport ? '' : 'disabled'} onclick="athSaveSetup()">${d.sport ? 'Build my program' : 'Pick a sport'}</button>`;
+}
+function athSaveSetup() {
+  const d = athDraft; if(!d || !d.sport) return;
+  const s = athState();
+  if(!s.since) s.since = localISO(new Date());
+  s.sport = d.sport; s.gameDow = d.gameDow; s.gameTime = d.gameTime || '10:00';
+  athSave(s);
+  thClose();
+  if(d.after === 'start') { selectedProgram = 'tridentAthlete'; startProgram(); }
+  else { try { if(currentPage === 'workout') renderWorkout(); } catch(e) {} }
+  showToast(`${ATH_SPORTS[s.sport].name} program ready`);
+}
+
+// ── Game Day page ──
+let athPageDay = null, athRate = null;
+function athOpenPage(rateFirst) {
+  const next = athNextGame(), u = next ? athDaysUntil(next) : 3;
+  athPageDay = Math.min(u, 3);
+  const un = athUnrated();
+  athRate = un ? { date: un, rating: 0, stats: {}, result: '' } : null;
+  athRenderPage();
+  thOpen('athGame');
+  if(rateFirst) setTimeout(() => { const r = document.getElementById('athRateBox'); if(r) r.scrollIntoView({ block: 'start' }); }, 360);
+}
+function athRenderPage() {
+  const s = athState(), sp = ATH_SPORTS[s.sport], el = document.getElementById('athGamePage');
+  if(!el || !sp) return;
+  const next = athNextGame(), u = next ? athDaysUntil(next) : null;
+  const n = sp.noun.toLowerCase();
+  // 4-day countdown chips: 3 days out … game day
+  const chips = [3, 2, 1, 0].map(k => {
+    const lbl = s.gameDow < 0 ? (k === 0 ? 'Game' : `−${k}`) : ATH_DOW[(s.gameDow - k + 7) % 7];
+    return `<button class="ath-chip${athPageDay === k ? ' on' : ''}${u === k ? ' today' : ''}" onclick="athPageDay=${k};athRenderPage()">${lbl}${k === 0 ? ' 🏆' : ''}</button>`;
+  }).join('');
+  const plan = athPlan(athPageDay, sp, s);
+  const ins = athInsights(s);
+  const games = s.games.slice().sort((a, b) => a.date < b.date ? -1 : 1).slice(-12);
+  const best = ins.rows[0];
+  const bars = games.map(g => {
+    const hit = best ? athFactors(s).find(f => f.k === best.k).test(g) === true : false;
+    return `<div class="ath-bar-col"><div class="ath-bar${hit ? ' hit' : ''}" style="height:${Math.max(8, g.rating / 5 * 100)}%"></div><div class="ath-bar-lbl">${new Date(g.date + 'T12:00:00').toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' })}</div></div>`;
+  }).join('');
+  el.innerHTML = `
+    <div class="ath-hero">
+      <div class="ath-ic big">${sp.ic}</div>
+      <div class="ath-eyebrow">${sp.name}</div>
+      <div class="ath-hero-t">${u == null ? 'No set game day' : u === 0 ? `${sp.noun} day` : `${sp.noun} in ${u} day${u === 1 ? '' : 's'}`}</div>
+      <div class="ath-hero-s">${u == null ? 'Set a game day to get a peak plan for every game.' : `${ATH_DOW_LONG[s.gameDow]} · ${athFmtTime(s.gameTime)}`}</div>
+    </div>
+
+    ${athRate ? athRateHTML(sp) : ''}
+
+    <div class="ath-sec">Peak plan</div>
+    <div class="ath-box" id="athPlanBox">
+      <div class="ath-dow ath-dow4">${chips}</div>
+      <div class="ath-row"><span class="ath-k">Train</span><span>${hyEsc(plan.train)}</span></div>
+      <div class="ath-row"><span class="ath-k">Carbs</span><span><b>${plan.carbs}g</b> · ${hyEsc(plan.carbsNote)}</span></div>
+      <div class="ath-row"><span class="ath-k">Sleep</span><span>${hyEsc(plan.sleep)}</span></div>
+    </div>
+
+    <div class="ath-sec">Your game day formula</div>
+    <div class="ath-box" id="athFormulaBox">
+      ${ins.rated < ATH_MIN_GAMES ? `
+        <div class="ath-unlock">${Array.from({ length: ATH_MIN_GAMES }, (_, i) => `<span class="${i < ins.rated ? 'on' : ''}"></span>`).join('')}</div>
+        <div class="ath-ins">Rate ${ATH_MIN_GAMES - ins.rated} more ${n}${ATH_MIN_GAMES - ins.rated === 1 ? '' : 's'} and the app will show what your best ones had in common: sleep, carbs, readiness and your primer.</div>`
+      : ins.rows.length ? `
+        <div class="ath-ins">${best.diff > 0.2 ? `You average <b>${best.yes.toFixed(1)}/5</b> after ${hyEsc(best.label)}, and <b>${best.no.toFixed(1)}/5</b> without it.` : `No clear pattern yet. Keep rating your ${n}s.`}</div>
+        ${ins.rows.map(r => `<div class="ath-f"><span>${hyEsc(r.label.charAt(0).toUpperCase() + r.label.slice(1))}</span><b class="${r.diff > 0.2 ? 'up' : r.diff < -0.2 ? 'down' : ''}">${r.diff >= 0 ? '+' : ''}${r.diff.toFixed(1)}</b></div>`).join('')}`
+      : `<div class="ath-ins">Connect Apple Health and log your meals so the app can compare your sleep, carbs and readiness before each ${n}.</div>`}
+      ${games.length ? `<div class="ath-bars">${bars}</div>${best ? `<div class="ath-legend"><span class="hit"></span>${hyEsc(best.label)}<span></span>without</div>` : ''}` : ''}
+    </div>
+
+    ${games.length ? `<div class="ath-sec">Rated ${n}s</div>
+    <div class="ath-box ath-hist">${games.slice().reverse().map(g => `<div class="ath-h-row">
+      <div><div class="ath-h-d">${new Date(g.date + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}${g.result ? ` · ${g.result}` : ''}</div>
+      <div class="ath-h-m">${[g.sleep != null ? `${(g.sleep / 60).toFixed(1)}h sleep` : '', g.carbs != null ? `${g.carbs}g carbs` : '', g.ready != null ? `readiness ${g.ready}` : '', ...Object.entries(g.stats || {}).filter(([, v]) => v !== '' && v != null).map(([k, v]) => `${v} ${k.toLowerCase()}`)].filter(Boolean).join(' · ') || 'No data that day'}</div></div>
+      <div class="ath-h-r">${'★'.repeat(g.rating)}<span>${'★'.repeat(5 - g.rating)}</span></div>
+    </div>`).join('')}</div>` : ''}
+
+    ${athRate ? '' : `<button class="wo-change-prog-btn" id="athRateBtn" onclick="athStartRate()">Rate a ${n}</button>`}
+    <button class="wo-change-prog-btn" id="athChangeBtn" onclick="athOpenSetup()">Change sport or game day</button>
+    <button class="wo-change-prog-btn" onclick="thClose();setTimeout(()=>athTourStart(true),400)">Take the tour again</button>`;
+}
+function athRateHTML(sp) {
+  const r = athRate, n = sp.noun.toLowerCase();
+  return `<div class="ath-box ath-rate" id="athRateBox">
+    <div class="ath-rate-t">How did you play?</div>
+    <div class="field" style="margin:6px 0 10px;"><div class="iw"><input type="date" value="${r.date}" max="${localISO(new Date())}" onchange="athRate.date=this.value"></div></div>
+    <div class="ath-stars">${[1, 2, 3, 4, 5].map(i => `<button class="${r.rating >= i ? 'on' : ''}" onclick="athRate.rating=${i};athRenderPage()" aria-label="${i} of 5">★</button>`).join('')}</div>
+    <div class="ath-stars-l"><span>Off day</span><span>Best ever</span></div>
+    <div class="ath-stat-grid">${sp.stats.map(k => `<label class="ath-stat"><span>${k}</span><input type="number" inputmode="decimal" min="0" step="any" value="${r.stats[k] != null ? r.stats[k] : ''}" oninput="athRate.stats['${k}']=this.value"></label>`).join('')}</div>
+    <div class="ath-dow ath-res">${['Win', 'Loss', 'Draw'].map(x => `<button class="ath-chip${r.result === x ? ' on' : ''}" onclick="athRate.result=athRate.result==='${x}'?'':'${x}';athRenderPage()">${x}</button>`).join('')}</div>
+    <button class="wo-start-btn" ${r.rating ? '' : 'disabled'} onclick="athSaveRate()">Save ${n}</button>
+    <button class="wo-change-prog-btn" onclick="athSkipRate()">I didn't play</button>
+  </div>`;
+}
+function athStartRate() { athRate = { date: athUnrated() || localISO(new Date()), rating: 0, stats: {}, result: '' }; athRenderPage(); }
+function athSaveRate() {
+  const r = athRate; if(!r || !r.rating || !/^\d{4}-\d{2}-\d{2}$/.test(r.date)) return;
+  const s = athState();
+  const stats = {};
+  Object.entries(r.stats).forEach(([k, v]) => { const x = parseFloat(v); if(!isNaN(x)) stats[k] = x; });
+  const g = { date: r.date, rating: r.rating, stats, result: r.result || '', sleep: athSleepFor(r.date), carbs: athCarbsOn(athPrevISO(r.date)), ready: athReadyFor(r.date), primer: athPrimerDone(r.date), at: Date.now() };
+  s.games = s.games.filter(x => x.date !== r.date).concat(g).slice(-200);
+  athSave(s);
+  athRate = null;
+  athRenderPage();
+  try { if(currentPage === 'workout') renderWorkout(); } catch(e) {}
+  showToast(`${ATH_SPORTS[s.sport].noun} saved`);
+}
+
+// ── Athlete program tutorial: a spotlight on each part with a pop-up that explains it ──
+// Runs the first time the Athlete program shows on the Workout tab; "Take the tour again" on the Game Day page replays it.
+const ATH_TOUR_KEY = 'trident_athlete_tour_v1';
+let athTour = null, athTourQueued = false;
+function athTourMaybe() {
+  if(athTourQueued || athTour) return;
+  try { if(localStorage.getItem(ATH_TOUR_KEY)) return; } catch(e) { return; }
+  athTourQueued = true;
+  setTimeout(() => { athTourQueued = false; if(currentPage === 'workout' && document.querySelector('.ath-card') && !document.querySelector('.th-page.open')) athTourStart(); }, 700);
+}
+function athTourSteps() {
+  const s = athState(), sp = ATH_SPORTS[s.sport] || ATH_SPORTS.flag, n = sp.noun.toLowerCase();
+  const gd = s.gameDow < 0 ? 'game day' : ATH_DOW_LONG[s.gameDow];
+  const onPage = () => { if(!document.getElementById('th-athGame').classList.contains('open')) athOpenPage(); };
+  const offPage = () => { if(document.querySelector('.th-page.open')) thClose(); };
+  return [
+    { el: '.wo-preview-program-card .wo-preview-prog-desc', before: offPage, title: `Welcome, ${sp.name.toLowerCase().replace(/^./, c => c.toUpperCase())} athlete ${sp.ic}`,
+      text: `Your week is built backwards from ${gd}: heavy legs 5 days out, the last leg power day 72 hours out, a primer the day before, and recovery the day after. You peak right when it counts.` },
+    { el: '.ath-card .ath-top', before: offPage, title: 'Your Game Day Engine',
+      text: `This card counts down to your next ${n}. Tap it any time to open the full Game Day page.` },
+    { el: '.ath-card .ath-today', before: offPage, title: 'Today\'s plan: train, carbs, sleep',
+      text: `This changes every day as the ${n} gets closer. Carbs go up two days out with a carb load the day before, and you get a bedtime the night before.` },
+    { el: '.wo-preview-day-card .wo-preview-ex-list', before: offPage, title: 'Today\'s session',
+      text: `Matched to how far you are from the ${n}. Tap Start Workout and log it like any other workout. On the day before, it's a 15-minute primer to wake your legs up.` },
+    { el: '#athPlanBox', before: onPage, title: 'The peak plan',
+      text: `Tap the days to see exactly what to do on each of the 3 days before your ${n}, and on ${n} day itself (breakfast timing and warm-up).` },
+    { el: '#athRateBox, #athRateBtn', before: onPage, title: `Rate every ${n}`,
+      text: `After each ${n}, a reminder shows on your Workout card. Give it 1–5 stars, add your ${sp.stats.slice(0, 2).join(' and ').toLowerCase()}, and save. It takes 10 seconds.` },
+    { el: '#athFormulaBox', before: onPage, title: 'Your game day formula',
+      text: `After ${ATH_MIN_GAMES} rated ${n}s, the app compares your sleep, carbs, readiness and primer before each one, and shows what your best ${n}s had in common.` },
+    { el: '#athChangeBtn', before: onPage, title: 'Change it any time',
+      text: `New season or new ${n} day? Change your sport or day here and the whole week moves with it. You're all set. Go win. 🏆` },
+  ];
+}
+function athTourStart(force) {
+  if(!force) { try { if(localStorage.getItem(ATH_TOUR_KEY)) return; } catch(e) {} }
+  if(!athSport()) return;
+  if(currentPage !== 'workout') navTo('workout');
+  athTour = { i: 0, steps: athTourSteps() };
+  let ov = document.getElementById('athTourOv');
+  if(!ov) {
+    ov = document.createElement('div'); ov.id = 'athTourOv'; ov.className = 'ath-tour';
+    ov.innerHTML = '<div class="ath-tour-hole"></div><div class="ath-tour-pop" role="dialog" aria-live="polite"></div>';
+    document.body.appendChild(ov);
+    window.addEventListener('resize', () => { if(athTour) athTourPlace(); });
+  }
+  ov.classList.add('on');
+  athTourShow();
+}
+function athTourShow() {
+  const t = athTour; if(!t) return;
+  const st = t.steps[t.i];
+  try { st.before && st.before(); } catch(e) {}
+  const pop = document.querySelector('#athTourOv .ath-tour-pop');
+  pop.classList.remove('in');
+  // Wait for a page slide (Game Day page) before measuring
+  setTimeout(() => {
+    const el = document.querySelector(st.el);
+    if(!el) { if(t.i < t.steps.length - 1) { t.i++; athTourShow(); } else athTourEnd(); return; }
+    el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    const last = t.i === t.steps.length - 1;
+    pop.innerHTML = `<div class="ath-tour-step">${t.i + 1} of ${t.steps.length}</div>
+      <div class="ath-tour-t">${st.title}</div>
+      <div class="ath-tour-x">${st.text}</div>
+      <div class="ath-tour-dots">${t.steps.map((_, k) => `<span class="${k === t.i ? 'on' : ''}"></span>`).join('')}</div>
+      <div class="ath-tour-btns">
+        ${last ? '<span></span>' : '<button class="ath-tour-skip" onclick="athTourEnd()">Skip</button>'}
+        <div style="display:flex;gap:8px;">
+          ${t.i ? '<button class="ath-tour-back" onclick="athTourGo(-1)">Back</button>' : ''}
+          <button class="ath-tour-next" onclick="${last ? 'athTourEnd()' : 'athTourGo(1)'}">${last ? 'Let\'s go' : 'Next'}</button>
+        </div>
+      </div>`;
+    setTimeout(() => { athTourPlace(); pop.classList.add('in'); }, 380);
+  }, st.before && /athPlan|athRate|athFormula|athChange/.test(st.el) ? 420 : 60);
+}
+function athTourPlace() {
+  const t = athTour; if(!t) return;
+  const el = document.querySelector(t.steps[t.i].el); if(!el) return;
+  const hole = document.querySelector('#athTourOv .ath-tour-hole'), pop = document.querySelector('#athTourOv .ath-tour-pop');
+  const r = el.getBoundingClientRect(), pad = 8, vh = window.innerHeight, vw = window.innerWidth;
+  const top = Math.max(8, r.top - pad), bottom = Math.min(vh - 8, r.bottom + pad);
+  Object.assign(hole.style, { left: Math.max(6, r.left - pad) + 'px', top: top + 'px', width: Math.min(vw - 12, r.width + pad * 2) + 'px', height: Math.max(0, bottom - top) + 'px' });
+  const ph = pop.offsetHeight || 200, below = vh - bottom, above = top;
+  pop.classList.toggle('up', !(below >= ph + 20) && above > below);
+  if(below >= ph + 20) pop.style.top = (bottom + 12) + 'px';
+  else if(above >= ph + 20) pop.style.top = (top - ph - 12) + 'px';
+  else pop.style.top = Math.max(12, vh - ph - 110) + 'px';   // tall target: float over its lower part
+}
+function athTourGo(d) { if(!athTour) return; athTour.i = Math.max(0, Math.min(athTour.steps.length - 1, athTour.i + d)); athTourShow(); }
+function athTourEnd() {
+  athTour = null;
+  try { localStorage.setItem(ATH_TOUR_KEY, '1'); } catch(e) {}
+  const ov = document.getElementById('athTourOv'); if(ov) ov.classList.remove('on');
+  if(document.getElementById('th-athGame').classList.contains('open')) thClose();
+  try { const c = document.querySelector('.ath-card'); if(c) c.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch(e) {}
+}
+function athSkipRate() {
+  const s = athState(), r = athRate;
+  if(r && r.date) { s.skipped = (s.skipped || []).filter(d => d !== r.date).concat(r.date).slice(-30); athSave(s); }
+  athRate = null; athRenderPage();
+  try { if(currentPage === 'workout') renderWorkout(); } catch(e) {}
 }
 
 // ══════════════════════════════════════
